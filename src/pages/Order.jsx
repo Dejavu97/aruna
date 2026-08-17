@@ -37,7 +37,7 @@ export default function Order() {
       const created = await createInvitation(payload)
       rememberEditKey(created.slug, created.editKey)
       localStorage.removeItem(`aruna.draft.${themeId}`)
-      navigate(`/berhasil/${created.slug}`)
+      navigate(`/berhasil/${created.slug}?key=${encodeURIComponent(created.editKey)}`)
     } catch (err) {
       setError(err.message)
     } finally {

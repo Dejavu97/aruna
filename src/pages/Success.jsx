@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchInvitation, fetchSettings, getEditKey } from '../lib/api'
+import { fetchInvitation, fetchSettings, getEditKey, rememberEditKey } from '../lib/api'
 import { copyText, invitationUrl } from '../lib/utils'
 import { formatRupiah, packages, waLink } from '../data/site'
 
 export default function Success() {
   const { slug } = useParams()
+  const [params] = useSearchParams()
   const [data, setData] = useState(null)
   const [bank, setBank] = useState(null)
   const [copied, setCopied] = useState('')
-  const editKey = getEditKey(slug)
+  const editKey = params.get('key') || getEditKey(slug)
   const url = invitationUrl(slug)
+
+  useEffect(() => {
+    if (params.get('key')) rememberEditKey(slug, params.get('key'))
+  }, [slug, params])
 
   useEffect(() => {
     fetchInvitation(slug, editKey)
@@ -65,7 +70,10 @@ Mohon dicek pembayarannya.`
             <Link to={`/u/${slug}`} className="border border-ink px-4 py-2 text-xs uppercase tracking-[0.16em]">
               Buka undangan
             </Link>
-            <Link to={`/kelola/${slug}`} className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-[0.16em]">
+            <Link
+              to={editKey ? `/kelola/${slug}?key=${encodeURIComponent(editKey)}` : `/kelola/${slug}`}
+              className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-[0.16em]"
+            >
               Daftar tamu
             </Link>
           </div>
@@ -101,7 +109,7 @@ Mohon dicek pembayarannya.`
               <button type="button" className="underline" onClick={() => copy(editKey, 'key')}>
                 {copied === 'key' ? 'Tersalin' : 'Salin kode'}
               </button>
-              <Link to={`/edit/${slug}`} className="underline">
+              <Link to={`/edit/${slug}?key=${encodeURIComponent(editKey)}`} className="underline">
                 Ubah data undangan
               </Link>
             </div>

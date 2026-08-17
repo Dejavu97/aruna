@@ -1,24 +1,33 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchInvitation, getAdminKey, getEditKey, saveGuests } from '../lib/api'
+import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, saveGuests } from '../lib/api'
 import { copyText, invitationUrl } from '../lib/utils'
 import { waLink } from '../data/site'
 
 export default function Manage() {
   const { slug } = useParams()
-  const editKey = getEditKey(slug) || getAdminKey()
+  const [params] = useSearchParams()
+  const queryKey = params.get('key') || ''
+  const editKey = queryKey || getEditKey(slug) || getAdminKey()
   const [item, setItem] = useState(null)
   const [text, setText] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState('')
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
+    if (queryKey) rememberEditKey(slug, queryKey)
+  }, [slug, queryKey])
+
+  useEffect(() => {
+    if (!editKey) return
     fetchInvitation(slug, editKey)
       .then((data) => {
         setItem(data)
         setText((data.guests || []).join('\n'))
+        setError('')
       })
       .catch((err) => setError(err.message))
   }, [slug, editKey])
@@ -33,9 +42,12 @@ export default function Manage() {
   )
 
   async function save() {
+    setSaved(false)
+    setError('')
     try {
       const next = await saveGuests(slug, guests, editKey)
       setItem(next)
+      setSaved(true)
     } catch (err) {
       setError(err.message)
     }
@@ -79,6 +91,7 @@ export default function Manage() {
             Lihat undangan
           </Link>
         </div>
+        {saved && !error && <p className="mt-3 text-sm text-green-800">Daftar tamu tersimpan.</p>}
         {error && <p className="mt-3 text-sm text-red-800">{error}</p>}
         <ul className="mt-8 grid gap-3">
           {guests.map((name) => {
