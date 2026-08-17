@@ -15,7 +15,7 @@ import {
   saveUpload,
   uploadDir,
   upsert,
-  blobToken,
+  blobAuthInfo,
   useBlob,
 } from './store.js'
 
@@ -80,7 +80,7 @@ app.get('/api/health', (_req, res) => {
     ok: true,
     vercel: onVercel,
     blob: useBlob(),
-    hasBlobToken: Boolean(blobToken()),
+    auth: blobAuthInfo(),
   })
 })
 

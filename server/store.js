@@ -18,23 +18,39 @@ const defaultSettings = {
   },
 }
 
-/** On Vercel never touch the local disk — it is read-only. */
+/**
+ * Vercel Blob auth (2026):
+ * - Prefer OIDC when connected (BLOB_STORE_ID + VERCEL_OIDC_TOKEN) — no static token needed
+ * - Or long-lived BLOB_READ_WRITE_TOKEN
+ * Never write to local disk on Vercel (EROFS).
+ */
 export function useBlob() {
-  return Boolean(process.env.VERCEL) || Boolean(blobToken())
+  return Boolean(process.env.VERCEL) || canUseBlob()
+}
+
+export function canUseBlob() {
+  return Boolean(blobToken() || process.env.BLOB_STORE_ID || process.env.VERCEL)
 }
 
 export function blobToken() {
   return process.env.BLOB_READ_WRITE_TOKEN || ''
 }
 
-function requireBlobToken() {
-  const token = blobToken()
-  if (!token) {
-    throw new Error(
-      'BLOB_READ_WRITE_TOKEN belum terpasang di Environment Variables. Di Vercel: Storage → Blob → Connect ke project, centang Production, lalu Redeploy.',
-    )
+export function blobAuthInfo() {
+  return {
+    hasReadWriteToken: Boolean(blobToken()),
+    hasStoreId: Boolean(process.env.BLOB_STORE_ID),
+    hasOidc: Boolean(process.env.VERCEL_OIDC_TOKEN),
+    keys: Object.keys(process.env)
+      .filter((k) => k.includes('BLOB') || k.includes('OIDC'))
+      .sort(),
   }
-  return token
+}
+
+/** Options for @vercel/blob — omit token so OIDC can work. */
+function blobAuthOptions() {
+  const token = blobToken()
+  return token ? { token } : {}
 }
 
 export function ensureDirs() {
@@ -73,26 +89,46 @@ export function getSettings() {
 
 async function blobPut(pathname, body, extra = {}) {
   const { put } = await import('@vercel/blob')
-  return put(pathname, body, {
-    access: 'public',
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    token: requireBlobToken(),
-    ...extra,
-  })
+  try {
+    return await put(pathname, body, {
+      access: 'public',
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      ...blobAuthOptions(),
+      ...extra,
+    })
+  } catch (err) {
+    const msg = err?.message || String(err)
+    if (/token|auth|oidc|unauthorized|forbidden/i.test(msg)) {
+      throw new Error(
+        `${msg} — Hubungkan Blob di Vercel Storage ke project ini (Connect → Production), atau tempel BLOB_READ_WRITE_TOKEN di Environment Variables, lalu Redeploy.`,
+      )
+    }
+    throw err
+  }
 }
 
 async function blobReadJson(pathname, fallback) {
   const { list } = await import('@vercel/blob')
-  const { blobs } = await list({
-    prefix: pathname,
-    limit: 1,
-    token: requireBlobToken(),
-  })
-  if (!blobs[0]) return fallback
-  const res = await fetch(blobs[0].url, { cache: 'no-store' })
-  if (!res.ok) return fallback
-  return res.json()
+  try {
+    const { blobs } = await list({
+      prefix: pathname,
+      limit: 1,
+      ...blobAuthOptions(),
+    })
+    if (!blobs[0]) return fallback
+    const res = await fetch(blobs[0].url, { cache: 'no-store' })
+    if (!res.ok) return fallback
+    return res.json()
+  } catch (err) {
+    const msg = err?.message || String(err)
+    if (/token|auth|oidc|unauthorized|forbidden/i.test(msg)) {
+      throw new Error(
+        `${msg} — Hubungkan Blob di Vercel Storage ke project ini, lalu Redeploy.`,
+      )
+    }
+    throw err
+  }
 }
 
 export async function listAll() {
@@ -133,7 +169,6 @@ export async function saveUpload(file) {
   const ext = path.extname(file.originalname || '').toLowerCase() || mimeExt(file.mimetype)
   const filename = `${Date.now()}-${Math.random().toString(16).slice(2, 10)}${ext}`
 
-  // Never write to disk on Vercel (EROFS)
   if (useBlob()) {
     const blob = await blobPut(`aruna/uploads/${filename}`, file.buffer, {
       contentType: file.mimetype || 'application/octet-stream',
