@@ -159,6 +159,7 @@ app.post('/api/invitations', async (req, res) => {
     gallery: body.gallery || [],
     music: body.music || '',
     qris: body.qris || '',
+    backdrop: body.backdrop || '',
     customerName: body.customerName || '',
     customerWhatsapp: body.customerWhatsapp || '',
     customerNote: body.customerNote || '',

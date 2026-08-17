@@ -39,6 +39,7 @@ export function blankWedding(themeId) {
     gallery: [],
     music: '',
     qris: '',
+    backdrop: '',
     customerName: '',
     customerWhatsapp: '',
     customerNote: '',
@@ -250,6 +251,11 @@ export default function WeddingForm({
                 </Pair>
               ))}
             </div>
+            <MediaUpload
+              label="Foto background (otomatis di-blur). Kosong = template tema"
+              value={form.backdrop}
+              onChange={(v) => update('backdrop', v)}
+            />
             <MediaUpload
               label="Foto QRIS (opsional)"
               value={form.qris}

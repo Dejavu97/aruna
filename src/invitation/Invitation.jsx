@@ -27,8 +27,8 @@ export default function Invitation({ data, guest = '', preview = false }) {
   }, [data])
 
   const couple = `${data.bride?.nick || ''} & ${data.groom?.nick || ''}`
-  const coverImg =
-    data.gallery?.[0] || data.bride?.photo || data.groom?.photo || theme.cover
+  const coverImg = theme.cover
+  const backdropImg = data.backdrop || theme.cover
 
   async function refresh() {
     if (data.demo || preview) return
@@ -66,7 +66,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
 
   return (
     <div className="inv" data-theme={theme.id} style={cssVars}>
-      <div className="inv-backdrop" style={{ backgroundImage: `url(${coverImg})` }} aria-hidden />
+      <div className="inv-backdrop" style={{ backgroundImage: `url(${backdropImg})` }} aria-hidden />
       <div className="inv-stage">
         {!open && (
           <Cover
