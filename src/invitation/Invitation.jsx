@@ -27,6 +27,8 @@ export default function Invitation({ data, guest = '', preview = false }) {
   }, [data])
 
   const couple = `${data.bride?.nick || ''} & ${data.groom?.nick || ''}`
+  const coverImg =
+    data.gallery?.[0] || data.bride?.photo || data.groom?.photo || theme.cover
 
   async function refresh() {
     if (data.demo || preview) return
@@ -64,67 +66,71 @@ export default function Invitation({ data, guest = '', preview = false }) {
 
   return (
     <div className="inv" data-theme={theme.id} style={cssVars}>
-      {!open && (
-        <Cover
-          theme={theme}
-          data={data}
-          guest={guest}
-          couple={couple}
-          onOpen={() => {
-            setOpen(true)
-            setMusicOn(Boolean(data.music))
-          }}
-        />
-      )}
-
-      {open && (
-        <main className="inv-main">
-          {data.music && (
-            <button
-              type="button"
-              className="music-btn"
-              onClick={() => setMusicOn((v) => !v)}
-              aria-label={musicOn ? 'Matikan musik' : 'Putar musik'}
-            >
-              {musicOn ? <Pause size={16} /> : <Play size={16} />}
-            </button>
-          )}
-          {data.music && musicOn && <audio src={data.music} autoPlay loop />}
-
-          <Hero theme={theme} data={data} couple={couple} />
-          <Greeting theme={theme} text={theme.greeting} />
-          <Couple theme={theme} data={data} />
-          <Countdown tick={tick} date={data.date} />
-          <Events events={data.events || []} isDark={isDark} />
-          {data.quote && <Quote data={data} theme={theme} />}
-          {data.story?.length > 0 && <Story story={data.story} />}
-          {data.gallery?.length > 0 && (
-            <Gallery images={data.gallery} onOpen={setLightbox} />
-          )}
-          <Rsvp
-            slug={data.slug}
-            demo={data.demo}
-            preview={preview}
-            onDone={refresh}
+      <div className="inv-backdrop" style={{ backgroundImage: `url(${coverImg})` }} aria-hidden />
+      <div className="inv-stage">
+        {!open && (
+          <Cover
+            theme={theme}
+            data={data}
+            guest={guest}
+            couple={couple}
+            coverImg={coverImg}
+            onOpen={() => {
+              setOpen(true)
+              setMusicOn(Boolean(data.music))
+            }}
           />
-          <Wishes
-            slug={data.slug}
-            wishes={local.wishes || []}
-            demo={data.demo}
-            preview={preview}
-            onDone={refresh}
-          />
-          {(data.banks?.length > 0 || data.qris) && (
-            <Gift
-              banks={data.banks || []}
-              qris={data.qris}
-              copied={copied}
-              onCopy={onCopy}
+        )}
+
+        {open && (
+          <main className="inv-main">
+            {data.music && (
+              <button
+                type="button"
+                className="music-btn"
+                onClick={() => setMusicOn((v) => !v)}
+                aria-label={musicOn ? 'Matikan musik' : 'Putar musik'}
+              >
+                {musicOn ? <Pause size={16} /> : <Play size={16} />}
+              </button>
+            )}
+            {data.music && musicOn && <audio src={data.music} autoPlay loop />}
+
+            <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} />
+            <Greeting theme={theme} text={theme.greeting} />
+            <Couple theme={theme} data={data} />
+            <Countdown tick={tick} date={data.date} />
+            <Events events={data.events || []} isDark={isDark} />
+            {data.quote && <Quote data={data} theme={theme} />}
+            {data.story?.length > 0 && <Story story={data.story} />}
+            {data.gallery?.length > 0 && (
+              <Gallery images={data.gallery} onOpen={setLightbox} />
+            )}
+            <Rsvp
+              slug={data.slug}
+              demo={data.demo}
+              preview={preview}
+              onDone={refresh}
             />
-          )}
-          <Closer couple={couple} theme={theme} />
-        </main>
-      )}
+            <Wishes
+              slug={data.slug}
+              wishes={local.wishes || []}
+              demo={data.demo}
+              preview={preview}
+              onDone={refresh}
+            />
+            {(data.banks?.length > 0 || data.qris) && (
+              <Gift
+                banks={data.banks || []}
+                qris={data.qris}
+                copied={copied}
+                onCopy={onCopy}
+              />
+            )}
+            <Closer couple={couple} theme={theme} />
+          </main>
+        )}
+      </div>
 
       {lightbox !== null && (
         <button type="button" className="lightbox" onClick={() => setLightbox(null)}>
@@ -135,9 +141,9 @@ export default function Invitation({ data, guest = '', preview = false }) {
   )
 }
 
-function Cover({ theme, data, guest, couple, onOpen }) {
+function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
   return (
-    <section className="cover" style={{ backgroundImage: `url(${theme.cover})` }}>
+    <section className="cover" style={{ backgroundImage: `url(${coverImg})` }}>
       <div className="cover-shade" />
       <Corners />
       <div className="cover-inner">
@@ -159,10 +165,10 @@ function Cover({ theme, data, guest, couple, onOpen }) {
   )
 }
 
-function Hero({ theme, data, couple }) {
+function Hero({ theme, couple, data, coverImg }) {
   return (
     <section className="hero-inv">
-      <div className="hero-photo" style={{ backgroundImage: `url(${theme.cover})` }} />
+      <div className="hero-photo" style={{ backgroundImage: `url(${coverImg})` }} />
       <div className="hero-copy">
         <p className="kicker">{theme.opener}</p>
         <h2>{couple}</h2>

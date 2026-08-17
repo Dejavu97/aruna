@@ -74,10 +74,14 @@ Mohon dicek pembayarannya.`
               Buka undangan
             </Link>
             <Link
-              to={editKey ? `/kelola/${slug}?key=${encodeURIComponent(editKey)}` : `/kelola/${slug}`}
+              to={
+                editKey
+                  ? `/kelola/${slug}?key=${encodeURIComponent(editKey)}&from=customer`
+                  : `/kelola/${slug}?from=customer`
+              }
               className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-[0.16em]"
             >
-              Daftar tamu
+              Dashboard & statistik
             </Link>
           </div>
         </div>

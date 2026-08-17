@@ -51,7 +51,8 @@ export default function Edit() {
     setError('')
     try {
       await updateInvitation(slug, payload, key)
-      navigate(`/berhasil/${slug}`)
+      if (params.get('from') === 'admin') navigate('/admin')
+      else navigate(`/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -59,9 +60,21 @@ export default function Edit() {
     }
   }
 
+  const fromAdmin = params.get('from') === 'admin'
+  const backHref = fromAdmin
+    ? '/admin'
+    : key
+      ? `/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`
+      : '/'
+
   return (
     <div className="bg-ivory">
       <SiteNav />
+      <div className="mx-auto max-w-6xl px-5 pt-8">
+        <Link to={backHref} className="inline-flex text-sm text-stone hover:text-ink">
+          {fromAdmin ? '← Kembali ke admin' : '← Kembali ke dashboard'}
+        </Link>
+      </div>
       {!item ? (
         <section className="mx-auto max-w-md px-5 py-20">
           <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Revisi</p>

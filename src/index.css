@@ -45,15 +45,46 @@ body {
 
 /* Invitation */
 .inv {
+  position: relative;
   min-height: 100dvh;
   background: var(--bg);
   color: var(--fg);
   font-family: var(--body);
+  overflow-x: hidden;
+}
+
+.inv-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(32px) saturate(1.08);
+  transform: scale(1.12);
+  pointer-events: none;
+}
+
+.inv-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklab, var(--bg) 62%, transparent);
+}
+
+.inv-stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: var(--bg);
 }
 
 .cover {
   position: relative;
   min-height: 100dvh;
+  min-height: 100svh;
   background-size: cover;
   background-position: center;
   display: grid;
@@ -212,7 +243,8 @@ body {
 }
 
 .inv-main {
-  max-width: 40rem;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   background: var(--bg);
 }
@@ -222,8 +254,8 @@ body {
 }
 
 .hero-photo {
-  height: 62vh;
-  min-height: 22rem;
+  height: min(62vh, 28rem);
+  min-height: 16rem;
   background-size: cover;
   background-position: center;
 }
@@ -240,7 +272,7 @@ body {
 }
 
 .pad {
-  padding: 2.6rem 1.4rem;
+  padding: 2rem 1.15rem;
 }
 
 .center {
@@ -608,6 +640,9 @@ body {
 }
 
 @media (min-width: 640px) {
+  .pad {
+    padding: 2.6rem 1.75rem;
+  }
   .couple {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
@@ -623,5 +658,64 @@ body {
   }
   .events {
     grid-template-columns: 1fr 1fr;
+  }
+  .hero-photo {
+    height: 58vh;
+    min-height: 22rem;
+  }
+}
+
+/* Tablet & desktop: kartu undangan lebih lebar, backdrop blur terlihat di samping */
+@media (min-width: 768px) {
+  .inv-stage {
+    max-width: 34rem;
+    margin: 1.5rem auto;
+    min-height: calc(100dvh - 3rem);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--accent) 18%, transparent),
+      0 30px 80px rgba(0, 0, 0, 0.22);
+  }
+  .cover {
+    min-height: calc(100dvh - 3rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .inv-stage {
+    max-width: 40rem;
+    margin: 2rem auto;
+    min-height: calc(100dvh - 4rem);
+  }
+  .cover {
+    min-height: calc(100dvh - 4rem);
+  }
+  .cover-names {
+    font-size: clamp(3rem, 5vw, 4.2rem);
+  }
+  .pad {
+    padding: 3rem 2.25rem;
+  }
+  .hero-photo {
+    height: 26rem;
+  }
+  .person img {
+    width: 9.5rem;
+    height: 11.5rem;
+  }
+}
+
+/* HP kecil: rapikan tap target & teks */
+@media (max-width: 380px) {
+  .cover-inner {
+    padding: 1.75rem 1rem 2.5rem;
+  }
+  .cover-names {
+    font-size: 2.35rem;
+  }
+  .pad {
+    padding: 1.75rem 1rem;
+  }
+  .count strong {
+    font-size: 1.25rem;
   }
 }

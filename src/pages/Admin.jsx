@@ -14,6 +14,7 @@ import {
 } from '../lib/api'
 import { formatLongDate, invitationUrl } from '../lib/utils'
 import { formatRupiah, packages } from '../data/site'
+import { invitePath } from '../lib/nav'
 
 export default function Admin() {
   const [password, setPassword] = useState('')
@@ -153,18 +154,29 @@ export default function Admin() {
                       <Link to={`/u/${item.slug}`} className="bg-ink px-3 py-2 text-ivory">
                         Buka
                       </Link>
-                      <button
-                        type="button"
+                      <Link
+                        to={invitePath(`/edit/${item.slug}`, {
+                          key: item.editKey,
+                          from: 'admin',
+                        })}
                         className="border border-ink/20 px-3 py-2"
                         onClick={() => {
                           if (item.editKey) rememberEditKey(item.slug, item.editKey)
-                          window.location.href = `/edit/${item.slug}`
                         }}
                       >
                         Edit
-                      </button>
-                      <Link to={`/kelola/${item.slug}`} className="border border-ink/20 px-3 py-2">
-                        Tamu
+                      </Link>
+                      <Link
+                        to={invitePath(`/kelola/${item.slug}`, {
+                          key: item.editKey,
+                          from: 'admin',
+                        })}
+                        className="border border-ink/20 px-3 py-2"
+                        onClick={() => {
+                          if (item.editKey) rememberEditKey(item.slug, item.editKey)
+                        }}
+                      >
+                        Dashboard
                       </Link>
                       <button
                         type="button"
