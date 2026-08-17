@@ -18,12 +18,27 @@ const defaultSettings = {
   },
 }
 
+/** On Vercel never touch the local disk — it is read-only. */
 export function useBlob() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+  return Boolean(process.env.VERCEL) || Boolean(blobToken())
+}
+
+export function blobToken() {
+  return process.env.BLOB_READ_WRITE_TOKEN || ''
+}
+
+function requireBlobToken() {
+  const token = blobToken()
+  if (!token) {
+    throw new Error(
+      'BLOB_READ_WRITE_TOKEN belum terpasang di Environment Variables. Di Vercel: Storage → Blob → Connect ke project, centang Production, lalu Redeploy.',
+    )
+  }
+  return token
 }
 
 export function ensureDirs() {
-  if (useBlob() || process.env.VERCEL) return
+  if (useBlob()) return
   fs.mkdirSync(dataDir, { recursive: true })
   fs.mkdirSync(uploadDir, { recursive: true })
   if (!fs.existsSync(invitationsFile)) writeJson(invitationsFile, [])
@@ -62,7 +77,7 @@ async function blobPut(pathname, body, extra = {}) {
     access: 'public',
     addRandomSuffix: false,
     allowOverwrite: true,
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+    token: requireBlobToken(),
     ...extra,
   })
 }
@@ -72,7 +87,7 @@ async function blobReadJson(pathname, fallback) {
   const { blobs } = await list({
     prefix: pathname,
     limit: 1,
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+    token: requireBlobToken(),
   })
   if (!blobs[0]) return fallback
   const res = await fetch(blobs[0].url, { cache: 'no-store' })
@@ -117,12 +132,15 @@ export async function remove(slug) {
 export async function saveUpload(file) {
   const ext = path.extname(file.originalname || '').toLowerCase() || mimeExt(file.mimetype)
   const filename = `${Date.now()}-${Math.random().toString(16).slice(2, 10)}${ext}`
+
+  // Never write to disk on Vercel (EROFS)
   if (useBlob()) {
     const blob = await blobPut(`aruna/uploads/${filename}`, file.buffer, {
-      contentType: file.mimetype,
+      contentType: file.mimetype || 'application/octet-stream',
     })
     return blob.url
   }
+
   fs.writeFileSync(path.join(uploadDir, filename), file.buffer)
   return `/uploads/${filename}`
 }
@@ -135,7 +153,7 @@ function mimeExt(type) {
   if (type === 'audio/mpeg' || type === 'audio/mp3') return '.mp3'
   if (type === 'audio/wav') return '.wav'
   if (type === 'audio/ogg') return '.ogg'
-  return ''
+  return '.bin'
 }
 
 export function publicInvitation(item) {

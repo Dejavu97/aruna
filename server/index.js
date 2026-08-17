@@ -15,6 +15,7 @@ import {
   saveUpload,
   uploadDir,
   upsert,
+  blobToken,
   useBlob,
 } from './store.js'
 
@@ -75,7 +76,12 @@ async function uniqueSlug(base) {
 }
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, vercel: onVercel, blob: useBlob() })
+  res.json({
+    ok: true,
+    vercel: onVercel,
+    blob: useBlob(),
+    hasBlobToken: Boolean(blobToken()),
+  })
 })
 
 app.get('/api/settings', (_req, res) => {
