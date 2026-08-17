@@ -25,7 +25,11 @@ export default function Invitation({ data, guest = '', preview = false }) {
   const [musicOn, setMusicOn] = useState(false)
   const [showPass, setShowPass] = useState(false)
   const [local, setLocal] = useState(data)
+  const [scene, setScene] = useState('')
+  const [sceneB, setSceneB] = useState('')
+  const [useA, setUseA] = useState(true)
   const isDark = ['sage', 'noir', 'batik'].includes(theme.id)
+  const scenes = useMemo(() => sceneMap(data, theme), [data, theme])
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -39,8 +43,39 @@ export default function Invitation({ data, guest = '', preview = false }) {
   }, [data])
 
   const couple = `${data.bride?.nick || ''} & ${data.groom?.nick || ''}`
-  const coverImg = theme.cover
-  const backdropImg = data.backdrop || theme.cover
+  const coverImg = data.gallery?.[0] || data.backdrop || theme.cover
+
+  useEffect(() => {
+    const first = scenes.home
+    setScene(first)
+    setSceneB(first)
+    setUseA(true)
+  }, [scenes.home])
+
+  useEffect(() => {
+    if (!open) return
+    let current = scenes.home
+    const nodes = document.querySelectorAll('[data-scene]')
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (!hit) return
+        const src = hit.getAttribute('data-scene')
+        if (!src || src === current) return
+        current = src
+        setUseA((on) => {
+          if (on) setSceneB(src)
+          else setScene(src)
+          return !on
+        })
+      },
+      { root: null, rootMargin: '-22% 0px -48% 0px', threshold: [0.15, 0.4, 0.65] },
+    )
+    nodes.forEach((n) => io.observe(n))
+    return () => io.disconnect()
+  }, [open, scenes.home])
 
   async function refresh() {
     if (data.demo || preview) return
@@ -78,7 +113,16 @@ export default function Invitation({ data, guest = '', preview = false }) {
 
   return (
     <div className="inv" data-theme={theme.id} style={cssVars}>
-      <div className="inv-backdrop" style={{ backgroundImage: `url(${backdropImg})` }} aria-hidden />
+      <aside className="inv-photo" aria-hidden>
+        <div
+          className={`inv-photo-layer${useA ? ' is-on' : ''}`}
+          style={{ backgroundImage: `url(${scene || coverImg})` }}
+        />
+        <div
+          className={`inv-photo-layer${!useA ? ' is-on' : ''}`}
+          style={{ backgroundImage: `url(${sceneB || coverImg})` }}
+        />
+      </aside>
       <div className="inv-stage">
         {!open && (
           <Cover
@@ -108,20 +152,25 @@ export default function Invitation({ data, guest = '', preview = false }) {
             )}
             {data.music && musicOn && <audio src={data.music} autoPlay loop />}
 
-            <div id="home" />
-            <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} />
-            <Greeting theme={theme} text={theme.greeting} />
-            {data.quote && <Quote data={data} theme={theme} />}
-            <Couple theme={theme} data={data} />
-            {data.story?.length > 0 && <Story story={data.story} />}
-            <Countdown tick={tick} date={data.date} data={data} couple={couple} />
-            <Events events={data.events || []} isDark={isDark} />
-            <CheckIn data={data} guest={guest} couple={couple} onOpen={() => setShowPass(true)} />
-            <DressCode data={data} />
-            <Live data={data} />
-            <Frame data={data} guest={guest} />
+            <Hero
+              theme={theme}
+              data={data}
+              couple={couple}
+              coverImg={coverImg}
+              scene={scenes.home}
+            />
+            <Greeting theme={theme} text={theme.greeting} scene={scenes.home} />
+            {data.quote && <Quote data={data} theme={theme} scene={scenes.story} />}
+            <Couple theme={theme} data={data} scene={scenes.couple} />
+            {data.story?.length > 0 && <Story story={data.story} scene={scenes.story} />}
+            <Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} />
+            <Events events={data.events || []} isDark={isDark} scene={scenes.event} />
+            <CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} />
+            <DressCode data={data} scene={scenes.date} />
+            <Live data={data} scene={scenes.story} />
+            <Frame data={data} guest={guest} scene={scenes.gallery} />
             {data.gallery?.length > 0 && (
-              <Gallery images={data.gallery} onOpen={setLightbox} />
+              <Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} />
             )}
             <Rsvp
               slug={data.slug}
@@ -129,6 +178,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
               demo={data.demo}
               preview={preview}
               onDone={refresh}
+              scene={scenes.wishes}
             />
             <Wishes
               slug={data.slug}
@@ -137,6 +187,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
               demo={data.demo}
               preview={preview}
               onDone={refresh}
+              scene={scenes.wishes}
             />
             <Gift
               banks={data.banks || []}
@@ -145,8 +196,9 @@ export default function Invitation({ data, guest = '', preview = false }) {
               wishlist={data.wishlist || []}
               copied={copied}
               onCopy={onCopy}
+              scene={scenes.gift}
             />
-            <Closer couple={couple} theme={theme} hashtag={data.hashtag} />
+            <Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} />
             <BottomNav />
           </main>
         )}
@@ -172,7 +224,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
 
 function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
   return (
-    <section className="cover" id="home" style={{ backgroundImage: `url(${coverImg})` }}>
+    <section className="cover" id="home" data-scene={coverImg} style={{ backgroundImage: `url(${coverImg})` }}>
       <div className="cover-shade" />
       <Corners />
       <div className="cover-inner">
@@ -194,9 +246,9 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
   )
 }
 
-function Hero({ theme, couple, data, coverImg }) {
+function Hero({ theme, couple, data, coverImg, scene }) {
   return (
-    <section className="hero-inv">
+    <section className="hero-inv" data-scene={scene || coverImg}>
       <div className="hero-photo" style={{ backgroundImage: `url(${coverImg})` }} />
       <div className="hero-copy">
         <p className="kicker">{theme.opener}</p>
@@ -207,9 +259,9 @@ function Hero({ theme, couple, data, coverImg }) {
   )
 }
 
-function Greeting({ theme, text }) {
+function Greeting({ theme, text, scene }) {
   return (
-    <section className="pad center">
+    <section className="pad center" data-scene={scene}>
       {theme.layout === 'islamic' && (
         <div className="bismillah">
           <StarGeom className="orn-md" color="var(--accent)" />
@@ -226,13 +278,13 @@ function Greeting({ theme, text }) {
   )
 }
 
-function Couple({ theme, data }) {
+function Couple({ theme, data, scene }) {
   const order = [
     { who: data.bride, role: 'The Bride' },
     { who: data.groom, role: 'The Groom' },
   ]
   return (
-    <section className="pad couple" id="couple">
+    <section className="pad couple" id="couple" data-scene={scene}>
       {order.map((item) =>
         item.who ? (
           <article key={item.role} className="person">
@@ -262,7 +314,7 @@ function Couple({ theme, data }) {
   )
 }
 
-function Countdown({ tick, date, data, couple }) {
+function Countdown({ tick, date, data, couple, scene }) {
   if (!tick) return null
   const cells = [
     [tick.d, 'Hari'],
@@ -279,7 +331,7 @@ function Countdown({ tick, date, data, couple }) {
     details: `Undangan pernikahan ${couple}`,
   })
   return (
-    <section className="pad center">
+    <section className="pad center" data-scene={scene}>
       <p className="kicker">{tick.done ? 'Telah berlangsung' : 'Save the date'}</p>
       <h3 className="sec-title">{formatLongDate(date)}</h3>
       <div className="count">
@@ -299,10 +351,10 @@ function Countdown({ tick, date, data, couple }) {
   )
 }
 
-function Events({ events, isDark }) {
+function Events({ events, isDark, scene }) {
   if (!events.length) return null
   return (
-    <section className="pad" id="event">
+    <section className="pad" id="event" data-scene={scene}>
       <p className="kicker center">Waktu & tempat</p>
       <div className="events">
         {events.map((ev) => (
@@ -325,9 +377,9 @@ function Events({ events, isDark }) {
   )
 }
 
-function Quote({ data, theme }) {
+function Quote({ data, theme, scene }) {
   return (
-    <section className="pad center quote">
+    <section className="pad center quote" data-scene={scene}>
       {theme.layout === 'islamic' ? (
         <StarGeom className="orn-md" color="var(--accent)" />
       ) : (
@@ -339,9 +391,9 @@ function Quote({ data, theme }) {
   )
 }
 
-function Story({ story }) {
+function Story({ story, scene }) {
   return (
-    <section className="pad">
+    <section className="pad" data-scene={scene}>
       <p className="kicker center">Cerita kami</p>
       <ol className="story">
         {story.map((s) => (
@@ -356,9 +408,9 @@ function Story({ story }) {
   )
 }
 
-function Gallery({ images, onOpen }) {
+function Gallery({ images, onOpen, scene }) {
   return (
-    <section className="pad" id="gallery">
+    <section className="pad" id="gallery" data-scene={scene}>
       <p className="kicker center">Galeri</p>
       <div className="gallery">
         {images.map((src, i) => (
@@ -371,7 +423,7 @@ function Gallery({ images, onOpen }) {
   )
 }
 
-function Rsvp({ slug, guest, demo, preview, onDone }) {
+function Rsvp({ slug, guest, demo, preview, onDone, scene }) {
   const [form, setForm] = useState({ name: guest || '', status: 'hadir', guests: 1, note: '' })
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -391,7 +443,7 @@ function Rsvp({ slug, guest, demo, preview, onDone }) {
   }
 
   return (
-    <section className="pad" id="wishes">
+    <section className="pad" id="wishes" data-scene={scene}>
       <p className="kicker center">Konfirmasi kehadiran</p>
       <h3 className="sec-title center">RSVP</h3>
       {sent ? (
@@ -501,11 +553,11 @@ function Wishes({ slug, wishes, guest, demo, preview, onDone }) {
   )
 }
 
-function Gift({ banks, qris, address, wishlist, copied, onCopy }) {
+function Gift({ banks, qris, address, wishlist, copied, onCopy, scene }) {
   const items = (wishlist || []).filter((w) => w.title)
   if (!banks.length && !qris && !address && !items.length) return null
   return (
-    <section className="pad" id="gift">
+    <section className="pad" id="gift" data-scene={scene}>
       <p className="kicker center">Wedding gift</p>
       <h3 className="sec-title center">Tanda kasih</h3>
       <p className="lead">Doa restu Anda sudah cukup. Jika ingin memberi kado, silakan melalui rekening atau wishlist berikut.</p>
@@ -561,9 +613,9 @@ function Gift({ banks, qris, address, wishlist, copied, onCopy }) {
   )
 }
 
-function Closer({ couple, theme, hashtag }) {
+function Closer({ couple, theme, hashtag, scene }) {
   return (
-    <footer className="inv-foot">
+    <footer className="inv-foot" data-scene={scene}>
       <Divider />
       <p>Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.</p>
       <h3>{couple}</h3>
@@ -573,11 +625,11 @@ function Closer({ couple, theme, hashtag }) {
   )
 }
 
-function CheckIn({ data, guest, couple, onOpen }) {
+function CheckIn({ data, guest, onOpen, scene }) {
   const url = invitationUrl(data.slug, guest)
   const src = qrImageUrl(url)
   return (
-    <section className="pad center">
+    <section className="pad center" data-scene={scene}>
       <p className="kicker">QR check-in</p>
       <h3 className="sec-title">Kartu akses</h3>
       <p className="lead">Tunjukkan QR ini kepada penerima tamu di lokasi acara.</p>
@@ -619,11 +671,11 @@ function AccessCard({ data, guest, couple, onClose }) {
   )
 }
 
-function DressCode({ data }) {
+function DressCode({ data, scene }) {
   const colors = parseColors(data.dressColors)
   if (!colors.length && !data.dressNote) return null
   return (
-    <section className="pad center">
+    <section className="pad center" data-scene={scene}>
       <p className="kicker">A guide to attire</p>
       <h3 className="sec-title">Dress code</h3>
       {data.dressNote && <p className="lead">{data.dressNote}</p>}
@@ -638,10 +690,10 @@ function DressCode({ data }) {
   )
 }
 
-function Live({ data }) {
+function Live({ data, scene }) {
   if (!data.liveUrl) return null
   return (
-    <section className="pad center">
+    <section className="pad center" data-scene={scene}>
       <p className="kicker">Join our wedding</p>
       <h3 className="sec-title">Live streaming</h3>
       {(data.liveDate || data.liveTime) && (
@@ -657,10 +709,10 @@ function Live({ data }) {
   )
 }
 
-function Frame({ data, guest }) {
+function Frame({ data, guest, scene }) {
   if (!data.frameImage && !data.frameLink) return null
   return (
-    <section className="pad center">
+    <section className="pad center" data-scene={scene}>
       <p className="kicker">Capture your moment</p>
       <h3 className="sec-title">Wedding frame</h3>
       <p className="lead">Abadikan momen kehadiranmu dengan frame pernikahan kami.</p>
@@ -694,6 +746,29 @@ function BottomNav() {
       ))}
     </nav>
   )
+}
+
+function sceneMap(data, theme) {
+  const g = data.gallery || []
+  const pool = [
+    data.backdrop,
+    ...g,
+    data.bride?.photo,
+    data.groom?.photo,
+    theme.cover,
+  ].filter(Boolean)
+  const uniq = [...new Set(pool)]
+  const at = (i) => uniq[i % Math.max(uniq.length, 1)] || theme.cover
+  return {
+    home: g[0] || data.backdrop || theme.cover,
+    couple: data.bride?.photo || data.groom?.photo || at(1),
+    story: at(2),
+    date: at(3),
+    event: at(1),
+    gallery: g[0] || at(0),
+    wishes: at(2),
+    gift: at(3),
+  }
 }
 
 function Divider() {
