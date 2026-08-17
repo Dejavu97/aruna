@@ -61,7 +61,37 @@ export default function Manage() {
           <Link to={`/edit/${slug}`} className="mt-4 inline-block underline">
             Masukkan kode
           </Link>
+          <div className="mt-4">
+            <Link to="/" className="text-sm underline">
+              ← Kembali ke beranda
+            </Link>
+          </div>
         </div>
+      </div>
+    )
+  }
+
+  if (error && !item) {
+    return (
+      <div className="bg-ivory">
+        <SiteNav />
+        <section className="mx-auto max-w-lg px-5 py-16 text-center">
+          <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Daftar tamu</p>
+          <h1 className="mt-2 font-display text-4xl">Undangan tidak ditemukan</h1>
+          <p className="mt-4 text-sm leading-relaxed text-stone">
+            Data <strong>{slug}</strong> tidak ada di server. Biasanya karena Blob diganti / undangan
+            dibuat sebelum penyimpanan stabil. Buat undangan baru, lalu isi daftar tamu lagi.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3 text-xs uppercase tracking-[0.16em]">
+            <Link to="/tema" className="bg-ink px-4 py-3 text-ivory">
+              Buat undangan baru
+            </Link>
+            <Link to="/" className="border border-ink px-4 py-3">
+              ← Kembali
+            </Link>
+          </div>
+        </section>
+        <SiteFooter />
       </div>
     )
   }
@@ -70,7 +100,13 @@ export default function Manage() {
     <div className="bg-ivory">
       <SiteNav />
       <section className="mx-auto max-w-3xl px-5 py-14">
-        <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Daftar tamu</p>
+        <Link
+          to={editKey ? `/berhasil/${slug}?key=${encodeURIComponent(editKey)}` : `/berhasil/${slug}`}
+          className="inline-flex text-sm text-stone hover:text-ink"
+        >
+          ← Kembali ke halaman bayar
+        </Link>
+        <p className="mt-6 text-xs uppercase tracking-[0.28em] text-gold-deep">Daftar tamu</p>
         <h1 className="mt-2 font-display text-4xl">
           {item ? `${item.bride?.nick} & ${item.groom?.nick}` : slug}
         </h1>

@@ -53,10 +53,18 @@ export default function InvitationPage() {
       <div className="grid min-h-dvh place-items-center bg-ivory px-5 text-center">
         <div>
           <p className="font-display text-3xl">Undangan tidak ditemukan.</p>
-          <p className="mt-2 text-stone">Cek tautannya, atau buat undangan baru dari katalog.</p>
-          <Link to="/tema" className="mt-5 inline-block bg-ink px-4 py-2 text-xs uppercase tracking-[0.16em] text-ivory">
-            Pilih tema
-          </Link>
+          <p className="mt-2 max-w-md text-stone">
+            Tautan <code className="bg-paper px-1">/u/{slug}</code> tidak ada di server. Kalau baru
+            ganti Blob store, undangan lama hilang — buat ulang dari katalog.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link to="/tema" className="bg-ink px-4 py-2 text-xs uppercase tracking-[0.16em] text-ivory">
+              Buat undangan baru
+            </Link>
+            <Link to="/" className="border border-ink px-4 py-2 text-xs uppercase tracking-[0.16em]">
+              ← Kembali
+            </Link>
+          </div>
         </div>
       </div>
     )

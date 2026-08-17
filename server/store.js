@@ -7,7 +7,8 @@ export const dataDir = path.join(dir, 'data')
 export const uploadDir = path.join(dir, 'uploads')
 const invitationsFile = path.join(dataDir, 'invitations.json')
 const settingsFile = path.join(dataDir, 'settings.json')
-const INVITE_BLOB = 'aruna/invitations.json'
+const INVITE_PREFIX = 'aruna/invitations/'
+const LEGACY_LIST = 'aruna/invitations.json'
 
 const defaultSettings = {
   adminPassword: 'aruna2026',
@@ -19,10 +20,10 @@ const defaultSettings = {
 }
 
 /**
- * Vercel Blob auth (2026):
- * - Prefer OIDC when connected (BLOB_STORE_ID + VERCEL_OIDC_TOKEN) — no static token needed
- * - Or long-lived BLOB_READ_WRITE_TOKEN
- * Never write to local disk on Vercel (EROFS).
+ * Vercel Blob auth:
+ * - OIDC (BLOB_STORE_ID + VERCEL_OIDC_TOKEN) preferred
+ * - Or BLOB_READ_WRITE_TOKEN
+ * Each invitation is its own blob so concurrent writes cannot wipe others.
  */
 export function useBlob() {
   return Boolean(process.env.VERCEL) || canUseBlob()
@@ -47,7 +48,6 @@ export function blobAuthInfo() {
   }
 }
 
-/** Options for @vercel/blob — omit token so OIDC can work. */
 function blobAuthOptions() {
   const token = blobToken()
   return token ? { token } : {}
@@ -99,70 +99,126 @@ async function blobPut(pathname, body, extra = {}) {
     })
   } catch (err) {
     const msg = err?.message || String(err)
-    if (/token|auth|oidc|unauthorized|forbidden/i.test(msg)) {
+    if (/token|auth|oidc|unauthorized|forbidden|private store/i.test(msg)) {
       throw new Error(
-        `${msg} — Hubungkan Blob di Vercel Storage ke project ini (Connect → Production), atau tempel BLOB_READ_WRITE_TOKEN di Environment Variables, lalu Redeploy.`,
+        `${msg} — Pastikan Blob Public, Connected ke project, lalu Redeploy. Atau isi BLOB_READ_WRITE_TOKEN.`,
       )
     }
     throw err
   }
 }
 
-async function blobReadJson(pathname, fallback) {
+async function blobList(prefix) {
   const { list } = await import('@vercel/blob')
-  try {
-    const { blobs } = await list({
-      prefix: pathname,
-      limit: 1,
+  const out = []
+  let cursor
+  do {
+    const page = await list({
+      prefix,
+      cursor,
+      limit: 1000,
       ...blobAuthOptions(),
     })
-    if (!blobs[0]) return fallback
-    const res = await fetch(blobs[0].url, { cache: 'no-store' })
-    if (!res.ok) return fallback
-    return res.json()
-  } catch (err) {
-    const msg = err?.message || String(err)
-    if (/token|auth|oidc|unauthorized|forbidden/i.test(msg)) {
-      throw new Error(
-        `${msg} — Hubungkan Blob di Vercel Storage ke project ini, lalu Redeploy.`,
-      )
-    }
-    throw err
-  }
+    out.push(...(page.blobs || []))
+    cursor = page.hasMore ? page.cursor : undefined
+  } while (cursor)
+  return out
+}
+
+async function blobReadUrl(url, fallback) {
+  const res = await fetch(url, { cache: 'no-store' })
+  if (!res.ok) return fallback
+  return res.json()
+}
+
+function invitePath(slug) {
+  return `${INVITE_PREFIX}${slug}.json`
 }
 
 export async function listAll() {
-  if (useBlob()) return blobReadJson(INVITE_BLOB, [])
-  return readJson(invitationsFile, [])
+  if (!useBlob()) return readJson(invitationsFile, [])
+
+  const blobs = await blobList(INVITE_PREFIX)
+  const files = blobs.filter((b) => b.pathname?.endsWith('.json') && b.pathname !== LEGACY_LIST)
+  if (files.length === 0) {
+    // migrate legacy single-file list if present
+    const legacy = await blobList(LEGACY_LIST)
+    if (legacy[0]) {
+      const old = await blobReadUrl(legacy[0].url, [])
+      if (Array.isArray(old) && old.length) {
+        for (const item of old) {
+          if (item?.slug) await upsert(item)
+        }
+        return old
+      }
+    }
+    return []
+  }
+
+  const items = await Promise.all(files.map((b) => blobReadUrl(b.url, null)))
+  return items
+    .filter(Boolean)
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
 }
 
 export async function findBySlug(slug) {
-  const list = await listAll()
-  return list.find((item) => item.slug === slug) || null
-}
-
-export async function saveAll(list) {
-  if (useBlob()) {
-    await blobPut(INVITE_BLOB, JSON.stringify(list, null, 2), {
-      contentType: 'application/json',
-    })
-    return
+  if (!useBlob()) {
+    return readJson(invitationsFile, []).find((item) => item.slug === slug) || null
   }
-  writeJson(invitationsFile, list)
+
+  const { list } = await import('@vercel/blob')
+  const pathname = invitePath(slug)
+  const { blobs } = await list({
+    prefix: pathname,
+    limit: 1,
+    ...blobAuthOptions(),
+  })
+  const hit = blobs.find((b) => b.pathname === pathname) || blobs[0]
+  if (hit) return blobReadUrl(hit.url, null)
+
+  // fallback: scan (handles slight path mismatches)
+  const all = await listAll()
+  return all.find((item) => item.slug === slug) || null
 }
 
 export async function upsert(record) {
-  const list = await listAll()
-  const i = list.findIndex((item) => item.slug === record.slug)
-  if (i >= 0) list[i] = record
-  else list.unshift(record)
-  await saveAll(list)
+  if (!record?.slug) throw new Error('Slug undangan wajib.')
+
+  if (!useBlob()) {
+    const list = readJson(invitationsFile, [])
+    const i = list.findIndex((item) => item.slug === record.slug)
+    if (i >= 0) list[i] = record
+    else list.unshift(record)
+    writeJson(invitationsFile, list)
+    return record
+  }
+
+  await blobPut(invitePath(record.slug), JSON.stringify(record, null, 2), {
+    contentType: 'application/json',
+  })
   return record
 }
 
 export async function remove(slug) {
-  const list = await listAll()
-  await saveAll(list.filter((item) => item.slug !== slug))
+  if (!useBlob()) {
+    writeJson(
+      invitationsFile,
+      readJson(invitationsFile, []).filter((item) => item.slug !== slug),
+    )
+    return
+  }
+
+  const { del, list } = await import('@vercel/blob')
+  const pathname = invitePath(slug)
+  const { blobs } = await list({
+    prefix: pathname,
+    limit: 5,
+    ...blobAuthOptions(),
+  })
+  const urls = blobs.filter((b) => b.pathname === pathname || b.pathname?.includes(`/${slug}.json`)).map((b) => b.url)
+  if (urls.length) {
+    await del(urls, blobAuthOptions())
+  }
 }
 
 export async function saveUpload(file) {

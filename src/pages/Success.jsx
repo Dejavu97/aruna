@@ -48,7 +48,10 @@ Mohon dicek pembayarannya.`
     <div className="bg-ivory">
       <SiteNav />
       <section className="mx-auto max-w-2xl px-5 py-16">
-        <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Order masuk</p>
+        <Link to="/tema" className="inline-flex text-sm text-stone hover:text-ink">
+          ← Kembali ke katalog
+        </Link>
+        <p className="mt-6 text-xs uppercase tracking-[0.28em] text-gold-deep">Order masuk</p>
         <h1 className="mt-3 font-display text-5xl">Undangan sudah hidup.</h1>
         <p className="mt-4 text-stone">
           {data
