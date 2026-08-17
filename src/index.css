@@ -47,10 +47,9 @@ body {
 .inv {
   position: relative;
   min-height: 100dvh;
-  background: var(--bg);
+  background: transparent;
   color: var(--fg);
   font-family: var(--body);
-  overflow-x: hidden;
 }
 
 .inv-photo {
@@ -79,7 +78,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: color-mix(in oklab, var(--bg) 28%, transparent);
+  background: color-mix(in oklab, var(--bg) 18%, transparent);
 }
 
 .inv-stage {
@@ -88,7 +87,9 @@ body {
   width: 100%;
   margin: 0 auto;
   min-height: 100dvh;
-  background: transparent;
+  background: color-mix(in oklab, var(--bg) 42%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .cover {
@@ -107,7 +108,7 @@ body {
 .cover-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.72));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.42));
 }
 
 [data-theme="marmer"] .cover {
@@ -115,7 +116,7 @@ body {
 }
 
 [data-theme="marmer"] .cover-shade {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(247, 245, 242, 0.88));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(247, 245, 242, 0.42));
 }
 
 .cover-inner {
@@ -257,7 +258,7 @@ body {
   width: 100%;
   max-width: 26.5rem;
   margin: 0 auto;
-  background: color-mix(in oklab, var(--bg) 92%, transparent);
+  background: transparent;
 }
 
 .hero-inv {
@@ -390,7 +391,7 @@ body {
 }
 
 .count div {
-  background: var(--paper);
+  background: color-mix(in oklab, var(--paper) 62%, transparent);
   padding: 0.9rem 0.2rem;
   border: 1px solid color-mix(in oklab, var(--accent) 28%, transparent);
 }
@@ -416,7 +417,7 @@ body {
 }
 
 .event-card {
-  background: var(--paper);
+  background: color-mix(in oklab, var(--paper) 62%, transparent);
   padding: 1.4rem 1.2rem;
   border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent);
   text-align: center;
@@ -554,7 +555,7 @@ body {
 .form select,
 .form textarea {
   border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent);
-  background: var(--paper);
+  background: color-mix(in oklab, var(--paper) 72%, transparent);
   color: var(--fg);
   padding: 0.75rem 0.8rem;
   font: inherit;
@@ -582,7 +583,7 @@ body {
 }
 
 .wishes li {
-  background: var(--paper);
+  background: color-mix(in oklab, var(--paper) 62%, transparent);
   padding: 0.9rem 1rem;
   border-left: 2px solid var(--accent);
 }
@@ -599,7 +600,7 @@ body {
 }
 
 .bank {
-  background: var(--paper);
+  background: color-mix(in oklab, var(--paper) 62%, transparent);
   padding: 1.1rem;
   text-align: center;
   border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent);
@@ -824,9 +825,6 @@ body {
   }
   .inv-main {
     max-width: 32rem;
-    box-shadow:
-      0 0 0 1px color-mix(in oklab, var(--accent) 16%, transparent),
-      0 20px 56px rgba(0, 0, 0, 0.16);
   }
   .cover {
     min-height: calc(100dvh - 2.5rem);
@@ -850,35 +848,39 @@ body {
   }
 }
 
-/* PC Attari-style: foto penuh kiri, undangan scroll kanan */
+/* PC: foto pasangan FIXED full belakang, panel undangan kaca di kanan */
 @media (min-width: 1024px) {
   .inv {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) 28rem;
-    min-height: 100dvh;
+    display: block;
+    background: transparent;
   }
   .inv-photo {
-    position: sticky;
-    top: 0;
-    inset: auto;
+    position: fixed;
+    inset: 0;
+    width: 100%;
     height: 100dvh;
     z-index: 0;
   }
   .inv-photo::after {
-    background: transparent;
+    background: color-mix(in oklab, var(--bg) 8%, transparent);
   }
   .inv-stage {
-    max-width: none;
+    position: relative;
+    z-index: 1;
+    margin-left: auto;
+    margin-right: 0;
     width: 28rem;
-    margin: 0;
-    background: var(--bg);
-    box-shadow: -16px 0 40px rgba(0, 0, 0, 0.12);
+    max-width: 38vw;
+    background: color-mix(in oklab, var(--bg) 48%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: -18px 0 50px rgba(0, 0, 0, 0.18);
   }
   .inv-main {
     max-width: none;
     width: 100%;
     margin: 0;
-    background: var(--bg);
+    background: transparent;
     box-shadow: none;
   }
   .cover {
@@ -886,15 +888,16 @@ body {
     background-image: none !important;
   }
   .cover-shade {
-    background: var(--bg);
+    background: transparent;
   }
   [data-theme='marmer'] .cover-shade {
-    background: var(--bg);
+    background: transparent;
   }
   .cover .kicker,
   .cover-names,
   .cover-date,
-  .cover-guest {
+  .cover-guest,
+  .cover .open-btn {
     color: var(--fg);
     opacity: 1;
   }
