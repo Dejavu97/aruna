@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+server/uploads/*
+!server/uploads/.gitkeep
+server/data/invitations.json
+server/data/settings.json
+server/data/*.tmp
+*.log
+.vercel

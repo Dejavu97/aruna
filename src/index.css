@@ -1,0 +1,627 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-script: "Great Vibes", cursive;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --color-ivory: #f4efe6;
+  --color-ink: #1a1714;
+  --color-gold: #b08d57;
+  --color-gold-deep: #8a6a3b;
+  --color-stone: #6b645b;
+  --color-paper: #fbf7f0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ivory);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #e6d3b0;
+  color: #1a1714;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-script {
+  font-family: var(--font-script);
+}
+
+/* Invitation */
+.inv {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+}
+
+.cover {
+  position: relative;
+  min-height: 100dvh;
+  background-size: cover;
+  background-position: center;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #f7efe2;
+}
+
+.cover-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.72));
+}
+
+[data-theme="marmer"] .cover {
+  color: #161616;
+}
+
+[data-theme="marmer"] .cover-shade {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(247, 245, 242, 0.88));
+}
+
+.cover-inner {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem 1.4rem 3rem;
+  max-width: 28rem;
+}
+
+.cover-names,
+.hero-copy h2,
+.sec-title,
+.person h3,
+.inv-foot h3 {
+  font-family: var(--display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.cover-names {
+  font-size: clamp(2.6rem, 10vw, 4rem);
+  line-height: 0.95;
+  margin: 0.4rem 0 0.6rem;
+}
+
+[data-theme="emas-senja"] .cover-names,
+[data-theme="garden"] .cover-names,
+[data-theme="noir"] .cover-names {
+  font-family: var(--script);
+  font-weight: 400;
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 0.68rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.cover .kicker {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.cover-date {
+  margin: 0.4rem 0 1.4rem;
+  letter-spacing: 0.04em;
+}
+
+.cover-guest {
+  margin: 0 auto 1.4rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid color-mix(in oklab, currentColor 30%, transparent);
+  max-width: 16rem;
+}
+
+.cover-guest span {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.cover-guest strong {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.open-btn,
+.form button,
+.bank button,
+.maps {
+  border: 1px solid var(--accent);
+  background: color-mix(in oklab, var(--accent) 16%, transparent);
+  color: inherit;
+  padding: 0.95rem 1.4rem;
+  min-height: 48px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.open-btn {
+  width: min(16rem, 100%);
+}
+
+.open-btn:hover,
+.form button:hover,
+.bank button:hover,
+.maps:hover {
+  background: var(--accent);
+  color: var(--cover);
+}
+
+[data-theme="marmer"] .open-btn,
+[data-theme="marmer"] .form button {
+  color: #111;
+}
+
+.c {
+  position: absolute;
+  width: 4.2rem;
+  z-index: 1;
+  opacity: 0.85;
+}
+
+.c.nw {
+  top: 1rem;
+  left: 1rem;
+}
+.c.ne {
+  top: 1rem;
+  right: 1rem;
+  transform: scaleX(-1);
+}
+.c.sw {
+  bottom: 1rem;
+  left: 1rem;
+  transform: scaleY(-1);
+}
+.c.se {
+  bottom: 1rem;
+  right: 1rem;
+  transform: scale(-1);
+}
+
+.inv-main {
+  max-width: 40rem;
+  margin: 0 auto;
+  background: var(--bg);
+}
+
+.hero-inv {
+  position: relative;
+}
+
+.hero-photo {
+  height: 62vh;
+  min-height: 22rem;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-copy {
+  text-align: center;
+  padding: 2rem 1.4rem 0.5rem;
+}
+
+.hero-copy h2 {
+  font-size: clamp(2.4rem, 8vw, 3.6rem);
+  margin: 0.35rem 0;
+  line-height: 0.95;
+}
+
+.pad {
+  padding: 2.6rem 1.4rem;
+}
+
+.center {
+  text-align: center;
+}
+
+.lead,
+.fine,
+.parents,
+.addr,
+.inv-foot p,
+.thanks {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.lead {
+  max-width: 30rem;
+  margin: 1rem auto 0;
+}
+
+.orn {
+  width: min(16rem, 80%);
+  margin: 0.8rem auto;
+  display: block;
+}
+
+.orn-md {
+  width: 3rem;
+  margin: 0 auto 0.8rem;
+  display: block;
+}
+
+.bismillah p {
+  font-family: var(--script);
+  font-size: 1.5rem;
+  margin: 0.2rem 0 0.4rem;
+}
+
+.couple {
+  display: grid;
+  gap: 2.2rem;
+  position: relative;
+}
+
+.person {
+  text-align: center;
+}
+
+.person img {
+  width: 8.5rem;
+  height: 10.5rem;
+  object-fit: cover;
+  margin: 0 auto 1rem;
+  filter: saturate(0.85);
+}
+
+[data-theme="marmer"] .person img {
+  width: 9.5rem;
+  height: 12rem;
+}
+
+.role {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.66rem;
+  color: var(--accent);
+  margin: 0 0 0.35rem;
+}
+
+.person h3 {
+  font-size: 1.8rem;
+  margin: 0 0 0.4rem;
+}
+
+.and-script,
+.and-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--script);
+  font-size: 3rem;
+  color: var(--accent);
+  background: var(--bg);
+  padding: 0 0.4rem;
+}
+
+.and-mark {
+  width: 2.4rem;
+  padding: 0.3rem;
+}
+
+.count {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+.count div {
+  background: var(--paper);
+  padding: 0.9rem 0.2rem;
+  border: 1px solid color-mix(in oklab, var(--accent) 28%, transparent);
+}
+
+.count strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+.count span {
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.events {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.event-card {
+  background: var(--paper);
+  padding: 1.4rem 1.2rem;
+  border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent);
+  text-align: center;
+}
+
+.event-card h3 {
+  font-family: var(--display);
+  font-size: 1.6rem;
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+}
+
+.event-card p {
+  margin: 0.15rem 0;
+}
+
+.event-card strong {
+  display: block;
+  margin: 0.7rem 0 0.2rem;
+}
+
+.maps {
+  margin-top: 1rem;
+}
+
+.fine {
+  text-align: center;
+  font-size: 0.85rem;
+  margin: 1.2rem 0 0;
+}
+
+.quote blockquote {
+  font-family: var(--display);
+  font-size: 1.55rem;
+  font-style: italic;
+  line-height: 1.45;
+  margin: 0.8rem 0 0.6rem;
+}
+
+.quote cite {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+}
+
+.story {
+  list-style: none;
+  padding: 0;
+  margin: 1.2rem 0 0;
+  display: grid;
+  gap: 1.2rem;
+}
+
+.story span {
+  color: var(--accent);
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+}
+
+.story h4 {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  margin: 0.15rem 0 0.3rem;
+  font-weight: 500;
+}
+
+.story p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.gallery button {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.gallery img,
+.lightbox img,
+.qris img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.gallery img {
+  height: 8.5rem;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  border: 0;
+  padding: 1.2rem;
+}
+
+.lightbox img {
+  max-height: 88dvh;
+  width: auto;
+  max-width: 100%;
+}
+
+.form {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.form input,
+.form select,
+.form textarea {
+  border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+  background: var(--paper);
+  color: var(--fg);
+  padding: 0.75rem 0.8rem;
+  font: inherit;
+  font-size: 16px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.form button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.thanks {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.wishes {
+  list-style: none;
+  padding: 0;
+  margin: 1.4rem 0 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.wishes li {
+  background: var(--paper);
+  padding: 0.9rem 1rem;
+  border-left: 2px solid var(--accent);
+}
+
+.wishes p {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+}
+
+.banks {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.bank {
+  background: var(--paper);
+  padding: 1.1rem;
+  text-align: center;
+  border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent);
+}
+
+.bank span {
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.bank strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  margin: 0.3rem 0;
+  letter-spacing: 0.04em;
+}
+
+.qris {
+  max-width: 14rem;
+  margin: 1.2rem auto 0;
+  padding: 0.6rem;
+  background: white;
+}
+
+.inv-foot {
+  text-align: center;
+  padding: 2rem 1.4rem max(3.4rem, env(safe-area-inset-bottom));
+}
+
+.inv-foot h3 {
+  font-size: 2rem;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.brand-mini {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.music-btn {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 20;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--paper);
+  color: var(--fg);
+  display: grid;
+  place-items: center;
+}
+
+@media (min-width: 640px) {
+  .couple {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding-top: 3rem;
+  }
+  .and-script,
+  .and-mark {
+    top: 3.6rem;
+    transform: translate(-50%, 0);
+  }
+  .gallery img {
+    height: 11rem;
+  }
+  .events {
+    grid-template-columns: 1fr 1fr;
+  }
+}
