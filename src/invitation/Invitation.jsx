@@ -1,8 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Copy, Check, MapPin, Pause, Play } from 'lucide-react'
+import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Images, Heart, Gift as GiftIcon } from 'lucide-react'
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
-import { copyText, countdownParts, formatLongDate, formatTime, pad } from '../lib/utils'
+import {
+  copyText,
+  countdownParts,
+  formatLongDate,
+  formatTime,
+  googleCalendarUrl,
+  instagramUrl,
+  invitationUrl,
+  pad,
+  parseColors,
+  qrImageUrl,
+} from '../lib/utils'
 import { getTheme } from '../data/themes'
 
 export default function Invitation({ data, guest = '', preview = false }) {
@@ -12,6 +23,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
   const [lightbox, setLightbox] = useState(null)
   const [copied, setCopied] = useState('')
   const [musicOn, setMusicOn] = useState(false)
+  const [showPass, setShowPass] = useState(false)
   const [local, setLocal] = useState(data)
   const isDark = ['sage', 'noir', 'batik'].includes(theme.id)
 
@@ -96,18 +108,24 @@ export default function Invitation({ data, guest = '', preview = false }) {
             )}
             {data.music && musicOn && <audio src={data.music} autoPlay loop />}
 
+            <div id="home" />
             <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} />
             <Greeting theme={theme} text={theme.greeting} />
-            <Couple theme={theme} data={data} />
-            <Countdown tick={tick} date={data.date} />
-            <Events events={data.events || []} isDark={isDark} />
             {data.quote && <Quote data={data} theme={theme} />}
+            <Couple theme={theme} data={data} />
             {data.story?.length > 0 && <Story story={data.story} />}
+            <Countdown tick={tick} date={data.date} data={data} couple={couple} />
+            <Events events={data.events || []} isDark={isDark} />
+            <CheckIn data={data} guest={guest} couple={couple} onOpen={() => setShowPass(true)} />
+            <DressCode data={data} />
+            <Live data={data} />
+            <Frame data={data} guest={guest} />
             {data.gallery?.length > 0 && (
               <Gallery images={data.gallery} onOpen={setLightbox} />
             )}
             <Rsvp
               slug={data.slug}
+              guest={guest}
               demo={data.demo}
               preview={preview}
               onDone={refresh}
@@ -115,22 +133,33 @@ export default function Invitation({ data, guest = '', preview = false }) {
             <Wishes
               slug={data.slug}
               wishes={local.wishes || []}
+              guest={guest}
               demo={data.demo}
               preview={preview}
               onDone={refresh}
             />
-            {(data.banks?.length > 0 || data.qris) && (
-              <Gift
-                banks={data.banks || []}
-                qris={data.qris}
-                copied={copied}
-                onCopy={onCopy}
-              />
-            )}
-            <Closer couple={couple} theme={theme} />
+            <Gift
+              banks={data.banks || []}
+              qris={data.qris}
+              address={data.giftAddress}
+              wishlist={data.wishlist || []}
+              copied={copied}
+              onCopy={onCopy}
+            />
+            <Closer couple={couple} theme={theme} hashtag={data.hashtag} />
+            <BottomNav />
           </main>
         )}
       </div>
+
+      {showPass && (
+        <AccessCard
+          data={data}
+          guest={guest}
+          couple={couple}
+          onClose={() => setShowPass(false)}
+        />
+      )}
 
       {lightbox !== null && (
         <button type="button" className="lightbox" onClick={() => setLightbox(null)}>
@@ -143,7 +172,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
 
 function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
   return (
-    <section className="cover" style={{ backgroundImage: `url(${coverImg})` }}>
+    <section className="cover" id="home" style={{ backgroundImage: `url(${coverImg})` }}>
       <div className="cover-shade" />
       <Corners />
       <div className="cover-inner">
@@ -199,11 +228,11 @@ function Greeting({ theme, text }) {
 
 function Couple({ theme, data }) {
   const order = [
-    { who: data.bride, role: 'Mempelai Wanita' },
-    { who: data.groom, role: 'Mempelai Pria' },
+    { who: data.bride, role: 'The Bride' },
+    { who: data.groom, role: 'The Groom' },
   ]
   return (
-    <section className="pad couple">
+    <section className="pad couple" id="couple">
       {order.map((item) =>
         item.who ? (
           <article key={item.role} className="person">
@@ -211,6 +240,16 @@ function Couple({ theme, data }) {
             <p className="role">{item.role}</p>
             <h3>{item.who.full || item.who.nick}</h3>
             <p className="parents">{item.who.parents}</p>
+            {item.who.ig && (
+              <a
+                className="ig-link"
+                href={instagramUrl(item.who.ig)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                @{String(item.who.ig).replace(/^@/, '')}
+              </a>
+            )}
           </article>
         ) : null,
       )}
@@ -223,7 +262,7 @@ function Couple({ theme, data }) {
   )
 }
 
-function Countdown({ tick, date }) {
+function Countdown({ tick, date, data, couple }) {
   if (!tick) return null
   const cells = [
     [tick.d, 'Hari'],
@@ -231,9 +270,17 @@ function Countdown({ tick, date }) {
     [tick.m, 'Menit'],
     [tick.s, 'Detik'],
   ]
+  const first = data?.events?.[0]
+  const cal = googleCalendarUrl({
+    title: `The Wedding of ${couple}`,
+    date: first?.date || date,
+    time: first?.time || '09:00',
+    venue: first?.venue || '',
+    details: `Undangan pernikahan ${couple}`,
+  })
   return (
     <section className="pad center">
-      <p className="kicker">{tick.done ? 'Telah berlangsung' : 'Menghitung hari'}</p>
+      <p className="kicker">{tick.done ? 'Telah berlangsung' : 'Save the date'}</p>
       <h3 className="sec-title">{formatLongDate(date)}</h3>
       <div className="count">
         {cells.map(([n, label]) => (
@@ -243,6 +290,11 @@ function Countdown({ tick, date }) {
           </div>
         ))}
       </div>
+      {cal && (
+        <a className="maps" href={cal} target="_blank" rel="noreferrer">
+          Simpan tanggal
+        </a>
+      )}
     </section>
   )
 }
@@ -250,7 +302,7 @@ function Countdown({ tick, date }) {
 function Events({ events, isDark }) {
   if (!events.length) return null
   return (
-    <section className="pad">
+    <section className="pad" id="event">
       <p className="kicker center">Waktu & tempat</p>
       <div className="events">
         {events.map((ev) => (
@@ -306,7 +358,7 @@ function Story({ story }) {
 
 function Gallery({ images, onOpen }) {
   return (
-    <section className="pad">
+    <section className="pad" id="gallery">
       <p className="kicker center">Galeri</p>
       <div className="gallery">
         {images.map((src, i) => (
@@ -319,8 +371,8 @@ function Gallery({ images, onOpen }) {
   )
 }
 
-function Rsvp({ slug, demo, preview, onDone }) {
-  const [form, setForm] = useState({ name: '', status: 'hadir', guests: 1, note: '' })
+function Rsvp({ slug, guest, demo, preview, onDone }) {
+  const [form, setForm] = useState({ name: guest || '', status: 'hadir', guests: 1, note: '' })
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
   const locked = demo || preview
@@ -339,7 +391,7 @@ function Rsvp({ slug, demo, preview, onDone }) {
   }
 
   return (
-    <section className="pad">
+    <section className="pad" id="wishes">
       <p className="kicker center">Konfirmasi kehadiran</p>
       <h3 className="sec-title center">RSVP</h3>
       {sent ? (
@@ -394,8 +446,8 @@ function Rsvp({ slug, demo, preview, onDone }) {
   )
 }
 
-function Wishes({ slug, wishes, demo, preview, onDone }) {
-  const [form, setForm] = useState({ name: '', message: '' })
+function Wishes({ slug, wishes, guest, demo, preview, onDone }) {
+  const [form, setForm] = useState({ name: guest || '', message: '' })
   const [busy, setBusy] = useState(false)
   const locked = demo || preview
 
@@ -449,12 +501,14 @@ function Wishes({ slug, wishes, demo, preview, onDone }) {
   )
 }
 
-function Gift({ banks, qris, copied, onCopy }) {
+function Gift({ banks, qris, address, wishlist, copied, onCopy }) {
+  const items = (wishlist || []).filter((w) => w.title)
+  if (!banks.length && !qris && !address && !items.length) return null
   return (
-    <section className="pad">
-      <p className="kicker center">Tanda kasih</p>
-      <h3 className="sec-title center">Amplop digital</h3>
-      <p className="lead">Doa restu Anda sudah cukup. Jika ingin memberi kado, silakan melalui rekening berikut.</p>
+    <section className="pad" id="gift">
+      <p className="kicker center">Wedding gift</p>
+      <h3 className="sec-title center">Tanda kasih</h3>
+      <p className="lead">Doa restu Anda sudah cukup. Jika ingin memberi kado, silakan melalui rekening atau wishlist berikut.</p>
       <div className="banks">
         {banks.map((b) => (
           <article key={b.number} className="bank">
@@ -473,18 +527,172 @@ function Gift({ banks, qris, copied, onCopy }) {
           <img src={qris} alt="QRIS" />
         </div>
       )}
+      {address && (
+        <article className="bank">
+          <span>Kirim kado</span>
+          <p>{address}</p>
+          <button type="button" onClick={() => onCopy(address, 'addr')}>
+            {copied === 'addr' ? 'Tersalin' : 'Salin alamat'}
+          </button>
+        </article>
+      )}
+      {items.length > 0 && (
+        <div className="wishlist">
+          <p className="kicker center">Rekomendasi kado</p>
+          <ul>
+            {items.map((w) => (
+              <li key={w.title}>
+                {w.image && <img src={w.image} alt="" />}
+                <div>
+                  <strong>{w.title}</strong>
+                  {w.price && <p>{w.price}</p>}
+                  {w.url && (
+                    <a href={w.url} target="_blank" rel="noreferrer">
+                      Lihat
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   )
 }
 
-function Closer({ couple, theme }) {
+function Closer({ couple, theme, hashtag }) {
   return (
     <footer className="inv-foot">
       <Divider />
       <p>Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.</p>
       <h3>{couple}</h3>
+      {hashtag && <p className="hashtag">{hashtag.startsWith('#') ? hashtag : `#${hashtag}`}</p>}
       <p className="brand-mini">Dibuat dengan Aruna · Tema {theme.name}</p>
     </footer>
+  )
+}
+
+function CheckIn({ data, guest, couple, onOpen }) {
+  const url = invitationUrl(data.slug, guest)
+  const src = qrImageUrl(url)
+  return (
+    <section className="pad center">
+      <p className="kicker">QR check-in</p>
+      <h3 className="sec-title">Kartu akses</h3>
+      <p className="lead">Tunjukkan QR ini kepada penerima tamu di lokasi acara.</p>
+      <img className="qr-img" src={src} alt="QR check-in" />
+      {guest && <p className="fine">Kepada Yth. {guest}</p>}
+      <button type="button" className="maps" onClick={onOpen}>
+        Buka kartu akses
+      </button>
+    </section>
+  )
+}
+
+function AccessCard({ data, guest, couple, onClose }) {
+  const url = invitationUrl(data.slug, guest)
+  const src = qrImageUrl(url, 280)
+  return (
+    <div className="pass-overlay" role="dialog">
+      <div className="pass-card">
+        <p className="kicker">Kartu akses masuk</p>
+        <h3>{couple}</h3>
+        <p>{formatLongDate(data.date)}</p>
+        {guest && (
+          <p>
+            Kepada Yth.
+            <br />
+            <strong>{guest}</strong>
+          </p>
+        )}
+        <img className="qr-img" src={src} alt="QR" />
+        <p className="fine">Tunjukkan QR ini di lokasi acara.</p>
+        <a className="maps" href={src} download="kartu-akses.png" target="_blank" rel="noreferrer">
+          Unduh QR
+        </a>
+        <button type="button" className="pass-close" onClick={onClose}>
+          Tutup
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function DressCode({ data }) {
+  const colors = parseColors(data.dressColors)
+  if (!colors.length && !data.dressNote) return null
+  return (
+    <section className="pad center">
+      <p className="kicker">A guide to attire</p>
+      <h3 className="sec-title">Dress code</h3>
+      {data.dressNote && <p className="lead">{data.dressNote}</p>}
+      {colors.length > 0 && (
+        <div className="swatches">
+          {colors.map((c) => (
+            <span key={c} style={{ background: c }} title={c} />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function Live({ data }) {
+  if (!data.liveUrl) return null
+  return (
+    <section className="pad center">
+      <p className="kicker">Join our wedding</p>
+      <h3 className="sec-title">Live streaming</h3>
+      {(data.liveDate || data.liveTime) && (
+        <p>
+          {data.liveDate ? formatLongDate(data.liveDate) : ''} {data.liveTime ? formatTime(data.liveTime) : ''}
+        </p>
+      )}
+      {data.liveNote && <p className="lead">{data.liveNote}</p>}
+      <a className="maps" href={data.liveUrl} target="_blank" rel="noreferrer">
+        Join live
+      </a>
+    </section>
+  )
+}
+
+function Frame({ data, guest }) {
+  if (!data.frameImage && !data.frameLink) return null
+  return (
+    <section className="pad center">
+      <p className="kicker">Capture your moment</p>
+      <h3 className="sec-title">Wedding frame</h3>
+      <p className="lead">Abadikan momen kehadiranmu dengan frame pernikahan kami.</p>
+      {data.frameImage && <img className="frame-preview" src={data.frameImage} alt="Wedding frame" />}
+      {guest && <p className="fine">Hi, {guest}</p>}
+      {data.frameLink && (
+        <a className="maps" href={data.frameLink} target="_blank" rel="noreferrer">
+          Buka frame
+        </a>
+      )}
+    </section>
+  )
+}
+
+function BottomNav() {
+  const items = [
+    ['#home', Home, 'Home'],
+    ['#couple', Users, 'Mempelai'],
+    ['#event', CalendarDays, 'Acara'],
+    ['#gallery', Images, 'Galeri'],
+    ['#wishes', Heart, 'RSVP'],
+    ['#gift', GiftIcon, 'Kado'],
+  ]
+  return (
+    <nav className="inv-nav" aria-label="Navigasi undangan">
+      {items.map(([href, Icon, label]) => (
+        <a key={href} href={href}>
+          <Icon size={16} />
+          <span>{label}</span>
+        </a>
+      ))}
+    </nav>
   )
 }
 

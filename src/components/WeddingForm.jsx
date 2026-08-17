@@ -17,8 +17,8 @@ const emptyEvent = () => ({
 export function blankWedding(themeId) {
   return {
     themeId,
-    bride: { nick: '', full: '', parents: '', photo: '' },
-    groom: { nick: '', full: '', parents: '', photo: '' },
+    bride: { nick: '', full: '', parents: '', photo: '', ig: '' },
+    groom: { nick: '', full: '', parents: '', photo: '', ig: '' },
     date: '',
     slug: '',
     quote: '',
@@ -40,6 +40,21 @@ export function blankWedding(themeId) {
     music: '',
     qris: '',
     backdrop: '',
+    hashtag: '',
+    dressColors: '#C9A36A,#F4EFE6,#2A241C',
+    dressNote: '',
+    liveUrl: '',
+    liveDate: '',
+    liveTime: '',
+    liveNote: '',
+    frameImage: '',
+    frameLink: '',
+    giftAddress: '',
+    wishlist: [
+      { title: '', price: '', image: '', url: '' },
+      { title: '', price: '', image: '', url: '' },
+      { title: '', price: '', image: '', url: '' },
+    ],
     customerName: '',
     customerWhatsapp: '',
     customerNote: '',
@@ -116,6 +131,7 @@ export default function WeddingForm({
       story: form.story.filter((s) => s.title || s.body),
       banks: form.banks.filter((b) => b.bank && b.number),
       events: form.events.filter((ev) => ev.title && ev.venue),
+      wishlist: (form.wishlist || []).filter((w) => w.title),
     }
     onSubmit(payload)
   }
@@ -182,6 +198,11 @@ export default function WeddingForm({
                 value={form.bride.photo}
                 onChange={(v) => update('bride.photo', v)}
               />
+              <Field
+                label="Instagram (tanpa @)"
+                value={form.bride.ig}
+                onChange={(v) => update('bride.ig', v)}
+              />
             </Pair>
             <Pair title="Mempelai pria">
               <Field label="Nama panggilan" value={form.groom.nick} onChange={(v) => update('groom.nick', v)} />
@@ -191,6 +212,11 @@ export default function WeddingForm({
                 label="Foto mempelai pria"
                 value={form.groom.photo}
                 onChange={(v) => update('groom.photo', v)}
+              />
+              <Field
+                label="Instagram (tanpa @)"
+                value={form.groom.ig}
+                onChange={(v) => update('groom.ig', v)}
               />
             </Pair>
             <Field label="Tanggal pernikahan" type="date" value={form.date} onChange={(v) => update('date', v)} />
@@ -273,6 +299,42 @@ export default function WeddingForm({
               onChange={(v) => update('music', v)}
               accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
             />
+            <Field label="Hashtag" value={form.hashtag} onChange={(v) => update('hashtag', v)} hint="Contoh: #DimasShelly" />
+            <Field
+              label="Warna dress code (hex, pisah koma)"
+              value={form.dressColors}
+              onChange={(v) => update('dressColors', v)}
+            />
+            <Field label="Catatan dress code" value={form.dressNote} onChange={(v) => update('dressNote', v)} />
+            <Field label="Link live streaming" value={form.liveUrl} onChange={(v) => update('liveUrl', v)} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Tanggal live" type="date" value={form.liveDate} onChange={(v) => update('liveDate', v)} />
+              <Field label="Jam live" type="time" value={form.liveTime} onChange={(v) => update('liveTime', v)} />
+            </div>
+            <Field label="Catatan live" value={form.liveNote} onChange={(v) => update('liveNote', v)} />
+            <MediaUpload
+              label="Gambar wedding frame (opsional)"
+              value={form.frameImage}
+              onChange={(v) => update('frameImage', v)}
+            />
+            <Field
+              label="Link Instagram / highlight frame"
+              value={form.frameLink}
+              onChange={(v) => update('frameLink', v)}
+            />
+            <Field label="Alamat kirim kado" value={form.giftAddress} onChange={(v) => update('giftAddress', v)} />
+            {form.wishlist.map((w, i) => (
+              <Pair key={i} title={`Wishlist ${i + 1}`}>
+                <Field label="Nama barang" value={w.title} onChange={(v) => update(`wishlist.${i}.title`, v)} />
+                <Field label="Harga" value={w.price} onChange={(v) => update(`wishlist.${i}.price`, v)} />
+                <Field label="Link beli" value={w.url} onChange={(v) => update(`wishlist.${i}.url`, v)} />
+                <MediaUpload
+                  label="Foto barang"
+                  value={w.image}
+                  onChange={(v) => update(`wishlist.${i}.image`, v)}
+                />
+              </Pair>
+            ))}
           </div>
         )}
 

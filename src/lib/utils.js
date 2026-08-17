@@ -65,3 +65,53 @@ export async function copyText(text) {
 export function pad(n) {
   return String(n).padStart(2, '0')
 }
+
+export function googleCalendarUrl({ title, date, time = '09:00', endTime, venue, details }) {
+  if (!date) return ''
+  const start = toGCal(date, time)
+  const end = toGCal(date, endTime || addHours(time, 3))
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title || 'Wedding',
+    dates: `${start}/${end}`,
+    location: venue || '',
+    details: details || '',
+  })
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
+
+function addHours(time, hours) {
+  const [h, m] = (time || '09:00').split(':').map(Number)
+  const d = new Date(2000, 0, 1, h || 0, m || 0)
+  d.setHours(d.getHours() + hours)
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function toGCal(date, time) {
+  const local = new Date(`${date}T${time || '09:00'}:00`)
+  if (Number.isNaN(local.getTime())) return ''
+  const y = local.getFullYear()
+  const mo = pad(local.getMonth() + 1)
+  const d = pad(local.getDate())
+  const h = pad(local.getHours())
+  const mi = pad(local.getMinutes())
+  return `${y}${mo}${d}T${h}${mi}00`
+}
+
+export function instagramUrl(handle) {
+  if (!handle) return ''
+  const name = String(handle).replace(/^@/, '').trim()
+  return name ? `https://www.instagram.com/${name}` : ''
+}
+
+export function qrImageUrl(data, size = 260) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=10&data=${encodeURIComponent(data)}`
+}
+
+export function parseColors(value) {
+  return String(value || '')
+    .split(/[,|\s]+/)
+    .map((c) => c.trim())
+    .filter((c) => /^#?[0-9a-fA-F]{3,8}$/.test(c))
+    .map((c) => (c.startsWith('#') ? c : `#${c}`))
+}
