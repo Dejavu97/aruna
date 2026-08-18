@@ -397,8 +397,7 @@ body {
   top: 50%;
   transform: translate(-50%, -50%);
   color: var(--accent);
-  background: color-mix(in oklab, var(--bg) 90%, transparent);
-  padding: 0 0.4rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 
 .and-script {
