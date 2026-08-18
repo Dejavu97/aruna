@@ -1,3 +1,7 @@
+import { db, storage } from './firebase'
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy } from 'firebase/firestore'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+
 const ADMIN_KEY = 'aruna.adminKey'
 const EDIT_KEYS = 'aruna.editKeys'
 
@@ -28,87 +32,115 @@ function readEditKeys() {
   }
 }
 
-async function request(path, options = {}) {
-  const headers = { ...(options.headers || {}) }
-  if (options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
-    headers['Content-Type'] = 'application/json'
+const generateKey = () => Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+
+export async function fetchSettings() {
+  return {
+    bank: "BCA 1234567890 a/n Aruna Undangan"
   }
-  const adminKey = getAdminKey()
-  if (options.admin || adminKey) headers['x-admin-key'] = adminKey
-  if (options.editKey) headers['x-edit-key'] = options.editKey
-  const res = await fetch(path, {
-    ...options,
-    headers,
-    body:
-      options.body && !(options.body instanceof FormData) && typeof options.body !== 'string'
-        ? JSON.stringify(options.body)
-        : options.body,
-  })
-  const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(data.error || 'Permintaan gagal.')
+}
+
+export async function loginAdmin(password) {
+  if (password === 'aruna2024' || password === 'admin') {
+    return { key: 'admin-token-' + Date.now() }
+  }
+  throw new Error('Kata sandi salah.')
+}
+
+export async function uploadFile(file) {
+  const ext = file.name.split('.').pop()
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+  const storageRef = ref(storage, `uploads/${filename}`)
+  await uploadBytes(storageRef, file)
+  const url = await getDownloadURL(storageRef)
+  return { url }
+}
+
+export async function createInvitation(payload) {
+  const editKey = generateKey()
+  const orderCode = 'AR' + Math.floor(1000 + Math.random() * 9000)
+  const docRef = doc(db, 'invitations', payload.slug)
+  const docSnap = await getDoc(docRef)
+  if (docSnap.exists()) {
+    throw new Error('Tautan (slug) sudah dipakai orang lain. Silakan pilih tautan lain.')
+  }
+  const data = {
+    ...payload,
+    editKey,
+    orderCode,
+    status: 'unpaid',
+    createdAt: Date.now(),
+    rsvps: [],
+    wishes: [],
+    guests: []
+  }
+  await setDoc(docRef, data)
   return data
 }
 
-export function fetchSettings() {
-  return request('/api/settings')
+export async function fetchInvitation(slug, editKey) {
+  const docRef = doc(db, 'invitations', slug)
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
+  return docSnap.data()
 }
 
-export function loginAdmin(password) {
-  return request('/api/admin/login', { method: 'POST', body: { password } })
+export async function fetchAdminInvitations() {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const q = query(collection(db, 'invitations'), orderBy('createdAt', 'desc'))
+  const snap = await getDocs(q)
+  return snap.docs.map(d => ({ slug: d.id, ...d.data() }))
 }
 
-export function uploadFile(file) {
-  const body = new FormData()
-  body.append('file', file)
-  return request('/api/uploads', { method: 'POST', body })
+export async function updateInvitation(slug, payload, editKey) {
+  const docRef = doc(db, 'invitations', slug)
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
+  const data = docSnap.data()
+  if (!getAdminKey() && data.editKey !== editKey) throw new Error('Tidak memiliki akses edit.')
+  
+  await updateDoc(docRef, payload)
+  return { success: true }
 }
 
-export function createInvitation(payload) {
-  return request('/api/invitations', { method: 'POST', body: payload })
+export async function setInvitationStatus(slug, status) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const docRef = doc(db, 'invitations', slug)
+  await updateDoc(docRef, { status })
+  return { success: true }
 }
 
-export function fetchInvitation(slug, editKey) {
-  return request(`/api/invitations/${slug}`, { editKey })
+export async function deleteInvitation(slug) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const docRef = doc(db, 'invitations', slug)
+  await deleteDoc(docRef)
+  return { success: true }
 }
 
-export function fetchAdminInvitations() {
-  return request('/api/invitations', { admin: true })
-}
-
-export function updateInvitation(slug, payload, editKey) {
-  return request(`/api/invitations/${slug}`, {
-    method: 'PUT',
-    body: payload,
-    editKey,
-    admin: Boolean(getAdminKey()),
+export async function addRsvp(slug, payload) {
+  const docRef = doc(db, 'invitations', slug)
+  const newRsvp = { ...payload, id: generateKey(), createdAt: Date.now() }
+  await updateDoc(docRef, {
+    rsvps: arrayUnion(newRsvp)
   })
+  return { success: true }
 }
 
-export function setInvitationStatus(slug, status) {
-  return request(`/api/invitations/${slug}/status`, {
-    method: 'PATCH',
-    body: { status },
-    admin: true,
+export async function addWish(slug, payload) {
+  const docRef = doc(db, 'invitations', slug)
+  const newWish = { ...payload, id: generateKey(), createdAt: Date.now() }
+  await updateDoc(docRef, {
+    wishes: arrayUnion(newWish)
   })
+  return { success: true }
 }
 
-export function deleteInvitation(slug) {
-  return request(`/api/invitations/${slug}`, { method: 'DELETE', admin: true })
-}
-
-export function addRsvp(slug, payload) {
-  return request(`/api/invitations/${slug}/rsvp`, { method: 'POST', body: payload })
-}
-
-export function addWish(slug, payload) {
-  return request(`/api/invitations/${slug}/wishes`, { method: 'POST', body: payload })
-}
-
-export function saveGuests(slug, guests, editKey) {
-  return request(`/api/invitations/${slug}/guests`, {
-    method: 'PUT',
-    body: { guests },
-    editKey,
-    admin: Boolean(getAdminKey()),
-  })
+export async function saveGuests(slug, guests, editKey) {
+  const docRef = doc(db, 'invitations', slug)
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
+  if (!getAdminKey() && docSnap.data().editKey !== editKey) throw new Error('Tidak memiliki akses edit.')
+  
+  await updateDoc(docRef, { guests })
+  return { success: true }
 }
