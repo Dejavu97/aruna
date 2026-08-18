@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish } from '../lib/api'
+import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
 import { waLink } from '../data/site'
 import { backFromInvite, invitePath } from '../lib/nav'
@@ -39,14 +39,20 @@ export default function Manage() {
     if (queryKey) rememberEditKey(slug, queryKey)
   }, [slug, queryKey])
 
+  const [globalAnnouncement, setGlobalAnnouncement] = useState('')
+
   useEffect(() => {
     if (!editKey) return
-    fetchInvitation(slug, editKey)
-      .then((data) => {
+    Promise.all([
+      fetchInvitation(slug, editKey),
+      getAnnouncement()
+    ])
+      .then(([data, ann]) => {
         setItem(data)
         setText((data.guests || []).join('\n'))
         if (data.waTemplate) setWaTemplate(data.waTemplate)
         if (data.customDomain) setCustomDomain(data.customDomain)
+        setGlobalAnnouncement(ann)
         setError('')
       })
       .catch((err) => setError(err.message))
@@ -167,6 +173,13 @@ export default function Manage() {
     <div className="bg-ivory">
       <SiteNav />
       <section className="mx-auto max-w-5xl px-5 py-10 md:py-14">
+        {globalAnnouncement && (
+          <div className="mb-8 border border-gold bg-gold/10 px-6 py-4 rounded-md shadow-sm">
+            <h3 className="text-xs uppercase tracking-widest text-gold-deep mb-1 font-bold">📢 Pengumuman</h3>
+            <p className="text-sm text-ink font-medium leading-relaxed">{globalAnnouncement}</p>
+          </div>
+        )}
+
         <Link to={backHref} className="inline-flex text-sm text-stone hover:text-ink">
           {backLabel}
         </Link>

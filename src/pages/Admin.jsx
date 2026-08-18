@@ -13,6 +13,8 @@ import {
   rememberEditKey,
   setAdminKey,
   setInvitationStatus,
+  getAnnouncement,
+  saveAnnouncement
 } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
 import { formatRupiah, packages } from '../data/site'
@@ -26,6 +28,8 @@ export default function Admin() {
   const [open, setOpen] = useState(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('unpaid')
+  const [announcement, setAnnouncement] = useState('')
+  const [savingAnnouncement, setSavingAnnouncement] = useState(false)
   const [copied, setCopied] = useState('')
 
   useEffect(() => {
@@ -39,7 +43,12 @@ export default function Admin() {
   async function load() {
     try {
       setLoading(true)
-      setItems(await fetchAdminInvitations())
+      const [fetchedItems, fetchedAnnouncement] = await Promise.all([
+        fetchAdminInvitations(),
+        getAnnouncement()
+      ])
+      setItems(fetchedItems)
+      setAnnouncement(fetchedAnnouncement)
       setError('')
     } catch (err) {
       console.error(err)
@@ -148,6 +157,37 @@ export default function Admin() {
           >
             Keluar
           </button>
+        </div>
+
+        <div className="mt-8 border border-gold bg-gold/5 p-5 relative">
+          <h2 className="text-xs uppercase tracking-widest text-gold-deep mb-2 font-semibold">Spanduk Pengumuman Global</h2>
+          <p className="text-sm text-stone mb-3">Teks ini akan muncul sebagai spanduk kuning di atas dashboard kelola semua pelanggan. Kosongkan jika tidak ada pengumuman.</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input 
+              type="text"
+              value={announcement}
+              onChange={(e) => setAnnouncement(e.target.value)}
+              placeholder="Cth: Fitur buku tamu digital sudah rilis! Cek di menu Ucapan."
+              className="flex-grow border border-ink/20 p-2 text-sm bg-white"
+            />
+            <button 
+              onClick={async () => {
+                setSavingAnnouncement(true)
+                try {
+                  await saveAnnouncement(announcement)
+                  alert('Pengumuman global berhasil disimpan!')
+                } catch (err) {
+                  alert('Gagal menyimpan: ' + err.message)
+                } finally {
+                  setSavingAnnouncement(false)
+                }
+              }}
+              disabled={savingAnnouncement}
+              className="bg-gold-deep text-white px-5 py-2 text-xs uppercase tracking-widest hover:bg-gold disabled:opacity-50 whitespace-nowrap"
+            >
+              {savingAnnouncement ? 'Menyimpan...' : 'Simpan Pengumuman'}
+            </button>
+          </div>
         </div>
 
         <div className="mt-8 flex gap-4 border-b border-ink/10 pb-2 text-xs uppercase tracking-[0.16em] text-stone">

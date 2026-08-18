@@ -181,3 +181,15 @@ export async function fetchInvitationByDomain(domain) {
   if (snap.empty) throw new Error('Undangan tidak ditemukan untuk domain ini.')  
   return { slug: snap.docs[0].id, ...snap.docs[0].data() }  
 } 
+  
+export async function getAnnouncement() {  
+  try {  
+    const docSnap = await getDoc(doc(db, 'settings', 'announcement'))  
+    return docSnap.exists() ? docSnap.data().text : ''  
+  } catch { return '' }  
+}  
+  
+export async function saveAnnouncement(text) {  
+  if (!getAdminKey()) throw new Error('Unauthorized')  
+  await setDoc(doc(db, 'settings', 'announcement'), { text })  
+} 
