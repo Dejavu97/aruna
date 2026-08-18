@@ -1,6 +1,5 @@
-import { db, storage } from './firebase'
+import { db } from './firebase'
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy } from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 
 const ADMIN_KEY = 'aruna.adminKey'
 const EDIT_KEYS = 'aruna.editKeys'
@@ -48,12 +47,21 @@ export async function loginAdmin(password) {
 }
 
 export async function uploadFile(file) {
-  const ext = file.name.split('.').pop()
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const storageRef = ref(storage, `uploads/${filename}`)
-  await uploadBytes(storageRef, file)
-  const url = await getDownloadURL(storageRef)
-  return { url }
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', 'arunawedd')
+
+  const res = await fetch('https://api.cloudinary.com/v1_1/a6luorsr/image/upload', {
+    method: 'POST',
+    body: formData
+  })
+
+  if (!res.ok) {
+    throw new Error('Gagal mengupload gambar.')
+  }
+
+  const data = await res.json()
+  return { url: data.secure_url }
 }
 
 export async function createInvitation(payload) {
