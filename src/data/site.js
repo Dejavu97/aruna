@@ -13,7 +13,7 @@ export const packages = [
   {
     id: 'hemat',
     name: 'Hemat',
-    price: 199000,
+    price: 25000,
     blurb: 'Cukup untuk sebar undangan yang rapi.',
     features: [
       '1 tema pilihan',
@@ -27,7 +27,7 @@ export const packages = [
   {
     id: 'lengkap',
     name: 'Lengkap',
-    price: 399000,
+    price: 50000,
     popular: true,
     blurb: 'Paling sering dipesan. Terasa utuh.',
     features: [
@@ -43,12 +43,11 @@ export const packages = [
   {
     id: 'premium',
     name: 'Premium',
-    price: 899000,
+    price: 150000,
     blurb: 'Kalau mau beda dan ditangani sampai beres.',
     features: [
       'Semua di paket Lengkap',
       'Penyesuaian warna & ornament',
-      'Domain sendiri (opsional)',
       'Bantuan isi data 1-on-1',
       'Prioritas pengerjaan',
       'Revisi sampai puas',
