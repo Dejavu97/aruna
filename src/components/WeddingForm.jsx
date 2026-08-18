@@ -259,8 +259,18 @@ export default function WeddingForm({
 
         {step === 2 && (
           <div className="grid gap-6">
-            <Field label="Kutipan" value={form.quote} onChange={(v) => update('quote', v)} />
-            <Field label="Sumber kutipan" value={form.quoteSource} onChange={(v) => update('quoteSource', v)} />
+            <Field 
+              label="Kutipan" 
+              value={form.quote} 
+              onChange={(v) => update('quote', v)} 
+              hint="Kutipan atau ayat suci yang akan muncul di undangan."
+            />
+            <Field 
+              label="Sumber kutipan" 
+              value={form.quoteSource} 
+              onChange={(v) => update('quoteSource', v)} 
+              hint="Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa."
+            />
             {form.story.map((s, i) => (
               <div key={i} className="grid gap-3 sm:grid-cols-3">
                 <Field label="Tahun" value={s.year} onChange={(v) => update(`story.${i}.year`, v)} />
@@ -304,14 +314,30 @@ export default function WeddingForm({
               label="Warna dress code (hex, pisah koma)"
               value={form.dressColors}
               onChange={(v) => update('dressColors', v)}
+              hint="Contoh: #C9A36A (Emas), #F4EFE6 (Krem/Putih Tulang), #1a1a1a (Hitam), #000080 (Navy)"
             />
-            <Field label="Catatan dress code" value={form.dressNote} onChange={(v) => update('dressNote', v)} />
-            <Field label="Link live streaming" value={form.liveUrl} onChange={(v) => update('liveUrl', v)} />
+            <Field 
+              label="Catatan dress code" 
+              value={form.dressNote} 
+              onChange={(v) => update('dressNote', v)} 
+              hint="Contoh: Tamu undangan dihimbau memakai warna senada."
+            />
+            <Field 
+              label="Link live streaming" 
+              value={form.liveUrl} 
+              onChange={(v) => update('liveUrl', v)} 
+              hint="Tautan YouTube atau Instagram Live (jika ada)."
+            />
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Tanggal live" type="date" value={form.liveDate} onChange={(v) => update('liveDate', v)} />
               <Field label="Jam live" type="time" value={form.liveTime} onChange={(v) => update('liveTime', v)} />
             </div>
-            <Field label="Catatan live" value={form.liveNote} onChange={(v) => update('liveNote', v)} />
+            <Field 
+              label="Catatan live" 
+              value={form.liveNote} 
+              onChange={(v) => update('liveNote', v)} 
+              hint="Contoh: Siaran langsung akan dimulai 15 menit sebelum akad."
+            />
             <MediaUpload
               label="Gambar wedding frame (opsional)"
               value={form.frameImage}
