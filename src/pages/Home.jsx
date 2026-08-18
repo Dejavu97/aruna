@@ -1,12 +1,20 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import ThemeCard from '../components/ThemeCard'
 import { faqs, features, formatRupiah, packages, site, steps, testimonials, waLink } from '../data/site'
 import { themes } from '../data/themes'
+import { getAnnouncement } from '../lib/api'
 
 export default function Home() {
+  const [globalAnnouncement, setGlobalAnnouncement] = useState('')
+
+  useEffect(() => {
+    getAnnouncement().then(ann => setGlobalAnnouncement(ann)).catch(() => {})
+  }, [])
+
   return (
     <div className="relative min-h-screen text-ink">
       {/* Aesthetic Fixed Background */}
@@ -19,6 +27,12 @@ export default function Home() {
 
       {/* Content wrapper */}
       <div className="relative z-10">
+        {globalAnnouncement && (
+          <div className="bg-gold-deep text-ivory px-5 py-3 text-center text-sm font-medium">
+            <span className="mr-2">📢</span>
+            {globalAnnouncement}
+          </div>
+        )}
         <SiteNav />
         <Hero />
         <How />
