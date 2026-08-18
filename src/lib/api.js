@@ -54,7 +54,7 @@ export async function uploadFile(file) {
   formData.append('file', file)
   formData.append('upload_preset', 'arunawedd')
 
-  const res = await fetch('https://api.cloudinary.com/v1_1/a6luorsr/image/upload', {
+  const res = await fetch('https://api.cloudinary.com/v1_1/a6luorsr/auto/upload', {
     method: 'POST',
     body: formData
   })
