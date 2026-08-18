@@ -5,10 +5,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { domain } = req.body
+    const { domain, slug, editKey } = req.body
 
-    if (!domain) {
-      return res.status(400).json({ error: 'Domain is required' })
+    if (!domain || !slug || !editKey) {
+      return res.status(400).json({ error: 'Domain, slug, and editKey are required' })
+    }
+
+    // Validasi editKey ke Firebase (Mencegah spam API oleh hacker)
+    const firebaseUrl = `https://firestore.googleapis.com/v1/projects/aruna-1cfc9/databases/(default)/documents/invitations/${slug}`
+    const fbRes = await fetch(firebaseUrl)
+    const fbDoc = await fbRes.json()
+    
+    if (!fbRes.ok || !fbDoc.fields || fbDoc.fields.editKey?.stringValue !== editKey) {
+      return res.status(403).json({ error: 'Akses ditolak: Kunci rahasia (editKey) tidak valid atau undangan tidak ditemukan.' })
     }
 
     // Mengambil informasi rahasia dari environment variables Vercel

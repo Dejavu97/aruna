@@ -471,7 +471,7 @@ export default function Manage() {
                         const res = await fetch('/api/add-domain', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ domain: customDomain })
+                          body: JSON.stringify({ domain: customDomain, slug, editKey })
                         })
                         const data = await res.json()
                         if (!res.ok) throw new Error(data.error || 'Gagal menambahkan domain ke server.')
@@ -497,7 +497,7 @@ export default function Manage() {
                           const res = await fetch('/api/remove-domain', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ domain: item.customDomain })
+                            body: JSON.stringify({ domain: item.customDomain, slug, editKey })
                           })
                           const data = await res.json()
                           if (!res.ok) throw new Error(data.error || 'Gagal menghapus domain dari server.')
