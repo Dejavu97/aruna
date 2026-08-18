@@ -24,21 +24,27 @@ export default function Admin() {
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
   const [open, setOpen] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       setAuthed(Boolean(user))
+      setLoading(false)
     })
     return () => unsub()
   }, [])
 
   async function load() {
     try {
+      setLoading(true)
       setItems(await fetchAdminInvitations())
       setError('')
     } catch (err) {
+      console.error(err)
       setError(err.message)
       setAdminKey('')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -48,13 +54,26 @@ export default function Admin() {
 
   async function onLogin(e) {
     e.preventDefault()
+    if (!password) return
     try {
+      setLoading(true)
+      setError('')
       const res = await loginAdmin(password)
       setAdminKey(res.key)
       setAuthed(true)
     } catch (err) {
+      console.error(err)
       setError(err.message)
+      setLoading(false)
     }
+  }
+
+  if (loading && !authed) {
+    return (
+      <div className="bg-ivory min-h-screen flex items-center justify-center">
+        <p className="text-stone">Memuat...</p>
+      </div>
+    )
   }
 
   if (!authed) {
@@ -70,13 +89,16 @@ export default function Admin() {
           <form onSubmit={onLogin} className="mt-6 grid gap-3">
             <input
               type="password"
+              placeholder="Kata sandi..."
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="border border-ink/15 bg-paper px-3 py-3"
-              placeholder="Kata sandi admin"
+              className="border border-ink/20 bg-transparent px-4 py-2"
+              autoFocus
+              disabled={loading}
             />
-            <button type="submit" className="bg-ink py-3 text-xs uppercase tracking-[0.16em] text-ivory">
-              Masuk
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            <button type="submit" disabled={loading} className="bg-ink px-4 py-2 text-ivory disabled:opacity-50">
+              {loading ? 'Memuat...' : 'Masuk'}
             </button>
           </form>
           {error && <p className="mt-4 text-sm text-red-800">{error}</p>}
