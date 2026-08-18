@@ -25,6 +25,7 @@ export default function Admin() {
   const [error, setError] = useState('')
   const [open, setOpen] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState('unpaid')
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -108,7 +109,6 @@ export default function Admin() {
     )
   }
 
-  const [tab, setTab] = useState('unpaid')
   const now = new Date().setHours(0,0,0,0)
 
   const categorized = items.reduce((acc, item) => {
