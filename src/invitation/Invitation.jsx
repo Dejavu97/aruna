@@ -324,30 +324,39 @@ function Couple({ theme, data, scene }) {
   ]
   return (
     <section className="pad couple" id="couple" data-scene={scene}>
-      {order.map((item) =>
+      {order.map((item, index) =>
         item.who ? (
-          <article key={item.role} className="person">
-            {item.who.photo && <img src={item.who.photo} alt={item.who.nick} />}
-            <p className="role">{item.role}</p>
-            <h3>{item.who.full || item.who.nick}</h3>
-            <p className="parents">{item.who.parents}</p>
-            {item.who.ig && (
-              <a
-                className="ig-link"
-                href={instagramUrl(item.who.ig)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                @{String(item.who.ig).replace(/^@/, '')}
-              </a>
+          <div key={item.role}>
+            <article className="person glass-panel">
+              {item.who.photo && <img src={item.who.photo} alt={item.who.nick} />}
+              <div className="person-info">
+                <p className="role">{item.role}</p>
+                <h3>{item.who.full || item.who.nick}</h3>
+                <p className="parents">{item.who.parents}</p>
+                {item.who.ig && (
+                  <a
+                    className="ig-link"
+                    href={instagramUrl(item.who.ig)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    @{String(item.who.ig).replace(/^@/, '')}
+                  </a>
+                )}
+              </div>
+            </article>
+            
+            {index === 0 && (
+              <div className="and-separator">
+                {theme.layout === 'islamic' ? (
+                  <StarGeom className="and-mark" color="var(--accent)" />
+                ) : (
+                  <span className="and-script">&</span>
+                )}
+              </div>
             )}
-          </article>
+          </div>
         ) : null,
-      )}
-      {theme.layout === 'islamic' ? (
-        <StarGeom className="and-mark" color="var(--accent)" />
-      ) : (
-        <span className="and-script">&</span>
       )}
     </section>
   )

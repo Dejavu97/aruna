@@ -354,27 +354,34 @@ body {
 }
 
 .couple {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   position: relative;
 }
 
 .person {
   text-align: center;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
 }
 
 .person img {
-  width: 7.25rem;
-  height: 9.25rem;
+  width: 100%;
+  aspect-ratio: 3/4;
   object-fit: cover;
   object-position: center;
-  margin: 0 auto 0.75rem;
+  margin: 0;
   filter: saturate(0.9);
 }
 
+.person-info {
+  padding: 1.5rem;
+}
+
 [data-theme="marmer"] .person img {
-  width: 7.25rem;
-  height: 9.25rem;
+  width: 100%;
 }
 
 .role {
@@ -386,32 +393,32 @@ body {
 }
 
 .person h3 {
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   margin: 0 0 0.3rem;
 }
 
-.and-script,
-.and-mark {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--accent);
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+.and-separator {
+  text-align: center;
+  padding: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .and-script {
   font-family: var(--display);
   font-style: italic;
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 400;
+  color: var(--accent);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 
 .and-mark {
-  font-family: var(--script);
-  font-size: 3rem;
-  width: 2.4rem;
+  width: 3rem;
   padding: 0.3rem;
+  color: var(--accent);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 
 .count {
@@ -840,14 +847,8 @@ body {
     padding: 1.75rem 1.4rem;
   }
   .couple {
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
+    gap: 2rem;
     padding-top: 2.25rem;
-  }
-  .and-script,
-  .and-mark {
-    top: 2.4rem;
-    transform: translate(-50%, 0);
   }
   .events {
     grid-template-columns: 1fr 1fr;
@@ -855,10 +856,6 @@ body {
   .hero-photo {
     aspect-ratio: 4 / 5;
     max-height: 26rem;
-  }
-  .person img {
-    width: 8.5rem;
-    height: 10.75rem;
   }
 }
 
@@ -881,10 +878,6 @@ body {
   }
   .hero-copy h2 {
     font-size: 2.2rem;
-  }
-  .person img {
-    width: 9.5rem;
-    height: 12rem;
   }
   .gallery {
     grid-template-columns: 1fr 1fr;
