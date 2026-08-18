@@ -55,7 +55,10 @@ export default function BoardingInvitation({ data, guest = '', preview = false }
               
               <div className="flex justify-between items-center relative">
                 <div className="text-center">
-                  <h2 className="font-mono text-4xl text-[#0284C7] font-bold">{bride.substring(0, 3).toUpperCase()}</h2>
+                  {data.bride?.photo && (
+                    <img src={data.bride.photo} alt={bride} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 border-2 border-slate-200" />
+                  )}
+                  <h2 className="font-mono text-3xl sm:text-4xl text-[#0284C7] font-bold">{bride.substring(0, 3).toUpperCase()}</h2>
                   <p className="text-xs font-bold uppercase mt-1">{bride}</p>
                 </div>
                 
@@ -65,7 +68,10 @@ export default function BoardingInvitation({ data, guest = '', preview = false }
                 </div>
                 
                 <div className="text-center">
-                  <h2 className="font-mono text-4xl text-[#0284C7] font-bold">{groom.substring(0, 3).toUpperCase()}</h2>
+                  {data.groom?.photo && (
+                    <img src={data.groom.photo} alt={groom} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 border-2 border-slate-200" />
+                  )}
+                  <h2 className="font-mono text-3xl sm:text-4xl text-[#0284C7] font-bold">{groom.substring(0, 3).toUpperCase()}</h2>
                   <p className="text-xs font-bold uppercase mt-1">{groom}</p>
                 </div>
               </div>
@@ -94,8 +100,14 @@ export default function BoardingInvitation({ data, guest = '', preview = false }
         </div>
       ) : (
         <div className="max-w-md mx-auto bg-white min-h-screen shadow-xl relative overflow-hidden">
+          {/* Hero Image */}
+          <div 
+            className="w-full h-48 bg-slate-200 bg-cover bg-center" 
+            style={{ backgroundImage: `url(${coverImg})` }}
+          />
+          
           {/* Header */}
-          <header className="bg-[#0284C7] text-white p-6 sticky top-0 z-20 shadow-md">
+          <header className="bg-[#0284C7] text-white p-6 sticky top-0 z-20 shadow-md border-t border-white/20">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-[10px] uppercase tracking-widest opacity-80">Destination</p>
