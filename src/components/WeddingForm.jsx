@@ -356,7 +356,7 @@ export default function WeddingForm({
               <select 
                 value={form.textColor || ''} 
                 onChange={(e) => update('textColor', e.target.value)}
-                className="border border-ink/15 bg-ivory px-3 py-2.5 text-base normal-case tracking-normal text-ink"
+                className="w-full min-w-0 border border-ink/15 bg-ivory px-3 py-2.5 text-base normal-case tracking-normal text-ink"
               >
                 <option value="">Bawaan Tema</option>
                 <option value="#ffffff">Putih (Terang)</option>
@@ -563,7 +563,7 @@ function Field({ label, value, onChange, type = 'text', hint }) {
         type={type}
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
-        className="border border-ink/15 bg-ivory px-3 py-2.5 text-base normal-case tracking-normal text-ink"
+        className="w-full min-w-0 border border-ink/15 bg-ivory px-3 py-2.5 text-base normal-case tracking-normal text-ink"
       />
       {hint && <span className="normal-case tracking-normal text-[11px]">{hint}</span>}
     </label>
