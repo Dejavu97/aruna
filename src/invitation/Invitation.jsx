@@ -19,6 +19,7 @@ import {
 } from '../lib/utils'
 import { getTheme } from '../data/themes'
 import AttariInvitation from './AttariInvitation'
+import BoardingInvitation from './BoardingInvitation'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
@@ -26,6 +27,11 @@ export default function Invitation({ data, guest = '', preview = false }) {
   // Gunakan komponen terpisah untuk tema Attari
   if (theme.layout === 'attari') {
     return <AttariInvitation data={data} guest={guest} preview={preview} />
+  }
+
+  // Komponen khusus Boarding Pass
+  if (theme.layout === 'boarding') {
+    return <BoardingInvitation data={data} guest={guest} preview={preview} />
   }
 
   const [open, setOpen] = useState(false)

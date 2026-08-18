@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { formatRupiah, packages } from '../data/site'
 import { getTheme, themes } from '../data/themes'
 import MediaUpload from './MediaUpload'
+import Invitation from '../invitation/Invitation'
 import { slugify } from '../lib/utils'
 
 const emptyEvent = () => ({
@@ -75,6 +76,7 @@ export default function WeddingForm({
 }) {
   const theme = getTheme(themeId)
   const [step, setStep] = useState(0)
+  const [showPreview, setShowPreview] = useState(false)
   const [form, setForm] = useState(initial || blankWedding(themeId))
   const draftKey = `aruna.draft.${themeId}`
 
@@ -140,6 +142,25 @@ export default function WeddingForm({
   }
 
   const steps = ['Pengantin', 'Acara', 'Pelengkap', mode === 'create' ? 'Bayar' : 'Pemesan']
+
+  if (showPreview) {
+    return (
+      <div className="fixed inset-0 z-50 bg-ivory">
+        <div className="absolute top-4 right-4 z-[9999] flex gap-2">
+          <button 
+            type="button"
+            onClick={() => setShowPreview(false)} 
+            className="bg-ink px-4 py-2 text-xs uppercase tracking-widest text-ivory shadow-xl border border-white/20 hover:bg-gold hover:text-ink transition-colors"
+          >
+            ← Kembali ke Form
+          </button>
+        </div>
+        <div className="h-full w-full overflow-y-auto relative">
+          <Invitation data={form} preview={true} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <section className="mx-auto grid max-w-6xl gap-10 px-5 py-12 lg:grid-cols-[0.9fr_1.1fr]">
@@ -523,23 +544,32 @@ export default function WeddingForm({
           >
             Kembali
           </button>
-          {step < 3 ? (
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={() => setStep((s) => s + 1)}
-              className="bg-ink px-5 py-3 text-xs uppercase tracking-[0.16em] text-ivory"
+              onClick={() => setShowPreview(true)}
+              className="border border-ink/20 px-5 py-3 text-xs uppercase tracking-[0.16em] text-ink hover:bg-ink/5"
             >
-              Lanjut
+              Lihat Preview
             </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={submitting}
-              className="bg-ink px-5 py-3 text-xs uppercase tracking-[0.16em] text-ivory disabled:opacity-50"
-            >
-              {submitting ? 'Menyimpan…' : mode === 'edit' ? 'Simpan perubahan' : 'Buat undangan'}
-            </button>
-          )}
+            {step < 3 ? (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s + 1)}
+                className="bg-ink px-5 py-3 text-xs uppercase tracking-[0.16em] text-ivory"
+              >
+                Lanjut
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={submitting}
+                className="bg-ink px-5 py-3 text-xs uppercase tracking-[0.16em] text-ivory disabled:opacity-50"
+              >
+                {submitting ? 'Menyimpan…' : mode === 'edit' ? 'Simpan perubahan' : 'Buat undangan'}
+              </button>
+            )}
+          </div>
         </div>
       </form>
     </section>

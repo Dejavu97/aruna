@@ -112,6 +112,31 @@ export const themes = [
     },
   },
   {
+    id: 'boarding',
+    name: 'Boarding Pass',
+    tag: 'Unik',
+    tags: ['unik', 'modern', 'casual'],
+    description: 'Desain mirip tiket pesawat. Sempurna untuk pasangan LDR, suka traveling, atau destination wedding.',
+    cover: '/themes/boarding.jpg',
+    layout: 'boarding',
+    greeting: 'Dengan suka cita, kami mengundang Anda untuk terbang bersama dalam perjalanan baru kami.',
+    opener: 'First Class Ticket',
+    fonts: {
+      display: '"Space Mono", monospace',
+      script: '"Permanent Marker", cursive',
+      body: '"Outfit", sans-serif',
+    },
+    colors: {
+      bg: '#E2E8F0',
+      paper: '#FFFFFF',
+      fg: '#0F172A',
+      muted: '#64748B',
+      accent: '#0284C7',
+      accentSoft: '#E0F2FE',
+      cover: '#0F172A',
+    },
+  },
+  {
     id: 'noir',
     name: 'Noir Velvet',
     tag: 'Mewah',
@@ -525,6 +550,50 @@ export const demos = {
     banks: [
       { bank: 'BCA', name: 'Bagas Aditya', number: '1234567890' },
       { bank: 'MANDIRI', name: 'Kirana Larasati', number: '0987654321' },
+    ],
+  }),
+  boarding: demo({
+    themeId: 'boarding',
+    slug: 'gilang-tara',
+    groom: {
+      nick: 'Gilang',
+      full: 'Gilang Saputra',
+      parents: 'Putra dari Bapak Herman & Ibu Wati',
+      photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80',
+    },
+    bride: {
+      nick: 'Tara',
+      full: 'Tara Anindita',
+      parents: 'Putri dari Bapak Budi & Ibu Rini',
+      photo: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80',
+    },
+    date: '2026-11-20',
+    quote: 'Love is the greatest adventure.',
+    quoteSource: 'Unknown',
+    story: [
+      { year: '2020', title: 'First Flight', body: 'Bertemu di bandara Soekarno Hatta saat delay pesawat ke Bali.' },
+      { year: '2024', title: 'The Proposal', body: 'Dilamar di atas awan, dalam penerbangan menuju Tokyo.' }
+    ],
+    events: [
+      {
+        title: 'Akad',
+        date: '2026-11-20',
+        time: '08:00',
+        venue: 'Terminal 1',
+        address: 'Jl. Bandara No. 1, Jakarta',
+        maps: 'https://maps.google.com/?q=Bandara+Soekarno+Hatta',
+      },
+      {
+        title: 'Resepsi',
+        date: '2026-11-20',
+        time: '19:00',
+        venue: 'Grand Ballroom',
+        address: 'Jl. Sudirman No. 99, Jakarta',
+        maps: 'https://maps.google.com/?q=Sudirman+Jakarta',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Gilang Saputra', number: '1234567890' },
     ],
   }),
 }
