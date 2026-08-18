@@ -494,20 +494,15 @@ export default function WeddingForm({
                     <span className="shrink-0 font-display text-xl">{formatRupiah(p.price)}</span>
                   </label>
                 ))}
-                <label className="flex cursor-pointer items-start gap-4 border border-ink/10 p-4 mt-2">
-                  <input 
-                    type="checkbox" 
-                    className="mt-1" 
-                    checked={form.customDomain} 
-                    onChange={(e) => update('customDomain', e.target.checked)} 
-                  />
+                <div className="flex items-start gap-4 rounded bg-ivory/50 p-4 border border-ink/10">
+                  <div className="text-xl mt-1 opacity-70">🌐</div>
                   <div>
-                    <strong className="font-display text-lg">Tambah Domain Kustom (+ Rp 150.000)</strong>
-                    <span className="mt-1 block text-sm normal-case tracking-normal text-stone">
-                      Gunakan alamat seperti www.namakamu.com agar lebih eksklusif. Tim kami akan menghubungi untuk ketersediaan nama domain.
+                    <strong className="font-display text-lg">Domain Pribadi (Kustom)</strong>
+                    <span className="mt-1 block text-sm normal-case tracking-normal text-stone leading-relaxed">
+                      Kabar baik! Anda dapat memasang domain pribadi secara <strong>mandiri & gratis</strong> melalui Dashboard Pelanggan setelah pesanan ini selesai. Hubungi Admin jika Anda memerlukan bantuan konfigurasi.
                     </span>
                   </div>
-                </label>
+                </div>
                 <div className="mt-4">
                   <Field
                     label="Kode Voucher / Promo"

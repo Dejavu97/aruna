@@ -184,9 +184,8 @@ export default function Admin() {
               const heads = hadir.reduce((n, r) => n + Number(r.guests || 1), 0)
               
               // Calculate extra price if any
-              const domainPrice = item.customDomain ? 150000 : 0
               const basePrice = pack ? pack.price : 0
-              const totalPrice = basePrice + domainPrice
+              const totalPrice = basePrice
               
               return (
                 <article key={item.slug} className="grid gap-5 border border-ink/10 bg-paper p-5 md:grid-cols-[8rem_1fr]">

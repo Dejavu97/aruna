@@ -34,10 +34,30 @@ export default function Themes() {
             </button>
           ))}
         </div>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((t) => (
-            <ThemeCard key={t.id} theme={t} />
-          ))}
+        <div className="mt-10">
+          <h2 className="text-xl font-display mb-4">Koleksi Premium (Baru)</h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {list.filter(t => t.id === 'boarding-pass').length > 0 ? (
+              list.filter(t => t.id === 'boarding-pass').map((t) => (
+                <ThemeCard key={t.id} theme={t} />
+              ))
+            ) : (
+              <p className="text-sm text-stone italic">Tidak ada tema di kategori ini yang sesuai filter.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-14">
+          <h2 className="text-xl font-display mb-4">Koleksi Klasik (V1)</h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {list.filter(t => t.id !== 'boarding-pass').length > 0 ? (
+              list.filter(t => t.id !== 'boarding-pass').map((t) => (
+                <ThemeCard key={t.id} theme={t} />
+              ))
+            ) : (
+              <p className="text-sm text-stone italic">Tidak ada tema di kategori ini yang sesuai filter.</p>
+            )}
+          </div>
         </div>
       </section>
       <SiteFooter />
