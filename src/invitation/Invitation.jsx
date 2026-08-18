@@ -156,19 +156,13 @@ export default function Invitation({ data, guest = '', preview = false }) {
             )}
             {data.music && musicOn && <audio src={data.music} autoPlay loop />}
 
-            <Reveal><Hero
-              theme={theme}
-              data={data}
-              couple={couple}
-              coverImg={coverImg}
-              scene={scenes.home}
-            /></Reveal>
+            <Reveal>{theme.layout === 'attari' ? <HeroAttari theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} /> : <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} />}</Reveal>
             <Reveal><Greeting theme={theme} text={theme.greeting} scene={scenes.home} /></Reveal>
             {data.quote && <Reveal><Quote data={data} theme={theme} scene={scenes.story} /></Reveal>}
-            <Reveal><Couple theme={theme} data={data} scene={scenes.couple} /></Reveal>
+            <Reveal>{theme.layout === 'attari' ? <CoupleAttari data={data} scene={scenes.couple} /> : <Couple theme={theme} data={data} scene={scenes.couple} />}</Reveal>
             {data.story?.length > 0 && <Reveal><Story story={data.story} scene={scenes.story} /></Reveal>}
             <Reveal><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
-            <Reveal><Events events={data.events || []} isDark={isDark} scene={scenes.event} /></Reveal>
+            <Reveal>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
             <Reveal><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
             <Reveal><DressCode data={data} scene={scenes.date} /></Reveal>
             <Reveal><Live data={data} scene={scenes.story} /></Reveal>
@@ -229,7 +223,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
 function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
   return (
     <motion.section 
-      className="cover" 
+      className={`cover${theme.layout === 'attari' ? ' attari-cover-wrap' : ''}`} 
       id="home" 
       data-scene={coverImg} 
       style={{ backgroundImage: `url(${coverImg})` }}
@@ -237,9 +231,9 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
       transition={{ duration: 0.8, ease: "easeInOut" }}
     >
       <div className="cover-shade" />
-      <Corners />
+      {theme.layout !== 'attari' && <Corners />}
       <motion.div 
-        className="cover-inner"
+        className={`cover-inner${theme.layout === 'attari' ? ' attari-cover-inner' : ''}`}
         initial="hidden"
         animate="visible"
         variants={{
@@ -253,11 +247,13 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
         <motion.p variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="kicker">
           {theme.opener}
         </motion.p>
-        <motion.h1 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } }} className="cover-names">
-          {couple}
+        <motion.h1 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } }} className={`cover-names${theme.layout === 'attari' ? ' attari-cover-names' : ''}`}>
+          {data.bride?.nick || ''}
+          <em className="attari-amp">&</em>
+          {data.groom?.nick || ''}
         </motion.h1>
         <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}>
-          <Divider />
+          {theme.layout === 'attari' ? <div className="attari-cover-divider" /> : <Divider />}
         </motion.div>
         <motion.p variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="cover-date">
           {formatLongDate(data.date)}
@@ -270,16 +266,20 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
           </motion.div>
         )}
         
-        <motion.button 
-          variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: 1.2 } } }} 
-          type="button" 
-          className="open-btn glass-btn" 
-          onClick={onOpen}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: 1.2 } } }}
+          className={theme.layout === 'attari' ? 'attari-cover-btns' : ''}
         >
-          <MailOpen size={16} /> Buka Undangan
-        </motion.button>
+          <motion.button 
+            type="button" 
+            className={`open-btn${theme.layout === 'attari' ? ' attari-open-btn' : ' glass-btn'}`}
+            onClick={onOpen}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <MailOpen size={16} /> BUKA UNDANGAN
+          </motion.button>
+        </motion.div>
       </motion.div>
     </motion.section>
   )
@@ -844,5 +844,83 @@ function Reveal({ children, delay = 0 }) {
     >
       {children}
     </motion.div>
+  )
+}
+
+function CoupleAttari({ data, scene }) {
+  const order = [
+    { who: data.groom, role: 'THE GROOM' },
+    { who: data.bride, role: 'THE BRIDE' },
+  ]
+  return (
+    <section className="pad attari-couple" id="couple" data-scene={scene}>
+      <p className="attari-section-kicker">PASANGAN</p>
+      <div className="attari-divider-line" />
+      <div className="attari-couple-grid">
+        {order.map((item) =>
+          item.who ? (
+            <article key={item.role} className="attari-person">
+              <p className="attari-person-role">{item.role}</p>
+              {item.who.photo && (
+                <div className="attari-person-photo">
+                  <img src={item.who.photo} alt={item.who.nick} />
+                </div>
+              )}
+              <div className="attari-person-info">
+                <h3>{item.who.full || item.who.nick}</h3>
+                <p className="attari-parents">{item.who.parents}</p>
+                {item.who.ig && (
+                  <a
+                    className="attari-ig"
+                    href={`https://instagram.com/${String(item.who.ig).replace(/^@/, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span>📷</span> @{String(item.who.ig).replace(/^@/, '')}
+                  </a>
+                )}
+              </div>
+            </article>
+          ) : null,
+        )}
+      </div>
+    </section>
+  )
+}
+
+function HeroAttari({ theme, couple, data, coverImg, scene }) {
+  return (
+    <section className="attari-hero" id="home" data-scene={scene}>
+      <p className="attari-section-kicker">{theme.opener}</p>
+      <h2 className="attari-hero-names">{couple}</h2>
+      <div className="attari-divider-line" />
+      <p className="attari-hero-date">{formatLongDate(data.date)}</p>
+    </section>
+  )
+}
+
+function EventsAttari({ events, scene }) {
+  if (!events.length) return null
+  return (
+    <section className="pad" id="event" data-scene={scene}>
+      <p className="attari-section-kicker">SAVE OUR DATE</p>
+      <div className="attari-divider-line" />
+      <div className="attari-events-grid">
+        {events.map((ev) => (
+          <article key={ev.title} className="attari-event-card">
+            <h3>{ev.title}</h3>
+            <p className="attari-event-date">{formatLongDate(ev.date)}</p>
+            <p className="attari-event-time">{ev.time}</p>
+            <p className="attari-event-venue">{ev.venue}</p>
+            <p className="attari-event-addr">{ev.address}</p>
+            {ev.maps && (
+              <a href={ev.maps} target="_blank" rel="noreferrer" className="attari-map-btn">
+                GOOGLE MAPS
+              </a>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
   )
 }
