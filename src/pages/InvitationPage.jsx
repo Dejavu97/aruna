@@ -74,7 +74,7 @@ export default function InvitationPage() {
   return (
     <div>
       {data.demo && (
-        <div className="bg-ink px-4 py-2 text-center text-[11px] uppercase tracking-[0.16em] text-ivory/80">
+        <div className="relative z-50 bg-ink px-4 py-2 text-center text-[11px] uppercase tracking-[0.16em] text-ivory/80">
           Ini contoh tema {theme.name}.{' '}
           <Link to={`/pesan/${theme.id}`} className="underline">
             Pakai tema ini
@@ -82,7 +82,7 @@ export default function InvitationPage() {
         </div>
       )}
       {data.status === 'unpaid' && !data.demo && (
-        <div className="bg-gold px-4 py-2 text-center text-[11px] uppercase tracking-[0.16em] text-ink">
+        <div className="relative z-50 bg-gold px-4 py-2 text-center text-[11px] uppercase tracking-[0.16em] text-ink">
           Menunggu pelunasan — undangan sudah bisa dibuka untuk dicek
         </div>
       )}
