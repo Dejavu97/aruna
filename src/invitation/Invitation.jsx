@@ -128,7 +128,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
   )
 
   return (
-    <div className="inv" data-theme={theme.id} style={cssVars}>
+    <div className="inv" data-theme={theme.id} data-layout={theme.layout} style={cssVars}>
       <aside className="inv-photo" aria-hidden>
         <div
           className={`inv-photo-layer${useA ? ' is-on' : ''}`}
