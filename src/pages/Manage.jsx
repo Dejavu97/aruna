@@ -472,8 +472,36 @@ export default function Manage() {
                     }}
                     className="bg-ink px-6 py-3 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep"
                   >
-                    Hubungkan Domain
+                    {item?.customDomain ? 'Ganti Domain' : 'Hubungkan Domain'}
                   </button>
+                  {item?.customDomain && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!confirm('Yakin ingin menghapus domain khusus ini?')) return
+                        setError('')
+                        try {
+                          const res = await fetch('/api/remove-domain', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ domain: item.customDomain })
+                          })
+                          const data = await res.json()
+                          if (!res.ok) throw new Error(data.error || 'Gagal menghapus domain dari server.')
+                          
+                          await updateInvitation(slug, { customDomain: null }, editKey)
+                          setItem(prev => ({ ...prev, customDomain: null }))
+                          setCustomDomain('')
+                          alert('Domain berhasil dihapus.')
+                        } catch (err) {
+                          setError(err.message)
+                        }
+                      }}
+                      className="border border-red-600/50 text-red-600 px-6 py-3 text-xs uppercase tracking-widest hover:bg-red-50"
+                    >
+                      Hapus Domain
+                    </button>
+                  )}
                 </div>
                 {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
               </div>
