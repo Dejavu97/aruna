@@ -8,6 +8,8 @@ import {
   countdownParts,
   formatLongDate,
   formatTime,
+  formatNameWithDegree,
+  formatParents,
   googleCalendarUrl,
   instagramUrl,
   invitationUrl,
@@ -338,8 +340,8 @@ function Couple({ theme, data, scene }) {
               {item.who.photo && <img src={item.who.photo} alt={item.who.nick} />}
               <div className="person-info">
                 <p className="role">{item.role}</p>
-                <h3>{item.who.full || item.who.nick}</h3>
-                <p className="parents">{item.who.parents}</p>
+                <h3>{formatNameWithDegree(item.who)}</h3>
+                <p className="parents">{formatParents(item.who, index === 0 ? 'Putri' : 'Putra')}</p>
                 {item.who.ig && (
                   <a
                     className="ig-link"
@@ -874,8 +876,8 @@ function CoupleAttari({ data, scene }) {
                 </div>
               )}
               <div className="attari-person-info">
-                <h3>{item.who.full || item.who.nick}</h3>
-                <p className="attari-parents">{item.who.parents}</p>
+                <h3>{formatNameWithDegree(item.who)}</h3>
+                <p className="attari-parents">{formatParents(item.who, item.role === 'THE BRIDE' ? 'Putri' : 'Putra')}</p>
                 {item.who.ig && (
                   <a
                     className="attari-ig"

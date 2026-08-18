@@ -11,6 +11,27 @@ export function uid() {
   return Math.random().toString(36).slice(2, 10)
 }
 
+export function formatNameWithDegree(who) {
+  if (!who) return '';
+  const name = who.full || who.nick || '';
+  return who.degree ? `${name}, ${who.degree}` : name;
+}
+
+export function formatParents(who, roleType = 'Putri') {
+  if (!who) return '';
+  if (who.parents) return who.parents;
+  
+  if (!who.fatherName && !who.motherName) return '';
+  
+  const dad = who.fatherName ? `Bapak ${who.fatherName}${who.fatherDegree ? `, ${who.fatherDegree}` : ''}` : '';
+  const mom = who.motherName ? `Ibu ${who.motherName}${who.motherDegree ? `, ${who.motherDegree}` : ''}` : '';
+  
+  if (dad && mom) return `${roleType} dari ${dad} & ${mom}`;
+  if (dad) return `${roleType} dari ${dad}`;
+  if (mom) return `${roleType} dari ${mom}`;
+  return '';
+}
+
 export function formatLongDate(iso) {
   if (!iso) return ''
   const d = new Date(`${iso}T00:00:00`)

@@ -17,8 +17,8 @@ const emptyEvent = () => ({
 export function blankWedding(themeId) {
   return {
     themeId,
-    bride: { nick: '', full: '', parents: '', photo: '', ig: '' },
-    groom: { nick: '', full: '', parents: '', photo: '', ig: '' },
+    bride: { nick: '', full: '', degree: '', fatherName: '', fatherDegree: '', motherName: '', motherDegree: '', parents: '', photo: '', ig: '' },
+    groom: { nick: '', full: '', degree: '', fatherName: '', fatherDegree: '', motherName: '', motherDegree: '', parents: '', photo: '', ig: '' },
     date: '',
     slug: '',
     quote: '',
@@ -194,8 +194,36 @@ export default function WeddingForm({
           <div className="grid gap-6">
             <Pair title="Mempelai wanita">
               <Field label="Nama panggilan" value={form.bride.nick} onChange={(v) => update('bride.nick', v)} />
-              <Field label="Nama lengkap" value={form.bride.full} onChange={(v) => update('bride.full', v)} />
-              <Field label="Putri dari" value={form.bride.parents} onChange={(v) => update('bride.parents', v)} />
+              <div className="grid gap-4 sm:grid-cols-4">
+                <div className="sm:col-span-3">
+                  <Field label="Nama lengkap" value={form.bride.full} onChange={(v) => update('bride.full', v)} />
+                </div>
+                <div className="sm:col-span-1">
+                  <Field label="Gelar" value={form.bride.degree} onChange={(v) => update('bride.degree', v)} hint="S.E., M.B.A." />
+                </div>
+              </div>
+              <div className="mt-2 border-l-2 border-ink/10 pl-4">
+                <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">Orang Tua</p>
+                <div className="grid gap-4 sm:grid-cols-4">
+                  <div className="sm:col-span-3">
+                    <Field label="Nama Bapak" value={form.bride.fatherName} onChange={(v) => update('bride.fatherName', v)} />
+                  </div>
+                  <div className="sm:col-span-1">
+                    <Field label="Gelar Bapak" value={form.bride.fatherDegree} onChange={(v) => update('bride.fatherDegree', v)} />
+                  </div>
+                </div>
+                <div className="mt-3 grid gap-4 sm:grid-cols-4">
+                  <div className="sm:col-span-3">
+                    <Field label="Nama Ibu" value={form.bride.motherName} onChange={(v) => update('bride.motherName', v)} />
+                  </div>
+                  <div className="sm:col-span-1">
+                    <Field label="Gelar Ibu" value={form.bride.motherDegree} onChange={(v) => update('bride.motherDegree', v)} />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <Field label="Teks Lengkap (Opsional)" value={form.bride.parents} onChange={(v) => update('bride.parents', v)} hint="Kosongkan jika ingin nama orang tua di atas dirangkai otomatis." />
+                </div>
+              </div>
               <MediaUpload
                 label="Foto mempelai wanita"
                 value={form.bride.photo}
@@ -209,8 +237,36 @@ export default function WeddingForm({
             </Pair>
             <Pair title="Mempelai pria">
               <Field label="Nama panggilan" value={form.groom.nick} onChange={(v) => update('groom.nick', v)} />
-              <Field label="Nama lengkap" value={form.groom.full} onChange={(v) => update('groom.full', v)} />
-              <Field label="Putra dari" value={form.groom.parents} onChange={(v) => update('groom.parents', v)} />
+              <div className="grid gap-4 sm:grid-cols-4">
+                <div className="sm:col-span-3">
+                  <Field label="Nama lengkap" value={form.groom.full} onChange={(v) => update('groom.full', v)} />
+                </div>
+                <div className="sm:col-span-1">
+                  <Field label="Gelar" value={form.groom.degree} onChange={(v) => update('groom.degree', v)} hint="S.T., M.Eng." />
+                </div>
+              </div>
+              <div className="mt-2 border-l-2 border-ink/10 pl-4">
+                <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">Orang Tua</p>
+                <div className="grid gap-4 sm:grid-cols-4">
+                  <div className="sm:col-span-3">
+                    <Field label="Nama Bapak" value={form.groom.fatherName} onChange={(v) => update('groom.fatherName', v)} />
+                  </div>
+                  <div className="sm:col-span-1">
+                    <Field label="Gelar Bapak" value={form.groom.fatherDegree} onChange={(v) => update('groom.fatherDegree', v)} />
+                  </div>
+                </div>
+                <div className="mt-3 grid gap-4 sm:grid-cols-4">
+                  <div className="sm:col-span-3">
+                    <Field label="Nama Ibu" value={form.groom.motherName} onChange={(v) => update('groom.motherName', v)} />
+                  </div>
+                  <div className="sm:col-span-1">
+                    <Field label="Gelar Ibu" value={form.groom.motherDegree} onChange={(v) => update('groom.motherDegree', v)} />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <Field label="Teks Lengkap (Opsional)" value={form.groom.parents} onChange={(v) => update('groom.parents', v)} hint="Kosongkan jika ingin nama orang tua di atas dirangkai otomatis." />
+                </div>
+              </div>
               <MediaUpload
                 label="Foto mempelai pria"
                 value={form.groom.photo}

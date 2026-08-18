@@ -6,6 +6,8 @@ import {
   copyText,
   countdownParts,
   formatLongDate,
+  formatNameWithDegree,
+  formatParents,
   googleCalendarUrl,
   instagramUrl,
   invitationUrl,
@@ -183,8 +185,8 @@ function Couple({ data }) {
                 </div>
               )}
               <div className="at-person-info">
-                <h3>{item.who.full || item.who.nick}</h3>
-                <p className="at-person-parents">{item.who.parents}</p>
+                <h3>{formatNameWithDegree(item.who)}</h3>
+                <p className="at-person-parents">{formatParents(item.who, item.role === 'THE BRIDE' ? 'Putri' : 'Putra')}</p>
                 {item.who.ig && (
                   <a
                     className="at-ig-link"
