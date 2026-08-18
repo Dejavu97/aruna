@@ -93,7 +93,14 @@ export async function fetchInvitation(slug, editKey) {
   const docRef = doc(db, 'invitations', slug)
   const docSnap = await getDoc(docRef)
   if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
-  return docSnap.data()
+  const data = docSnap.data()
+  
+  // Jika editKey diberikan (akses dashboard), maka wajib cocok dengan data di server
+  if (editKey !== undefined && editKey !== data.editKey && !getAdminKey()) {
+    throw new Error('Kode edit salah atau tidak memiliki akses.')
+  }
+  
+  return data
 }
 
 export async function fetchAdminInvitations() {
