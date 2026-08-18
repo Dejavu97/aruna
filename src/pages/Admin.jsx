@@ -14,7 +14,7 @@ import {
   setAdminKey,
   setInvitationStatus,
 } from '../lib/api'
-import { formatLongDate, invitationUrl } from '../lib/utils'
+import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
 import { formatRupiah, packages } from '../data/site'
 import { invitePath } from '../lib/nav'
 
@@ -26,6 +26,7 @@ export default function Admin() {
   const [open, setOpen] = useState(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('unpaid')
+  const [copied, setCopied] = useState('')
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -259,6 +260,21 @@ export default function Admin() {
                       >
                         Dashboard
                       </Link>
+                      {item.editKey && (
+                        <button
+                          type="button"
+                          className="bg-paper border border-ink/20 px-3 py-2 text-ink hover:bg-ivory"
+                          onClick={async () => {
+                            const cleanUrl = `${window.location.origin}/kelola/${item.slug}?key=${item.editKey}`
+                            if (await copyText(cleanUrl)) {
+                              setCopied(item.slug)
+                              setTimeout(() => setCopied(''), 1500)
+                            }
+                          }}
+                        >
+                          {copied === item.slug ? 'Tersalin!' : 'Copy Link Pelanggan'}
+                        </button>
+                      )}
                       <button
                         type="button"
                         className="border border-ink/20 px-3 py-2"
