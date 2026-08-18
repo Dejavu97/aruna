@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, saveGuests } from '../lib/api'
+import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
 import { waLink } from '../data/site'
 import { backFromInvite, invitePath } from '../lib/nav'
 import { getTheme } from '../data/themes'
+
+const defaultWaTemplate = `Kepada Yth. [nama]\n\nDengan hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di pernikahan kami.\n\n[link]`
 
 export default function Manage() {
   const { slug } = useParams()
@@ -18,6 +20,7 @@ export default function Manage() {
 
   const [item, setItem] = useState(null)
   const [text, setText] = useState('')
+  const [waTemplate, setWaTemplate] = useState(defaultWaTemplate)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState('')
   const [saved, setSaved] = useState(false)
@@ -36,6 +39,7 @@ export default function Manage() {
       .then((data) => {
         setItem(data)
         setText((data.guests || []).join('\n'))
+        if (data.waTemplate) setWaTemplate(data.waTemplate)
         setError('')
       })
       .catch((err) => setError(err.message))
@@ -72,8 +76,8 @@ export default function Manage() {
     setSaved(false)
     setError('')
     try {
-      const next = await saveGuests(slug, guests, editKey)
-      setItem(next)
+      await updateInvitation(slug, { guests, waTemplate }, editKey)
+      setItem((prev) => ({ ...prev, guests, waTemplate }))
       setSaved(true)
     } catch (err) {
       setError(err.message)
@@ -85,6 +89,7 @@ export default function Manage() {
       const data = await fetchInvitation(slug, editKey)
       setItem(data)
       setText((data.guests || []).join('\n'))
+      if (data.waTemplate) setWaTemplate(data.waTemplate)
     } catch (err) {
       setError(err.message)
     }
@@ -313,13 +318,24 @@ export default function Manage() {
                 onChange={(e) => setText(e.target.value)}
                 placeholder={'Bapak Budi & Istri\nKeluarga Besar Wijaya\nAndi (Teman Kantor)'}
               />
+              
+              <h3 className="mt-8 font-display text-xl">Template Pesan WhatsApp</h3>
+              <p className="mt-2 text-sm text-stone">
+                Gunakan <code className="bg-ink/5 px-1 py-0.5 text-ink">[nama]</code> untuk memanggil nama tamu dan <code className="bg-ink/5 px-1 py-0.5 text-ink">[link]</code> untuk menaruh tautan undangan.
+              </p>
+              <textarea
+                className="mt-3 min-h-32 w-full border border-ink/20 bg-transparent p-4 text-sm focus:border-ink focus:outline-none"
+                value={waTemplate}
+                onChange={(e) => setWaTemplate(e.target.value)}
+              />
+
               <div className="mt-4 flex flex-wrap items-center gap-4">
                 <button
                   type="button"
                   onClick={save}
                   className="bg-ink px-5 py-3 text-xs uppercase tracking-[0.16em] text-ivory transition-colors hover:bg-gold-deep"
                 >
-                  Simpan Daftar Ini
+                  Simpan Perubahan
                 </button>
                 {saved && !error && <span className="text-xs uppercase tracking-[0.1em] text-green-700">✓ Tersimpan di database</span>}
                 {error && <span className="text-xs text-red-700">{error}</span>}
@@ -327,7 +343,7 @@ export default function Manage() {
               <ul className="mt-8 grid gap-3">
                 {guests.map((name) => {
                   const url = invitationUrl(slug, name)
-                  const msg = `Kepada Yth. ${name}\n\nDengan hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di pernikahan kami.\n\n${url}`
+                  const msg = waTemplate.replace(/\[nama\]/gi, name).replace(/\[link\]/gi, url)
                   return (
                     <li key={name} className="border border-ink/10 bg-paper p-4">
                       <p className="font-display text-xl">{name}</p>
