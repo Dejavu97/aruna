@@ -36,7 +36,7 @@ const generateKey = () => Math.random().toString(36).slice(2) + Math.random().to
 
 export async function fetchSettings() {
   return {
-    bank: "BCA 1234567890 a/n Aruna Undangan"
+    bank: null
   }
 }
 

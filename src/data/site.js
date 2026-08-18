@@ -3,7 +3,7 @@ export const site = {
   tagline: 'Undangan digital yang terasa seperti kertas mahal.',
   description:
     'Aruna membuat undangan pernikahan digital yang siap disebar lewat WhatsApp. Pilih tema, isi data, dapatkan tautan dalam hitungan menit.',
-  whatsapp: '6281234567890',
+  whatsapp: '6285157440439',
   instagram: 'aruna.undangan',
   email: 'halo@aruna.undangan',
   city: 'Indonesia',

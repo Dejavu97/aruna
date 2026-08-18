@@ -20,7 +20,7 @@ export default function SiteFooter() {
         <div className="text-sm text-stone">
           <p className="mb-3 uppercase tracking-[0.2em] text-ink/50">Kontak</p>
           <div className="grid gap-2">
-            <span>WhatsApp 0812-3456-7890</span>
+            <span>WhatsApp 0851-5744-0439</span>
             <span>@{site.instagram}</span>
             <span>{site.email}</span>
           </div>
