@@ -78,7 +78,22 @@ export default function Admin() {
     )
   }
 
-  const unpaid = items.filter((i) => i.status !== 'paid').length
+  const [tab, setTab] = useState('unpaid')
+  const now = new Date().setHours(0,0,0,0)
+
+  const categorized = items.reduce((acc, item) => {
+    const isPast = new Date(item.date).getTime() < now
+    if (item.status !== 'paid') {
+      acc.unpaid.push(item)
+    } else if (isPast) {
+      acc.past.push(item)
+    } else {
+      acc.paid.push(item)
+    }
+    return acc
+  }, { unpaid: [], paid: [], past: [] })
+
+  const displayedItems = categorized[tab] || []
 
   return (
     <div className="bg-ivory">
@@ -89,8 +104,7 @@ export default function Admin() {
             <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Admin</p>
             <h1 className="mt-2 font-display text-5xl">Order masuk</h1>
             <p className="mt-3 text-stone">
-              {items.length} undangan · {unpaid} belum lunas. Data tersimpan di server, tidak hilang saat cache
-              dibersihkan.
+              {items.length} total undangan. Data tersimpan di server, tidak hilang saat cache dibersihkan.
             </p>
           </div>
           <button
@@ -105,20 +119,44 @@ export default function Admin() {
           </button>
         </div>
 
-        {items.length === 0 ? (
+        <div className="mt-8 flex gap-4 border-b border-ink/10 pb-2 text-xs uppercase tracking-[0.16em] text-stone">
+          <button 
+            className={`pb-1 ${tab === 'unpaid' ? 'border-b-2 border-gold text-ink' : ''}`}
+            onClick={() => setTab('unpaid')}
+          >
+            Belum Bayar ({categorized.unpaid.length})
+          </button>
+          <button 
+            className={`pb-1 ${tab === 'paid' ? 'border-b-2 border-gold text-ink' : ''}`}
+            onClick={() => setTab('paid')}
+          >
+            Lunas Aktif ({categorized.paid.length})
+          </button>
+          <button 
+            className={`pb-1 ${tab === 'past' ? 'border-b-2 border-gold text-ink' : ''}`}
+            onClick={() => setTab('past')}
+          >
+            Selesai ({categorized.past.length})
+          </button>
+        </div>
+
+        {displayedItems.length === 0 ? (
           <div className="mt-10 border border-dashed border-ink/20 p-10 text-center">
-            <p>Belum ada order.</p>
-            <Link to="/tema" className="mt-4 inline-block underline">
-              Buat undangan uji
-            </Link>
+            <p>Tidak ada order di tab ini.</p>
           </div>
         ) : (
           <div className="mt-10 grid gap-6">
-            {items.map((item) => {
+            {displayedItems.map((item) => {
               const theme = getTheme(item.themeId)
               const pack = packages.find((p) => p.id === item.packageId)
               const hadir = (item.rsvps || []).filter((r) => r.status === 'hadir')
               const heads = hadir.reduce((n, r) => n + Number(r.guests || 1), 0)
+              
+              // Calculate extra price if any
+              const domainPrice = item.customDomain ? 150000 : 0
+              const basePrice = pack ? pack.price : 0
+              const totalPrice = basePrice + domainPrice
+              
               return (
                 <article key={item.slug} className="grid gap-5 border border-ink/10 bg-paper p-5 md:grid-cols-[8rem_1fr]">
                   <img src={theme.cover} alt="" className="aspect-[3/4] w-full object-cover" />
@@ -134,14 +172,27 @@ export default function Admin() {
                       <span className="text-[11px] uppercase tracking-[0.16em] text-stone">
                         {item.orderCode} · {theme.name}
                       </span>
+                      {item.customDomain && (
+                        <span className="px-2 py-0.5 text-[10px] bg-gold/10 text-gold-deep uppercase tracking-[0.16em]">
+                          Custom Domain
+                        </span>
+                      )}
+                      {item.voucher && (
+                        <span className="px-2 py-0.5 text-[10px] border border-ink/20 text-ink uppercase tracking-[0.16em]">
+                          Voucher: {item.voucher}
+                        </span>
+                      )}
                     </div>
                     <h2 className="mt-2 font-display text-3xl">
                       {item.bride?.nick} & {item.groom?.nick}
                     </h2>
                     <p className="text-sm text-stone">{formatLongDate(item.date)}</p>
-                    <p className="mt-2 text-sm">
-                      {pack ? `${pack.name} · ${formatRupiah(pack.price)}` : item.packageId}
+                    <p className="mt-2 text-sm font-semibold">
+                      {pack ? `${pack.name} · Total: ${formatRupiah(totalPrice)}` : item.packageId}
                     </p>
+                    {item.customerNote && (
+                      <p className="mt-1 text-xs text-stone italic">Catatan: {item.customerNote}</p>
+                    )}
                     <p className="mt-1 text-sm text-stone">
                       Pemesan {item.customerName || '—'} · {item.customerWhatsapp || '—'}
                     </p>
