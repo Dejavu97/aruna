@@ -212,6 +212,31 @@ body {
 
 .open-btn {
   width: min(16rem, 100%);
+  border-radius: 99px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+}
+
+.glass-btn {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+[data-theme="marmer"] .glass-btn,
+[data-theme="marmer"] .glass-panel {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #111;
 }
 
 .open-btn:hover,
@@ -391,9 +416,12 @@ body {
 }
 
 .count div {
-  background: color-mix(in oklab, var(--paper) 62%, transparent);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   padding: 0.9rem 0.2rem;
-  border: 1px solid color-mix(in oklab, var(--accent) 28%, transparent);
 }
 
 .count strong {
@@ -417,9 +445,12 @@ body {
 }
 
 .event-card {
-  background: color-mix(in oklab, var(--paper) 62%, transparent);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   padding: 1.4rem 1.2rem;
-  border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent);
   text-align: center;
 }
 
@@ -583,9 +614,13 @@ body {
 }
 
 .wishes li {
-  background: color-mix(in oklab, var(--paper) 62%, transparent);
-  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-left: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
 }
 
 .wishes p {
@@ -600,10 +635,13 @@ body {
 }
 
 .bank {
-  background: color-mix(in oklab, var(--paper) 62%, transparent);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   padding: 1.1rem;
   text-align: center;
-  border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent);
 }
 
 .bank span {

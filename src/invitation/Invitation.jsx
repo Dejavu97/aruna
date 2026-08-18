@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Images, Heart, Gift as GiftIcon } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Images, Heart, Gift as GiftIcon, MailOpen } from 'lucide-react'
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import {
@@ -125,19 +125,22 @@ export default function Invitation({ data, guest = '', preview = false }) {
         />
       </aside>
       <div className="inv-stage">
-        {!open && (
-          <Cover
-            theme={theme}
-            data={data}
-            guest={guest}
-            couple={couple}
-            coverImg={coverImg}
-            onOpen={() => {
-              setOpen(true)
-              setMusicOn(Boolean(data.music))
-            }}
-          />
-        )}
+        <AnimatePresence>
+          {!open && (
+            <Cover
+              key="cover"
+              theme={theme}
+              data={data}
+              guest={guest}
+              couple={couple}
+              coverImg={coverImg}
+              onOpen={() => {
+                setOpen(true)
+                setMusicOn(Boolean(data.music))
+              }}
+            />
+          )}
+        </AnimatePresence>
 
         {open && (
           <main className="inv-main">
@@ -225,25 +228,60 @@ export default function Invitation({ data, guest = '', preview = false }) {
 
 function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
   return (
-    <section className="cover" id="home" data-scene={coverImg} style={{ backgroundImage: `url(${coverImg})` }}>
+    <motion.section 
+      className="cover" 
+      id="home" 
+      data-scene={coverImg} 
+      style={{ backgroundImage: `url(${coverImg})` }}
+      exit={{ opacity: 0, y: -50, filter: "blur(10px)" }}
+      transition={{ duration: 0.8, ease: "easeInOut" }}
+    >
       <div className="cover-shade" />
       <Corners />
-      <div className="cover-inner">
-        <p className="kicker">{theme.opener}</p>
-        <h1 className="cover-names">{couple}</h1>
-        <Divider />
-        <p className="cover-date">{formatLongDate(data.date)}</p>
+      <motion.div 
+        className="cover-inner"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.2, delayChildren: 0.3 }
+          }
+        }}
+      >
+        <motion.p variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="kicker">
+          {theme.opener}
+        </motion.p>
+        <motion.h1 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } }} className="cover-names">
+          {couple}
+        </motion.h1>
+        <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}>
+          <Divider />
+        </motion.div>
+        <motion.p variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="cover-date">
+          {formatLongDate(data.date)}
+        </motion.p>
+        
         {guest && (
-          <div className="cover-guest">
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="cover-guest glass-panel">
             <span>Kepada Yth.</span>
             <strong>{guest}</strong>
-          </div>
+          </motion.div>
         )}
-        <button type="button" className="open-btn" onClick={onOpen}>
-          Buka Undangan
-        </button>
-      </div>
-    </section>
+        
+        <motion.button 
+          variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: 1.2 } } }} 
+          type="button" 
+          className="open-btn glass-btn" 
+          onClick={onOpen}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <MailOpen size={16} /> Buka Undangan
+        </motion.button>
+      </motion.div>
+    </motion.section>
   )
 }
 
