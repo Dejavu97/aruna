@@ -609,6 +609,12 @@ function Wishes({ slug, wishes, guest, demo, preview, onDone }) {
           <li key={w.id}>
             <strong>{w.name}</strong>
             <p>{w.message}</p>
+            {w.reply && (
+              <div className="wish-reply" style={{ marginTop: '0.5rem', background: 'var(--soft)', padding: '0.75rem', borderLeft: '2px solid var(--accent)', fontSize: '0.85rem' }}>
+                <strong style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.15em', display: 'block', marginBottom: '0.2rem', color: 'var(--accent)' }}>Balasan Pengantin</strong>
+                <p style={{ margin: 0 }}>{w.reply}</p>
+              </div>
+            )}
           </li>
         ))}
       </ul>

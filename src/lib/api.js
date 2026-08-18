@@ -162,3 +162,15 @@ export async function saveGuests(slug, guests, editKey) {
   await updateDoc(docRef, { guests })
   return { success: true }
 }
+  
+export async function replyWish(slug, editKey, wishId, replyText) {  
+  const docRef = doc(db, 'invitations', slug)  
+  const docSnap = await getDoc(docRef)  
+  if (!docSnap.exists()) throw new Error('Not found')  
+  const data = docSnap.data()  
+  if (!getAdminKey() && data.editKey !== editKey) throw new Error('Unauthorized')  
+  
+  const updatedWishes = (data.wishes || []).map(w => w.id === wishId ? { ...w, reply: replyText } : w)
+  await updateDoc(docRef, { wishes: updatedWishes })
+  return updatedWishes
+}

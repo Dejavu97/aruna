@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation } from '../lib/api'
+import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
 import { waLink } from '../data/site'
 import { backFromInvite, invitePath } from '../lib/nav'
@@ -25,6 +25,11 @@ export default function Manage() {
   const [copied, setCopied] = useState('')
   const [saved, setSaved] = useState(false)
   const [tab, setTab] = useState('ringkas')
+  
+  // State for replying to wishes
+  const [replyingTo, setReplyingTo] = useState(null)
+  const [replyText, setReplyText] = useState('')
+  const [replying, setReplying] = useState(false)
 
   const backHref = backFromInvite(slug, { key: editKey && !isAdmin ? editKey : '', from: isAdmin ? 'admin' : '' })
   const backLabel = isAdmin ? '← Kembali ke admin' : '← Kembali ke halaman bayar'
@@ -81,6 +86,21 @@ export default function Manage() {
       setSaved(true)
     } catch (err) {
       setError(err.message)
+    }
+  }
+
+  async function handleReply(wishId) {
+    if (!replyText.trim()) return
+    setReplying(true)
+    try {
+      const updatedWishes = await replyWish(slug, editKey, wishId, replyText)
+      setItem(prev => ({ ...prev, wishes: updatedWishes }))
+      setReplyingTo(null)
+      setReplyText('')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setReplying(false)
     }
   }
 
@@ -210,8 +230,8 @@ export default function Manage() {
 
         <div className="mt-6">
           {tab === 'ringkas' && (
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="border border-ink/10 bg-paper p-5">
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="border border-ink/10 bg-paper p-5 lg:col-span-2">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-stone">Tautan undangan</p>
                 <p className="mt-2 break-all text-sm">{invitationUrl(slug)}</p>
                 <button
@@ -230,41 +250,90 @@ export default function Manage() {
                   Personalize: tambah <code className="bg-ivory px-1">?to=Nama+Tamu</code> atau pakai tab Daftar
                   tamu.
                 </p>
+                <div className="mt-8 border-t border-ink/10 pt-5">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-stone">Ringkasan RSVP</p>
+                  <ul className="mt-3 grid gap-2 text-sm">
+                    <li>
+                      RSVP masuk: <strong>{stats.total}</strong>
+                    </li>
+                    <li>
+                      Diperkirakan hadir: <strong>{stats.heads} orang</strong> ({stats.hadir} konfirmasi)
+                    </li>
+                    <li>
+                      Ucapan: <strong>{stats.wishes}</strong>
+                    </li>
+                    <li>
+                      Nama di daftar sebar: <strong>{stats.guestList || guests.length}</strong>
+                    </li>
+                  </ul>
+                  {(item?.rsvps || []).length > 0 && (
+                    <div className="mt-4 border-t border-ink/10 pt-4">
+                      <p className="text-[11px] uppercase tracking-[0.16em] text-stone">RSVP terbaru</p>
+                      <ul className="mt-2 grid gap-1 text-sm">
+                        {(item.rsvps || []).slice(0, 5).map((r) => (
+                          <li key={r.id}>
+                            {r.name} · {r.status} · {r.guests} tamu
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="border border-ink/10 bg-paper p-5">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-stone">Ringkasan</p>
-                <ul className="mt-3 grid gap-2 text-sm">
-                  <li>
-                    RSVP masuk: <strong>{stats.total}</strong>
-                  </li>
-                  <li>
-                    Diperkirakan hadir: <strong>{stats.heads} orang</strong> ({stats.hadir} konfirmasi)
-                  </li>
-                  <li>
-                    Ucapan: <strong>{stats.wishes}</strong>
-                  </li>
-                  <li>
-                    Nama di daftar sebar: <strong>{stats.guestList || guests.length}</strong>
-                  </li>
-                </ul>
-                {(item?.rsvps || []).length > 0 && (
-                  <div className="mt-4 border-t border-ink/10 pt-4">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-stone">RSVP terbaru</p>
-                    <ul className="mt-2 grid gap-1 text-sm">
-                      {(item.rsvps || []).slice(0, 5).map((r) => (
-                        <li key={r.id}>
-                          {r.name} · {r.status} · {r.guests} tamu
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+              <div className="border border-ink/10 bg-paper p-5 text-center flex flex-col items-center">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-stone w-full text-left">QR Code Undangan</p>
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(invitationUrl(slug))}&margin=10`} 
+                  alt="QR Code" 
+                  className="mt-6 w-32 h-32 border border-ink/10"
+                />
+                <p className="mt-4 text-xs text-stone leading-relaxed">
+                  Simpan gambar QR Code ini untuk dicetak di undangan fisik atau kartu suvenir.
+                </p>
+                <a 
+                  href={`https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(invitationUrl(slug))}&margin=10`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 border border-ink px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-ink hover:text-ivory"
+                >
+                  Buka Resolusi Tinggi
+                </a>
               </div>
             </div>
           )}
 
           {tab === 'rsvp' && (
             <div className="border border-ink/10 bg-paper">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 p-5">
+                <h3 className="font-display text-xl">Daftar Kehadiran</h3>
+                {(item?.rsvps || []).length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const header = ['Nama', 'Status', 'Jumlah Tamu', 'Pesan', 'Waktu']
+                      const rows = (item.rsvps || []).map(r => [
+                        `"${r.name}"`,
+                        r.status,
+                        r.guests || 1,
+                        `"${r.note || ''}"`,
+                        r.at ? new Date(r.at).toLocaleString('id-ID') : ''
+                      ])
+                      const csvContent = [header, ...rows].map(e => e.join(",")).join("\n")
+                      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+                      const url = URL.createObjectURL(blob)
+                      const link = document.createElement('a')
+                      link.href = url
+                      link.setAttribute('download', `RSVP_${slug}.csv`)
+                      document.body.appendChild(link)
+                      link.click()
+                      document.body.removeChild(link)
+                    }}
+                    className="bg-ink px-4 py-2 text-xs uppercase tracking-[0.16em] text-ivory hover:bg-gold-deep"
+                  >
+                    Download Excel (CSV)
+                  </button>
+                )}
+              </div>
               {(item?.rsvps || []).length === 0 ? (
                 <p className="p-6 text-sm text-stone">Belum ada RSVP. Tamu mengisi lewat undangan.</p>
               ) : (
@@ -298,6 +367,60 @@ export default function Manage() {
                     <li key={w.id} className="px-5 py-4">
                       <p className="font-medium">{w.name}</p>
                       <p className="mt-1 text-sm text-stone">{w.message}</p>
+                      
+                      {w.reply ? (
+                        <div className="mt-3 bg-ivory/50 p-3 border-l-2 border-gold text-sm text-stone">
+                          <p className="font-medium text-xs uppercase tracking-widest mb-1 text-gold-deep">Balasan Anda</p>
+                          <p>{w.reply}</p>
+                        </div>
+                      ) : (
+                        <div className="mt-3">
+                          {replyingTo === w.id ? (
+                            <div className="flex flex-col gap-2">
+                              <textarea
+                                className="w-full border border-ink/20 bg-transparent p-3 text-sm focus:border-ink focus:outline-none"
+                                rows="2"
+                                placeholder="Ketik balasan Anda..."
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                disabled={replying}
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleReply(w.id)}
+                                  disabled={replying || !replyText.trim()}
+                                  className="bg-ink px-4 py-2 text-[10px] uppercase tracking-widest text-ivory hover:bg-gold-deep disabled:opacity-50"
+                                >
+                                  {replying ? 'Menyimpan...' : 'Kirim Balasan'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setReplyingTo(null)
+                                    setReplyText('')
+                                  }}
+                                  disabled={replying}
+                                  className="border border-ink/20 px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-ink/5"
+                                >
+                                  Batal
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReplyingTo(w.id)
+                                setReplyText('')
+                              }}
+                              className="text-xs uppercase tracking-widest text-gold-deep underline hover:text-ink"
+                            >
+                              Balas Ucapan
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
