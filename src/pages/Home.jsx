@@ -8,17 +8,28 @@ import { themes } from '../data/themes'
 
 export default function Home() {
   return (
-    <div className="bg-ivory text-ink">
-      <SiteNav />
-      <Hero />
-      <How />
-      <Themes />
-      <FeatureGrid />
-      <Pricing />
-      <Words />
-      <Faq />
-      <Close />
-      <SiteFooter />
+    <div className="relative min-h-screen text-ink">
+      {/* Aesthetic Fixed Background */}
+      <div 
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1920&q=80)' }}
+      />
+      {/* Translucent Overlay (Cream/Ivory but see-through) */}
+      <div className="fixed inset-0 z-0 bg-ivory/85" />
+
+      {/* Content wrapper */}
+      <div className="relative z-10">
+        <SiteNav />
+        <Hero />
+        <How />
+        <Themes />
+        <FeatureGrid />
+        <Pricing />
+        <Words />
+        <Faq />
+        <Close />
+        <SiteFooter />
+      </div>
     </div>
   )
 }
@@ -92,7 +103,7 @@ function How() {
 
 function Themes() {
   return (
-    <section className="bg-paper py-20">
+    <section className="bg-paper/40 py-20 backdrop-blur-sm">
       <div className="mx-auto max-w-6xl px-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -120,7 +131,7 @@ function FeatureGrid() {
       <h2 className="mt-2 max-w-2xl font-display text-4xl md:text-5xl">Semua yang tamu butuhkan, tanpa yang tidak perlu.</h2>
       <div className="mt-10 grid gap-px bg-ink/10 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((f) => (
-          <article key={f.title} className="bg-ivory p-6">
+          <article key={f.title} className="bg-ivory/60 p-6 backdrop-blur-sm">
             <h3 className="font-display text-2xl">{f.title}</h3>
             <p className="mt-2 text-sm leading-relaxed text-stone">{f.body}</p>
           </article>
@@ -132,7 +143,7 @@ function FeatureGrid() {
 
 function Pricing() {
   return (
-    <section id="harga" className="bg-ink py-20 text-ivory">
+    <section id="harga" className="bg-ink/90 py-20 text-ivory backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-5">
         <p className="text-xs uppercase tracking-[0.28em] text-gold">Harga jasa</p>
         <h2 className="mt-2 font-display text-4xl md:text-5xl">Jelas dari awal. Tidak ada biaya mengejutkan.</h2>
@@ -189,7 +200,7 @@ function Words() {
 
 function Faq() {
   return (
-    <section className="bg-paper py-20">
+    <section className="bg-paper/40 py-20 backdrop-blur-sm">
       <div className="mx-auto max-w-3xl px-5">
         <h2 className="font-display text-4xl">Pertanyaan yang biasanya muncul</h2>
         <div className="mt-8 divide-y divide-ink/10">
