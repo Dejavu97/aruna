@@ -1,5 +1,5 @@
 import { db, auth } from './firebase'
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy, where } from 'firebase/firestore'
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
 
 const ADMIN_KEY = 'aruna.adminKey'
@@ -174,3 +174,10 @@ export async function replyWish(slug, editKey, wishId, replyText) {
   await updateDoc(docRef, { wishes: updatedWishes })
   return updatedWishes
 }
+  
+export async function fetchInvitationByDomain(domain) {  
+  const q = query(collection(db, 'invitations'), where('customDomain', '==', domain))  
+  const snap = await getDocs(q)  
+  if (snap.empty) throw new Error('Undangan tidak ditemukan untuk domain ini.')  
+  return { slug: snap.docs[0].id, ...snap.docs[0].data() }  
+} 

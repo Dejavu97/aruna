@@ -8,8 +8,16 @@ import Admin from './pages/Admin'
 import InvitationPage from './pages/InvitationPage'
 import Edit from './pages/Edit'
 import Manage from './pages/Manage'
+import CustomDomainPage from './pages/CustomDomainPage'
 
 export default function App() {
+  const hostname = window.location.hostname
+  const isCustomDomain = !hostname.includes('localhost') && !hostname.includes('127.0.0.1') && !hostname.includes('aruna.com') && !hostname.includes('vercel.app') && !hostname.includes('ngrok-free.app')
+  
+  if (isCustomDomain) {
+    return <CustomDomainPage domain={hostname} />
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
