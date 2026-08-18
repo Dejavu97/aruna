@@ -41,6 +41,7 @@ export function blankWedding(themeId) {
     qris: '',
     backdrop: '',
     hashtag: '',
+    textColor: '',
     dressColors: '#C9A36A,#F4EFE6,#2A241C',
     dressNote: '',
     liveUrl: '',
@@ -292,6 +293,20 @@ export default function WeddingForm({
               value={form.backdrop}
               onChange={(v) => update('backdrop', v)}
             />
+            <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-stone">
+              Warna Teks Utama (Opsional)
+              <select 
+                value={form.textColor || ''} 
+                onChange={(e) => update('textColor', e.target.value)}
+                className="border border-ink/15 bg-ivory px-3 py-2.5 text-base normal-case tracking-normal text-ink"
+              >
+                <option value="">Bawaan Tema</option>
+                <option value="#ffffff">Putih (Terang)</option>
+                <option value="#1a1a1a">Hitam (Gelap)</option>
+                <option value="#d4a96a">Emas (Gold)</option>
+              </select>
+              <span className="normal-case tracking-normal text-[11px]">Gunakan ini jika warna teks bawaan tema bertabrakan dengan foto background.</span>
+            </label>
             <MediaUpload
               label="Foto QRIS (opsional)"
               value={form.qris}

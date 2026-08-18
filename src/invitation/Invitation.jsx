@@ -107,8 +107,8 @@ export default function Invitation({ data, guest = '', preview = false }) {
     () => ({
       '--bg': theme.colors.bg,
       '--paper': theme.colors.paper,
-      '--fg': theme.colors.fg,
-      '--muted': theme.colors.muted,
+      '--fg': data.textColor || theme.colors.fg,
+      '--muted': data.textColor || theme.colors.muted,
       '--accent': theme.colors.accent,
       '--soft': theme.colors.accentSoft,
       '--cover': theme.colors.cover,
@@ -116,7 +116,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
       '--script': theme.fonts.script,
       '--body': theme.fonts.body,
     }),
-    [theme],
+    [theme, data.textColor],
   )
 
   return (
