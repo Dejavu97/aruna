@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
 import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Images, Heart, Gift as GiftIcon } from 'lucide-react'
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
@@ -152,35 +153,35 @@ export default function Invitation({ data, guest = '', preview = false }) {
             )}
             {data.music && musicOn && <audio src={data.music} autoPlay loop />}
 
-            <Hero
+            <Reveal><Hero
               theme={theme}
               data={data}
               couple={couple}
               coverImg={coverImg}
               scene={scenes.home}
-            />
-            <Greeting theme={theme} text={theme.greeting} scene={scenes.home} />
-            {data.quote && <Quote data={data} theme={theme} scene={scenes.story} />}
-            <Couple theme={theme} data={data} scene={scenes.couple} />
-            {data.story?.length > 0 && <Story story={data.story} scene={scenes.story} />}
-            <Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} />
-            <Events events={data.events || []} isDark={isDark} scene={scenes.event} />
-            <CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} />
-            <DressCode data={data} scene={scenes.date} />
-            <Live data={data} scene={scenes.story} />
-            <Frame data={data} guest={guest} scene={scenes.gallery} />
+            /></Reveal>
+            <Reveal><Greeting theme={theme} text={theme.greeting} scene={scenes.home} /></Reveal>
+            {data.quote && <Reveal><Quote data={data} theme={theme} scene={scenes.story} /></Reveal>}
+            <Reveal><Couple theme={theme} data={data} scene={scenes.couple} /></Reveal>
+            {data.story?.length > 0 && <Reveal><Story story={data.story} scene={scenes.story} /></Reveal>}
+            <Reveal><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
+            <Reveal><Events events={data.events || []} isDark={isDark} scene={scenes.event} /></Reveal>
+            <Reveal><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
+            <Reveal><DressCode data={data} scene={scenes.date} /></Reveal>
+            <Reveal><Live data={data} scene={scenes.story} /></Reveal>
+            <Reveal><Frame data={data} guest={guest} scene={scenes.gallery} /></Reveal>
             {data.gallery?.length > 0 && (
-              <Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} />
+              <Reveal><Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} /></Reveal>
             )}
-            <Rsvp
+            <Reveal><Rsvp
               slug={data.slug}
               guest={guest}
               demo={data.demo}
               preview={preview}
               onDone={refresh}
               scene={scenes.wishes}
-            />
-            <Wishes
+            /></Reveal>
+            <Reveal><Wishes
               slug={data.slug}
               wishes={local.wishes || []}
               guest={guest}
@@ -188,8 +189,8 @@ export default function Invitation({ data, guest = '', preview = false }) {
               preview={preview}
               onDone={refresh}
               scene={scenes.wishes}
-            />
-            <Gift
+            /></Reveal>
+            <Reveal><Gift
               banks={data.banks || []}
               qris={data.qris}
               address={data.giftAddress}
@@ -197,8 +198,8 @@ export default function Invitation({ data, guest = '', preview = false }) {
               copied={copied}
               onCopy={onCopy}
               scene={scenes.gift}
-            />
-            <Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} />
+            /></Reveal>
+            <Reveal><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} /></Reveal>
             <BottomNav />
           </main>
         )}
@@ -783,5 +784,18 @@ function Corners() {
       <Corner className="c sw" color="var(--accent)" />
       <Corner className="c se" color="var(--accent)" />
     </>
+  )
+}
+
+function Reveal({ children, delay = 0 }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, delay, ease: "easeOut" }}
+    >
+      {children}
+    </motion.div>
   )
 }
