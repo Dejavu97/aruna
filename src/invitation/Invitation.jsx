@@ -16,9 +16,16 @@ import {
   qrImageUrl,
 } from '../lib/utils'
 import { getTheme } from '../data/themes'
+import AttariInvitation from './AttariInvitation'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
+
+  // Gunakan komponen terpisah untuk tema Attari
+  if (theme.layout === 'attari') {
+    return <AttariInvitation data={data} guest={guest} preview={preview} />
+  }
+
   const [open, setOpen] = useState(false)
   const [tick, setTick] = useState(() => countdownParts(data.date, data.events?.[0]?.time || '09:00'))
   const [lightbox, setLightbox] = useState(null)
@@ -63,7 +70,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
         if (!hit) return
-        const src = hit.getAttribute('data-scene')
+        const src = hit.target.getAttribute('data-scene')
         if (!src || src === current) return
         current = src
         setUseA((on) => {
