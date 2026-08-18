@@ -1,16 +1,17 @@
-import { db } from './firebase'
+import { db, auth } from './firebase'
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy } from 'firebase/firestore'
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
 
 const ADMIN_KEY = 'aruna.adminKey'
 const EDIT_KEYS = 'aruna.editKeys'
 
 export function getAdminKey() {
-  return sessionStorage.getItem(ADMIN_KEY) || ''
+  // If we have a Firebase currentUser, they are admin
+  return auth.currentUser ? 'firebase-admin' : ''
 }
 
 export function setAdminKey(key) {
-  if (key) sessionStorage.setItem(ADMIN_KEY, key)
-  else sessionStorage.removeItem(ADMIN_KEY)
+  if (!key) signOut(auth).catch(() => {})
 }
 
 export function rememberEditKey(slug, key) {
@@ -40,10 +41,12 @@ export async function fetchSettings() {
 }
 
 export async function loginAdmin(password) {
-  if (password === 'aruna2024' || password === 'admin') {
-    return { key: 'admin-token-' + Date.now() }
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, 'admin@aruna.com', password)
+    return { key: userCredential.user.uid }
+  } catch (err) {
+    throw new Error('Kata sandi salah atau akun admin belum dibuat di Firebase.')
   }
-  throw new Error('Kata sandi salah.')
 }
 
 export async function uploadFile(file) {

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import { getTheme } from '../data/themes'
+import { auth } from '../lib/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 import {
   deleteInvitation,
   fetchAdminInvitations,
@@ -18,10 +20,17 @@ import { invitePath } from '../lib/nav'
 
 export default function Admin() {
   const [password, setPassword] = useState('')
-  const [authed, setAuthed] = useState(Boolean(getAdminKey()))
+  const [authed, setAuthed] = useState(false)
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
   const [open, setOpen] = useState(null)
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setAuthed(Boolean(user))
+    })
+    return () => unsub()
+  }, [])
 
   async function load() {
     try {
@@ -29,7 +38,6 @@ export default function Admin() {
       setError('')
     } catch (err) {
       setError(err.message)
-      setAuthed(false)
       setAdminKey('')
     }
   }
@@ -57,7 +65,7 @@ export default function Admin() {
           <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Admin</p>
           <h1 className="mt-2 font-display text-4xl">Masuk untuk kelola order</h1>
           <p className="mt-3 text-sm text-stone">
-            Kata sandi default ada di <code>server/data/settings.json</code> — ganti sebelum jualan.
+            Gunakan kata sandi yang sudah kamu atur untuk akun <strong>admin@aruna.com</strong> di Firebase Authentication.
           </p>
           <form onSubmit={onLogin} className="mt-6 grid gap-3">
             <input
