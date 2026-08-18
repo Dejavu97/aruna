@@ -21,7 +21,7 @@ export const themes = [
     opener: 'The Wedding of',
     fonts: {
       display: '"Cormorant Garamond", serif',
-      script: '"Great Vibes", cursive',
+      script: '"Alex Brush", cursive',
       body: '"Outfit", sans-serif',
     },
     colors: {
@@ -98,7 +98,7 @@ export const themes = [
     opener: 'A garden wedding',
     fonts: {
       display: '"Cormorant Garamond", serif',
-      script: '"Great Vibes", cursive',
+      script: '"Alex Brush", cursive',
       body: '"Outfit", sans-serif',
     },
     colors: {
@@ -122,8 +122,8 @@ export const themes = [
     greeting: 'Kami mengundang Anda untuk merayakan malam yang kami nantikan.',
     opener: 'An evening affair',
     fonts: {
-      display: '"Cormorant Garamond", serif',
-      script: '"Great Vibes", cursive',
+      display: '"Playfair Display", serif',
+      script: '"Pinyon Script", cursive',
       body: '"Outfit", sans-serif',
     },
     colors: {
