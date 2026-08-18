@@ -162,6 +162,32 @@ export const themes = [
       cover: '#1C100C',
     },
   },
+  {
+    id: 'attari',
+    name: 'Attari Elegance',
+    tag: 'Premium',
+    tags: ['premium', 'elegan', 'modern'],
+    popular: true,
+    description: 'Kloning dari desain premium Byattari. Minimalis, tipografi besar, dan elegan.',
+    cover: '/themes/marmer.jpg',
+    layout: 'attari',
+    greeting: 'Tanpa mengurangi rasa hormat, kami mengundang anda untuk menghadiri acara pernikahan kami.',
+    opener: 'THE WEDDING OF',
+    fonts: {
+      display: '"Playfair Display", serif',
+      script: '"Playfair Display", serif',
+      body: '"Outfit", sans-serif',
+    },
+    colors: {
+      bg: '#FFFFFF',
+      paper: '#F8F8F8',
+      fg: '#1A1A1A',
+      muted: '#777777',
+      accent: '#B08D57',
+      accentSoft: '#E6D3B0',
+      cover: '#FAFAFA',
+    },
+  },
 ]
 
 export function getTheme(id) {
@@ -450,6 +476,55 @@ export const demos = {
     banks: [
       { bank: 'BRI', name: 'Dewi Laksmi', number: '0011223344' },
       { bank: 'BCA', name: 'Satria Wibowo', number: '4433221100' },
+    ],
+  }),
+  attari: demo({
+    themeId: 'attari',
+    slug: 'dimas-shelly',
+    groom: {
+      nick: 'Dimas',
+      full: 'Dimas Aldi Pangestu, S.Kep',
+      parents: 'Putra Pertama Dari Bapak Wiwoho & Ibu Asih Fatikha',
+      photo:
+        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80',
+      ig: 'aldhisyafiq_',
+    },
+    bride: {
+      nick: 'Shelly',
+      full: 'Shellyana Novianti, S.Farm',
+      parents: 'Putri Ketiga Dari Bapak Cholid & Ibu Darningsih',
+      photo:
+        'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80',
+      ig: 'nshellyana',
+    },
+    date: '2026-04-09',
+    quote: 'Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri...',
+    quoteSource: 'Q.S Ar-Rum: 21',
+    story: [
+      { year: '2023', title: 'Pertemuan', body: 'April 2023, siapa sangka sebuah pertemuan sederhana bisa meninggalkan kesan yang begitu mendalam...' },
+      { year: '2025', title: 'Lamaran', body: 'Pada bulan Mei 2025, dengan penuh haru dan syukur. Kami mengikat niat dalam sebuah lamaran.' },
+    ],
+    events: [
+      {
+        title: 'Akad',
+        date: '2026-04-09',
+        time: '07:00 WIB',
+        venue: 'Kediaman Mempelai Wanita',
+        address: 'Jl. Drs Cipto Mangunkusumo No 348 Kel. Krandon, Kec. Margadana, Kota Tegal',
+        maps: 'https://maps.app.goo.gl/x6TBCxABrHnx6kpr5?g_st=ic',
+      },
+      {
+        title: 'Resepsi',
+        date: '2026-04-09',
+        time: '10:00 WIB - Selesai',
+        venue: 'Kediaman Mempelai Wanita',
+        address: 'Jl. Drs Cipto Mangunkusumo No 348 Kel. Krandon, Kec. Margadana, Kota Tegal',
+        maps: 'https://maps.app.goo.gl/x6TBCxABrHnx6kpr5?g_st=ic',
+      },
+    ],
+    banks: [
+      { bank: 'BANK JATENG', name: 'Dimas Aldi Pangestu', number: '3004183664' },
+      { bank: 'MANDIRI', name: 'Shellyana Novianti', number: '1220011408096' },
     ],
   }),
 }
