@@ -543,7 +543,7 @@ function demo(partial) {
       },
       {
         id: 'w2',
-        name: 'Dimas',
+        name: 'Raka',
         message: 'Akhirnya. Jangan lupa undang makan-makan setelah bulan madu.',
         at: Date.now() - 3600000,
       },

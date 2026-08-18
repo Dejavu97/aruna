@@ -302,26 +302,28 @@ export default function Manage() {
 
           {tab === 'tamu' && (
             <div>
-              <p className="text-sm text-stone">
-                Satu nama per baris. Setiap nama dapat tautan sampul yang menyapa mereka.
+              <p className="text-[11px] uppercase tracking-[0.18em] text-gold-deep">Pembuat Link & Sapaan Otomatis</p>
+              <h2 className="mt-1 font-display text-2xl">Bikin link untuk tiap tamu</h2>
+              <p className="mt-2 text-sm text-stone">
+                Ketik nama tamu di bawah ini (satu baris untuk satu nama). Link undangan khusus dengan nama mereka akan otomatis terbentuk di bawah.
               </p>
               <textarea
-                className="mt-4 min-h-48 w-full border border-ink/15 bg-paper p-3 text-base"
+                className="mt-5 min-h-32 w-full border border-ink/20 bg-transparent p-4 text-base focus:border-ink focus:outline-none"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder={'Keluarga Wijaya\nBudi dan Istri\nRekan Kantor'}
+                placeholder={'Bapak Budi & Istri\nKeluarga Besar Wijaya\nAndi (Teman Kantor)'}
               />
-              <div className="mt-3 flex flex-wrap gap-3">
+              <div className="mt-4 flex flex-wrap items-center gap-4">
                 <button
                   type="button"
                   onClick={save}
-                  className="bg-ink px-4 py-2 text-xs uppercase tracking-[0.16em] text-ivory"
+                  className="bg-ink px-5 py-3 text-xs uppercase tracking-[0.16em] text-ivory transition-colors hover:bg-gold-deep"
                 >
-                  Simpan daftar
+                  Simpan Daftar Ini
                 </button>
+                {saved && !error && <span className="text-xs uppercase tracking-[0.1em] text-green-700">✓ Tersimpan di database</span>}
+                {error && <span className="text-xs text-red-700">{error}</span>}
               </div>
-              {saved && !error && <p className="mt-3 text-sm text-green-800">Daftar tamu tersimpan.</p>}
-              {error && <p className="mt-3 text-sm text-red-800">{error}</p>}
               <ul className="mt-8 grid gap-3">
                 {guests.map((name) => {
                   const url = invitationUrl(slug, name)

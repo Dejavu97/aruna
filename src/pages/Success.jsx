@@ -123,10 +123,22 @@ Mohon dicek pembayarannya.`
           </div>
         )}
 
-        <p className="mt-6 text-sm text-stone">
-          Personalize tamu: tambah <code className="bg-paper px-1">?to=Keluarga+Wijaya</code> atau pakai halaman
-          daftar tamu.
-        </p>
+        <div className="mt-6 border-t border-ink/10 pt-6">
+          <p className="text-sm font-semibold text-ink">Ingin menyebar undangan ke banyak orang?</p>
+          <p className="mt-1 text-sm text-stone">
+            Gunakan fitur <strong>Pembuat Link & Sapaan Otomatis</strong> agar setiap tamu mendapatkan link khusus dengan nama mereka.
+          </p>
+          <Link
+            to={
+              editKey
+                ? `/kelola/${slug}?key=${encodeURIComponent(editKey)}&from=customer`
+                : `/kelola/${slug}?from=customer`
+            }
+            className="mt-4 inline-block bg-ink px-5 py-3 text-xs uppercase tracking-[0.16em] text-ivory transition-colors hover:bg-gold-deep"
+          >
+            Buka Pembuat Link Tamu
+          </Link>
+        </div>
       </section>
       <SiteFooter />
     </div>

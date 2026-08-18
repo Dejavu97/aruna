@@ -326,7 +326,7 @@ export default function WeddingForm({
               onChange={(v) => update('music', v)}
               accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
             />
-            <Field label="Hashtag" value={form.hashtag} onChange={(v) => update('hashtag', v)} hint="Contoh: #DimasShelly" />
+            <Field label="Hashtag" value={form.hashtag} onChange={(v) => update('hashtag', v)} hint="Contoh: #AndiniRaka" />
             <Field
               label="Warna dress code (hex, pisah koma)"
               value={form.dressColors}

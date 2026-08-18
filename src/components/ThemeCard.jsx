@@ -2,34 +2,42 @@ import { Link } from 'react-router-dom'
 
 export default function ThemeCard({ theme }) {
   return (
-    <article className="group overflow-hidden border border-ink/10 bg-paper">
-      <Link to={`/tema/${theme.id}`} className="block">
-        <div className="relative aspect-[3/4] overflow-hidden">
+    <article className="group flex flex-col">
+      <Link to={`/tema/${theme.id}`} className="block relative overflow-hidden">
+        <div className="aspect-[3/4] overflow-hidden">
           <img
             src={theme.cover}
             alt={theme.name}
-            className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
           />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-ivory">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-ivory/75">{theme.tag}</p>
-            <h3 className="font-display text-2xl">{theme.name}</h3>
-          </div>
-          {theme.popular && (
-            <span className="absolute left-3 top-3 bg-ivory px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-ink">
-              Sering dipilih
-            </span>
-          )}
         </div>
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-5 text-ivory translate-y-2 opacity-90 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-ivory/80">{theme.tag}</p>
+          <h3 className="mt-1 font-display text-3xl">{theme.name}</h3>
+        </div>
+        {theme.popular && (
+          <span className="absolute left-4 top-4 bg-ink/80 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-ivory backdrop-blur-md">
+            Sering dipilih
+          </span>
+        )}
       </Link>
-      <div className="flex items-end justify-between gap-3 p-4">
+      
+      <div className="mt-4 flex-1">
         <p className="text-sm leading-relaxed text-stone">{theme.description}</p>
       </div>
-      <div className="grid grid-cols-2 border-t border-ink/10 text-center text-xs uppercase tracking-[0.16em]">
-        <Link to={`/tema/${theme.id}`} className="py-3 hover:bg-ink hover:text-ivory">
-          Lihat tema
+      
+      <div className="mt-5 grid grid-cols-2 gap-3 text-center text-xs uppercase tracking-[0.16em]">
+        <Link 
+          to={`/tema/${theme.id}`} 
+          className="border border-ink/20 py-3 transition-colors hover:bg-ink hover:text-ivory"
+        >
+          Lihat
         </Link>
-        <Link to={`/pesan/${theme.id}`} className="border-l border-ink/10 py-3 hover:bg-gold hover:text-ink">
-          Pakai tema ini
+        <Link 
+          to={`/pesan/${theme.id}`} 
+          className="bg-ink py-3 text-ivory transition-colors hover:bg-gold-deep hover:text-white"
+        >
+          Pesan
         </Link>
       </div>
     </article>

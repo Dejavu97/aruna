@@ -109,7 +109,7 @@ export const testimonials = [
       'Tamu yang paling gaptek pun bisa buka. RSVP-nya bantu banget hitung jamuan.',
   },
   {
-    name: 'Laras & Dimas',
+    name: 'Laras & Raka',
     city: 'Yogyakarta',
     quote:
       'Tema Batiknya terasa adat, bukan template luar negeri yang dipaksakan.',
