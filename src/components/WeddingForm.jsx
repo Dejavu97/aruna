@@ -339,25 +339,29 @@ export default function WeddingForm({
 
         {step === 2 && (
           <div className="grid gap-6">
-            <Field 
-              label="Kutipan" 
-              value={form.quote} 
-              onChange={(v) => update('quote', v)} 
-              hint="Kutipan atau ayat suci yang akan muncul di undangan."
-            />
-            <Field 
-              label="Sumber kutipan" 
-              value={form.quoteSource} 
-              onChange={(v) => update('quoteSource', v)} 
-              hint="Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa."
-            />
-            {form.story.map((s, i) => (
-              <div key={i} className="grid gap-3 sm:grid-cols-3">
-                <Field label="Tahun" value={s.year} onChange={(v) => update(`story.${i}.year`, v)} />
-                <Field label="Judul" value={s.title} onChange={(v) => update(`story.${i}.title`, v)} />
-                <Field label="Cerita" value={s.body} onChange={(v) => update(`story.${i}.body`, v)} />
-              </div>
-            ))}
+            {theme.layout !== 'boarding' && (
+              <>
+                <Field 
+                  label="Kutipan" 
+                  value={form.quote} 
+                  onChange={(v) => update('quote', v)} 
+                  hint="Kutipan atau ayat suci yang akan muncul di undangan."
+                />
+                <Field 
+                  label="Sumber kutipan" 
+                  value={form.quoteSource} 
+                  onChange={(v) => update('quoteSource', v)} 
+                  hint="Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa."
+                />
+                {form.story.map((s, i) => (
+                  <div key={i} className="grid gap-3 sm:grid-cols-3">
+                    <Field label="Tahun" value={s.year} onChange={(v) => update(`story.${i}.year`, v)} />
+                    <Field label="Judul" value={s.title} onChange={(v) => update(`story.${i}.title`, v)} />
+                    <Field label="Cerita" value={s.body} onChange={(v) => update(`story.${i}.body`, v)} />
+                  </div>
+                ))}
+              </>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               {form.banks.map((b, i) => (
                 <Pair key={i} title={`Rekening kado ${i + 1}`}>
@@ -367,94 +371,102 @@ export default function WeddingForm({
                 </Pair>
               ))}
             </div>
-            <MediaUpload
-              label="Foto background (otomatis di-blur). Kosong = template tema"
-              value={form.backdrop}
-              onChange={(v) => update('backdrop', v)}
-            />
-            <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-stone">
-              Warna Teks Utama (Opsional)
-              <select 
-                value={form.textColor || ''} 
-                onChange={(e) => update('textColor', e.target.value)}
-                className="w-full min-w-0 border border-ink/15 bg-ivory px-3 py-2.5 text-base normal-case tracking-normal text-ink"
-              >
-                <option value="">Bawaan Tema</option>
-                <option value="#ffffff">Putih (Terang)</option>
-                <option value="#1a1a1a">Hitam (Gelap)</option>
-                <option value="#d4a96a">Emas (Gold)</option>
-              </select>
-              <span className="normal-case tracking-normal text-[11px]">Gunakan ini jika warna teks bawaan tema bertabrakan dengan foto background.</span>
-            </label>
+            {theme.layout !== 'boarding' && (
+              <MediaUpload
+                label="Foto background (otomatis di-blur). Kosong = template tema"
+                value={form.backdrop}
+                onChange={(v) => update('backdrop', v)}
+              />
+            )}
+            {theme.layout !== 'boarding' && (
+              <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-stone">
+                Warna Teks Utama (Opsional)
+                <select 
+                  value={form.textColor || ''} 
+                  onChange={(e) => update('textColor', e.target.value)}
+                  className="w-full min-w-0 border border-ink/15 bg-ivory px-3 py-2.5 text-base normal-case tracking-normal text-ink"
+                >
+                  <option value="">Bawaan Tema</option>
+                  <option value="#ffffff">Putih (Terang)</option>
+                  <option value="#1a1a1a">Hitam (Gelap)</option>
+                  <option value="#d4a96a">Emas (Gold)</option>
+                </select>
+                <span className="normal-case tracking-normal text-[11px]">Gunakan ini jika warna teks bawaan tema bertabrakan dengan foto background.</span>
+              </label>
+            )}
             <MediaUpload
               label="Foto QRIS (opsional)"
               value={form.qris}
               onChange={(v) => update('qris', v)}
             />
             <MediaUpload
-              label="Galeri foto"
+              label={theme.layout === 'boarding' ? "Gambar utama / Hero" : "Galeri foto"}
               value={form.gallery}
               onChange={(v) => update('gallery', v)}
-              multiple
+              multiple={theme.layout !== 'boarding'}
             />
-            <MediaUpload
-              label="Musik latar (mp3, opsional)"
-              value={form.music}
-              onChange={(v) => update('music', v)}
-              accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
-            />
-            <Field label="Hashtag" value={form.hashtag} onChange={(v) => update('hashtag', v)} hint="Contoh: #AndiniRaka" />
-            <Field
-              label="Warna dress code (hex, pisah koma)"
-              value={form.dressColors}
-              onChange={(v) => update('dressColors', v)}
-              hint="Contoh: #C9A36A (Emas), #F4EFE6 (Krem/Putih Tulang), #1a1a1a (Hitam), #000080 (Navy)"
-            />
-            <Field 
-              label="Catatan dress code" 
-              value={form.dressNote} 
-              onChange={(v) => update('dressNote', v)} 
-              hint="Contoh: Tamu undangan dihimbau memakai warna senada."
-            />
-            <Field 
-              label="Link live streaming" 
-              value={form.liveUrl} 
-              onChange={(v) => update('liveUrl', v)} 
-              hint="Tautan YouTube atau Instagram Live (jika ada)."
-            />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Tanggal live" type="date" value={form.liveDate} onChange={(v) => update('liveDate', v)} />
-              <Field label="Jam live" type="time" value={form.liveTime} onChange={(v) => update('liveTime', v)} />
-            </div>
-            <Field 
-              label="Catatan live" 
-              value={form.liveNote} 
-              onChange={(v) => update('liveNote', v)} 
-              hint="Contoh: Siaran langsung akan dimulai 15 menit sebelum akad."
-            />
-            <MediaUpload
-              label="Gambar wedding frame (opsional)"
-              value={form.frameImage}
-              onChange={(v) => update('frameImage', v)}
-            />
-            <Field
-              label="Link Instagram / highlight frame"
-              value={form.frameLink}
-              onChange={(v) => update('frameLink', v)}
-            />
-            <Field label="Alamat kirim kado" value={form.giftAddress} onChange={(v) => update('giftAddress', v)} />
-            {form.wishlist.map((w, i) => (
-              <Pair key={i} title={`Wishlist ${i + 1}`}>
-                <Field label="Nama barang" value={w.title} onChange={(v) => update(`wishlist.${i}.title`, v)} />
-                <Field label="Harga" value={w.price} onChange={(v) => update(`wishlist.${i}.price`, v)} />
-                <Field label="Link beli" value={w.url} onChange={(v) => update(`wishlist.${i}.url`, v)} />
+            {theme.layout !== 'boarding' && (
+              <>
                 <MediaUpload
-                  label="Foto barang"
-                  value={w.image}
-                  onChange={(v) => update(`wishlist.${i}.image`, v)}
+                  label="Musik latar (mp3, opsional)"
+                  value={form.music}
+                  onChange={(v) => update('music', v)}
+                  accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
                 />
-              </Pair>
-            ))}
+                <Field label="Hashtag" value={form.hashtag} onChange={(v) => update('hashtag', v)} hint="Contoh: #AndiniRaka" />
+                <Field
+                  label="Warna dress code (hex, pisah koma)"
+                  value={form.dressColors}
+                  onChange={(v) => update('dressColors', v)}
+                  hint="Contoh: #C9A36A (Emas), #F4EFE6 (Krem/Putih Tulang), #1a1a1a (Hitam), #000080 (Navy)"
+                />
+                <Field 
+                  label="Catatan dress code" 
+                  value={form.dressNote} 
+                  onChange={(v) => update('dressNote', v)} 
+                  hint="Contoh: Tamu undangan dihimbau memakai warna senada."
+                />
+                <Field 
+                  label="Link live streaming" 
+                  value={form.liveUrl} 
+                  onChange={(v) => update('liveUrl', v)} 
+                  hint="Tautan YouTube atau Instagram Live (jika ada)."
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Tanggal live" type="date" value={form.liveDate} onChange={(v) => update('liveDate', v)} />
+                  <Field label="Jam live" type="time" value={form.liveTime} onChange={(v) => update('liveTime', v)} />
+                </div>
+                <Field 
+                  label="Catatan live" 
+                  value={form.liveNote} 
+                  onChange={(v) => update('liveNote', v)} 
+                  hint="Contoh: Siaran langsung akan dimulai 15 menit sebelum akad."
+                />
+                <MediaUpload
+                  label="Gambar wedding frame (opsional)"
+                  value={form.frameImage}
+                  onChange={(v) => update('frameImage', v)}
+                />
+                <Field
+                  label="Link Instagram / highlight frame"
+                  value={form.frameLink}
+                  onChange={(v) => update('frameLink', v)}
+                />
+                <Field label="Alamat kirim kado" value={form.giftAddress} onChange={(v) => update('giftAddress', v)} />
+                {form.wishlist.map((w, i) => (
+                  <Pair key={i} title={`Wishlist ${i + 1}`}>
+                    <Field label="Nama barang" value={w.title} onChange={(v) => update(`wishlist.${i}.title`, v)} />
+                    <Field label="Harga" value={w.price} onChange={(v) => update(`wishlist.${i}.price`, v)} />
+                    <Field label="Link beli" value={w.url} onChange={(v) => update(`wishlist.${i}.url`, v)} />
+                    <MediaUpload
+                      label="Foto barang"
+                      value={w.image}
+                      onChange={(v) => update(`wishlist.${i}.image`, v)}
+                    />
+                  </Pair>
+                ))}
+              </>
+            )}
           </div>
         )}
 
