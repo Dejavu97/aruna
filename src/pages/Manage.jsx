@@ -32,6 +32,7 @@ export default function Manage() {
   const [statusFilter, setStatusFilter] = useState('all') // 'all' | 'unconfirmed' | 'hadir' | 'tidak' | 'ragu'
   const [customDomain, setCustomDomain] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState('')
   const [saved, setSaved] = useState(false)
   const [tab, setTab] = useState('ringkas')
@@ -59,21 +60,32 @@ export default function Manage() {
   const [globalAnnouncement, setGlobalAnnouncement] = useState('')
 
   useEffect(() => {
-    if (!editKey && !isAdmin) return
+    let live = true
+    setLoading(true)
     Promise.all([
       fetchInvitation(slug, editKey),
-      getAnnouncement()
+      getAnnouncement().catch(() => '')
     ])
       .then(([data, ann]) => {
+        if (!live) return
         setItem(data)
-        setText((data.guests || []).join('\n'))
-        if (data.waTemplate) setWaTemplate(data.waTemplate)
-        if (data.waReminderTemplate) setWaReminderTemplate(data.waReminderTemplate)
-        if (data.customDomain) setCustomDomain(data.customDomain)
-        setGlobalAnnouncement(ann)
+        setText((data?.guests || []).join('\n'))
+        if (data?.waTemplate) setWaTemplate(data.waTemplate)
+        if (data?.waReminderTemplate) setWaReminderTemplate(data.waReminderTemplate)
+        if (data?.customDomain) setCustomDomain(data.customDomain)
+        setGlobalAnnouncement(ann || '')
         setError('')
       })
-      .catch((err) => setError(err.message))
+      .catch((err) => {
+        if (!live) return
+        setError(err.message || 'Undangan tidak ditemukan.')
+      })
+      .finally(() => {
+        if (live) setLoading(false)
+      })
+    return () => {
+      live = false
+    }
   }, [slug, editKey, isAdmin])
 
   const [guestSearch, setGuestSearch] = useState('')
@@ -412,17 +424,53 @@ export default function Manage() {
     }
   }
 
+  if (loading && !item && !error) {
+    return (
+      <div className="grid min-h-dvh place-items-center bg-ivory px-5 text-center">
+        <div className="space-y-3">
+          <div className="w-8 h-8 border-2 border-gold-deep border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="font-display text-xl">Memuat Dashboard...</p>
+          <p className="text-xs text-stone">Menyiapkan data undangan &amp; daftar tamu</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!editKey && !isAdmin) {
     return (
       <div className="grid min-h-dvh place-items-center bg-ivory px-5 text-center">
-        <div>
-          <p className="font-display text-3xl">Butuh kode edit.</p>
-          <p className="mt-2 text-sm text-stone">Kode ada di halaman sukses setelah undangan dibuat.</p>
-          <Link to={`/edit/${slug}`} className="mt-4 inline-block underline">
-            Masukkan kode
-          </Link>
-          <div className="mt-4">
-            <Link to="/" className="text-sm underline">
+        <div className="max-w-md w-full p-6 sm:p-8 bg-paper border border-ink/15 rounded-sm space-y-4 shadow-sm">
+          <p className="font-display text-2xl font-bold">Akses Dashboard Pelanggan</p>
+          <p className="text-xs text-stone leading-relaxed">
+            Untuk mengelola undangan <strong>{slug}</strong>, silakan masukkan kode edit rahasia Anda atau buka tautan lengkap dari WhatsApp konfirmasi pesanan:
+          </p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              const val = e.target.keyVal.value.trim()
+              if (val) {
+                rememberEditKey(slug, val)
+                window.location.href = `/kelola/${slug}?key=${encodeURIComponent(val)}`
+              }
+            }}
+            className="flex gap-2 pt-1"
+          >
+            <input
+              name="keyVal"
+              type="text"
+              placeholder="Masukkan kode edit"
+              required
+              className="flex-1 border border-ink/20 p-2.5 text-xs bg-white font-mono"
+            />
+            <button
+              type="submit"
+              className="bg-ink text-ivory px-5 py-2.5 text-xs uppercase tracking-wider font-semibold hover:bg-gold-deep transition-colors"
+            >
+              Masuk
+            </button>
+          </form>
+          <div className="pt-2 border-t border-ink/10">
+            <Link to="/" className="text-xs text-stone hover:text-ink underline">
               ← Kembali ke beranda
             </Link>
           </div>
