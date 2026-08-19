@@ -455,9 +455,9 @@ export default function WeddingForm({
 
             {features.heroImage && (
               <MediaUpload
-                label="Gambar utama / Tiket Hero"
-                value={form.gallery}
-                onChange={(v) => update('gallery', v)}
+                label="Foto Utama Tiket Boarding Pass"
+                value={Array.isArray(form.gallery) ? form.gallery[0] || '' : form.gallery || ''}
+                onChange={(v) => update('gallery', v ? [v] : [])}
                 multiple={false}
               />
             )}

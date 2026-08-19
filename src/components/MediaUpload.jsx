@@ -28,7 +28,9 @@ export default function MediaUpload({
     }
   }
 
-  const images = multiple ? value || [] : value ? [value] : []
+  const images = multiple 
+    ? (Array.isArray(value) ? value : value ? [value] : [])
+    : (Array.isArray(value) ? (value[0] ? [value[0]] : []) : value ? [value] : [])
 
   return (
     <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-stone">
