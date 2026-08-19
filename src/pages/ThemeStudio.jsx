@@ -239,6 +239,54 @@ export default function ThemeStudio() {
     link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:ital,wght@0,400;0,600;0,700;1,400&display=swap`
   }, [fonts.customGoogleFont])
 
+  const [uploadingFont, setUploadingFont] = useState(false)
+  const [customFontInfo, setCustomFontInfo] = useState(null)
+
+  async function handleFontFileUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingFont(true)
+    try {
+      const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9]/g, '')
+      const fontFamName = 'CustomFont_' + cleanName
+      const reader = new FileReader()
+      reader.onload = async (evt) => {
+        const dataUrl = evt.target.result
+        try {
+          const fontFace = new FontFace(fontFamName, `url(${dataUrl})`)
+          const loadedFont = await fontFace.load()
+          document.fonts.add(loadedFont)
+        } catch (fErr) {
+          console.warn('FontFace add warning:', fErr)
+        }
+
+        // Upload to server for public persistence
+        let fontServerUrl = ''
+        try {
+          const uploaded = await uploadFile(file)
+          fontServerUrl = uploaded.url
+        } catch (uErr) {
+          fontServerUrl = dataUrl
+        }
+
+        setCustomFontInfo({ name: file.name, fontFamName, url: fontServerUrl || dataUrl })
+        setFonts((prev) => ({
+          ...prev,
+          display: `"${fontFamName}", serif`,
+          script: `"${fontFamName}", cursive`,
+          customFontUrl: fontServerUrl || dataUrl,
+          customFontName: fontFamName,
+          customGoogleFont: '',
+        }))
+        setUploadingFont(false)
+      }
+      reader.readAsDataURL(file)
+    } catch (err) {
+      alert('Gagal memuat font: ' + err.message)
+      setUploadingFont(false)
+    }
+  }
+
   function applyPreset(p) {
     setColors(p.colors)
     if (p.opacities) setOpacities(p.opacities)
@@ -415,7 +463,11 @@ export default function ThemeStudio() {
     ],
   }
 
-  const activeDisplayFont = fonts.customGoogleFont?.trim() ? `"${fonts.customGoogleFont.trim()}", serif` : fonts.display
+  const activeDisplayFont = fonts.customFontName
+    ? `"${fonts.customFontName}", serif`
+    : fonts.customGoogleFont?.trim()
+    ? `"${fonts.customGoogleFont.trim()}", serif`
+    : fonts.display
   const paperBgColor = hexToRgba(colors.paper, opacities.paper)
   const mainBgColor = hexToRgba(colors.bg, opacities.bg)
   const accentBorderColor = hexToRgba(colors.accent, opacities.accent)
@@ -670,6 +722,53 @@ export default function ThemeStudio() {
                   />
                   <p className="text-[10px] text-stone mt-1">
                     Cukup masukkan nama font dari Google Fonts, sistem otomatis me-load secara live.
+                  </p>
+                </div>
+
+                <div className="border-t border-ink/10 pt-4">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs uppercase tracking-wider text-stone font-semibold">
+                      Upload File Font Sendiri (.TTF / .OTF / .WOFF2)
+                    </label>
+                    <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors inline-flex items-center gap-1">
+                      <Upload size={11} /> {uploadingFont ? 'Memuat Font...' : 'Pilih File Font'}
+                      <input
+                        type="file"
+                        accept=".ttf,.otf,.woff,.woff2"
+                        className="hidden"
+                        onChange={handleFontFileUpload}
+                      />
+                    </label>
+                  </div>
+                  
+                  {customFontInfo && (
+                    <div className="p-3 bg-paper border border-gold-deep/30 rounded-xs flex items-center justify-between mt-2">
+                      <div>
+                        <p className="text-xs font-bold text-ink" style={{ fontFamily: customFontInfo.fontFamName }}>
+                          {customFontInfo.name} (Pratinjau Font Aktif)
+                        </p>
+                        <p className="text-[10px] text-green-700 font-semibold">✓ Font kustom berhasil dimuat &amp; diterapkan ke nama pengantin</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCustomFontInfo(null)
+                          setFonts((prev) => ({
+                            ...prev,
+                            display: '"Playfair Display", serif',
+                            script: '"Playfair Display", serif',
+                            customFontUrl: '',
+                            customFontName: '',
+                          }))
+                        }}
+                        className="text-[10px] text-red-600 underline"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-stone mt-1">
+                    Mendukung format TTF, OTF, WOFF, dan WOFF2 untuk kaligrafi atau font eksklusif buatan desainer.
                   </p>
                 </div>
               </div>

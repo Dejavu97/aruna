@@ -77,6 +77,26 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
     setLocal(data)
   }, [data])
 
+  useEffect(() => {
+    if (!data.protectPhotos) return
+    const handleContextMenu = (e) => {
+      if (e.target.tagName === 'IMG' || e.target.closest('.gallery') || e.target.closest('.cover') || e.target.closest('.couple-photo') || e.target.closest('.person-photo')) {
+        e.preventDefault()
+      }
+    }
+    const handleDragStart = (e) => {
+      if (e.target.tagName === 'IMG') {
+        e.preventDefault()
+      }
+    }
+    window.addEventListener('contextmenu', handleContextMenu)
+    window.addEventListener('dragstart', handleDragStart)
+    return () => {
+      window.removeEventListener('contextmenu', handleContextMenu)
+      window.removeEventListener('dragstart', handleDragStart)
+    }
+  }, [data.protectPhotos])
+
   const couple = `${data.bride?.nick || ''} & ${data.groom?.nick || ''}`
   const coverImg = data.gallery?.[0] || data.backdrop || theme.cover
 

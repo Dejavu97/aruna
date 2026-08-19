@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX } from 'lucide-react'
+import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX, Shield } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import QrCameraScanner from '../components/QrCameraScanner'
@@ -620,6 +620,39 @@ export default function Manage() {
                   </a>
                 </div>
               </div>
+
+              {/* Privacy & Photo Protection Card */}
+              <div className="border border-ink/10 bg-paper p-5 lg:col-span-3 flex flex-wrap items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Shield className="text-gold-deep" size={16} />
+                    <h4 className="font-display text-base font-bold text-ink">Proteksi Privasi Foto &amp; Anti-Download</h4>
+                  </div>
+                  <p className="text-xs text-stone max-w-xl leading-relaxed">
+                    Nonaktifkan klik kanan, drag-and-drop, dan fitur simpan gambar pada seluruh foto galeri dan profil pengantin agar foto momen bahagia Anda tidak dapat diunduh sembarangan oleh tamu.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const nextVal = !item.protectPhotos
+                    try {
+                      await updateInvitation(slug, { protectPhotos: nextVal }, editKey)
+                      setItem((prev) => ({ ...prev, protectPhotos: nextVal }))
+                    } catch (err) {
+                      alert('Gagal mengubah pengaturan: ' + err.message)
+                    }
+                  }}
+                  className={`px-4 py-2 text-xs uppercase tracking-wider font-semibold border rounded-xs transition-colors ${
+                    item.protectPhotos
+                      ? 'bg-green-700 text-white border-green-700'
+                      : 'bg-white text-stone border-ink/20 hover:text-ink'
+                  }`}
+                >
+                  {item.protectPhotos ? '✓ Proteksi Foto Aktif' : 'Aktifkan Proteksi Foto'}
+                </button>
+              </div>
+
             </div>
           )}
 

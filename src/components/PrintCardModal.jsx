@@ -161,37 +161,90 @@ export default function PrintCardModal({ item, onClose }) {
     }
 
     // Table Tent Card
+    if (cardType === 'table') {
+      return (
+        <div
+          key={idx}
+          className={`relative p-6 rounded-xs border-2 flex flex-col items-center justify-between text-center transition-all ${styles.cardBg} ${styles.border} w-[300px] h-[400px] mx-auto shadow-xs print:shadow-none print:m-0`}
+        >
+          <div className="space-y-1 w-full">
+            <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-stone">The Wedding Of {couple}</p>
+            <div className="w-12 h-[1px] bg-current opacity-30 mx-auto my-2" />
+          </div>
+
+          {/* Big Table Number */}
+          <div className="space-y-1 my-2">
+            <h2 className="font-display text-4xl font-black uppercase tracking-wider">{title}</h2>
+            <p className="text-xs italic opacity-85">{subtitle}</p>
+          </div>
+
+          {/* QR Code for live access */}
+          <div className="space-y-1.5 flex flex-col items-center">
+            <div className="p-2 bg-white rounded-xs border border-black/10 shadow-xs">
+              <img src={qrCodeUrl} alt="QR Code" className="w-24 h-24 object-contain" />
+            </div>
+            <p className="text-[9px] uppercase tracking-wider opacity-75 font-semibold">Scan untuk Foto &amp; Ucapan Live</p>
+          </div>
+
+          <p className="text-[9px] font-semibold opacity-60 uppercase tracking-widest">{dateFormatted}</p>
+        </div>
+      )
+    }
+
+    // Bifold Foldable Invitation Card (2 Pages Folded Layout)
     return (
       <div
         key={idx}
-        className={`relative p-6 rounded-xs border-2 flex flex-col items-center justify-between text-center transition-all ${styles.cardBg} ${styles.border} w-[300px] h-[400px] mx-auto shadow-xs print:shadow-none print:m-0`}
+        className={`relative p-6 rounded-xs border-2 grid grid-cols-2 gap-4 text-center transition-all ${styles.cardBg} ${styles.border} w-full max-w-[580px] min-h-[380px] mx-auto shadow-xs print:shadow-none print:m-0`}
       >
-        <div className="space-y-1 w-full">
-          <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-stone">The Wedding Of {couple}</p>
-          <div className="w-12 h-[1px] bg-current opacity-30 mx-auto my-2" />
-        </div>
-
-        {/* Big Table Number */}
-        <div className="space-y-1 my-2">
-          <h2 className="font-display text-4xl font-black uppercase tracking-wider">{title}</h2>
-          <p className="text-xs italic opacity-85">{subtitle}</p>
-        </div>
-
-        {/* QR Code for live access */}
-        <div className="space-y-1.5 flex flex-col items-center">
-          <div className="p-2 bg-white rounded-xs border border-black/10 shadow-xs">
-            <img src={qrCodeUrl} alt="QR Code" className="w-24 h-24 object-contain" />
+        {/* Left Panel: Bride, Groom & Akad */}
+        <div className="flex flex-col items-center justify-between pr-3 border-r border-dashed border-current/25 relative">
+          <div className="space-y-1">
+            <p className="text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">Undangan Pernikahan</p>
+            <h4 className="font-display text-lg font-bold">{couple}</h4>
+            <div className="w-6 h-[1px] bg-current opacity-30 mx-auto my-1" />
           </div>
-          <p className="text-[9px] uppercase tracking-wider opacity-75 font-semibold">Scan untuk Foto &amp; Ucapan Live</p>
+
+          <div className="space-y-1 text-[9px] opacity-80 leading-relaxed px-1">
+            <p className="font-semibold text-[10px]">AKAD NIKAH</p>
+            <p>{dateFormatted}</p>
+            <p className="line-clamp-2">{item.events?.[0]?.venue || item.location || 'Lokasi Acara'}</p>
+          </div>
+
+          <div className="pt-2 border-t border-current/15 w-full space-y-1">
+            <p className="text-[8px] uppercase tracking-widest opacity-60 font-semibold">Buka Undangan Digital</p>
+            <div className="p-1.5 bg-white rounded-xs border border-black/10 inline-block">
+              <img src={qrCodeUrl} alt="QR Code" className="w-16 h-16 object-contain" />
+            </div>
+          </div>
         </div>
 
-        <p className="text-[9px] font-semibold opacity-60 uppercase tracking-widest">{dateFormatted}</p>
+        {/* Right Panel: Resepsi, RSVP & Monogram */}
+        <div className="flex flex-col items-center justify-between pl-3">
+          <div className="space-y-1">
+            <div className="w-8 h-8 mx-auto rounded-full border border-current/30 flex items-center justify-center font-display text-xs font-bold italic mb-1">
+              {brideNick[0]}&amp;{groomNick[0]}
+            </div>
+            <p className="text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">RESEPSI PERNIKAHAN</p>
+            <p className="text-[9px] font-semibold opacity-90">{dateFormatted}</p>
+          </div>
+
+          <div className="space-y-1 text-[9px] opacity-80 leading-relaxed px-1">
+            <p className="italic">{subtitle}</p>
+            <p className="font-mono text-[8px] opacity-70">{item.events?.[1]?.venue || 'Gedung Resepsi'}</p>
+          </div>
+
+          <div className="pt-2 border-t border-current/15 w-full text-[8px] opacity-70">
+            <p className="font-display text-xs font-bold">{couple}</p>
+            <p className="tracking-widest uppercase text-[7px] mt-0.5">Aruna Digital Invitation</p>
+          </div>
+        </div>
       </div>
     )
   }
 
   // Calculate number of cards in sheet grid
-  const gridCount = cardType === 'souvenir' ? 8 : cardType === 'enclosure' ? 2 : 2
+  const gridCount = cardType === 'souvenir' ? 8 : cardType === 'enclosure' ? 2 : cardType === 'bifold' ? 1 : 2
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto print:p-0 print:bg-white print:fixed print:inset-0">
@@ -238,11 +291,12 @@ export default function PrintCardModal({ item, onClose }) {
             {/* 1. Card Type Selection */}
             <div className="bg-ivory/50 p-4 border border-ink/10 rounded-xs space-y-2">
               <label className="block text-[11px] uppercase tracking-wider text-stone font-bold">1. Jenis Kartu Fisik</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  ['souvenir', 'Kartu Souvenir'],
+                  ['souvenir', 'Souvenir Tag'],
                   ['enclosure', 'Undangan Mini'],
                   ['table', 'Nomor Meja'],
+                  ['bifold', 'Lipat 2 (Bifold)'],
                 ].map(([cVal, cLbl]) => (
                   <button
                     key={cVal}
