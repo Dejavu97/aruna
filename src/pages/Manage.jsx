@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Bell, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX } from 'lucide-react'
+import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
+import QrCameraScanner from '../components/QrCameraScanner'
 import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl, uid } from '../lib/utils'
 import { shareWaLink, waLink } from '../data/site'
@@ -41,6 +42,7 @@ export default function Manage() {
   const [checkInSearch, setCheckInSearch] = useState('')
   const [checkInFilter, setCheckInFilter] = useState('all') // 'all' | 'checkedIn' | 'notYet'
   const [recentCheckIn, setRecentCheckIn] = useState(null)
+  const [showScanner, setShowScanner] = useState(false)
 
   const backHref = backFromInvite(slug, { key: editKey && !isAdmin ? editKey : '', from: isAdmin ? 'admin' : '' })
   const backLabel = isAdmin ? '← Kembali ke admin' : '← Kembali ke halaman bayar'
@@ -230,6 +232,33 @@ export default function Manage() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const handleQrScanned = (decodedText) => {
+    let name = ''
+    try {
+      if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
+        const parsed = new URL(decodedText)
+        const to = parsed.searchParams.get('to')
+        if (to) name = decodeURIComponent(to).replace(/\+/g, ' ').trim()
+      } else if (decodedText.includes('to=')) {
+        const parts = decodedText.split('to=')
+        if (parts[1]) {
+          name = decodeURIComponent(parts[1].split('&')[0]).replace(/\+/g, ' ').trim()
+        }
+      }
+    } catch {}
+
+    if (!name) name = decodedText.trim()
+
+    setShowScanner(false)
+    if (name) {
+      const matched = guestsWithRsvp.find(
+        (g) => g.name.toLowerCase().trim() === name.toLowerCase().trim(),
+      )
+      const defaultPax = matched?.rsvp?.guests || 1
+      toggleCheckIn(name, defaultPax)
+    }
   }
 
   const composeMessage = (guestName, guestPhone = '', mode = messageMode) => {
@@ -638,14 +667,21 @@ export default function Manage() {
                     <p className="text-[11px] uppercase tracking-[0.18em] text-gold-deep">Buku Tamu Digital &amp; Resepsi</p>
                     <h2 className="mt-1 font-display text-2xl">Buku Tamu &amp; VIP Check-In Lokasi</h2>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowScanner(true)}
+                      className="inline-flex items-center gap-2 bg-gold-deep text-ivory px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-gold transition-colors font-medium shadow-sm"
+                    >
+                      <Camera size={15} /> Scan QR Kamera
+                    </button>
                     {guestsWithCheckIn.length > 0 && (
                       <button
                         type="button"
                         onClick={exportCheckInCSV}
                         className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
                       >
-                        <Download size={14} /> Download Rekap Kehadiran (CSV)
+                        <Download size={14} /> Download Rekap (CSV)
                       </button>
                     )}
                   </div>
@@ -1280,6 +1316,14 @@ export default function Manage() {
           )}
         </div>
       </section>
+
+      {showScanner && (
+        <QrCameraScanner
+          onScan={handleQrScanned}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+
       <SiteFooter />
     </div>
   )
