@@ -206,7 +206,7 @@ function Couple({ data }) {
                   </a>
                 )}
               </div>
-            </article>
+            </motion.article>
           ) : null
         )}
       </div>
