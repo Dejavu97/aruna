@@ -30,27 +30,10 @@ function Cover({ data, coverImg, onOpen }) {
       exit={{ opacity: 0, y: -50, filter: "blur(10px)" }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
     >
-      {/* Background Batik - subtle */}
       <div className="ab-cover-bg" />
-
-      {/* Floral Corners - muncul stagger */}
-      <motion.div className="ab-floral-corner ab-floral-tl" initial={{ opacity: 0, x: -30, y: -30 }} animate={{ opacity: 1, x: 0, y: 0 }} transition={{ duration: 1, delay: 0.2 }} />
-      <motion.div className="ab-floral-corner ab-floral-tr" initial={{ opacity: 0, x: 30, y: -30 }} animate={{ opacity: 1, x: 0, y: 0 }} transition={{ duration: 1, delay: 0.4 }} />
-      <motion.div className="ab-floral-corner ab-floral-bl" initial={{ opacity: 0, x: -30, y: 30 }} animate={{ opacity: 1, x: 0, y: 0 }} transition={{ duration: 1, delay: 0.6 }} />
-      <motion.div className="ab-floral-corner ab-floral-br" initial={{ opacity: 0, x: 30, y: 30 }} animate={{ opacity: 1, x: 0, y: 0 }} transition={{ duration: 1, delay: 0.8 }} />
 
       <div className="ab-cover-content">
         <Kicker>THE WEDDING OF</Kicker>
-
-        {/* Pendopo / Rumah Jawa */}
-        <motion.img 
-          src="/themes/jawa-biru/house.png" 
-          alt="Pendopo" 
-          className="ab-pendopo"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
-        />
 
         <motion.h1 
           className="ab-title"

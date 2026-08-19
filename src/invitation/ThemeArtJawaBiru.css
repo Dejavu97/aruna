@@ -55,11 +55,18 @@
 .ab-cover-bg {
   position: absolute;
   inset: 0;
-  background-image: url('/themes/jawa-biru/bg_batik.jpg');
+  background-image: url('/themes/jawa-biru/house.png');
   background-size: cover;
   background-position: center;
   z-index: 0;
-  opacity: 0.15;
+  opacity: 1;
+}
+.ab-cover-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(244,247,246,0.6);
+  z-index: 1;
 }
 .ab-cover-content {
   position: relative;
