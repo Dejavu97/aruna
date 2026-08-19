@@ -236,48 +236,56 @@ export const demos = {
   'adat-jawa': demo({
     themeId: 'adat-jawa',
     slug: 'ayu-dimas',
+    music: '/music/gamelan_lambang_sari.mp3',
     groom: {
       nick: 'Dimas',
-      full: 'R. Dimas Suryo Diningrat',
-      parents: 'Putra dari Bpk. R.H. Suryo & Ibu R.Ay. Kusuma',
-      photo: '/themes/adat-jawa.jpg',
+      full: 'R. Dimas Suryo Diningrat, S.T., M.Sc.',
+      parents: 'Putra dari Bpk. R.H. Suryo Joyodiningrat & Ibu R.Ay. Kusuma Wardhani',
+      photo: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=600&q=80',
+      ig: '@dimassuryo'
     },
     bride: {
       nick: 'Ayu',
-      full: 'R.A. Ayu Sekar Wangi',
-      parents: 'Putri dari Bpk. R.M. Haryo & Ibu R.A. Lestari',
-      photo: '/themes/adat-jawa.jpg',
+      full: 'R.A. Ayu Sekar Wangi, S.E.',
+      parents: 'Putri dari Bpk. R.M. Haryo Sasongko & Ibu R.A. Lestari Ningsih',
+      photo: 'https://images.unsplash.com/photo-1549471013-3364d73206c3?auto=format&fit=crop&w=600&q=80',
+      ig: '@ayusekarw'
     },
     date: '2026-12-12',
-    quote: 'Tresna iku dudu mung amarga rupa, nanging amarga ati kang tulus.',
-    quoteSource: 'Pepatah Jawa',
+    quote: 'Tresna iku dudu mung amarga rupa, nanging amarga ati kang tulus lan keikhlasan kanggo urip bebarengan ing kahanan apa wae.',
+    quoteSource: 'Falsafah Jawa',
     story: [
-      { year: '2020', title: 'Pitepangan', body: 'Bertemu di keraton.' },
-      { year: '2024', title: 'Lamaran', body: 'Keluarga sepakat.' },
+      { year: '2020', title: 'Pitepangan (Pertemuan)', body: 'Pertemuan pertama kami secara tidak sengaja di sebuah acara kesenian di keraton. Sebuah sapaan sederhana yang membuka lembaran baru.' },
+      { year: '2023', title: 'Paseksen (Komitmen)', body: 'Setelah tiga tahun saling mengenal karakter dan keluarga, kami memutuskan untuk melangkah ke jenjang yang lebih serius dengan memohon restu orang tua.' },
+      { year: '2025', title: 'Lamaran (Tukar Cincin)', body: 'Keluarga besar bertemu dalam suasana hangat, membawa paningset sebagai tanda ikatan suci sebelum menuju pelaminan.' },
     ],
     events: [
       {
         title: 'Akad Nikah',
         date: '2026-12-12',
-        time: '08:00',
-        venue: 'Pendopo Keraton',
-        address: 'Jl. Keraton, Yogyakarta',
-        maps: '#',
+        time: '08:00 - 10:00 WIB',
+        venue: 'Masjid Gede Kauman',
+        address: 'Alun-Alun Keraton, Ngupasan, Gondomanan, Kota Yogyakarta, Daerah Istimewa Yogyakarta 55122',
+        maps: 'https://maps.google.com'
       },
       {
         title: 'Resepsi (Panggih)',
         date: '2026-12-12',
-        time: '11:00',
-        venue: 'Pendopo Keraton',
-        address: 'Jl. Keraton, Yogyakarta',
-        maps: '#',
+        time: '11:00 - 14:00 WIB',
+        venue: 'Pendopo Sasana Hinggil',
+        address: 'Alun-Alun Kidul, Patehan, Kraton, Kota Yogyakarta, Daerah Istimewa Yogyakarta 55133',
+        maps: 'https://maps.google.com'
       },
     ],
     banks: [
-      { bank: 'BCA', name: 'Ayu Sekar', number: '123456789' },
+      { bank: 'BCA', name: 'R.A. Ayu Sekar Wangi', number: '0123456789' },
+      { bank: 'Mandiri', name: 'R. Dimas Suryo Diningrat', number: '9876543210' }
     ],
     gallery: [
       '/themes/adat-jawa.jpg',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1000&q=80',
     ],
   }),
   'emas-senja': demo({

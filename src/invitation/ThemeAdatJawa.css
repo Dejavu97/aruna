@@ -51,7 +51,7 @@
 /* Pola Batik Ivory Cream */
 .jw-main {
   background-color: var(--jw-cream);
-  background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');
+  background-image: url('/themes/batik_sidoasih.jpg');
   min-height: 100dvh;
   color: var(--jw-dark);
 }
@@ -160,40 +160,44 @@
 
 /* Gunungan Graphic */
 .jw-gunungan-graphic {
-  width: 160px;
-  height: 160px;
-  margin: 0 auto 1.5rem;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 0.5rem;
   background-image: url('/themes/gunungan.jpg');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   mix-blend-mode: multiply;
+  position: relative;
+  z-index: 1;
 }
 
 /* Corner Ornaments */
 .jw-corner {
   position: absolute;
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   background-image: url('/themes/ukiran_sudut.jpg');
   background-size: contain;
   background-repeat: no-repeat;
   mix-blend-mode: multiply;
-  opacity: 0.8;
-  z-index: 0;
+  opacity: 0.85;
+  z-index: 2;
   pointer-events: none;
 }
-.jw-corner-tl { top: 0; left: 0; }
-.jw-corner-tr { top: 0; right: 0; transform: scaleX(-1); }
-.jw-corner-bl { bottom: 0; left: 0; transform: scaleY(-1); }
-.jw-corner-br { bottom: 0; right: 0; transform: scale(-1, -1); }
+/* Gambar asli → pojok kanan atas. Transform sesuai posisi */
+.jw-corner-tl { top: 0; left: 0;  transform: scaleX(-1); }
+.jw-corner-tr { top: 0; right: 0; transform: none; }
+.jw-corner-bl { bottom: 0; left: 0;  transform: scale(-1, -1); }
+.jw-corner-br { bottom: 0; right: 0; transform: scaleY(-1); }
 
 /* Hero */
 .jw-hero {
   position: relative;
   text-align: center;
-  padding: 8rem 1.5rem 6rem;
-  background: url('https://www.transparenttextures.com/patterns/arabesque.png');
+  padding: 0 1.5rem 4rem;
+  background: url('/themes/batik_sidoasih.jpg');
+  overflow: hidden;
 }
 .jw-hero-names {
   font-size: clamp(2.5rem, 8vw, 4rem);
@@ -214,34 +218,53 @@
   gap: 3rem;
   margin-top: 3rem;
 }
-.jw-person-photo {
+/* Container Utama */
+.jw-person-photo-wrap {
   position: relative;
-  width: 220px;
-  height: 280px;
+  width: 260px;
+  height: 300px;
   margin: 0 auto 1.5rem;
+  background: transparent; /* Harus transparent agar mix-blend-mode frame bisa berfungsi */
 }
-.jw-person-photo img {
-  position: absolute;
-  top: 30%;
-  left: 21%;
-  width: 58%;
-  height: 60%;
-  object-fit: cover;
-  border-radius: 90px 90px 0 0;
-  z-index: 1;
-}
-.jw-person-photo::after {
-  content: '';
+
+/* Bingkai Kayu (Absolute di Bawah sebagai Plakat) */
+.jw-person-frame {
   position: absolute;
   inset: 0;
   background-image: url('/themes/bingkai_gebyok.jpg');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-size: 100% 100%;
   mix-blend-mode: multiply;
-  z-index: 2;
   pointer-events: none;
+  z-index: 2; /* Frame di ATAS foto agar kelihatan melingkupi */
 }
+
+/* Lubang frame berdasarkan analisa gambar:
+   - Lubang mulai dari kiri ~29%, kanan ~71% → lebar ~42%
+   - Lubang mulai dari atas ~28%, bawah ~93% → tinggi ~65%
+   - Arch di bagian atas */
+.jw-person-clip {
+  position: absolute;
+  left: 30%;
+  top: 33%; /* Turun sedikit dari 27% agar rambut tidak ketutup arch */
+  width: 40%;
+  height: 59%; /* Dikurangi sedikit karena top naik */
+  border-radius: 60px 60px 0 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.jw-person-clip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 5%;
+}
+
+.jw-person {
+  background: transparent; /* Pastikan tidak ada bg putih saat slide-in */
+  text-align: center;
+}
+
 .jw-person h3 {
   font-size: 1.3rem;
   color: var(--jw-teak);
@@ -475,7 +498,7 @@
 /* Background Utility Classes */
 .jw-batik-bg {
   background-color: var(--jw-cream);
-  background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');
+  background-image: url('/themes/batik_sidoasih.jpg');
 }
 .jw-dark-bg {
   background-color: var(--jw-paper);

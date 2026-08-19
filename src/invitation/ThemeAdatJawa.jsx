@@ -41,9 +41,13 @@ function Petals() {
 
 function GoldLine({ width = '3rem', center = true }) {
   return (
-    <div
+    <motion.div
       className="jw-goldline"
-      style={{ width, margin: center ? '1rem auto' : '1rem 0' }}
+      style={{ margin: center ? '1rem auto' : '1rem 0' }}
+      initial={{ width: 0, opacity: 0 }}
+      whileInView={{ width, opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
     />
   )
 }
@@ -142,17 +146,61 @@ function Cover({ data, guest, coverImg, onOpen }) {
 function Hero({ data, bride, groom }) {
   return (
     <section className="jw-hero" id="home">
-      <div className="jw-corner jw-corner-tl" />
-      <div className="jw-corner jw-corner-tr" />
-      <div className="jw-gunungan-graphic" />
-      <Kicker>THE WEDDING OF</Kicker>
-      <h2 className="jw-hero-names">
-        <span>{bride}</span>
-        <em className="jw-hero-amp">&amp;</em>
-        <span>{groom}</span>
-      </h2>
-      <GoldLine />
-      <p className="jw-hero-date">{formatLongDate(data.date).toUpperCase()}</p>
+      {/* Corner ukiran: cukup fade-in saja, tanpa geser (sudah position absolute) */}
+      <motion.div className="jw-corner jw-corner-tl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.85 }}
+        transition={{ duration: 1.5, ease: 'easeOut', delay: 0.5 }}
+      />
+      <motion.div className="jw-corner jw-corner-tr"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.85 }}
+        transition={{ duration: 1.5, ease: 'easeOut', delay: 0.7 }}
+      />
+
+      {/* Gunungan: ayun kiri-kanan pelan (bukan muter penuh) */}
+      <motion.div
+        className="jw-gunungan-graphic"
+        animate={{ rotateZ: [0, 8, 0, -8, 0] }}
+        transition={{ duration: 8, ease: 'easeInOut', repeat: Infinity }}
+      />
+
+      {/* Kicker + Nama Stagger */}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.2, delayChildren: 0.5 } }
+        }}
+      >
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+          <Kicker>THE WEDDING OF</Kicker>
+        </motion.div>
+        <motion.h2
+          className="jw-hero-names"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
+        >
+          <motion.span variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}>
+            {bride}
+          </motion.span>
+          <motion.em className="jw-hero-amp"
+            variants={{ hidden: { opacity: 0, scale: 0.5 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } } }}
+          >&amp;</motion.em>
+          <motion.span variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}>
+            {groom}
+          </motion.span>
+        </motion.h2>
+        <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
+          <GoldLine width="6rem" />
+        </motion.div>
+        <motion.p
+          className="jw-hero-date"
+          variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}
+        >
+          {formatLongDate(data.date).toUpperCase()}
+        </motion.p>
+      </motion.div>
     </section>
   )
 }
@@ -171,31 +219,55 @@ function Quote({ data }) {
 
 function Couple({ data }) {
   const people = [
-    { who: data.groom, role: 'THE GROOM', direction: -100 },
-    { who: data.bride, role: 'THE BRIDE', direction: 100 },
+    { who: data.groom, role: 'THE GROOM', delay: 0 },
+    { who: data.bride, role: 'THE BRIDE', delay: 0.3 },
   ]
   return (
-    <section className="jw-pad jw-dark-bg" id="couple">
+    <section className="jw-pad jw-batik-bg" id="couple" style={{ position: 'relative', overflow: 'hidden' }}>
+      <div className="jw-gunungan-graphic" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) scale(4)', opacity: 0.04, mixBlendMode: 'multiply', pointerEvents: 'none' }} />
       <Kicker>PASANGAN</Kicker>
       <GoldLine />
       <div className="jw-couple-grid">
         {people.map((item) =>
           item.who ? (
-            <motion.article 
-              key={item.role} 
-              className="jw-person"
-              initial={{ x: item.direction, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            >
-              <p className="jw-person-role">{item.role}</p>
+            <article key={item.role} className="jw-person">
+              {/* Label role */}
+              <motion.p
+                className="jw-person-role"
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: item.delay }}
+              >
+                {item.role}
+              </motion.p>
+
+              {/* Frame & foto: frame TIDAK dianimasikan agar mix-blend-mode tidak rusak */}
               {item.who.photo && (
-                <div className="jw-person-photo">
-                  <img src={item.who.photo} alt={item.who.nick} />
+                <div className="jw-person-photo-wrap">
+                  <div className="jw-person-frame" />
+                  <div className="jw-person-clip">
+                    {/* Hanya foto yang di-fade-in, BUKAN containernya */}
+                    <motion.img
+                      src={item.who.photo}
+                      alt={item.who.nick}
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.2, delay: item.delay + 0.2 }}
+                    />
+                  </div>
                 </div>
               )}
-              <div className="jw-person-info">
+
+              {/* Teks nama: slide up */}
+              <motion.div
+                className="jw-person-info"
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: item.delay + 0.4 }}
+              >
                 <h3>{formatNameWithDegree(item.who)}</h3>
                 <p className="jw-person-parents">{formatParents(item.who, item.role === 'THE BRIDE' ? 'Putri' : 'Putra')}</p>
                 {item.who.ig && (
@@ -208,8 +280,8 @@ function Couple({ data }) {
                     <ExternalLink size={12} /> @{String(item.who.ig).replace(/^@/, '')}
                   </a>
                 )}
-              </div>
-            </motion.article>
+              </motion.div>
+            </article>
           ) : null
         )}
       </div>
@@ -282,18 +354,20 @@ function Countdown({ tick, date, data, bride, groom }) {
 function Events({ events }) {
   if (!events?.length) return null
   return (
-    <section className="jw-pad jw-batik-bg" id="event">
+    <section className="jw-pad jw-batik-bg" id="event" style={{ position: 'relative' }}>
+      <div className="jw-gunungan-graphic" style={{ position: 'absolute', top: '20%', left: '50%', transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0.05, mixBlendMode: 'multiply', pointerEvents: 'none' }} />
       <Kicker>SAVE OUR DATE</Kicker>
       <GoldLine />
       <div className="jw-event-cards">
         {events.map((ev, idx) => (
-          <motion.article 
-            key={ev.title} 
+          <motion.article
+            key={ev.title}
             className="jw-event-card"
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, delay: idx * 0.2 }}
+            initial={{ opacity: 0, scale: 0.85 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.6, delay: idx * 0.25, ease: 'easeOut' }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
           >
             <h3>{ev.title}</h3>
             <p className="jw-event-time">{formatLongDate(ev.date)} <br/> {ev.time}</p>
