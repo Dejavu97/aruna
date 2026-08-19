@@ -44,7 +44,7 @@ function Cover({ data, coverImg, onOpen }) {
 
         {/* Pendopo / Rumah Jawa */}
         <motion.img 
-          src="/themes/jawa-biru/house.jpg" 
+          src="/themes/jawa-biru/house.png" 
           alt="Pendopo" 
           className="ab-pendopo"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -270,7 +270,7 @@ export default function ThemeArtJawaBiru({ theme, data }) {
             <h2 className="ab-title" style={{ fontSize: '2rem', marginBottom: '1rem' }}>Terima Kasih</h2>
             <p>Atas doa & restu yang diberikan.</p>
             <div style={{ marginTop: '2rem' }}>
-              <img src="/themes/jawa-biru/ornament.jpg" alt="Bunga" style={{ width: '100px', mixBlendMode: 'multiply' }} />
+              <img src="/themes/jawa-biru/ornament.png" alt="Bunga" style={{ width: '100px' }} />
             </div>
           </section>
         </motion.div>

@@ -72,11 +72,10 @@
   gap: 1.5rem;
 }
 
-/* Pendopo Image (White bg to transparent hack) */
+/* Pendopo Image (Transparent PNG) */
 .ab-pendopo {
   width: 250px;
   height: auto;
-  mix-blend-mode: multiply;
   margin-bottom: 1rem;
 }
 
@@ -85,10 +84,9 @@
   position: absolute;
   width: 150px;
   height: 150px;
-  background-image: url('/themes/jawa-biru/ornament.jpg');
+  background-image: url('/themes/jawa-biru/ornament.png');
   background-size: contain;
   background-repeat: no-repeat;
-  mix-blend-mode: multiply;
   z-index: 5;
   pointer-events: none;
 }
@@ -166,9 +164,8 @@
 .ab-photo-frame-img {
   position: absolute;
   inset: 0;
-  background-image: url('/themes/jawa-biru/frame.jpg');
+  background-image: url('/themes/jawa-biru/frame.png');
   background-size: 100% 100%;
-  mix-blend-mode: multiply;
   pointer-events: none;
   z-index: 2;
 }
