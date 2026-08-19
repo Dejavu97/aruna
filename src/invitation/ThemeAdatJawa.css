@@ -1,19 +1,19 @@
 /* ===========================================
-   TEMA ADAT JAWA KLASIK (REVISI)
+   TEMA ADAT JAWA KLASIK (FULL BATIK DARK)
    =========================================== */
 .jw-wrap {
-  --jw-dark: #3b2518;
-  --jw-gold: #c59b41;
-  --jw-light: #fdfaf6;
-  --jw-paper: #f3e9dc;
-  --jw-red: #802319;
-  --jw-text: #2c1a10;
+  --jw-dark: #2c1a10;
+  --jw-darker: #1a0f09;
+  --jw-gold: #d4af37;
+  --jw-gold-light: #fbe285;
+  --jw-red: #8b0000;
+  --jw-text: #fdfaf6;
   
   --jw-serif: 'Playfair Display', serif;
   --jw-sans: 'Inter', sans-serif;
   --jw-script: 'Great Vibes', cursive;
   
-  background-color: var(--jw-light);
+  background-color: var(--jw-dark);
   color: var(--jw-text);
   font-family: var(--jw-sans);
   line-height: 1.6;
@@ -24,7 +24,7 @@
   min-height: 100dvh;
   font-family: var(--jw-sans);
   color: var(--jw-text);
-  background: var(--jw-dark);
+  background: var(--jw-darker);
 }
 
 .jw-bg {
@@ -37,7 +37,7 @@
 .jw-bg-shade {
   position: absolute;
   inset: 0;
-  background: rgba(59,37,24,0.6);
+  background: rgba(26,15,9,0.7);
 }
 
 .jw-panel {
@@ -46,9 +46,13 @@
   min-height: 100dvh;
   background: transparent;
 }
+
+/* Pola Batik Utama */
 .jw-main {
-  background: var(--jw-light);
+  background-color: var(--jw-dark);
+  background-image: url('https://www.transparenttextures.com/patterns/black-floral-motif.png');
   min-height: 100dvh;
+  color: var(--jw-text);
 }
 
 @media (min-width: 1024px) {
@@ -57,42 +61,37 @@
     width: 45vw;
     max-width: 600px;
     min-height: 100dvh;
-    background: var(--jw-light);
-    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.8);
   }
 }
 
 .jw-wrap * { box-sizing: border-box; }
-.jw-wrap h1, .jw-wrap h2, .jw-wrap h3 {
+.jw-wrap h1, .jw-wrap h2, .jw-wrap h3, .jw-wrap h4 {
   font-family: var(--jw-serif);
   font-weight: 600;
   margin: 0;
-  color: var(--jw-dark);
+  color: var(--jw-gold);
 }
 
 .jw-pad { padding: 4rem 1.5rem; }
 .jw-center { text-align: center; }
 
-/* Ornamen Batik Background */
-.jw-batik-bg {
-  background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');
-  background-color: var(--jw-paper);
-}
-
-.jw-dark-bg {
-  background-color: var(--jw-dark);
-  background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');
-  color: var(--jw-light);
-}
-
-.jw-dark-bg h2, .jw-dark-bg h3 {
-  color: var(--jw-gold);
-}
-
 .jw-goldline {
   height: 2px;
   background: var(--jw-gold);
   margin: 1.5rem auto;
+  border-radius: 2px;
+}
+
+/* Gunungan Kicker / Ornamen */
+.jw-kicker {
+  font-family: var(--jw-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  font-size: 0.75rem;
+  color: var(--jw-gold-light);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
 }
 
 /* Cover */
@@ -100,7 +99,7 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background-color: var(--jw-dark);
+  background-color: var(--jw-darker);
   background-size: cover;
   background-position: center;
   display: flex;
@@ -110,61 +109,70 @@
 .jw-cover-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(59,37,24,0.3), rgba(59,37,24,0.85) 60%, rgba(59,37,24,1));
+  background: linear-gradient(to bottom, rgba(26,15,9,0.4), rgba(26,15,9,0.9) 60%, rgba(26,15,9,1));
 }
 .jw-cover-inner {
   position: relative;
   z-index: 2;
   text-align: center;
   padding: 2rem;
-  color: var(--jw-light);
+  color: var(--jw-text);
   width: 100%;
 }
 .jw-cover-names {
   font-size: clamp(2.5rem, 8vw, 4.5rem);
   color: var(--jw-gold);
   line-height: 1.1;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+  text-shadow: 0 4px 15px rgba(0,0,0,0.9);
   margin: 1rem 0;
 }
 .jw-cover-names span { display: block; }
+.jw-cover-names em {
+  font-family: var(--jw-script);
+  font-size: 0.7em;
+  color: var(--jw-text);
+  display: block;
+  margin: 0.2rem 0;
+}
 .jw-cover-date {
   font-size: 0.8rem;
   letter-spacing: 0.2em;
-  color: var(--jw-light);
+  color: var(--jw-gold-light);
 }
 .jw-btn-primary {
-  background: var(--jw-red);
-  color: #fff;
-  border: 2px solid var(--jw-gold);
+  background: var(--jw-gold);
+  color: var(--jw-darker);
+  border: 2px solid var(--jw-gold-light);
   padding: 0.8rem 2rem;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  font-weight: 700;
+  letter-spacing: 0.2em;
+  font-weight: 800;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   border-radius: 4px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
 }
 
 /* Hero */
 .jw-hero {
   text-align: center;
   padding: 6rem 1.5rem 4rem;
-  border-bottom: 8px solid var(--jw-dark);
+  border-bottom: 4px solid var(--jw-gold);
+  background: linear-gradient(to bottom, rgba(26,15,9,1), transparent);
 }
 .jw-hero-names {
   font-size: clamp(2.5rem, 8vw, 4rem);
-  color: var(--jw-dark);
+  color: var(--jw-gold);
   margin: 1rem 0;
+  line-height: 1.2;
 }
 .jw-hero-amp {
   font-family: var(--jw-script);
-  font-size: 0.7em;
-  color: var(--jw-red);
+  font-size: 0.8em;
+  color: var(--jw-text);
   display: block;
 }
 
@@ -181,7 +189,7 @@
   border: 6px solid var(--jw-gold);
   border-radius: 120px 120px 0 0;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.7);
   background: var(--jw-gold);
 }
 .jw-person-photo img {
@@ -192,7 +200,7 @@
 }
 .jw-person h3 {
   font-size: 1.5rem;
-  color: var(--jw-gold);
+  color: var(--jw-gold-light);
   margin-bottom: 0.5rem;
 }
 .jw-ig-link {
@@ -201,8 +209,9 @@
   gap: 0.25rem;
   margin-top: 1rem;
   padding: 0.4rem 0.8rem;
-  background: var(--jw-gold);
-  color: var(--jw-dark);
+  background: var(--jw-darker);
+  color: var(--jw-gold);
+  border: 1px solid var(--jw-gold);
   text-decoration: none;
   font-size: 0.7rem;
   font-weight: bold;
@@ -212,36 +221,47 @@
 /* Events */
 .jw-event-cards {
   display: grid;
-  gap: 2rem;
+  gap: 2.5rem;
   margin-top: 3rem;
 }
 .jw-event-card {
-  background: var(--jw-light);
-  border: 4px solid var(--jw-gold);
+  background: rgba(26,15,9,0.85);
+  border: 2px solid var(--jw-gold);
   padding: 2.5rem 1.5rem;
   text-align: center;
   position: relative;
-  box-shadow: 8px 8px 0 var(--jw-dark);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  border-radius: 8px 8px 0 0;
+}
+.jw-event-card::before {
+  content: '';
+  position: absolute;
+  top: -15px; left: 50%;
+  transform: translateX(-50%);
+  width: 30px; height: 30px;
+  background: var(--jw-gold);
+  transform: translateX(-50%) rotate(45deg);
 }
 .jw-event-card h3 {
   font-size: 1.5rem;
-  color: var(--jw-red);
+  color: var(--jw-gold-light);
   margin-bottom: 1rem;
 }
 .jw-event-time {
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: var(--jw-dark);
-  background: var(--jw-paper);
-  padding: 0.5rem;
-  border: 1px dashed var(--jw-gold);
+  color: var(--jw-gold);
+  background: rgba(0,0,0,0.3);
+  padding: 0.8rem;
+  border-radius: 4px;
 }
 .jw-btn-secondary {
   display: inline-block;
   margin-top: 1.5rem;
   padding: 0.8rem 1.5rem;
-  background: var(--jw-dark);
+  background: transparent;
+  border: 2px solid var(--jw-gold);
   color: var(--jw-gold);
   text-decoration: none;
   font-size: 0.75rem;
@@ -250,29 +270,115 @@
   font-weight: bold;
 }
 
-/* Form */
+/* Form Elements */
 .jw-input, .jw-select, .jw-textarea {
   width: 100%;
   padding: 0.8rem 1rem;
-  border: 2px solid var(--jw-dark);
-  background: var(--jw-light);
+  border: 1px solid var(--jw-gold);
+  background: rgba(0,0,0,0.5);
   color: var(--jw-text);
   font-family: var(--jw-sans);
   margin-bottom: 1rem;
 }
+.jw-input:focus, .jw-textarea:focus {
+  outline: none;
+  border-color: var(--jw-gold-light);
+}
 .jw-submit {
   width: 100%;
   padding: 1rem;
-  background: var(--jw-red);
-  color: #fff;
-  border: 2px solid var(--jw-gold);
-  font-weight: 700;
+  background: var(--jw-gold);
+  color: var(--jw-darker);
+  border: none;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   cursor: pointer;
 }
 
-/* Galeri Masonry */
+/* Quote & Save */
+.jw-quote-box {
+  background: rgba(0,0,0,0.4);
+  border-left: 4px solid var(--jw-gold);
+  padding: 2rem;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--jw-gold-light);
+}
+.jw-save-quote {
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--jw-text);
+  margin-bottom: 2rem;
+}
+.jw-count {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 2rem 0;
+}
+.jw-count-cell {
+  background: var(--jw-gold);
+  color: var(--jw-darker);
+  padding: 1rem 0;
+  border-radius: 4px;
+}
+.jw-count-cell strong {
+  display: block;
+  font-size: 1.8rem;
+  font-family: var(--jw-serif);
+}
+.jw-count-cell span {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: bold;
+}
+.jw-btn-outline {
+  display: inline-block;
+  border: 2px solid var(--jw-gold);
+  color: var(--jw-gold);
+  padding: 0.8rem 2rem;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+}
+
+/* Timeline / Story */
+.jw-story {
+  list-style: none;
+  padding: 0;
+  margin: 3rem 0 0;
+  border-left: 2px solid var(--jw-gold);
+  margin-left: 1rem;
+}
+.jw-story-item {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 3rem;
+  text-align: left;
+}
+.jw-story-dot {
+  position: absolute;
+  left: -9px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  background: var(--jw-gold);
+  border-radius: 50%;
+}
+.jw-story-year {
+  display: inline-block;
+  background: var(--jw-gold);
+  color: var(--jw-darker);
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+/* Gallery */
 .jw-gallery-grid {
   column-count: 2;
   column-gap: 1rem;
@@ -281,24 +387,47 @@
 .jw-gallery-item {
   break-inside: avoid;
   margin-bottom: 1rem;
-  border: 4px solid var(--jw-gold);
-  box-shadow: 4px 4px 0 var(--jw-dark);
+  border: 2px solid var(--jw-gold);
 }
 .jw-gallery-item img {
   width: 100%;
   display: block;
 }
 
-/* Utils */
-.jw-kicker {
-  font-family: var(--jw-sans);
-  text-transform: uppercase;
-  letter-spacing: 0.35em;
-  font-size: 0.75rem;
-  color: var(--jw-red);
-  font-weight: 700;
-  margin-bottom: 0.75rem;
+/* Nav */
+.jw-nav {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background: rgba(26,15,9,0.9);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1.5rem;
+  border-radius: 40px;
+  gap: 1.5rem;
+  z-index: 50;
+  border: 1px solid var(--jw-gold);
 }
-.jw-dark-bg .jw-kicker {
+.jw-nav-item {
   color: var(--jw-gold);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.7;
+  font-size: 0.6rem;
+  font-weight: bold;
+  margin-top: 0.2rem;
+}
+.jw-nav-item:hover, .jw-nav-item.is-active {
+  opacity: 1;
+}
+
+/* Overrides to ensure text visibility */
+.jw-wrap p, .jw-wrap span, .jw-wrap div {
+  color: var(--jw-text);
+}
+.jw-wrap .jw-kicker {
+  color: var(--jw-gold-light);
 }
