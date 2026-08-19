@@ -21,6 +21,7 @@ import { getTheme } from '../data/themes'
 import AttariInvitation from './AttariInvitation'
 import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
+import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
@@ -28,6 +29,10 @@ export default function Invitation({ data, guest = '', preview = false }) {
   // Tema Adat Jawa
   if (theme.layout === 'adat-jawa') {
     return <ThemeAdatJawa data={data} guest={guest} preview={preview} />
+  }
+
+  if (theme.layout === 'art-jawa-biru') {
+    return <ThemeArtJawaBiru theme={theme} data={data} guest={guest} preview={preview} />
   }
 
   // Gunakan komponen terpisah untuk tema Attari

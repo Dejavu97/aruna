@@ -9,6 +9,17 @@ const galleryClassic = [
 
 export const themes = [
   {
+    id: 'art-jawa-biru',
+    name: 'Art Jawa Biru',
+    tag: 'Adat',
+    tags: ['adat', 'elegan'],
+    popular: true,
+    description: 'Tema Adat Jawa dengan warna navy blue elegan, ornamen joglo, dan bunga cat air.',
+    cover: '/themes/pendopo_biru.jpg',
+    layout: 'art-jawa-biru',
+    opener: 'The Wedding of',
+  },
+  {
     id: 'emas-senja',
     name: 'Emas Senja',
     tag: 'Elegan',
@@ -233,6 +244,50 @@ export function hasTheme(id) {
 }
 
 export const demos = {
+  'art-jawa-biru': demo({
+    themeId: 'art-jawa-biru',
+    slug: 'yogi-ratna',
+    music: '/music/gamelan_lambang_sari.mp3',
+    groom: {
+      nick: 'Yogi',
+      full: 'Yogi Pradipta, S.Kom',
+      parents: 'Bpk. Haryanto & Ibu Sulastri',
+      photo: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=600&q=80',
+      ig: '@yogiprad'
+    },
+    bride: {
+      nick: 'Ratna',
+      full: 'Ratna Dewi, S.E',
+      parents: 'Bpk. Widodo & Ibu Sri Mulyani',
+      photo: 'https://images.unsplash.com/photo-1541250848049-b4f7141dca3f?auto=format&fit=crop&w=600&q=80',
+      ig: '@ratnadew'
+    },
+    date: '2026-11-20',
+    quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.',
+    quoteSource: 'Ar-Rum: 21',
+    story: [
+      { year: '2019', title: 'Awal Bertemu', text: 'Pertemuan pertama kami secara tidak sengaja di sebuah acara kampus.', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80' },
+      { year: '2024', title: 'Lamaran', text: 'Keluarga besar bertemu dalam suasana hangat, membawa paningset sebagai tanda ikatan suci sebelum menuju pelaminan.', image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80' },
+    ],
+    events: [
+      {
+        title: 'Akad Nikah',
+        date: '2026-11-20',
+        time: '08:00 WIB - Selesai',
+        venue: 'Masjid Agung',
+        address: 'Jl. Utama No. 123, Kota Yogyakarta',
+        maps: 'https://maps.google.com'
+      },
+      {
+        title: 'Resepsi',
+        date: '2026-11-20',
+        time: '11:00 - 14:00 WIB',
+        venue: 'Gedung Serbaguna',
+        address: 'Jl. Sudirman No. 45, Kota Yogyakarta',
+        maps: 'https://maps.google.com'
+      },
+    ],
+  }),
   'adat-jawa': demo({
     themeId: 'adat-jawa',
     slug: 'ayu-dimas',
@@ -247,9 +302,9 @@ export const demos = {
     bride: {
       nick: 'Ayu',
       full: 'R.A. Ayu Sekar Wangi, S.E.',
-      parents: 'Putri dari Bpk. R.M. Haryo Sasongko & Ibu R.A. Lestari Ningsih',
-      photo: 'https://images.unsplash.com/photo-1549471013-3364d73206c3?auto=format&fit=crop&w=600&q=80',
-      ig: '@ayusekarw'
+      parents: 'Putri dari Bpk. R.T. Mangun Kusumo & Ibu R.Ny. Sri Widowati',
+      photo: 'https://images.unsplash.com/photo-1541250848049-b4f7141dca3f?auto=format&fit=crop&w=600&q=80',
+      ig: '@ayusekar'
     },
     date: '2026-12-12',
     quote: 'Tresna iku dudu mung amarga rupa, nanging amarga ati kang tulus lan keikhlasan kanggo urip bebarengan ing kahanan apa wae.',
