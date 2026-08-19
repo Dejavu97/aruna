@@ -1,0 +1,376 @@
+/* ===========================================
+   TEMA ADAT JAWA KLASIK (ISOLASI)
+   Warna: #3E2723 (Coklat Tua), #FFD54F (Emas), #FAF8F5 (Putih Tulang)
+   =========================================== */
+
+/* Variabel Khusus Tema Jawa */
+.jw-wrap {
+  --jw-dark: #3E2723;
+  --jw-gold: #cba052;
+  --jw-light: #FAF8F5;
+  --jw-ink: #1a1512;
+  --jw-muted: #8c7562;
+  
+  --jw-serif: 'Playfair Display', serif;
+  --jw-sans: 'Inter', sans-serif;
+  --jw-script: 'Great Vibes', cursive;
+  
+  background-color: var(--jw-light);
+  color: var(--jw-ink);
+  font-family: var(--jw-sans);
+  line-height: 1.6;
+}
+
+/* Base resets inside the wrap */
+.jw-wrap * {
+  box-sizing: border-box;
+}
+.jw-wrap h1, .jw-wrap h2, .jw-wrap h3 {
+  font-family: var(--jw-serif);
+  font-weight: 500;
+  margin: 0;
+  color: var(--jw-dark);
+}
+
+/* Gunungan / Gunungan Ornaments */
+.jw-gunungan {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.5rem;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 L100 80 L50 100 L0 80 Z" fill="none" stroke="%23cba052" stroke-width="2"/><circle cx="50" cy="65" r="15" fill="none" stroke="%23cba052" stroke-width="1"/></svg>');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.8;
+}
+
+/* Global Elements */
+.jw-goldline {
+  height: 1px;
+  background: var(--jw-gold);
+  opacity: 0.5;
+}
+
+.jw-kicker {
+  font-family: var(--jw-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.65rem;
+  color: var(--jw-gold);
+  margin-bottom: 0.75rem;
+}
+
+/* Cover Screen */
+.jw-cover {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background-color: var(--jw-dark);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.jw-cover-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(62,39,35,0.4), rgba(62,39,35,0.85) 70%, rgba(62,39,35,0.95));
+}
+.jw-cover-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+  color: var(--jw-light);
+  width: 100%;
+}
+.jw-cover-names {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  color: var(--jw-gold);
+  line-height: 1.1;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  margin: 1rem 0;
+}
+.jw-amp {
+  font-family: var(--jw-script);
+  font-size: 0.7em;
+  color: var(--jw-light);
+  display: inline-block;
+  margin: 0 0.5rem;
+}
+.jw-open-btn {
+  background: var(--jw-gold);
+  color: var(--jw-dark);
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 2px;
+  margin-top: 2rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+.jw-open-btn:hover {
+  background: #e6b866;
+  transform: translateY(-2px);
+}
+
+/* Hero Section */
+.jw-hero {
+  text-align: center;
+  padding: 5rem 1.5rem 3rem;
+  background: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+}
+.jw-hero-names {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  margin-bottom: 1rem;
+}
+
+/* Story */
+.jw-story {
+  padding: 4rem 1.5rem;
+  background: var(--jw-light);
+}
+
+/* Couple */
+.jw-couple {
+  padding: 5rem 1.5rem;
+  background: var(--jw-dark);
+  color: var(--jw-light);
+  text-align: center;
+}
+.jw-couple .jw-kicker {
+  color: var(--jw-gold);
+}
+.jw-couple h2 {
+  color: var(--jw-light);
+}
+.jw-couple-grid {
+  display: grid;
+  gap: 3rem;
+  margin-top: 3rem;
+}
+@media (min-width: 768px) {
+  .jw-couple-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.jw-person-photo {
+  width: 180px;
+  height: 240px;
+  margin: 0 auto 1.5rem;
+  border: 4px solid var(--jw-gold);
+  border-radius: 90px 90px 0 0; /* Arch shape */
+  overflow: hidden;
+  padding: 4px;
+}
+.jw-person-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 86px 86px 0 0;
+  filter: sepia(0.3) contrast(1.1);
+}
+.jw-person h3 {
+  font-size: 1.5rem;
+  color: var(--jw-gold);
+  margin-bottom: 0.5rem;
+}
+.jw-person-parents {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+}
+.jw-ig {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--jw-gold);
+  text-decoration: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+
+/* Events */
+.jw-events {
+  padding: 5rem 1.5rem;
+  background: var(--jw-light);
+  background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+}
+.jw-event-cards {
+  display: grid;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+@media (min-width: 768px) {
+  .jw-event-cards {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+.jw-event-card {
+  background: #fff;
+  border: 1px solid rgba(62,39,35,0.1);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+.jw-event-card::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  border: 1px solid var(--jw-gold);
+  opacity: 0.3;
+  pointer-events: none;
+}
+.jw-event-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+.jw-event-time {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--jw-dark);
+}
+.jw-event-venue {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.jw-map-btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.5rem;
+  border: 1px solid var(--jw-gold);
+  color: var(--jw-dark);
+  text-decoration: none;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: all 0.2s;
+}
+.jw-map-btn:hover {
+  background: var(--jw-gold);
+  color: #fff;
+}
+
+/* Count */
+.jw-count-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 2rem auto;
+  max-width: 400px;
+}
+.jw-count-item {
+  background: var(--jw-dark);
+  color: var(--jw-gold);
+  padding: 1rem 0;
+  border-radius: 4px;
+}
+.jw-count-val {
+  font-size: 1.5rem;
+  font-family: var(--jw-serif);
+}
+.jw-count-lbl {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7);
+}
+
+/* Protocol, Galeri, RSVP (Reusing basic styles but with JW colors) */
+.jw-protocol, .jw-gallery, .jw-gift, .jw-rsvp {
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+.jw-protocol { background: var(--jw-dark); color: var(--jw-light); }
+.jw-protocol h2 { color: var(--jw-gold); }
+.jw-gallery { background: var(--jw-light); }
+.jw-gift { background: #f2eee8; }
+.jw-rsvp { background: var(--jw-dark); color: var(--jw-light); }
+.jw-rsvp h2 { color: var(--jw-gold); }
+
+/* Form Elements */
+.jw-input, .jw-select, .jw-textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(62,39,35,0.2);
+  background: rgba(255,255,255,0.9);
+  color: var(--jw-ink);
+  font-family: var(--jw-sans);
+  margin-bottom: 1rem;
+}
+.jw-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.jw-submit {
+  width: 100%;
+  padding: 1rem;
+  background: var(--jw-gold);
+  color: var(--jw-dark);
+  border: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+}
+
+/* Nav */
+.jw-nav {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background: rgba(62,39,35,0.95);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1rem;
+  border-radius: 40px;
+  gap: 1.5rem;
+  z-index: 50;
+  border: 1px solid rgba(203,160,82,0.3);
+}
+.jw-nav-item {
+  color: var(--jw-gold);
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.jw-nav-item:hover, .jw-nav-item.is-active {
+  opacity: 1;
+}
+
+/* Audio Btn */
+.jw-audio-btn {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(62,39,35,0.8);
+  border: 1px solid var(--jw-gold);
+  color: var(--jw-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  cursor: pointer;
+}

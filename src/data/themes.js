@@ -188,6 +188,15 @@ export const themes = [
     },
   },
   {
+    id: 'adat-jawa',
+    name: 'Adat Jawa Klasik',
+    price: 199000,
+    cover: '/themes/adat-jawa.jpg',
+    features: ['Ornamen Gunungan', 'Warna Emas Keraton', 'Font Serif Klasik', 'RSVP & Ucapan', 'Navigasi Melayang'],
+    layout: 'adat-jawa',
+    opener: 'THE WEDDING OF',
+  },
+  {
     id: 'attari',
     name: 'Attari Elegance',
     tag: 'Premium',
