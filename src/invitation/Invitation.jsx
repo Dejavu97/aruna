@@ -45,6 +45,10 @@ export default function Invitation({ data, guest = '', preview = false }) {
     return <BoardingInvitation data={data} guest={guest} preview={preview} />
   }
 
+  return <StandardInvitation data={data} guest={guest} preview={preview} theme={theme} />
+}
+
+function StandardInvitation({ data, guest = '', preview = false, theme }) {
   const [open, setOpen] = useState(false)
   const [tick, setTick] = useState(() => countdownParts(data.date, data.events?.[0]?.time || '09:00'))
   const [lightbox, setLightbox] = useState(null)
