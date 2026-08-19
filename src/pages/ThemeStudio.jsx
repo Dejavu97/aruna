@@ -3,11 +3,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Sparkles, Palette, Type, Layout, Image as ImageIcon, Music, 
   Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet,
-  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images
+  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import AtmosphereParticles from '../components/AtmosphereParticles'
+import ImageAdjustModal from '../components/ImageAdjustModal'
 import { createCustomTheme, fetchCustomTheme, uploadFile } from '../lib/api'
 import { themes } from '../data/themes'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -17,6 +18,7 @@ const themePresets = [
   {
     name: 'Terracotta Boho',
     colors: { bg: '#FDFBF7', paper: '#F7F2EB', fg: '#2C221E', muted: '#876D61', accent: '#C86D51', accentSoft: '#F4DCD4', cover: '#2C221E' },
+    cardOpacity: 95,
     fonts: { display: '"Playfair Display", serif', script: '"Playfair Display", serif', body: '"Plus Jakarta Sans", sans-serif' },
     ornamentStyle: 'botanical',
     particleEffect: 'petals',
@@ -27,6 +29,7 @@ const themePresets = [
   {
     name: 'Emerald Royalty',
     colors: { bg: '#0A1C16', paper: '#112B22', fg: '#F2EDE4', muted: '#A3B8B0', accent: '#D4AF37', accentSoft: '#385E50', cover: '#071510' },
+    cardOpacity: 85,
     fonts: { display: '"Cinzel", serif', script: '"Cinzel", serif', body: '"Lora", serif' },
     ornamentStyle: 'gold_flourish',
     particleEffect: 'gold_dust',
@@ -37,6 +40,7 @@ const themePresets = [
   {
     name: 'Sage Serenity',
     colors: { bg: '#F4F7F4', paper: '#FFFFFF', fg: '#203328', muted: '#6D8275', accent: '#52796F', accentSoft: '#CAD2C5', cover: '#2F3E46' },
+    cardOpacity: 90,
     fonts: { display: '"Cormorant Garamond", serif', script: '"Cormorant Garamond", serif', body: '"Plus Jakarta Sans", sans-serif' },
     ornamentStyle: 'botanical',
     particleEffect: 'melati',
@@ -47,6 +51,7 @@ const themePresets = [
   {
     name: 'Midnight Vogue',
     colors: { bg: '#0F172A', paper: '#1E293B', fg: '#F8FAFC', muted: '#94A3B8', accent: '#38BDF8', accentSoft: '#0369A1', cover: '#020617' },
+    cardOpacity: 75,
     fonts: { display: '"Syne", sans-serif', script: '"Syne", sans-serif', body: '"Inter", sans-serif' },
     ornamentStyle: 'clean_line',
     particleEffect: 'bokeh',
@@ -57,6 +62,7 @@ const themePresets = [
   {
     name: 'Rose Gold Romance',
     colors: { bg: '#FFF9F9', paper: '#FFFFFF', fg: '#332227', muted: '#8F6E78', accent: '#B76E79', accentSoft: '#FADADD', cover: '#4A2832' },
+    cardOpacity: 85,
     fonts: { display: '"Playfair Display", serif', script: '"Great Vibes", cursive', body: '"Outfit", sans-serif' },
     ornamentStyle: 'botanical',
     particleEffect: 'petals',
@@ -67,6 +73,7 @@ const themePresets = [
   {
     name: 'Batik Kraton',
     colors: { bg: '#1A120B', paper: '#2B1B14', fg: '#F5EBE0', muted: '#D5BDAF', accent: '#D4A373', accentSoft: '#4A3525', cover: '#140C07' },
+    cardOpacity: 90,
     fonts: { display: '"Cinzel", serif', script: '"Cinzel", serif', body: '"Lora", serif' },
     ornamentStyle: 'batik',
     particleEffect: 'gold_dust',
@@ -74,6 +81,14 @@ const themePresets = [
     openingAnimation: 'curtain',
     layoutStyle: 'stacked',
   },
+]
+
+// Curated Video Background Presets
+const videoPresets = [
+  { name: 'Tanpa Video', url: '' },
+  { name: 'Debu Emas Sinematik', url: 'https://assets.mixkit.co/videos/preview/mixkit-floating-golden-particles-in-the-dark-34487-large.mp4' },
+  { name: 'Kelopak Bunga Melayang', url: 'https://assets.mixkit.co/videos/preview/mixkit-delicate-pink-rose-petals-falling-41865-large.mp4' },
+  { name: 'Awan Anggun & Sunset', url: 'https://assets.mixkit.co/videos/preview/mixkit-clouds-and-blue-sky-2408-large.mp4' },
 ]
 
 export default function ThemeStudio() {
@@ -103,6 +118,11 @@ export default function ThemeStudio() {
     cover: '#1C1917',
   })
 
+  // Transparansi / Opacity controls
+  const [cardOpacity, setCardOpacity] = useState(90) // 0 - 100%
+  const [bgOpacity, setBgOpacity] = useState(100) // 0 - 100%
+  const [coverOverlayOpacity, setCoverOverlayOpacity] = useState(65) // 0 - 100%
+
   const [fonts, setFonts] = useState({
     display: '"Playfair Display", serif',
     script: '"Playfair Display", serif',
@@ -119,14 +139,21 @@ export default function ThemeStudio() {
   // Comprehensive Custom Uploaded Assets
   const [customAssets, setCustomAssets] = useState({
     coverImgUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
+    coverImgSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     bgTextureUrl: '',
-    bgOverlayOpacity: 0.85,
+    bgTextureSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
+    bgVideoUrl: '',
     monogramUrl: '',
+    monogramSettings: { scale: 1, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
     customOrnamentUrl: '',
+    customOrnamentSettings: { scale: 1, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
     cardBgUrl: '',
     frameImageUrl: '',
     customMusicUrl: '',
   })
+
+  // Image Adjustment Modal State
+  const [adjustTarget, setAdjustTarget] = useState(null) // { field: 'coverImgUrl', title: 'Sesuaikan Foto Sampul', url: '...', settingsKey: 'coverImgSettings' }
 
   const [saving, setSaving] = useState(false)
   const [savedThemeId, setSavedThemeId] = useState('')
@@ -163,6 +190,7 @@ export default function ThemeStudio() {
 
   function applyPreset(p) {
     setColors(p.colors)
+    if (p.cardOpacity !== undefined) setCardOpacity(p.cardOpacity)
     setFonts(p.fonts)
     setOrnamentStyle(p.ornamentStyle)
     setParticleEffect(p.particleEffect)
@@ -185,6 +213,15 @@ export default function ThemeStudio() {
     }
   }
 
+  function handleSaveAdjustSettings(newSettings) {
+    if (!adjustTarget) return
+    const { settingsKey } = adjustTarget
+    setCustomAssets((prev) => ({
+      ...prev,
+      [settingsKey]: newSettings,
+    }))
+  }
+
   async function handleSaveTheme() {
     if (!themeName.trim()) {
       setError('Harap masukkan nama tema Anda.')
@@ -200,6 +237,9 @@ export default function ThemeStudio() {
         collection: 'community',
         isPublic,
         colors,
+        cardOpacity,
+        bgOpacity,
+        coverOverlayOpacity,
         fonts: {
           ...fonts,
           display: fonts.customGoogleFont?.trim() ? `"${fonts.customGoogleFont.trim()}", serif` : fonts.display,
@@ -222,6 +262,18 @@ export default function ThemeStudio() {
     } finally {
       setSaving(false)
     }
+  }
+
+  // Convert Hex color to RGBA for transparency
+  function hexToRgba(hex, alphaPercent) {
+    if (!hex || !hex.startsWith('#')) return hex
+    let c = hex.substring(1)
+    if (c.length === 3) c = c.split('').map((x) => x + x).join('')
+    const r = parseInt(c.substring(0, 2), 16) || 0
+    const g = parseInt(c.substring(2, 4), 16) || 0
+    const b = parseInt(c.substring(4, 6), 16) || 0
+    const a = (alphaPercent / 100).toFixed(2)
+    return `rgba(${r}, ${g}, ${b}, ${a})`
   }
 
   // Ultra-Complete Dummy Preview Data
@@ -286,6 +338,7 @@ export default function ThemeStudio() {
   }
 
   const activeDisplayFont = fonts.customGoogleFont?.trim() ? `"${fonts.customGoogleFont.trim()}", serif` : fonts.display
+  const paperBgColor = hexToRgba(colors.paper, cardOpacity)
 
   return (
     <div className="min-h-screen bg-[#F8F7F4] text-ink flex flex-col font-body">
@@ -427,35 +480,82 @@ export default function ThemeStudio() {
               </div>
             )}
 
-            {/* TAB 2: WARNA & BACKGROUND */}
+            {/* TAB 2: WARNA & TRANSPARANSI */}
             {activeTab === 'color' && (
-              <div className="space-y-4">
-                <h3 className="font-display text-lg mb-1">Palet Warna Undangan</h3>
-                <p className="text-xs text-stone mb-4">Ubah warna elemen visual utama untuk menciptakan atmosfer yang pas:</p>
+              <div className="space-y-5">
+                <div>
+                  <h3 className="font-display text-lg mb-1">Palet Warna Undangan</h3>
+                  <p className="text-xs text-stone mb-4">Ubah warna elemen visual utama untuk menciptakan atmosfer yang pas:</p>
 
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    ['bg', 'Background Utama', colors.bg],
-                    ['paper', 'Kartu Kontainer', colors.paper],
-                    ['accent', 'Aksen / Emas', colors.accent],
-                    ['accentSoft', 'Aksen Lembut', colors.accentSoft],
-                    ['fg', 'Warna Teks Utama', colors.fg],
-                    ['muted', 'Warna Teks Redup', colors.muted],
-                    ['cover', 'Warna Sampul', colors.cover],
-                  ].map(([key, label, val]) => (
-                    <div key={key} className="border border-ink/15 p-2.5 rounded-sm bg-ivory/20 flex items-center justify-between">
-                      <div>
-                        <p className="text-[11px] font-medium">{label}</p>
-                        <p className="text-[10px] font-mono text-stone">{val}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      ['bg', 'Background Utama', colors.bg],
+                      ['paper', 'Kartu Kontainer', colors.paper],
+                      ['accent', 'Aksen / Emas', colors.accent],
+                      ['accentSoft', 'Aksen Lembut', colors.accentSoft],
+                      ['fg', 'Warna Teks Utama', colors.fg],
+                      ['muted', 'Warna Teks Redup', colors.muted],
+                      ['cover', 'Warna Sampul', colors.cover],
+                    ].map(([key, label, val]) => (
+                      <div key={key} className="border border-ink/15 p-2.5 rounded-sm bg-ivory/20 flex items-center justify-between">
+                        <div>
+                          <p className="text-[11px] font-medium">{label}</p>
+                          <p className="text-[10px] font-mono text-stone">{val}</p>
+                        </div>
+                        <input
+                          type="color"
+                          value={val}
+                          onChange={(e) => setColors((prev) => ({ ...prev, [key]: e.target.value }))}
+                          className="w-8 h-8 rounded border border-ink/20 cursor-pointer"
+                        />
                       </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Transparency / Glassmorphism Slider */}
+                <div className="border-t border-ink/10 pt-4 space-y-4">
+                  <h4 className="font-display text-base font-semibold">Tingkat Transparansi Kartu (Glassmorphism)</h4>
+                  <p className="text-xs text-stone">Atur transparansi panel kartu agar latar belakang foto/video terlihat tembus pandang:</p>
+
+                  <div className="bg-ivory/60 border border-ink/10 p-3.5 rounded-sm space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[11px] uppercase tracking-wider text-stone w-28 font-medium">Transparansi Kartu</span>
                       <input
-                        type="color"
-                        value={val}
-                        onChange={(e) => setColors((prev) => ({ ...prev, [key]: e.target.value }))}
-                        className="w-8 h-8 rounded border border-ink/20 cursor-pointer"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="5"
+                        value={cardOpacity}
+                        onChange={(e) => setCardOpacity(parseInt(e.target.value))}
+                        className="flex-1 accent-gold-deep cursor-pointer"
                       />
+                      <span className="text-xs font-mono text-stone w-12 text-right">{cardOpacity}%</span>
                     </div>
-                  ))}
+
+                    {/* Quick Transparency Presets */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      <span className="text-[10px] uppercase tracking-wider text-stone mr-1">Preset:</span>
+                      {[
+                        [100, 'Solid (100%)'],
+                        [85, 'Glass Blur (85%)'],
+                        [50, 'Semi Transparan (50%)'],
+                        [20, 'Ultra Glass (20%)'],
+                        [0, 'Full Transparan (0%)'],
+                      ].map(([val, lbl]) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setCardOpacity(val)}
+                          className={`px-2 py-0.5 text-[10px] border transition-colors ${
+                            cardOpacity === val ? 'bg-ink text-ivory border-ink font-medium' : 'border-ink/15 text-stone hover:border-ink/30'
+                          }`}
+                        >
+                          {lbl}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -644,15 +744,17 @@ export default function ThemeStudio() {
               </div>
             )}
 
-            {/* TAB 7: UPLOAD ASET PRIBADI LENGKAP */}
+            {/* TAB 7: UPLOAD ASET PRIBADI DENGAN TOMBOL EDIT & VIDEO BACKGROUND */}
             {activeTab === 'assets' && (
-              <div className="space-y-4">
-                <h3 className="font-display text-lg mb-1">Upload Aset Desain Lengkap</h3>
-                <p className="text-xs text-stone mb-4">Unggah gambar latar sampul, latar belakang undangan, logo inisial, dan ornamen buatan sendiri:</p>
+              <div className="space-y-5">
+                <div>
+                  <h3 className="font-display text-lg mb-1">Upload Aset &amp; Video Latar</h3>
+                  <p className="text-xs text-stone mb-4">Unggah gambar latar, logo inisial, atau video gerak latar belakang:</p>
+                </div>
 
-                {/* 1. Background Cover Utama */}
-                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30">
-                  <div className="flex items-center justify-between mb-2">
+                {/* 1. Background Cover Utama + Tombol Edit */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
+                  <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium">1. Gambar Latar Sampul (Cover Background)</p>
                       <p className="text-[10px] text-stone">Foto latar belakang layar pembuka undangan.</p>
@@ -668,18 +770,82 @@ export default function ThemeStudio() {
                     </label>
                   </div>
                   {customAssets.coverImgUrl && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <img src={customAssets.coverImgUrl} alt="Cover" className="w-14 h-9 object-cover border" />
-                      <span className="text-[10px] text-green-700 font-medium">✓ Foto Sampul Terpasang</span>
+                    <div className="flex items-center justify-between bg-paper p-2 border border-ink/10">
+                      <div className="flex items-center gap-2">
+                        <img src={customAssets.coverImgUrl} alt="Cover" className="w-14 h-9 object-cover border" />
+                        <span className="text-[10px] text-green-700 font-medium">✓ Foto Sampul Aktif</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAdjustTarget({
+                            field: 'coverImgUrl',
+                            title: 'Sesuaikan Foto Sampul',
+                            url: customAssets.coverImgUrl,
+                            settingsKey: 'coverImgSettings',
+                          })
+                        }
+                        className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium text-ink"
+                      >
+                        <Sliders size={12} /> Edit Ukuran &amp; Posisi
+                      </button>
                     </div>
                   )}
                 </div>
 
-                {/* 2. Background Latar Isi Undangan */}
-                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30">
-                  <div className="flex items-center justify-between mb-2">
+                {/* 2. Video Latar Belakang (Motion Video Background) */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-3">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">2. Gambar Latar Undangan (Body Background Texture)</p>
+                      <p className="text-xs font-medium">2. Video Latar Belakang Gerak (Motion Video)</p>
+                      <p className="text-[10px] text-stone">Video latar belakang berulang (looping MP4).</p>
+                    </div>
+                    <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
+                      {uploadingAsset === 'bgVideoUrl' ? 'Mengunggah...' : 'Upload MP4'}
+                      <input
+                        type="file"
+                        accept="video/mp4,video/webm"
+                        className="hidden"
+                        onChange={(e) => handleAssetUpload('bgVideoUrl', e)}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Curated Video Presets */}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {videoPresets.map((vp) => (
+                      <button
+                        key={vp.name}
+                        type="button"
+                        onClick={() => setCustomAssets((prev) => ({ ...prev, bgVideoUrl: vp.url }))}
+                        className={`p-2 text-left border rounded-sm text-[10px] uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
+                          customAssets.bgVideoUrl === vp.url ? 'bg-ink text-ivory border-ink font-semibold' : 'border-ink/15 text-stone hover:border-ink/30'
+                        }`}
+                      >
+                        <Film size={12} /> {vp.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {customAssets.bgVideoUrl && (
+                    <div className="flex items-center justify-between bg-paper p-2 border border-ink/10">
+                      <span className="text-[10px] text-green-700 font-medium">✓ Video Latar Belakang Aktif</span>
+                      <button
+                        type="button"
+                        onClick={() => setCustomAssets((prev) => ({ ...prev, bgVideoUrl: '' }))}
+                        className="text-[10px] text-red-600 underline font-medium"
+                      >
+                        Hapus Video
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Background Gambar Latar Isi Undangan + Tombol Edit */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium">3. Gambar Latar Undangan (Body Background Texture)</p>
                       <p className="text-[10px] text-stone">Motif watercolor/batik/gedung untuk latar belakang isi.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
@@ -693,25 +859,43 @@ export default function ThemeStudio() {
                     </label>
                   </div>
                   {customAssets.bgTextureUrl && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <img src={customAssets.bgTextureUrl} alt="Texture" className="w-14 h-9 object-cover border" />
-                      <span className="text-[10px] text-green-700 font-medium">✓ Latar Isi Terpasang</span>
-                      <button
-                        type="button"
-                        onClick={() => setCustomAssets((prev) => ({ ...prev, bgTextureUrl: '' }))}
-                        className="text-[10px] text-red-600 underline ml-auto"
-                      >
-                        Hapus
-                      </button>
+                    <div className="flex items-center justify-between bg-paper p-2 border border-ink/10">
+                      <div className="flex items-center gap-2">
+                        <img src={customAssets.bgTextureUrl} alt="Texture" className="w-14 h-9 object-cover border" />
+                        <span className="text-[10px] text-green-700 font-medium">✓ Latar Isi Terpasang</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAdjustTarget({
+                              field: 'bgTextureUrl',
+                              title: 'Sesuaikan Gambar Latar Isi',
+                              url: customAssets.bgTextureUrl,
+                              settingsKey: 'bgTextureSettings',
+                            })
+                          }
+                          className="inline-flex items-center gap-1 border border-ink/20 px-2 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                        >
+                          <Sliders size={12} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCustomAssets((prev) => ({ ...prev, bgTextureUrl: '' }))}
+                          className="text-[10px] text-red-600 underline font-medium"
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* 3. Logo Monogram / Inisial Pengantin */}
-                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30">
-                  <div className="flex items-center justify-between mb-2">
+                {/* 4. Logo Monogram / Inisial Pengantin + Tombol Edit */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">3. Logo Monogram / Inisial (PNG Transparan)</p>
+                      <p className="text-xs font-medium">4. Logo Monogram / Inisial (PNG Transparan)</p>
                       <p className="text-[10px] text-stone">Lambang mahkota / inisial pengantin.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
@@ -725,26 +909,44 @@ export default function ThemeStudio() {
                     </label>
                   </div>
                   {customAssets.monogramUrl && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <img src={customAssets.monogramUrl} alt="Monogram" className="w-10 h-10 object-contain border p-1 bg-white" />
-                      <span className="text-[10px] text-green-700 font-medium">✓ Monogram Aktif</span>
-                      <button
-                        type="button"
-                        onClick={() => setCustomAssets((prev) => ({ ...prev, monogramUrl: '' }))}
-                        className="text-[10px] text-red-600 underline ml-auto"
-                      >
-                        Hapus
-                      </button>
+                    <div className="flex items-center justify-between bg-paper p-2 border border-ink/10">
+                      <div className="flex items-center gap-2">
+                        <img src={customAssets.monogramUrl} alt="Monogram" className="w-10 h-10 object-contain border p-1 bg-white" />
+                        <span className="text-[10px] text-green-700 font-medium">✓ Monogram Aktif</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAdjustTarget({
+                              field: 'monogramUrl',
+                              title: 'Sesuaikan Ukuran Logo Monogram',
+                              url: customAssets.monogramUrl,
+                              settingsKey: 'monogramSettings',
+                            })
+                          }
+                          className="inline-flex items-center gap-1 border border-ink/20 px-2 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                        >
+                          <Sliders size={12} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCustomAssets((prev) => ({ ...prev, monogramUrl: '' }))}
+                          className="text-[10px] text-red-600 underline font-medium"
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* 4. Ornamen / Divider Bunga Kustom */}
-                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30">
-                  <div className="flex items-center justify-between mb-2">
+                {/* 5. Ornamen / Divider Bunga Kustom + Tombol Edit */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">4. Ornamen / Garis Pemisah Kustom (PNG Transparan)</p>
-                      <p className="text-[10px] text-stone">Ranting bunga / ukiran khusus untuk pemisah antar bagian.</p>
+                      <p className="text-xs font-medium">5. Ornamen / Garis Pemisah Kustom (PNG Transparan)</p>
+                      <p className="text-[10px] text-stone">Ranting bunga / ukiran khusus pemisah antar bagian.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
                       {uploadingAsset === 'customOrnamentUrl' ? 'Mengunggah...' : 'Upload PNG'}
@@ -757,16 +959,34 @@ export default function ThemeStudio() {
                     </label>
                   </div>
                   {customAssets.customOrnamentUrl && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <img src={customAssets.customOrnamentUrl} alt="Ornament" className="h-8 object-contain border p-1 bg-white" />
-                      <span className="text-[10px] text-green-700 font-medium">✓ Ornamen Kustom Aktif</span>
-                      <button
-                        type="button"
-                        onClick={() => setCustomAssets((prev) => ({ ...prev, customOrnamentUrl: '' }))}
-                        className="text-[10px] text-red-600 underline ml-auto"
-                      >
-                        Hapus
-                      </button>
+                    <div className="flex items-center justify-between bg-paper p-2 border border-ink/10">
+                      <div className="flex items-center gap-2">
+                        <img src={customAssets.customOrnamentUrl} alt="Ornament" className="h-8 object-contain border p-1 bg-white" />
+                        <span className="text-[10px] text-green-700 font-medium">✓ Ornamen Aktif</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAdjustTarget({
+                              field: 'customOrnamentUrl',
+                              title: 'Sesuaikan Ukuran Ornamen',
+                              url: customAssets.customOrnamentUrl,
+                              settingsKey: 'customOrnamentSettings',
+                            })
+                          }
+                          className="inline-flex items-center gap-1 border border-ink/20 px-2 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                        >
+                          <Sliders size={12} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCustomAssets((prev) => ({ ...prev, customOrnamentUrl: '' }))}
+                          className="text-[10px] text-red-600 underline font-medium"
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -823,14 +1043,27 @@ export default function ThemeStudio() {
             {/* Atmosphere Particles Layer */}
             <AtmosphereParticles effect={particleEffect} accentColor={colors.accent} />
 
+            {/* Video Background Layer (if active) */}
+            {customAssets.bgVideoUrl && (
+              <video
+                key={customAssets.bgVideoUrl}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 opacity-40"
+                src={customAssets.bgVideoUrl}
+              />
+            )}
+
             {/* Interactive Full Invitation Preview Container */}
             <div
-              className="w-full h-full overflow-y-auto relative scroll-smooth"
+              className="w-full h-full overflow-y-auto relative scroll-smooth z-10"
               style={{
-                backgroundColor: colors.bg,
-                backgroundImage: customAssets.bgTextureUrl ? `url(${customAssets.bgTextureUrl})` : 'none',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundColor: customAssets.bgVideoUrl ? 'transparent' : colors.bg,
+                backgroundImage: customAssets.bgTextureUrl && !customAssets.bgVideoUrl ? `url(${customAssets.bgTextureUrl})` : 'none',
+                backgroundSize: customAssets.bgTextureSettings?.fit || 'cover',
+                backgroundPosition: `${customAssets.bgTextureSettings?.posX || 0}px ${customAssets.bgTextureSettings?.posY || 0}px`,
                 color: colors.fg,
                 fontFamily: fonts.body,
               }}
@@ -841,9 +1074,10 @@ export default function ThemeStudio() {
                   <motion.div
                     className="absolute inset-0 z-30 flex flex-col justify-end p-6 text-center overflow-hidden"
                     style={{
-                      backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 60%, ${colors.cover} 100%), url(${customAssets.coverImgUrl})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
+                      backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,${coverOverlayOpacity / 100}) 60%, ${colors.cover} 100%), url(${customAssets.coverImgUrl})`,
+                      backgroundSize: customAssets.coverImgSettings?.fit || 'cover',
+                      backgroundPosition: `${customAssets.coverImgSettings?.posX || 0}px ${customAssets.coverImgSettings?.posY || 0}px`,
+                      filter: `brightness(${customAssets.coverImgSettings?.brightness || 100}%) blur(${customAssets.coverImgSettings?.blur || 0}px)`,
                     }}
                     exit={
                       openingAnimation === 'curtain'
@@ -854,7 +1088,16 @@ export default function ThemeStudio() {
                     }
                   >
                     {customAssets.monogramUrl ? (
-                      <img src={customAssets.monogramUrl} alt="Logo" className="w-16 h-16 mx-auto mb-3 object-contain drop-shadow" />
+                      <img
+                        src={customAssets.monogramUrl}
+                        alt="Logo"
+                        className="mx-auto mb-3 object-contain drop-shadow transition-transform"
+                        style={{
+                          width: `${(customAssets.monogramSettings?.scale || 1) * 64}px`,
+                          height: `${(customAssets.monogramSettings?.scale || 1) * 64}px`,
+                          transform: `translate(${customAssets.monogramSettings?.posX || 0}px, ${customAssets.monogramSettings?.posY || 0}px)`,
+                        }}
+                      />
                     ) : (
                       <div className="w-10 h-[1px] mx-auto mb-3" style={{ background: colors.accent }} />
                     )}
@@ -906,7 +1149,15 @@ export default function ThemeStudio() {
                 {/* 1. HERO HEADER */}
                 <section className="text-center pt-2">
                   {customAssets.monogramUrl && (
-                    <img src={customAssets.monogramUrl} alt="Logo" className="w-14 h-14 mx-auto mb-3 object-contain" />
+                    <img
+                      src={customAssets.monogramUrl}
+                      alt="Logo"
+                      className="mx-auto mb-3 object-contain"
+                      style={{
+                        width: `${(customAssets.monogramSettings?.scale || 1) * 56}px`,
+                        height: `${(customAssets.monogramSettings?.scale || 1) * 56}px`,
+                      }}
+                    />
                   )}
                   <p className="text-[10px] uppercase tracking-[0.28em]" style={{ color: colors.muted }}>
                     WALIMATUL 'URS
@@ -916,7 +1167,14 @@ export default function ThemeStudio() {
                   </h2>
                   
                   {customAssets.customOrnamentUrl ? (
-                    <img src={customAssets.customOrnamentUrl} alt="Divider" className="h-6 mx-auto my-3 object-contain" />
+                    <img
+                      src={customAssets.customOrnamentUrl}
+                      alt="Divider"
+                      className="mx-auto my-3 object-contain"
+                      style={{
+                        height: `${(customAssets.customOrnamentSettings?.scale || 1) * 24}px`,
+                      }}
+                    />
                   ) : (
                     <div className="w-12 h-[1px] mx-auto my-3" style={{ background: colors.accent }} />
                   )}
@@ -940,7 +1198,10 @@ export default function ThemeStudio() {
                   {layoutStyle === 'side_by_side' ? (
                     <div className="grid grid-cols-2 gap-3">
                       {/* Bride Card */}
-                      <div className="border p-3.5 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                      <div
+                        className="border p-3.5 text-center rounded-sm backdrop-blur-md"
+                        style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                      >
                         <div className="aspect-[3/4] overflow-hidden mb-2.5">
                           <img src={previewData.bride.photo} alt="Bride" className="w-full h-full object-cover" />
                         </div>
@@ -956,7 +1217,10 @@ export default function ThemeStudio() {
                       </div>
 
                       {/* Groom Card */}
-                      <div className="border p-3.5 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                      <div
+                        className="border p-3.5 text-center rounded-sm backdrop-blur-md"
+                        style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                      >
                         <div className="aspect-[3/4] overflow-hidden mb-2.5">
                           <img src={previewData.groom.photo} alt="Groom" className="w-full h-full object-cover" />
                         </div>
@@ -974,7 +1238,10 @@ export default function ThemeStudio() {
                   ) : (
                     <div className="space-y-4">
                       {/* Stacked Bride Card */}
-                      <div className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                      <div
+                        className="border p-4 text-center rounded-sm backdrop-blur-md"
+                        style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                      >
                         <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2" style={{ borderColor: colors.accent }}>
                           <img src={previewData.bride.photo} alt="Bride" className="w-full h-full object-cover" />
                         </div>
@@ -990,7 +1257,10 @@ export default function ThemeStudio() {
                       </div>
 
                       {/* Stacked Groom Card */}
-                      <div className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                      <div
+                        className="border p-4 text-center rounded-sm backdrop-blur-md"
+                        style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                      >
                         <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2" style={{ borderColor: colors.accent }}>
                           <img src={previewData.groom.photo} alt="Groom" className="w-full h-full object-cover" />
                         </div>
@@ -1016,7 +1286,11 @@ export default function ThemeStudio() {
                   </div>
                   <div className="space-y-2.5">
                     {previewData.story.map((st) => (
-                      <div key={st.year} className="border p-3 rounded-sm text-left flex gap-3" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                      <div
+                        key={st.year}
+                        className="border p-3 rounded-sm text-left flex gap-3 backdrop-blur-md"
+                        style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                      >
                         <span className="font-bold text-xs font-mono" style={{ color: colors.accent }}>{st.year}</span>
                         <div>
                           <p className="text-xs font-semibold" style={{ color: colors.fg }}>{st.title}</p>
@@ -1028,7 +1302,10 @@ export default function ThemeStudio() {
                 </section>
 
                 {/* 4. COUNTDOWN TIMER */}
-                <section className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                <section
+                  className="border p-4 text-center rounded-sm backdrop-blur-md"
+                  style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                >
                   <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>MENGHITUNG HARI</p>
                   <div className="grid grid-cols-4 gap-2 mt-3">
                     {[
@@ -1053,7 +1330,11 @@ export default function ThemeStudio() {
                   </div>
                   <div className="space-y-3">
                     {previewData.events.map((ev) => (
-                      <div key={ev.title} className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                      <div
+                        key={ev.title}
+                        className="border p-4 text-center rounded-sm backdrop-blur-md"
+                        style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                      >
                         <h4 className="text-xs uppercase tracking-widest font-semibold" style={{ color: colors.accent }}>{ev.title}</h4>
                         <p className="text-sm font-bold mt-1" style={{ color: colors.fg }}>{ev.time}</p>
                         <p className="text-xs font-semibold mt-1" style={{ color: colors.fg }}>{ev.venue}</p>
@@ -1095,7 +1376,10 @@ export default function ThemeStudio() {
                 </section>
 
                 {/* 7. DOA & UCAPAN (WISHES & RSVP) */}
-                <section className="border p-4 text-center rounded-sm space-y-3" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                <section
+                  className="border p-4 text-center rounded-sm space-y-3 backdrop-blur-md"
+                  style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                >
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>RSVP &amp; UCAPAN</p>
                     <h3 className="text-base font-display mt-0.5" style={{ color: colors.fg }}>Kirim Doa &amp; Konfirmasi</h3>
@@ -1120,7 +1404,10 @@ export default function ThemeStudio() {
                 </section>
 
                 {/* 8. TANDA KASIH (WEDDING GIFT) */}
-                <section className="border p-4 text-center rounded-sm space-y-3" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                <section
+                  className="border p-4 text-center rounded-sm space-y-3 backdrop-blur-md"
+                  style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                >
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>WEDDING GIFT</p>
                     <h3 className="text-base font-display mt-0.5" style={{ color: colors.fg }}>Tanda Kasih</h3>
@@ -1152,7 +1439,10 @@ export default function ThemeStudio() {
                 </section>
 
                 {/* 9. PHOTOBOOTH & STORY CARD */}
-                <section className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                <section
+                  className="border p-4 text-center rounded-sm backdrop-blur-md"
+                  style={{ backgroundColor: paperBgColor, borderColor: colors.accentSoft }}
+                >
                   <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>CAPTURE THE MOMENT</p>
                   <h3 className="text-base font-display mt-0.5" style={{ color: colors.fg }}>Frame Foto &amp; Story</h3>
                   <p className="text-[11px] mt-1" style={{ color: colors.muted }}>
@@ -1204,6 +1494,18 @@ export default function ThemeStudio() {
           </div>
         </div>
       </main>
+
+      {/* Image Adjuster Modal */}
+      {adjustTarget && (
+        <ImageAdjustModal
+          title={adjustTarget.title}
+          imageUrl={adjustTarget.url}
+          currentSettings={customAssets[adjustTarget.settingsKey] || {}}
+          onSave={handleSaveAdjustSettings}
+          onClose={() => setAdjustTarget(null)}
+        />
+      )}
+
       <SiteFooter />
     </div>
   )
