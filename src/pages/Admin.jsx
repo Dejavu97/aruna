@@ -106,6 +106,9 @@ export default function Admin() {
     const unsub = onAuthStateChanged(auth, (user) => {
       setAuthed(Boolean(user))
       setLoading(false)
+      if (user) {
+        setAdminKey('firebase-admin')
+      }
     })
     return () => unsub()
   }, [])
@@ -156,9 +159,8 @@ export default function Admin() {
 
       setError('')
     } catch (err) {
-      console.error(err)
-      setError(err.message)
-      setAdminKey('')
+      console.error('Admin load error:', err)
+      setError(err.message || 'Gagal memuat data admin.')
     } finally {
       setLoading(false)
     }

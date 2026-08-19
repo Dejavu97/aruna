@@ -213,39 +213,21 @@ export async function fetchInvitation(slug, editKey) {
   const docRef = doc(db, 'invitations', slug)
   const docSnap = await getDoc(docRef)
   if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
-  const data = docSnap.data()
-  
-  // Jika editKey diberikan dan bukan admin, maka wajib diverifikasi ke Vercel API
-  if (editKey !== undefined && !getAdminKey() && !auth.currentUser) {
-    const res = await fetch('/api/verify-key', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, editKey })
-    })
-    if (!res.ok) throw new Error('Kode edit salah atau tidak memiliki akses.')
-  }
-  
-  return data
+  return docSnap.data()
 }
 
 export async function fetchAdminInvitations() {
   if (!getAdminKey()) throw new Error('Unauthorized')
   const q = query(collection(db, 'invitations'), orderBy('createdAt', 'desc'))
-  const [invSnap, keysSnap] = await Promise.all([
-    getDocs(q),
-    getDocs(collection(db, 'private_keys')).catch(() => ({ docs: [] }))
-  ])
-  const keyMap = {}
-  if (keysSnap?.docs) {
-    keysSnap.docs.forEach(d => {
-      keyMap[d.id] = d.data().editKey || ''
-    })
-  }
-  return invSnap.docs.map(d => ({
-    slug: d.id,
-    ...d.data(),
-    editKey: keyMap[d.id] || d.data().editKey || '',
-  }))
+  const snap = await getDocs(q)
+  return snap.docs.map(d => {
+    const data = d.data()
+    return {
+      slug: d.id,
+      ...data,
+      editKey: data.editKey || getEditKey(d.id) || '',
+    }
+  })
 }
 
 export async function updateInvitation(slug, payload, editKey) {
