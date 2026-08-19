@@ -888,7 +888,7 @@ export function getDemoBySlug(slug) {
 
 export const filterChips = [
   { id: 'semua', label: 'Semua' },
-  { id: 'premium', label: '⭐ Premium (Baru)' },
+  { id: 'premium', label: 'Premium' },
   { id: 'adat', label: 'Adat' },
   { id: 'elegan', label: 'Elegan' },
   { id: 'modern', label: 'Modern' },
@@ -896,5 +896,5 @@ export const filterChips = [
   { id: 'floral', label: 'Floral' },
   { id: 'mewah', label: 'Mewah' },
   { id: 'unik', label: 'Unik' },
-  { id: 'klasik', label: 'Klasik (V1)' },
+  { id: 'klasik', label: 'Klasik' },
 ]

@@ -48,12 +48,9 @@ export default function Themes() {
         {/* Koleksi Premium */}
         {premiumList.length > 0 && (
           <div className="mt-12">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-xl">✨</span>
-              <h2 className="text-2xl font-display">Koleksi Premium (2.0)</h2>
-            </div>
+            <h2 className="text-2xl font-display mb-2">Koleksi Premium</h2>
             <p className="text-xs uppercase tracking-widest text-stone mb-6">
-              Desain eksklusif generasi terbaru dengan animasi khusus &amp; layout unik.
+              Desain eksklusif dengan animasi khusus &amp; layout unik.
             </p>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {premiumList.map((t) => (
