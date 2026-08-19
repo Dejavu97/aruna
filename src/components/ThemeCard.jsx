@@ -15,11 +15,15 @@ export default function ThemeCard({ theme }) {
           <p className="text-[10px] uppercase tracking-[0.25em] text-ivory/80">{theme.tag}</p>
           <h3 className="mt-1 font-display text-3xl">{theme.name}</h3>
         </div>
-        {theme.popular && (
+        {theme.collection === 'premium' ? (
+          <span className="absolute left-4 top-4 bg-gold-deep text-ivory px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold shadow-md backdrop-blur-md">
+            ⭐ Premium
+          </span>
+        ) : theme.popular ? (
           <span className="absolute left-4 top-4 bg-ink/80 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-ivory backdrop-blur-md">
             Sering dipilih
           </span>
-        )}
+        ) : null}
       </Link>
       
       <div className="mt-4 flex-1">
