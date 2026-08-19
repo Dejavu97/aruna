@@ -250,43 +250,69 @@ export const demos = {
     music: '/music/gamelan_lambang_sari.mp3',
     groom: {
       nick: 'Yogi',
-      full: 'Yogi Pradipta, S.Kom',
-      parents: 'Bpk. Haryanto & Ibu Sulastri',
-      photo: '/themes/jawa-biru/groom.jpg',
+      full: 'R. Mas Yogi Pradipta, S.Kom.',
+      parents: 'Putra dari Bpk. Haryanto & Ibu Sulastri',
+      photo: '/themes/jawa-biru/groom_portrait.jpg',
       ig: '@yogiprad'
     },
     bride: {
       nick: 'Ratna',
-      full: 'Ratna Dewi, S.E',
-      parents: 'Bpk. Widodo & Ibu Sri Mulyani',
-      photo: '/themes/jawa-biru/bride.jpg',
+      full: 'R. Ajeng Ratna Dewi, S.E.',
+      parents: 'Putri dari Bpk. Widodo & Ibu Sri Mulyani',
+      photo: '/themes/jawa-biru/bride_portrait.jpg',
       ig: '@ratnadew'
     },
     date: '2026-11-20',
-    quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.',
-    quoteSource: 'Ar-Rum: 21',
+    quote: 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.',
+    quoteSource: 'QS. Ar-Rum: 21',
     story: [
-      { year: '2019', title: 'Awal Bertemu', text: 'Pertemuan pertama kami secara tidak sengaja di sebuah acara kampus.', image: '/themes/jawa-biru/bride.jpg' },
-      { year: '2024', title: 'Lamaran', text: 'Keluarga besar bertemu dalam suasana hangat, membawa paningset sebagai tanda ikatan suci sebelum menuju pelaminan.', image: '/themes/jawa-biru/groom.jpg' },
+      { 
+        year: '2019', 
+        title: 'Pitepangan (Awal Bertemu)', 
+        text: 'Pertemuan pertama kami berawal di sebuah pagelaran seni karawitan di Jogja. Sapaan hangat dan canda sederhana menjadi awal dari rasa yang tumbuh perlahan.', 
+        image: '/themes/jawa-biru/groom_full.jpg' 
+      },
+      { 
+        year: '2022', 
+        title: 'Paseksen (Menjalin Janji)', 
+        text: 'Melalui banyak cerita dan perjalanan bersama, kami menyadari bahwa kami saling melengkapi. Doa dan restu keluarga senantiasa mengiringi setiap langkah kami.', 
+        image: '/themes/jawa-biru/bride_full.jpg' 
+      },
+      { 
+        year: '2024', 
+        title: 'Lamaran & Menuju Halal', 
+        text: 'Dalam suasana penuh kehangatan adat Jawa, kedua keluarga besar bersatu mengikat janji suci paningset menuju mahligai pernikahan.', 
+        image: '/themes/jawa-biru/wood_frame.jpg' 
+      },
     ],
     events: [
       {
         title: 'Akad Nikah',
         date: '2026-11-20',
-        time: '08:00 WIB - Selesai',
-        venue: 'Masjid Agung',
-        address: 'Jl. Utama No. 123, Kota Yogyakarta',
+        time: '08:00 - 10:00 WIB',
+        venue: 'Masjid Agung Al-Hikmah',
+        address: 'Jl. Malioboro No. 45, Danurejan, Kota Yogyakarta, Daerah Istimewa Yogyakarta',
         maps: 'https://maps.google.com'
       },
       {
-        title: 'Resepsi',
+        title: 'Resepsi Pernikahan (Panggih)',
         date: '2026-11-20',
         time: '11:00 - 14:00 WIB',
-        venue: 'Gedung Serbaguna',
-        address: 'Jl. Sudirman No. 45, Kota Yogyakarta',
+        venue: 'Grand Pendopo Sasana Kencana',
+        address: 'Jl. Sudirman No. 88, Kotabaru, Gondokusuman, Kota Yogyakarta',
         maps: 'https://maps.google.com'
       },
     ],
+    banks: [
+      { bank: 'BCA', no: '8820491823', name: 'YOGI PRADIPTA' },
+      { bank: 'Mandiri', no: '1370019284729', name: 'RATNA DEWI' },
+    ],
+    gallery: [
+      '/themes/jawa-biru/bride_full.jpg',
+      '/themes/jawa-biru/groom_full.jpg',
+      '/themes/jawa-biru/ornament.jpg',
+      '/themes/jawa-biru/master_batik.jpg',
+    ]
   }),
   'adat-jawa': demo({
     themeId: 'adat-jawa',
