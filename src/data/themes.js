@@ -266,8 +266,8 @@ export const demos = {
     quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.',
     quoteSource: 'Ar-Rum: 21',
     story: [
-      { year: '2019', title: 'Awal Bertemu', text: 'Pertemuan pertama kami secara tidak sengaja di sebuah acara kampus.', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80' },
-      { year: '2024', title: 'Lamaran', text: 'Keluarga besar bertemu dalam suasana hangat, membawa paningset sebagai tanda ikatan suci sebelum menuju pelaminan.', image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80' },
+      { year: '2019', title: 'Awal Bertemu', text: 'Pertemuan pertama kami secara tidak sengaja di sebuah acara kampus.', image: '/themes/jawa-biru/bride.jpg' },
+      { year: '2024', title: 'Lamaran', text: 'Keluarga besar bertemu dalam suasana hangat, membawa paningset sebagai tanda ikatan suci sebelum menuju pelaminan.', image: '/themes/jawa-biru/groom.jpg' },
     ],
     events: [
       {
