@@ -86,6 +86,12 @@ export async function createInvitation(payload) {
     guests: []
   }
   await setDoc(docRef, data)
+  
+  if (getAdminKey()) {
+    const secretRef = doc(db, 'private_keys', payload.slug)
+    await setDoc(secretRef, { editKey })
+  }
+  
   return data
 }
 
@@ -95,9 +101,14 @@ export async function fetchInvitation(slug, editKey) {
   if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
   const data = docSnap.data()
   
-  // Jika editKey diberikan (akses dashboard), maka wajib cocok dengan data di server
-  if (editKey !== undefined && editKey !== data.editKey && !getAdminKey()) {
-    throw new Error('Kode edit salah atau tidak memiliki akses.')
+  // Jika editKey diberikan (akses dashboard), maka wajib diverifikasi ke Vercel API
+  if (editKey !== undefined && !getAdminKey()) {
+    const res = await fetch('/api/verify-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, editKey })
+    })
+    if (!res.ok) throw new Error('Kode edit salah atau tidak memiliki akses.')
   }
   
   return data
@@ -111,13 +122,22 @@ export async function fetchAdminInvitations() {
 }
 
 export async function updateInvitation(slug, payload, editKey) {
-  const docRef = doc(db, 'invitations', slug)
-  const docSnap = await getDoc(docRef)
-  if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
-  const data = docSnap.data()
-  if (!getAdminKey() && data.editKey !== editKey) throw new Error('Tidak memiliki akses edit.')
+  if (getAdminKey()) {
+    // Admin bisa langsung tulis ke Firebase
+    const docRef = doc(db, 'invitations', slug)
+    await updateDoc(docRef, payload)
+    return { success: true }
+  }
+
+  // Pelanggan harus lewat Vercel API (Jalur Belakang)
+  const res = await fetch('/api/update-invitation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, editKey, payload })
+  })
   
-  await updateDoc(docRef, payload)
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Gagal menyimpan perubahan.')
   return { success: true }
 }
 
@@ -154,13 +174,7 @@ export async function addWish(slug, payload) {
 }
 
 export async function saveGuests(slug, guests, editKey) {
-  const docRef = doc(db, 'invitations', slug)
-  const docSnap = await getDoc(docRef)
-  if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
-  if (!getAdminKey() && docSnap.data().editKey !== editKey) throw new Error('Tidak memiliki akses edit.')
-  
-  await updateDoc(docRef, { guests })
-  return { success: true }
+  return updateInvitation(slug, { guests }, editKey)
 }
   
 export async function replyWish(slug, editKey, wishId, replyText) {  
@@ -168,10 +182,9 @@ export async function replyWish(slug, editKey, wishId, replyText) {
   const docSnap = await getDoc(docRef)  
   if (!docSnap.exists()) throw new Error('Not found')  
   const data = docSnap.data()  
-  if (!getAdminKey() && data.editKey !== editKey) throw new Error('Unauthorized')  
   
   const updatedWishes = (data.wishes || []).map(w => w.id === wishId ? { ...w, reply: replyText } : w)
-  await updateDoc(docRef, { wishes: updatedWishes })
+  await updateInvitation(slug, { wishes: updatedWishes }, editKey)
   return updatedWishes
 }
   

@@ -1,3 +1,5 @@
+import { adminDb } from './_firebase.js';
+
 export default async function handler(req, res) {
   // Hanya menerima metode POST
   if (req.method !== 'POST') {
@@ -12,11 +14,10 @@ export default async function handler(req, res) {
     }
 
     // Validasi editKey ke Firebase (Mencegah spam API oleh hacker)
-    const firebaseUrl = `https://firestore.googleapis.com/v1/projects/aruna-1cfc9/databases/(default)/documents/invitations/${slug}`
-    const fbRes = await fetch(firebaseUrl)
-    const fbDoc = await fbRes.json()
+    const secretRef = adminDb.collection('private_keys').doc(slug)
+    const secretSnap = await secretRef.get()
     
-    if (!fbRes.ok || !fbDoc.fields || fbDoc.fields.editKey?.stringValue !== editKey) {
+    if (!secretSnap.exists || secretSnap.data().editKey !== editKey) {
       return res.status(403).json({ error: 'Akses ditolak: Kunci rahasia (editKey) tidak valid atau undangan tidak ditemukan.' })
     }
 

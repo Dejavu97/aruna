@@ -1,3 +1,5 @@
+import { adminDb } from './_firebase.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' })
@@ -10,11 +12,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Domain, slug, and editKey are required' })
     }
 
-    const firebaseUrl = `https://firestore.googleapis.com/v1/projects/aruna-1cfc9/databases/(default)/documents/invitations/${slug}`
-    const fbRes = await fetch(firebaseUrl)
-    const fbDoc = await fbRes.json()
+    const secretRef = adminDb.collection('private_keys').doc(slug)
+    const secretSnap = await secretRef.get()
     
-    if (!fbRes.ok || !fbDoc.fields || fbDoc.fields.editKey?.stringValue !== editKey) {
+    if (!secretSnap.exists || secretSnap.data().editKey !== editKey) {
       return res.status(403).json({ error: 'Akses ditolak: Kunci rahasia tidak valid.' })
     }
 
