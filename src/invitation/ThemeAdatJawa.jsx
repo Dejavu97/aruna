@@ -168,17 +168,24 @@ function Quote({ data }) {
 
 function Couple({ data }) {
   const people = [
-    { who: data.groom, role: 'THE GROOM' },
-    { who: data.bride, role: 'THE BRIDE' },
+    { who: data.groom, role: 'THE GROOM', direction: -100 },
+    { who: data.bride, role: 'THE BRIDE', direction: 100 },
   ]
   return (
-    <section className="jw-pad" id="couple">
+    <section className="jw-pad jw-dark-bg" id="couple">
       <Kicker>PASANGAN</Kicker>
       <GoldLine />
       <div className="jw-couple-grid">
         {people.map((item) =>
           item.who ? (
-            <article key={item.role} className="jw-person">
+            <motion.article 
+              key={item.role} 
+              className="jw-person"
+              initial={{ x: item.direction, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
               <p className="jw-person-role">{item.role}</p>
               {item.who.photo && (
                 <div className="jw-person-photo">
@@ -272,24 +279,29 @@ function Countdown({ tick, date, data, bride, groom }) {
 function Events({ events }) {
   if (!events?.length) return null
   return (
-    <section className="jw-pad" id="event">
+    <section className="jw-pad jw-batik-bg" id="event">
       <Kicker>SAVE OUR DATE</Kicker>
       <GoldLine />
-      <div className="jw-events-grid">
-        {events.map((ev) => (
-          <article key={ev.title} className="jw-event-card">
-            <h3>{ev.title.toUpperCase()}</h3>
-            <div className="jw-event-line" />
-            <p className="jw-event-date">{formatLongDate(ev.date)}</p>
-            <p className="jw-event-time">{ev.time}</p>
+      <div className="jw-event-cards">
+        {events.map((ev, idx) => (
+          <motion.article 
+            key={ev.title} 
+            className="jw-event-card"
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: idx * 0.2 }}
+          >
+            <h3>{ev.title}</h3>
+            <p className="jw-event-time">{formatLongDate(ev.date)} <br/> {ev.time}</p>
             <p className="jw-event-venue">{ev.venue}</p>
             <p className="jw-event-addr">{ev.address}</p>
             {ev.maps && (
-              <a href={ev.maps} target="_blank" rel="noreferrer" className="jw-map-btn">
-                <MapPin size={11} /> GOOGLE MAPS
+              <a href={ev.maps} target="_blank" rel="noreferrer" className="jw-btn-secondary">
+                GOOGLE MAPS
               </a>
             )}
-          </article>
+          </motion.article>
         ))}
       </div>
     </section>
