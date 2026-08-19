@@ -177,8 +177,10 @@ export default function ThemeStudio() {
   const [ornamentTransition, setOrnamentTransition] = useState('expand_line') // 'expand_line' | 'unfurl' | 'glow_pulse' | 'none'
   const [panelTransition, setPanelTransition] = useState('staggered_slide') // 'staggered_slide' | 'flip_3d' | 'pop_in' | 'instant'
 
-  // Layering order for frame: 'frame_front' (Frame di atas foto) | 'photo_front' (Foto di atas frame)
-  const [frameLayerOrder, setFrameLayerOrder] = useState('frame_front')
+  // Couple Frame & Photo Settings
+  const [frameLayerOrder, setFrameLayerOrder] = useState('frame_front') // 'frame_front' | 'photo_front'
+  const [photoFitShape, setPhotoFitShape] = useState('rounded') // 'rounded' (Oval/Bulat) | 'arch' (Kubah) | 'rect' (Persegi)
+  const [photoInsetRatio, setPhotoInsetRatio] = useState(78) // 40% - 100% inner photo size relative to frame container
 
   // Comprehensive Custom Uploaded Assets with Adjuster Settings
   const [customAssets, setCustomAssets] = useState({
@@ -192,7 +194,7 @@ export default function ThemeStudio() {
     customOrnamentUrl: '',
     customOrnamentSettings: { scale: 1, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
     coupleFrameUrl: '',
-    coupleFrameSettings: { scale: 1.05, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
+    coupleFrameSettings: { scale: 1.15, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
     bridePhotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
     bridePhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     groomPhotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
@@ -318,6 +320,8 @@ export default function ThemeStudio() {
         ornamentTransition,
         panelTransition,
         frameLayerOrder,
+        photoFitShape,
+        photoInsetRatio,
         customAssets,
         cover: customAssets.coverImgUrl || '/themes/emas-senja.jpg',
         tags: ['komunitas', 'custom', isPublic ? 'publik' : 'privat'],
@@ -416,6 +420,13 @@ export default function ThemeStudio() {
   const mainBgColor = hexToRgba(colors.bg, opacities.bg)
   const accentBorderColor = hexToRgba(colors.accent, opacities.accent)
   const accentSoftColor = hexToRgba(colors.accentSoft, opacities.accentSoft)
+
+  // Helper for photo border radius based on photoFitShape
+  const getPhotoShapeClass = () => {
+    if (photoFitShape === 'rounded') return 'rounded-full'
+    if (photoFitShape === 'arch') return 'rounded-t-[80px] rounded-b-sm'
+    return 'rounded-sm'
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F7F4] text-ink flex flex-col font-body">
@@ -1123,12 +1134,12 @@ export default function ThemeStudio() {
                   )}
                 </div>
 
-                {/* 4. BINGKAI / FRAME FOTO MEMPELAI KUSTOM + PILIHAN POSISI LAYER */}
-                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-3">
+                {/* 4. BINGKAI / FRAME FOTO MEMPELAI KUSTOM + PENGATURAN LAYER & UKURAN FOTO DALAM FRAME */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-3.5">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium">4. Bingkai / Frame Foto Mempelai (PNG Transparan)</p>
-                      <p className="text-[10px] text-stone">Bingkai mahkota / ornamen bunga untuk melingkari foto pengantin.</p>
+                      <p className="text-[10px] text-stone">Bingkai mahkota / ukiran bunga untuk melingkari foto pengantin.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
                       {uploadingAsset === 'coupleFrameUrl' ? 'Mengunggah...' : 'Upload PNG'}
@@ -1141,37 +1152,89 @@ export default function ThemeStudio() {
                     </label>
                   </div>
 
-                  {/* Pilihan Posisi Layer Bingkai (Depan / Belakang Foto) */}
-                  <div className="pt-2 border-t border-ink/10 space-y-2">
-                    <span className="text-[11px] uppercase tracking-wider text-stone font-medium block">
-                      Posisi Layer Bingkai:
-                    </span>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setFrameLayerOrder('frame_front')}
-                        className={`p-2 text-left border rounded-sm text-xs transition-all ${
-                          frameLayerOrder === 'frame_front'
-                            ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold'
-                            : 'border-ink/15 text-stone hover:border-ink/30'
-                        }`}
-                      >
-                        <p className="text-xs">Frame di Atas Foto</p>
-                        <p className="text-[10px] text-stone">Frame menutupi tepi foto (Overlay)</p>
-                      </button>
+                  {/* Pengaturan Detail Bingkai & Foto */}
+                  <div className="pt-2 border-t border-ink/10 space-y-3">
+                    {/* A. Posisi Layer */}
+                    <div>
+                      <span className="text-[11px] uppercase tracking-wider text-stone font-medium block mb-1.5">
+                        Posisi Layer Bingkai:
+                      </span>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setFrameLayerOrder('frame_front')}
+                          className={`p-2 text-left border rounded-sm text-xs transition-all ${
+                            frameLayerOrder === 'frame_front'
+                              ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold'
+                              : 'border-ink/15 text-stone hover:border-ink/30'
+                          }`}
+                        >
+                          <p className="text-xs">Frame di Atas Foto</p>
+                          <p className="text-[10px] text-stone">Frame menutupi tepi luar foto (Overlay)</p>
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={() => setFrameLayerOrder('photo_front')}
-                        className={`p-2 text-left border rounded-sm text-xs transition-all ${
-                          frameLayerOrder === 'photo_front'
-                            ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold'
-                            : 'border-ink/15 text-stone hover:border-ink/30'
-                        }`}
-                      >
-                        <p className="text-xs">Foto di Atas Frame</p>
-                        <p className="text-[10px] text-stone">Frame menjadi latar belakang foto</p>
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => setFrameLayerOrder('photo_front')}
+                          className={`p-2 text-left border rounded-sm text-xs transition-all ${
+                            frameLayerOrder === 'photo_front'
+                              ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold'
+                              : 'border-ink/15 text-stone hover:border-ink/30'
+                          }`}
+                        >
+                          <p className="text-xs">Foto di Atas Frame</p>
+                          <p className="text-[10px] text-stone">Frame jadi latar belakang alas foto</p>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* B. Bentuk Lubang / Potongan Foto */}
+                    <div>
+                      <span className="text-[11px] uppercase tracking-wider text-stone font-medium block mb-1.5">
+                        Bentuk Foto di Dalam Bingkai:
+                      </span>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          ['rounded', 'Lingkaran / Oval'],
+                          ['arch', 'Kubah Arch'],
+                          ['rect', 'Persegi Elegan'],
+                        ].map(([shp, lbl]) => (
+                          <button
+                            key={shp}
+                            type="button"
+                            onClick={() => setPhotoFitShape(shp)}
+                            className={`p-1.5 text-center border rounded-sm text-[10px] uppercase tracking-wider transition-all ${
+                              photoFitShape === shp
+                                ? 'border-gold-deep bg-gold-deep/10 font-semibold'
+                                : 'border-ink/15 text-stone hover:border-ink/30'
+                            }`}
+                          >
+                            {lbl}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* C. Ukuran Foto Relatif Bingkai (Agar foto tidak menimpa bingkai) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[11px] uppercase tracking-wider text-stone font-medium">
+                          Ukuran Foto Relatif Bingkai:
+                        </span>
+                        <span className="text-xs font-mono text-stone">{photoInsetRatio}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="40"
+                        max="100"
+                        step="2"
+                        value={photoInsetRatio}
+                        onChange={(e) => setPhotoInsetRatio(parseInt(e.target.value))}
+                        className="w-full accent-gold-deep cursor-pointer"
+                      />
+                      <p className="text-[10px] text-stone mt-0.5">
+                        Kecilkan slider ini agar foto pas di dalam ruang bingkai tanpa menutupi ornamen bingkai.
+                      </p>
                     </div>
                   </div>
 
@@ -1313,20 +1376,29 @@ export default function ThemeStudio() {
                         <img src={customAssets.monogramUrl} alt="Monogram" className="w-10 h-10 object-contain border p-1 bg-white" />
                         <span className="text-[10px] text-green-700 font-medium">✓ Monogram Aktif</span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setAdjustTarget({
-                            field: 'monogramUrl',
-                            title: 'Sesuaikan Ukuran Logo Monogram',
-                            url: customAssets.monogramUrl,
-                            settingsKey: 'monogramSettings',
-                          })
-                        }
-                        className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
-                      >
-                        <Sliders size={12} /> Edit
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAdjustTarget({
+                              field: 'monogramUrl',
+                              title: 'Sesuaikan Ukuran Logo Monogram',
+                              url: customAssets.monogramUrl,
+                              settingsKey: 'monogramSettings',
+                            })
+                          }
+                          className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                        >
+                          <Sliders size={12} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCustomAssets((prev) => ({ ...prev, monogramUrl: '' }))}
+                          className="text-[10px] text-red-600 underline font-medium"
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1498,16 +1570,16 @@ export default function ThemeStudio() {
                     }
                   >
                     {customAssets.monogramUrl ? (
-                      <img
-                        src={customAssets.monogramUrl}
-                        alt="Logo"
-                        className="mx-auto mb-3 object-contain drop-shadow transition-transform"
-                        style={{
-                          width: `${(customAssets.monogramSettings?.scale || 1) * 64}px`,
-                          height: `${(customAssets.monogramSettings?.scale || 1) * 64}px`,
-                          transform: `translate(${customAssets.monogramSettings?.posX || 0}px, ${customAssets.monogramSettings?.posY || 0}px)`,
-                        }}
-                      />
+                      <div className="flex items-center justify-center mb-3">
+                        <img
+                          src={customAssets.monogramUrl}
+                          alt="Logo"
+                          className="object-contain max-h-20 max-w-[100px] drop-shadow"
+                          style={{
+                            transform: `scale(${customAssets.monogramSettings?.scale || 1})`,
+                          }}
+                        />
+                      </div>
                     ) : (
                       <div className="w-10 h-[1px] mx-auto mb-3" style={{ background: colors.accent }} />
                     )}
@@ -1561,18 +1633,19 @@ export default function ThemeStudio() {
                   </button>
                 </div>
 
-                {/* 1. HERO HEADER */}
-                <section className="text-center pt-2">
+                {/* 1. HERO HEADER (Safe natural DOM flow) */}
+                <section className="relative z-10 block text-center pt-2">
                   {customAssets.monogramUrl && (
-                    <img
-                      src={customAssets.monogramUrl}
-                      alt="Logo"
-                      className="mx-auto mb-3 object-contain"
-                      style={{
-                        width: `${(customAssets.monogramSettings?.scale || 1) * 56}px`,
-                        height: `${(customAssets.monogramSettings?.scale || 1) * 56}px`,
-                      }}
-                    />
+                    <div className="flex items-center justify-center mb-3">
+                      <img
+                        src={customAssets.monogramUrl}
+                        alt="Logo"
+                        className="object-contain max-h-20 max-w-[100px]"
+                        style={{
+                          transform: `scale(${customAssets.monogramSettings?.scale || 1})`,
+                        }}
+                      />
+                    </div>
                   )}
                   <p className="text-[10px] uppercase tracking-[0.28em]" style={{ color: colors.muted }}>
                     WALIMATUL 'URS
@@ -1635,8 +1708,8 @@ export default function ThemeStudio() {
                   </p>
                 </section>
 
-                {/* 2. MEMPELAI (COUPLE) SECTION WITH FLEXIBLE LAYERING & SCALING */}
-                <section className="space-y-4">
+                {/* 2. MEMPELAI (COUPLE) SECTION WITH DEDICATED FRAME & PHOTO PLACEMENT */}
+                <section className="relative z-10 block space-y-4">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>
                       PASANGAN MEMPELAI
@@ -1649,7 +1722,7 @@ export default function ThemeStudio() {
                       {/* Bride Card */}
                       <motion.div
                         key={`bride-sbs-${coupleTransition}-${animKey}`}
-                        className="border p-3.5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
+                        className="border p-3 text-center rounded-sm backdrop-blur-md relative"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
                           coupleTransition === 'meet_middle' ? { opacity: 0, x: -140, rotate: -8 }
@@ -1668,38 +1741,47 @@ export default function ThemeStudio() {
                           ease: 'easeOut',
                         }}
                       >
-                        <div className="aspect-[3/4] relative mb-2.5 rounded-xs overflow-hidden flex items-center justify-center">
-                          {/* UNDERLAY FRAME (If Photo is in Front) */}
+                        {/* Frame & Photo Combined Area */}
+                        <div className="aspect-[3/4] relative mb-2.5 flex items-center justify-center">
+                          {/* UNDERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Underlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
 
-                          {/* Bride Photo */}
-                          <img
-                            src={customAssets.bridePhotoUrl}
-                            alt="Bride"
-                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2' : 'relative z-0'}`}
+                          {/* Bride Photo Avatar Container */}
+                          <div
+                            className={`overflow-hidden shadow-xs select-none ${getPhotoShapeClass()} ${frameLayerOrder === 'photo_front' ? 'relative z-10' : 'relative z-0'}`}
                             style={{
-                              transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
-                              filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
+                              width: `${photoInsetRatio}%`,
+                              height: `${photoInsetRatio}%`,
                             }}
-                          />
+                          >
+                            <img
+                              src={customAssets.bridePhotoUrl}
+                              alt="Bride"
+                              className="w-full h-full object-cover"
+                              style={{
+                                transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
+                                filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
+                              }}
+                            />
+                          </div>
 
-                          {/* OVERLAY FRAME (If Frame is in Front) */}
+                          {/* OVERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Overlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
@@ -1718,7 +1800,7 @@ export default function ThemeStudio() {
                       {/* Groom Card */}
                       <motion.div
                         key={`groom-sbs-${coupleTransition}-${animKey}`}
-                        className="border p-3.5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
+                        className="border p-3 text-center rounded-sm backdrop-blur-md relative"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
                           coupleTransition === 'meet_middle' ? { opacity: 0, x: 140, rotate: 8 }
@@ -1738,38 +1820,47 @@ export default function ThemeStudio() {
                           ease: 'easeOut',
                         }}
                       >
-                        <div className="aspect-[3/4] relative mb-2.5 rounded-xs overflow-hidden flex items-center justify-center">
-                          {/* UNDERLAY FRAME (If Photo is in Front) */}
+                        {/* Frame & Photo Combined Area */}
+                        <div className="aspect-[3/4] relative mb-2.5 flex items-center justify-center">
+                          {/* UNDERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Underlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
 
-                          {/* Groom Photo */}
-                          <img
-                            src={customAssets.groomPhotoUrl}
-                            alt="Groom"
-                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2' : 'relative z-0'}`}
+                          {/* Groom Photo Avatar Container */}
+                          <div
+                            className={`overflow-hidden shadow-xs select-none ${getPhotoShapeClass()} ${frameLayerOrder === 'photo_front' ? 'relative z-10' : 'relative z-0'}`}
                             style={{
-                              transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
-                              filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
+                              width: `${photoInsetRatio}%`,
+                              height: `${photoInsetRatio}%`,
                             }}
-                          />
+                          >
+                            <img
+                              src={customAssets.groomPhotoUrl}
+                              alt="Groom"
+                              className="w-full h-full object-cover"
+                              style={{
+                                transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
+                                filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
+                              }}
+                            />
+                          </div>
 
-                          {/* OVERLAY FRAME (If Frame is in Front) */}
+                          {/* OVERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Overlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
@@ -1793,7 +1884,7 @@ export default function ThemeStudio() {
                       {/* Stacked Bride Card */}
                       <motion.div
                         key={`bride-stacked-${coupleTransition}-${animKey}`}
-                        className="border p-5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
+                        className="border p-5 text-center rounded-sm backdrop-blur-md relative"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
                           coupleTransition === 'meet_middle' ? { opacity: 0, x: -100 }
@@ -1805,37 +1896,45 @@ export default function ThemeStudio() {
                         transition={{ duration: 0.8, ease: 'easeOut' }}
                       >
                         <p className="text-[10px] uppercase tracking-[0.25em] text-stone mb-3">MEMPELAI WANITA</p>
-                        <div className="aspect-[4/5] max-w-[240px] mx-auto relative mb-4 rounded-sm border shadow-sm flex items-center justify-center overflow-hidden" style={{ borderColor: accentBorderColor }}>
+                        <div className="aspect-[4/5] max-w-[220px] mx-auto relative mb-4 flex items-center justify-center">
                           {/* UNDERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Underlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
 
-                          <img
-                            src={customAssets.bridePhotoUrl}
-                            alt="Bride"
-                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2.5' : 'relative z-0'}`}
+                          <div
+                            className={`overflow-hidden shadow-sm select-none ${getPhotoShapeClass()} ${frameLayerOrder === 'photo_front' ? 'relative z-10' : 'relative z-0'}`}
                             style={{
-                              transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
-                              filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
+                              width: `${photoInsetRatio}%`,
+                              height: `${photoInsetRatio}%`,
                             }}
-                          />
+                          >
+                            <img
+                              src={customAssets.bridePhotoUrl}
+                              alt="Bride"
+                              className="w-full h-full object-cover"
+                              style={{
+                                transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
+                                filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
+                              }}
+                            />
+                          </div>
 
                           {/* OVERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Overlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
@@ -1867,7 +1966,7 @@ export default function ThemeStudio() {
                       {/* Stacked Groom Card */}
                       <motion.div
                         key={`groom-stacked-${coupleTransition}-${animKey}`}
-                        className="border p-5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
+                        className="border p-5 text-center rounded-sm backdrop-blur-md relative"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
                           coupleTransition === 'meet_middle' ? { opacity: 0, x: 100 }
@@ -1879,37 +1978,45 @@ export default function ThemeStudio() {
                         transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
                       >
                         <p className="text-[10px] uppercase tracking-[0.25em] text-stone mb-3">MEMPELAI PRIA</p>
-                        <div className="aspect-[4/5] max-w-[240px] mx-auto relative mb-4 rounded-sm border shadow-sm flex items-center justify-center overflow-hidden" style={{ borderColor: accentBorderColor }}>
+                        <div className="aspect-[4/5] max-w-[220px] mx-auto relative mb-4 flex items-center justify-center">
                           {/* UNDERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Underlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
 
-                          <img
-                            src={customAssets.groomPhotoUrl}
-                            alt="Groom"
-                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2.5' : 'relative z-0'}`}
+                          <div
+                            className={`overflow-hidden shadow-sm select-none ${getPhotoShapeClass()} ${frameLayerOrder === 'photo_front' ? 'relative z-10' : 'relative z-0'}`}
                             style={{
-                              transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
-                              filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
+                              width: `${photoInsetRatio}%`,
+                              height: `${photoInsetRatio}%`,
                             }}
-                          />
+                          >
+                            <img
+                              src={customAssets.groomPhotoUrl}
+                              alt="Groom"
+                              className="w-full h-full object-cover"
+                              style={{
+                                transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
+                                filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
+                              }}
+                            />
+                          </div>
 
                           {/* OVERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Overlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
@@ -1939,7 +2046,7 @@ export default function ThemeStudio() {
                       {/* Arch Bride Card */}
                       <motion.div
                         key={`bride-arch-${coupleTransition}-${animKey}`}
-                        className="border p-3 text-center rounded-t-[70px] rounded-b-sm backdrop-blur-md relative overflow-hidden"
+                        className="border p-3 text-center rounded-t-[70px] rounded-b-sm backdrop-blur-md relative"
                         style={{ backgroundColor: paperBgColor, borderColor: accentBorderColor }}
                         initial={
                           coupleTransition === 'meet_middle' ? { opacity: 0, x: -120 }
@@ -1950,37 +2057,45 @@ export default function ThemeStudio() {
                         animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
                         transition={{ duration: 0.85, ease: 'easeOut' }}
                       >
-                        <div className="aspect-[3/4] rounded-t-[60px] rounded-b-xs overflow-hidden mb-2.5 relative border border-black/10 flex items-center justify-center">
+                        <div className="aspect-[3/4] relative mb-2.5 flex items-center justify-center">
                           {/* UNDERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Underlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
 
-                          <img
-                            src={customAssets.bridePhotoUrl}
-                            alt="Bride"
-                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2' : 'relative z-0'}`}
+                          <div
+                            className={`overflow-hidden shadow-xs select-none rounded-t-[60px] rounded-b-xs ${frameLayerOrder === 'photo_front' ? 'relative z-10' : 'relative z-0'}`}
                             style={{
-                              transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
-                              filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
+                              width: `${photoInsetRatio}%`,
+                              height: `${photoInsetRatio}%`,
                             }}
-                          />
+                          >
+                            <img
+                              src={customAssets.bridePhotoUrl}
+                              alt="Bride"
+                              className="w-full h-full object-cover"
+                              style={{
+                                transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
+                                filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
+                              }}
+                            />
+                          </div>
 
                           {/* OVERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Overlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
@@ -1999,7 +2114,7 @@ export default function ThemeStudio() {
                       {/* Arch Groom Card */}
                       <motion.div
                         key={`groom-arch-${coupleTransition}-${animKey}`}
-                        className="border p-3 text-center rounded-t-[70px] rounded-b-sm backdrop-blur-md relative overflow-hidden"
+                        className="border p-3 text-center rounded-t-[70px] rounded-b-sm backdrop-blur-md relative"
                         style={{ backgroundColor: paperBgColor, borderColor: accentBorderColor }}
                         initial={
                           coupleTransition === 'meet_middle' ? { opacity: 0, x: 120 }
@@ -2010,37 +2125,45 @@ export default function ThemeStudio() {
                         animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
                         transition={{ duration: 0.85, delay: 0.1, ease: 'easeOut' }}
                       >
-                        <div className="aspect-[3/4] rounded-t-[60px] rounded-b-xs overflow-hidden mb-2.5 relative border border-black/10 flex items-center justify-center">
+                        <div className="aspect-[3/4] relative mb-2.5 flex items-center justify-center">
                           {/* UNDERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Underlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
 
-                          <img
-                            src={customAssets.groomPhotoUrl}
-                            alt="Groom"
-                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2' : 'relative z-0'}`}
+                          <div
+                            className={`overflow-hidden shadow-xs select-none rounded-t-[60px] rounded-b-xs ${frameLayerOrder === 'photo_front' ? 'relative z-10' : 'relative z-0'}`}
                             style={{
-                              transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
-                              filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
+                              width: `${photoInsetRatio}%`,
+                              height: `${photoInsetRatio}%`,
                             }}
-                          />
+                          >
+                            <img
+                              src={customAssets.groomPhotoUrl}
+                              alt="Groom"
+                              className="w-full h-full object-cover"
+                              style={{
+                                transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
+                                filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
+                              }}
+                            />
+                          </div>
 
                           {/* OVERLAY FRAME */}
                           {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Frame Overlay"
+                              alt="Frame"
                               className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
-                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1.15})`,
                               }}
                             />
                           )}
@@ -2060,7 +2183,7 @@ export default function ThemeStudio() {
                 </section>
 
                 {/* 3. KISAH CINTA (LOVE STORY TIMELINE) */}
-                <section className="space-y-3">
+                <section className="relative z-10 block space-y-3">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>OUR LOVE STORY</p>
                     <h3 className="text-lg font-display mt-0.5" style={{ color: colors.fg }}>Perjalanan Cinta Kami</h3>
@@ -2088,7 +2211,7 @@ export default function ThemeStudio() {
 
                 {/* 4. COUNTDOWN TIMER */}
                 <motion.section
-                  className="border p-4 text-center rounded-sm backdrop-blur-md"
+                  className="relative z-10 block border p-4 text-center rounded-sm backdrop-blur-md"
                   style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
@@ -2112,7 +2235,7 @@ export default function ThemeStudio() {
                 </motion.section>
 
                 {/* 5. ACARA (EVENTS) WITH BOLD DISTINCT PANEL TRANSITIONS */}
-                <section className="space-y-3">
+                <section className="relative z-10 block space-y-3">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>SAVE OUR DATE</p>
                     <h3 className="text-lg font-display mt-0.5" style={{ color: colors.fg }}>Rangkaian Acara</h3>
@@ -2165,7 +2288,7 @@ export default function ThemeStudio() {
                 </section>
 
                 {/* 6. GALERI PREWEDDING */}
-                <section className="space-y-3">
+                <section className="relative z-10 block space-y-3">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>MOMENT OF LOVE</p>
                     <h3 className="text-lg font-display mt-0.5" style={{ color: colors.fg }}>Galeri Foto</h3>
@@ -2189,7 +2312,7 @@ export default function ThemeStudio() {
 
                 {/* 7. DOA & UCAPAN (WISHES & RSVP) */}
                 <motion.section
-                  className="border p-4 text-center rounded-sm space-y-3 backdrop-blur-md"
+                  className="relative z-10 block border p-4 text-center rounded-sm space-y-3 backdrop-blur-md"
                   style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -2221,7 +2344,7 @@ export default function ThemeStudio() {
 
                 {/* 8. TANDA KASIH (WEDDING GIFT) */}
                 <motion.section
-                  className="border p-4 text-center rounded-sm space-y-3 backdrop-blur-md"
+                  className="relative z-10 block border p-4 text-center rounded-sm space-y-3 backdrop-blur-md"
                   style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -2260,7 +2383,7 @@ export default function ThemeStudio() {
 
                 {/* 9. PHOTOBOOTH & STORY CARD */}
                 <motion.section
-                  className="border p-4 text-center rounded-sm backdrop-blur-md"
+                  className="relative z-10 block border p-4 text-center rounded-sm backdrop-blur-md"
                   style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -2282,7 +2405,7 @@ export default function ThemeStudio() {
                 </motion.section>
 
                 {/* 10. PENUTUP & WATERMARK */}
-                <footer className="text-center pt-8 border-t border-black/10 space-y-2">
+                <footer className="relative z-10 block text-center pt-8 border-t border-black/10 space-y-2">
                   <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>KAMI YANG BERBAHAGIA</p>
                   <h3 className="text-2xl italic" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
                     {previewData.bride.nick} &amp; {previewData.groom.nick}
