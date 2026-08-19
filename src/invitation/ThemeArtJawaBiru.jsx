@@ -9,17 +9,30 @@ function formatLongDate(dateStr) {
   return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-function Kicker({ children }) {
+function Kicker({ children, showOrnament = true }) {
   return (
-    <motion.p 
-      className="ab-subtitle"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-    >
-      {children}
-    </motion.p>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem' }}>
+      {showOrnament && (
+        <motion.img 
+          src="/themes/jawa-biru/ornament.png" 
+          alt="Ornament" 
+          style={{ width: '80px', marginBottom: '1rem' }}
+          initial={{ opacity: 0, scale: 0.5 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        />
+      )}
+      <motion.p 
+        className="ab-subtitle"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        {children}
+      </motion.p>
+    </div>
   )
 }
 
@@ -33,7 +46,7 @@ function Cover({ data, coverImg, onOpen }) {
       <div className="ab-cover-bg" />
 
       <div className="ab-cover-content">
-        <Kicker>THE WEDDING OF</Kicker>
+        <Kicker showOrnament={false}>THE WEDDING OF</Kicker>
 
         <motion.h1 
           className="ab-title"
@@ -124,13 +137,17 @@ function Story({ data }) {
           return (
             <div key={i} className="ab-story-item">
               <motion.div 
-                className="ab-story-photo"
+                className="ab-photo-wrap"
+                style={{ margin: 0, width: '100%', maxWidth: '240px', height: '280px', justifySelf: isEven ? 'end' : 'start' }}
                 initial={{ opacity: 0, x: isEven ? 50 : -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
-                {st.image && <img src={st.image} alt={st.title} />}
+                <div className="ab-photo-frame-img" />
+                <div className="ab-photo-inner">
+                  {st.image && <img src={st.image} alt={st.title} />}
+                </div>
               </motion.div>
               <motion.div 
                 className="ab-story-content"
