@@ -8,6 +8,7 @@ import Admin from './pages/Admin'
 import InvitationPage from './pages/InvitationPage'
 import Edit from './pages/Edit'
 import Manage from './pages/Manage'
+import ThemeStudio from './pages/ThemeStudio'
 import CustomDomainPage from './pages/CustomDomainPage'
 
 export default function App() {
@@ -23,6 +24,8 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/tema" element={<Themes />} />
       <Route path="/tema/:themeId" element={<ThemePreview />} />
+      <Route path="/studio" element={<ThemeStudio />} />
+      <Route path="/studio/:themeId" element={<ThemeStudio />} />
       <Route path="/pesan/:themeId" element={<Order />} />
       <Route path="/berhasil/:slug" element={<Success />} />
       <Route path="/edit/:slug" element={<Edit />} />

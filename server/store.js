@@ -6,8 +6,10 @@ const dir = path.dirname(fileURLToPath(import.meta.url))
 export const dataDir = path.join(dir, 'data')
 export const uploadDir = path.join(dir, 'uploads')
 const invitationsFile = path.join(dataDir, 'invitations.json')
+const customThemesFile = path.join(dataDir, 'custom_themes.json')
 const settingsFile = path.join(dataDir, 'settings.json')
 const INVITE_PREFIX = 'aruna/invitations/'
+const THEMES_PREFIX = 'aruna/custom_themes/'
 const LEGACY_LIST = 'aruna/invitations.json'
 
 const defaultSettings = {
@@ -58,6 +60,7 @@ export function ensureDirs() {
   fs.mkdirSync(dataDir, { recursive: true })
   fs.mkdirSync(uploadDir, { recursive: true })
   if (!fs.existsSync(invitationsFile)) writeJson(invitationsFile, [])
+  if (!fs.existsSync(customThemesFile)) writeJson(customThemesFile, [])
   if (!fs.existsSync(settingsFile)) writeJson(settingsFile, defaultSettings)
 }
 
@@ -257,4 +260,71 @@ export function publicInvitation(item) {
     ...rest
   } = item
   return rest
+}
+
+export async function listCustomThemes() {
+  if (!useBlob()) {
+    return readJson(customThemesFile, [])
+  }
+  try {
+    const { list } = await import('@vercel/blob')
+    const { blobs } = await list({
+      prefix: THEMES_PREFIX,
+      limit: 100,
+      ...blobAuthOptions(),
+    })
+    const themes = []
+    for (const b of blobs) {
+      try {
+        const res = await fetch(b.url)
+        if (res.ok) {
+          const data = await res.json()
+          themes.push(data)
+        }
+      } catch {}
+    }
+    return themes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+  } catch {
+    return []
+  }
+}
+
+export async function saveCustomTheme(theme) {
+  if (!theme.id) theme.id = `theme_custom_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+  theme.createdAt = theme.createdAt || Date.now()
+
+  if (!useBlob()) {
+    const list = readJson(customThemesFile, [])
+    const idx = list.findIndex((t) => t.id === theme.id)
+    if (idx >= 0) list[idx] = theme
+    else list.unshift(theme)
+    writeJson(customThemesFile, list)
+    return theme
+  }
+
+  await blobPut(`${THEMES_PREFIX}${theme.id}.json`, JSON.stringify(theme, null, 2), {
+    contentType: 'application/json',
+  })
+  return theme
+}
+
+export async function findCustomTheme(id) {
+  if (!useBlob()) {
+    const list = readJson(customThemesFile, [])
+    return list.find((t) => t.id === id) || null
+  }
+  try {
+    const { list } = await import('@vercel/blob')
+    const pathname = `${THEMES_PREFIX}${id}.json`
+    const { blobs } = await list({
+      prefix: pathname,
+      limit: 1,
+      ...blobAuthOptions(),
+    })
+    if (blobs.length > 0) {
+      const res = await fetch(blobs[0].url)
+      if (res.ok) return await res.json()
+    }
+  } catch {}
+  return null
 }

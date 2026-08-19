@@ -17,6 +17,9 @@ import {
   upsert,
   blobAuthInfo,
   useBlob,
+  listCustomThemes,
+  saveCustomTheme,
+  findCustomTheme,
 } from './store.js'
 
 ensureDirs()
@@ -297,6 +300,42 @@ app.put('/api/invitations/:slug/guests', async (req, res) => {
   const next = { ...item, guests, updatedAt: Date.now() }
   await upsert(next)
   res.json(next)
+})
+
+app.get('/api/custom-themes', async (_req, res) => {
+  try {
+    const list = await listCustomThemes()
+    res.json(list)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.post('/api/custom-themes', async (req, res) => {
+  try {
+    const body = req.body || {}
+    if (!body.name) {
+      res.status(400).json({ error: 'Nama tema wajib diisi.' })
+      return
+    }
+    const theme = await saveCustomTheme(body)
+    res.json(theme)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/api/custom-themes/:id', async (req, res) => {
+  try {
+    const item = await findCustomTheme(req.params.id)
+    if (!item) {
+      res.status(404).json({ error: 'Tema kustom tidak ditemukan.' })
+      return
+    }
+    res.json(item)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 function injectOg(html, item, origin, guestName = '') {

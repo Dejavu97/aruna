@@ -193,14 +193,47 @@ export async function fetchInvitationByDomain(domain) {
   return { slug: snap.docs[0].id, ...snap.docs[0].data() }  
 } 
   
-export async function getAnnouncement() {  
-  try {  
-    const docSnap = await getDoc(doc(db, 'settings', 'announcement'))  
-    return docSnap.exists() ? docSnap.data().text : ''  
-  } catch { return '' }  
-}  
+export async function getAnnouncement() {
+  try {
+    const docRef = doc(db, 'settings', 'announcement')
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      return docSnap.data().text || ''
+    }
+  } catch (err) {
+    console.error('Failed to fetch announcement:', err)
+  }
+  return ''
+}
+
+export async function fetchCustomThemes() {
+  try {
+    const res = await fetch('/api/custom-themes')
+    if (res.ok) return await res.json()
+  } catch {}
+  return []
+}
+
+export async function fetchCustomTheme(id) {
+  try {
+    const res = await fetch(`/api/custom-themes/${id}`)
+    if (res.ok) return await res.json()
+  } catch {}
+  return null
+}
+
+export async function createCustomTheme(themeData) {
+  const res = await fetch('/api/custom-themes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(themeData),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Gagal menyimpan tema kustom.')
+  return data
+}
   
 export async function saveAnnouncement(text) {  
   if (!getAdminKey()) throw new Error('Unauthorized')  
   await setDoc(doc(db, 'settings', 'announcement'), { text })  
-} 
+}

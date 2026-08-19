@@ -245,12 +245,15 @@ export const themes = [
   },
 ]
 
-export function getTheme(id) {
+export function getTheme(id, customThemes = []) {
+  if (typeof id === 'object' && id) return id
+  const custom = (customThemes || []).find((t) => t.id === id)
+  if (custom) return custom
   return themes.find((t) => t.id === id) || themes[0]
 }
 
-export function hasTheme(id) {
-  return themes.some((t) => t.id === id)
+export function hasTheme(id, customThemes = []) {
+  return themes.some((t) => t.id === id) || (customThemes || []).some((t) => t.id === id)
 }
 
 export function getThemeFeatures(themeOrId) {
@@ -888,6 +891,7 @@ export function getDemoBySlug(slug) {
 
 export const filterChips = [
   { id: 'semua', label: 'Semua' },
+  { id: 'komunitas', label: 'Koleksi Komunitas' },
   { id: 'premium', label: 'Premium' },
   { id: 'adat', label: 'Adat' },
   { id: 'elegan', label: 'Elegan' },

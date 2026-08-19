@@ -1,19 +1,30 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import WeddingForm from '../components/WeddingForm'
 import { hasTheme } from '../data/themes'
 import { waLink } from '../data/site'
-import { createInvitation, rememberEditKey } from '../lib/api'
+import { createInvitation, rememberEditKey, fetchCustomTheme } from '../lib/api'
 
 export default function Order() {
   const { themeId } = useParams()
   const navigate = useNavigate()
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [customTheme, setCustomTheme] = useState(null)
+  const [loadingCustom, setLoadingCustom] = useState(Boolean(themeId?.startsWith('theme_')))
 
-  if (!hasTheme(themeId)) {
+  useEffect(() => {
+    if (themeId?.startsWith('theme_')) {
+      fetchCustomTheme(themeId).then((t) => {
+        setCustomTheme(t)
+        setLoadingCustom(false)
+      }).catch(() => setLoadingCustom(false))
+    }
+  }, [themeId])
+
+  if (!loadingCustom && !hasTheme(themeId) && !customTheme) {
     return (
       <div className="grid min-h-dvh place-items-center bg-ivory px-5 text-center">
         <div>

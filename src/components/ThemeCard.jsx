@@ -15,7 +15,11 @@ export default function ThemeCard({ theme }) {
           <p className="text-[10px] uppercase tracking-[0.25em] text-ivory/80">{theme.tag}</p>
           <h3 className="mt-1 font-display text-3xl">{theme.name}</h3>
         </div>
-        {theme.collection === 'premium' ? (
+        {theme.collection === 'community' ? (
+          <span className="absolute left-4 top-4 bg-teal-800 text-ivory px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold shadow-md backdrop-blur-md">
+            Komunitas
+          </span>
+        ) : theme.collection === 'premium' ? (
           <span className="absolute left-4 top-4 bg-gold-deep text-ivory px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold shadow-md backdrop-blur-md">
             Premium
           </span>
@@ -27,15 +31,20 @@ export default function ThemeCard({ theme }) {
       </Link>
       
       <div className="mt-4 flex-1">
-        <p className="text-sm leading-relaxed text-stone">{theme.description}</p>
+        {theme.creator && (
+          <p className="text-[11px] font-medium text-gold-deep mb-1">
+            Rancangan: {theme.creator}
+          </p>
+        )}
+        <p className="text-sm leading-relaxed text-stone">{theme.description || theme.desc}</p>
       </div>
       
       <div className="mt-5 grid grid-cols-2 gap-3 text-center text-xs uppercase tracking-[0.16em]">
         <Link 
-          to={`/tema/${theme.id}`} 
+          to={theme.collection === 'community' ? `/studio/${theme.id}` : `/tema/${theme.id}`} 
           className="border border-ink/20 py-3 transition-colors hover:bg-ink hover:text-ivory"
         >
-          Lihat
+          {theme.collection === 'community' ? 'Lihat / Edit' : 'Lihat'}
         </Link>
         <Link 
           to={`/pesan/${theme.id}`} 

@@ -24,6 +24,7 @@ import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
 import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 import WeddingFrameModal from '../components/WeddingFrameModal'
+import AtmosphereParticles from '../components/AtmosphereParticles'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
@@ -158,6 +159,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
         />
       </aside>
       <div className="inv-stage">
+        <AtmosphereParticles effect={theme.particleEffect || data.particleEffect} accentColor={theme.colors?.accent} />
         <AnimatePresence>
           {!open && (
             <Cover
