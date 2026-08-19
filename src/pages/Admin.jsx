@@ -20,6 +20,7 @@ import {
   setInvitationStatus,
   getAnnouncement,
   saveAnnouncement,
+  deleteCustomTheme,
   fetchCustomThemes,
   fetchVouchers,
   saveVoucher,
@@ -277,6 +278,18 @@ export default function Admin() {
     }
   }
 
+  // Handle Delete Custom Theme
+  async function handleDeleteCustomTheme(themeId, themeName) {
+    if (!confirm(`Hapus tema kustom "${themeName || themeId}"? Tema ini akan dihapus dari katalog dan database.`)) return
+    try {
+      await deleteCustomTheme(themeId)
+      alert(`Tema "${themeName || themeId}" berhasil dihapus.`)
+      load()
+    } catch (err) {
+      alert('Gagal menghapus tema: ' + err.message)
+    }
+  }
+
   // Handle Delete Voucher
   async function handleDeleteVoucher(code) {
     if (!confirm(`Hapus voucher ${code}?`)) return
@@ -284,7 +297,7 @@ export default function Admin() {
       await deleteVoucher(code)
       load()
     } catch (err) {
-      alert('Gagal menghapus: ' + err.message)
+      alert('Gagal menghapus voucher: ' + err.message)
     }
   }
 
@@ -795,18 +808,28 @@ export default function Admin() {
                     </div>
 
                     <div className="pt-3 border-t border-ink/10 flex items-center justify-between gap-2 text-xs uppercase tracking-wider font-semibold">
-                      <Link
-                        to={`/studio?from=${ct.id}`}
-                        className="border border-ink/20 px-3 py-1.5 hover:bg-ink/5 inline-flex items-center gap-1 text-[11px]"
+                      <div className="flex items-center gap-1.5">
+                        <Link
+                          to={`/studio?from=${ct.id}`}
+                          className="border border-ink/20 px-2.5 py-1.5 hover:bg-ink/5 inline-flex items-center gap-1 text-[11px]"
+                        >
+                          <Edit size={12} /> Buka Studio
+                        </Link>
+                        <Link
+                          to={`/pesan/${ct.id}`}
+                          className="bg-ink text-ivory px-2.5 py-1.5 hover:bg-gold-deep transition-colors text-[11px]"
+                        >
+                          Pesan
+                        </Link>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCustomTheme(ct.id, ct.name)}
+                        className="border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 inline-flex items-center gap-1 text-[11px] transition-colors"
+                        title="Hapus Tema Kustom"
                       >
-                        <Edit size={12} /> Buka Studio
-                      </Link>
-                      <Link
-                        to={`/pesan/${ct.id}`}
-                        className="bg-ink text-ivory px-3 py-1.5 hover:bg-gold-deep transition-colors text-[11px]"
-                      >
-                        Pesan
-                      </Link>
+                        <Trash2 size={12} /> Hapus
+                      </button>
                     </div>
                   </article>
                 ))}

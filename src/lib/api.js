@@ -208,6 +208,22 @@ export async function getAnnouncement() {
 
 export async function fetchCustomThemes() {
   try {
+    const q = query(collection(db, 'custom_themes'), orderBy('createdAt', 'desc'))
+    const snap = await getDocs(q)
+    if (!snap.empty) {
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    }
+  } catch (err) {
+    console.warn('Firestore custom_themes fetch:', err)
+  }
+
+  // Fallback to local storage or API
+  try {
+    const local = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
+    if (local.length > 0) return local
+  } catch {}
+
+  try {
     const res = await fetch('/api/custom-themes')
     if (res.ok) return await res.json()
   } catch {}
@@ -216,6 +232,18 @@ export async function fetchCustomThemes() {
 
 export async function fetchCustomTheme(id) {
   try {
+    const docRef = doc(db, 'custom_themes', id)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() }
+  } catch {}
+
+  try {
+    const local = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
+    const found = local.find(t => t.id === id)
+    if (found) return found
+  } catch {}
+
+  try {
     const res = await fetch(`/api/custom-themes/${id}`)
     if (res.ok) return await res.json()
   } catch {}
@@ -223,15 +251,46 @@ export async function fetchCustomTheme(id) {
 }
 
 export async function createCustomTheme(themeData) {
-  const res = await fetch('/api/custom-themes', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(themeData),
-  })
-  const data = await res.json()
-  if (!res.ok) throw new Error(data.error || 'Gagal menyimpan tema kustom.')
+  const themeId = themeData.id || ('ct_' + Math.random().toString(36).slice(2, 10))
+  const data = {
+    ...themeData,
+    id: themeId,
+    createdAt: Date.now(),
+  }
+
+  try {
+    const docRef = doc(db, 'custom_themes', themeId)
+    await setDoc(docRef, data)
+  } catch (err) {
+    console.warn('Firestore setDoc custom_themes:', err)
+  }
+
+  try {
+    const savedList = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
+    const updatedList = [data, ...savedList.filter((item) => item.id !== themeId)]
+    localStorage.setItem('aruna_custom_themes', JSON.stringify(updatedList))
+  } catch {}
+
   return data
 }
+
+export async function deleteCustomTheme(id) {
+  try {
+    const docRef = doc(db, 'custom_themes', id)
+    await deleteDoc(docRef)
+  } catch (err) {
+    console.warn('Firestore deleteDoc custom_themes:', err)
+  }
+
+  try {
+    const savedList = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
+    const updatedList = savedList.filter((item) => item.id !== id)
+    localStorage.setItem('aruna_custom_themes', JSON.stringify(updatedList))
+  } catch {}
+
+  return { success: true }
+}
+
   
 export async function saveAnnouncement(text) {  
   if (!getAdminKey()) throw new Error('Unauthorized')  
