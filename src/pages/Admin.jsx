@@ -134,8 +134,10 @@ export default function Admin() {
 
       // Merge local custom themes
       let localThemes = []
+      let deletedIds = []
       try {
         localThemes = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
+        deletedIds = JSON.parse(localStorage.getItem('aruna_deleted_custom_themes') || '[]')
       } catch {}
 
       const mergedThemes = [...(fetchedThemes || [])]
@@ -145,9 +147,11 @@ export default function Admin() {
         }
       })
 
+      const finalCustomThemes = mergedThemes.filter((t) => !deletedIds.includes(t.id))
+
       setItems(fetchedItems || [])
       setAnnouncement(fetchedAnnouncement || '')
-      setCustomThemesList(mergedThemes)
+      setCustomThemesList(finalCustomThemes)
       setVouchersList(fetchedVouchers || [])
       
       if (fetchedPayment && Array.isArray(fetchedPayment.banks)) {
@@ -356,11 +360,13 @@ export default function Admin() {
   async function handleDeleteCustomTheme(themeId, themeName) {
     if (!confirm(`Hapus tema kustom "${themeName || themeId}"? Tema ini akan dihapus dari katalog dan database.`)) return
     try {
+      setCustomThemesList((prev) => prev.filter((ct) => ct.id !== themeId))
       await deleteCustomTheme(themeId)
       alert(`Tema "${themeName || themeId}" berhasil dihapus.`)
       load()
     } catch (err) {
       alert('Gagal menghapus tema: ' + err.message)
+      load()
     }
   }
 

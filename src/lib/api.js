@@ -318,30 +318,39 @@ export async function getAnnouncement() {
 }
 
 export async function fetchCustomThemes() {
+  let deletedIds = []
+  try {
+    deletedIds = JSON.parse(localStorage.getItem('aruna_deleted_custom_themes') || '[]')
+  } catch {}
+
+  let themesList = []
   try {
     const q = query(collection(db, 'custom_themes'), orderBy('createdAt', 'desc'))
     const snap = await getDocs(q)
     if (!snap.empty) {
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      themesList = snap.docs.map(d => ({ id: d.id, ...d.data() }))
     }
   } catch (err) {
     console.warn('Firestore custom_themes fetch:', err)
   }
 
-  // Fallback to local storage or API
-  try {
-    const local = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
-    if (local.length > 0) return local
-  } catch {}
+  if (themesList.length === 0) {
+    try {
+      const local = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
+      if (local.length > 0) themesList = local
+    } catch {}
+  }
 
-  try {
-    const res = await fetch('/api/custom-themes')
-    if (res.ok) return await res.json()
-  } catch {}
-  return []
+  // Filter out deleted themes
+  return themesList.filter(t => !deletedIds.includes(t.id))
 }
 
 export async function fetchCustomTheme(id) {
+  try {
+    const deletedIds = JSON.parse(localStorage.getItem('aruna_deleted_custom_themes') || '[]')
+    if (deletedIds.includes(id)) return null
+  } catch {}
+
   try {
     const docRef = doc(db, 'custom_themes', id)
     const docSnap = await getDoc(docRef)
@@ -368,6 +377,13 @@ export async function createCustomTheme(themeData) {
     id: themeId,
     createdAt: Date.now(),
   }
+
+  // If recreating, remove from deleted blacklist
+  try {
+    const deletedList = JSON.parse(localStorage.getItem('aruna_deleted_custom_themes') || '[]')
+    const cleaned = deletedList.filter(id => id !== themeId)
+    localStorage.setItem('aruna_deleted_custom_themes', JSON.stringify(cleaned))
+  } catch {}
 
   try {
     const docRef = doc(db, 'custom_themes', themeId)
@@ -397,6 +413,19 @@ export async function deleteCustomTheme(id) {
     const savedList = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
     const updatedList = savedList.filter((item) => item.id !== id)
     localStorage.setItem('aruna_custom_themes', JSON.stringify(updatedList))
+  } catch {}
+
+  // Save to deleted blacklist in localStorage so it never resurrects
+  try {
+    const deletedList = JSON.parse(localStorage.getItem('aruna_deleted_custom_themes') || '[]')
+    if (!deletedList.includes(id)) {
+      deletedList.push(id)
+      localStorage.setItem('aruna_deleted_custom_themes', JSON.stringify(deletedList))
+    }
+  } catch {}
+
+  try {
+    await fetch(`/api/custom-themes/${id}`, { method: 'DELETE' })
   } catch {}
 
   return { success: true }
