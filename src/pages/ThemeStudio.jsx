@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Sparkles, Palette, Type, Layout, Image as ImageIcon, Music, 
   Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet,
-  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3, Wand2, RotateCcw
+  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3, Wand2, RotateCcw, Disc
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -80,7 +80,7 @@ const themePresets = [
     particleEffect: 'petals',
     coverStyle: 'arch',
     openingAnimation: 'fade',
-    layoutStyle: 'stacked',
+    layoutStyle: 'arch',
     coupleTransition: 'scale_up',
     ornamentTransition: 'unfurl',
     panelTransition: 'pop_in',
@@ -109,11 +109,21 @@ const videoPresets = [
   { name: 'Awan Anggun & Sunset', url: 'https://assets.mixkit.co/videos/preview/mixkit-clouds-and-blue-sky-2408-large.mp4' },
 ]
 
+// Curated Music Audio Presets
+const musicPresets = [
+  { name: 'Tanpa Musik', url: '', artist: 'Mute' },
+  { name: 'A Thousand Years (Piano)', url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=piano-moment-9835.mp3', artist: 'Piano Acoustic' },
+  { name: 'Canon in D (Orchestra)', url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-wedding-112191.mp3', artist: 'Classical Strings' },
+  { name: 'Until I Found You (Strings)', url: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f792cb.mp3?filename=wedding-love-123477.mp3', artist: 'Romantic Instrumental' },
+  { name: 'Gending Kebo Giro (Jawa)', url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=traditional-asian-melody-14732.mp3', artist: 'Gamelan Nusantara' },
+]
+
 export default function ThemeStudio() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const starterId = params.get('from') || ''
   const previewScrollRef = useRef(null)
+  const audioRef = useRef(null)
 
   // Custom Theme Meta
   const [themeName, setThemeName] = useState('Tema Eksklusif Saya')
@@ -126,6 +136,7 @@ export default function ThemeStudio() {
   const [previewOpened, setPreviewOpened] = useState(false)
   const [copiedBank, setCopiedBank] = useState('')
   const [animKey, setAnimKey] = useState(1) // for re-triggering animations on option switch
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false)
 
   // Visual Colors & Individual Transparency (0% - 100%)
   const [colors, setColors] = useState({
@@ -183,6 +194,8 @@ export default function ThemeStudio() {
     bridePhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     groomPhotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
     groomPhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
+    customMusicUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=piano-moment-9835.mp3',
+    customMusicTitle: 'A Thousand Years (Piano Instrumental)',
   })
 
   // Image Adjustment Modal State
@@ -242,7 +255,11 @@ export default function ThemeStudio() {
     setUploadingAsset(field)
     try {
       const res = await uploadFile(file)
-      setCustomAssets((prev) => ({ ...prev, [field]: res.url }))
+      if (field === 'customMusicUrl') {
+        setCustomAssets((prev) => ({ ...prev, customMusicUrl: res.url, customMusicTitle: file.name }))
+      } else {
+        setCustomAssets((prev) => ({ ...prev, [field]: res.url }))
+      }
     } catch (err) {
       alert(err.message || 'Gagal mengunggah aset.')
     } finally {
@@ -257,6 +274,16 @@ export default function ThemeStudio() {
       ...prev,
       [settingsKey]: newSettings,
     }))
+  }
+
+  function toggleAudio() {
+    if (!audioRef.current) return
+    if (isPlayingAudio) {
+      audioRef.current.pause()
+      setIsPlayingAudio(false)
+    } else {
+      audioRef.current.play().then(() => setIsPlayingAudio(true)).catch(() => {})
+    }
   }
 
   async function handleSaveTheme() {
@@ -444,9 +471,9 @@ export default function ThemeStudio() {
               ['font', 'Font'],
               ['cover', 'Cover'],
               ['transition', 'Transisi'],
-              ['ornament', 'Ornamen'],
+              ['ornament', 'Layout & Ornamen'],
               ['particle', 'Efek Partikel'],
-              ['assets', 'Upload Aset'],
+              ['assets', 'Upload Aset & MP3'],
             ].map(([tab, label]) => (
               <button
                 key={tab}
@@ -706,7 +733,7 @@ export default function ThemeStudio() {
                   <label className="block text-xs uppercase tracking-wider text-stone font-medium">1. Transisi Foto Mempelai</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      ['meet_middle', 'Bertemu di Tengah', 'Foto pria meluncur dari kiri, wanita dari kanan (Slide & Tilt)'],
+                      ['meet_middle', 'Bertemu di Tengah', 'Foto pria meluncur dari kanan, wanita dari kiri (Slide & Tilt)'],
                       ['scale_up', 'Membesar Elastis', 'Foto membesar membal dari ukuran kecil (Spring Pop)'],
                       ['fade_blur', 'Fade & Blur In', 'Foto memudar dari blur tebal ke tajam (Cinematic De-blur)'],
                       ['parallax_float', 'Drop dari Atas', 'Foto meluncur turun dari atas (Smooth Fall)'],
@@ -788,10 +815,34 @@ export default function ThemeStudio() {
               </div>
             )}
 
-            {/* TAB 6: ORNAMEN & LAYOUT */}
+            {/* TAB 6: LAYOUT & ORNAMEN */}
             {activeTab === 'ornament' && (
               <div className="space-y-5">
                 <div>
+                  <h3 className="font-display text-lg mb-1">Layout Tampilan Mempelai</h3>
+                  <p className="text-xs text-stone mb-3">Pilih format tata letak foto dan informasi kedua mempelai:</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      ['side_by_side', '2 Kolom', 'Groom kiri, Bride kanan berdampingan'],
+                      ['stacked', 'Bertingkat', 'Kartu potret atas-bawah vertikal'],
+                      ['arch', 'Kubah Arch', 'Jendela kubah lengkung arsitektural'],
+                    ].map(([lVal, lLabel, lDesc]) => (
+                      <button
+                        key={lVal}
+                        type="button"
+                        onClick={() => setLayoutStyle(lVal)}
+                        className={`p-3 text-left border rounded-sm transition-all ${
+                          layoutStyle === lVal ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold' : 'border-ink/15 hover:border-ink/40'
+                        }`}
+                      >
+                        <p className="text-xs font-semibold">{lLabel}</p>
+                        <p className="text-[10px] text-stone mt-0.5">{lDesc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-ink/10 pt-4">
                   <h3 className="font-display text-lg mb-1">Gaya Ornamen &amp; Pemisah</h3>
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     {[
@@ -811,29 +862,6 @@ export default function ThemeStudio() {
                       >
                         <p className="text-xs font-medium">{oLabel}</p>
                         <p className="text-[10px] text-stone mt-0.5">{oDesc}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-ink/10 pt-4">
-                  <h3 className="font-display text-lg mb-1">Layout Tampilan Mempelai</h3>
-                  <div className="grid grid-cols-2 gap-2 mt-3">
-                    {[
-                      ['side_by_side', '2 Kolom Berdampingan', 'Groom kiri, Bride kanan (Vogue style)'],
-                      ['stacked', 'Bertingkat Vertikal', 'Kartu foto atas-bawah klasik'],
-                      ['arch', 'Arch Frame', 'Kubah lengkung arsitektural'],
-                    ].map(([lVal, lLabel, lDesc]) => (
-                      <button
-                        key={lVal}
-                        type="button"
-                        onClick={() => setLayoutStyle(lVal)}
-                        className={`p-3 text-left border rounded-sm transition-colors ${
-                          layoutStyle === lVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
-                        }`}
-                      >
-                        <p className="text-xs font-medium">{lLabel}</p>
-                        <p className="text-[10px] text-stone mt-0.5">{lDesc}</p>
                       </button>
                     ))}
                   </div>
@@ -871,13 +899,13 @@ export default function ThemeStudio() {
               </div>
             )}
 
-            {/* TAB 8: UPLOAD ASET DENGAN 2 PILIHAN BG (FOTO/VIDEO) & UPLOAD FRAME PENGANTIN */}
+            {/* TAB 8: UPLOAD ASET, VIDEO, FRAME, & AUDIO MP3 */}
             {activeTab === 'assets' && (
               <div className="space-y-5">
                 <div>
-                  <h3 className="font-display text-lg mb-1">Upload Aset &amp; Frame Pengantin</h3>
+                  <h3 className="font-display text-lg mb-1">Upload Aset, Video, &amp; Audio MP3</h3>
                   <p className="text-xs text-stone mb-4">
-                    Unggah gambar latar, video latar, frame foto pengantin, dan logo inisial. Setiap gambar dilengkapi tombol edit ukuran dan posisi:
+                    Unggah seluruh aset undangan, backsound MP3, video latar, dan frame pengantin:
                   </p>
                 </div>
 
@@ -1021,11 +1049,81 @@ export default function ThemeStudio() {
                   </div>
                 </div>
 
-                {/* 3. BINGKAI / FRAME FOTO MEMPELAI KUSTOM */}
+                {/* 3. MUSIK LATAR / BACKSOUND AUDIO MP3 */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium">3. Musik Latar Undangan (Backsound Audio MP3)</p>
+                      <p className="text-[10px] text-stone">Musik instrumental otomatis yang diputar saat undangan dibuka.</p>
+                    </div>
+                    <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
+                      {uploadingAsset === 'customMusicUrl' ? 'Mengunggah...' : 'Upload MP3'}
+                      <input
+                        type="file"
+                        accept="audio/mp3,audio/mpeg,audio/m4a,audio/wav"
+                        className="hidden"
+                        onChange={(e) => handleAssetUpload('customMusicUrl', e)}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Curated Music Track List */}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {musicPresets.map((mp) => (
+                      <button
+                        key={mp.name}
+                        type="button"
+                        onClick={() =>
+                          setCustomAssets((prev) => ({
+                            ...prev,
+                            customMusicUrl: mp.url,
+                            customMusicTitle: mp.name,
+                          }))
+                        }
+                        className={`p-2 text-left border rounded-sm text-[10px] uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
+                          customAssets.customMusicUrl === mp.url ? 'bg-ink text-ivory border-ink font-semibold' : 'border-ink/15 text-stone hover:border-ink/30'
+                        }`}
+                      >
+                        <Music size={12} /> {mp.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {customAssets.customMusicUrl && (
+                    <div className="flex items-center justify-between bg-paper p-2.5 border border-ink/10">
+                      <div className="flex items-center gap-2">
+                        <Disc size={16} className={`text-gold-deep ${isPlayingAudio ? 'animate-spin' : ''}`} />
+                        <div>
+                          <p className="text-xs font-medium text-ink">{customAssets.customMusicTitle || 'Musik Kustom Aktif'}</p>
+                          <p className="text-[9px] text-stone font-mono">Audio Siap Diputar</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={toggleAudio}
+                          className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider font-medium hover:bg-ink/5"
+                        >
+                          {isPlayingAudio ? <Pause size={12} /> : <Play size={12} />}
+                          {isPlayingAudio ? 'Jeda' : 'Putar Tes'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCustomAssets((prev) => ({ ...prev, customMusicUrl: '', customMusicTitle: '' }))}
+                          className="text-[10px] text-red-600 underline font-medium"
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. BINGKAI / FRAME FOTO MEMPELAI KUSTOM */}
                 <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">3. Bingkai / Frame Foto Mempelai (PNG Transparan)</p>
+                      <p className="text-xs font-medium">4. Bingkai / Frame Foto Mempelai (PNG Transparan)</p>
                       <p className="text-[10px] text-stone">Bingkai kubah emas / ornamen bunga untuk melingkari foto pengantin.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
@@ -1071,11 +1169,11 @@ export default function ThemeStudio() {
                   )}
                 </div>
 
-                {/* 4. Foto Mempelai Wanita */}
+                {/* 5. Foto Mempelai Wanita */}
                 <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">4. Foto Mempelai Wanita (Bride Photo)</p>
+                      <p className="text-xs font-medium">5. Foto Mempelai Wanita (Bride Photo)</p>
                       <p className="text-[10px] text-stone">Foto potret mempelai wanita.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
@@ -1112,11 +1210,11 @@ export default function ThemeStudio() {
                   )}
                 </div>
 
-                {/* 5. Foto Mempelai Pria */}
+                {/* 6. Foto Mempelai Pria */}
                 <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">5. Foto Mempelai Pria (Groom Photo)</p>
+                      <p className="text-xs font-medium">6. Foto Mempelai Pria (Groom Photo)</p>
                       <p className="text-[10px] text-stone">Foto potret mempelai pria.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
@@ -1153,11 +1251,11 @@ export default function ThemeStudio() {
                   )}
                 </div>
 
-                {/* 6. Logo Monogram / Inisial Pengantin */}
+                {/* 7. Logo Monogram / Inisial Pengantin */}
                 <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">6. Logo Monogram / Inisial (PNG Transparan)</p>
+                      <p className="text-xs font-medium">7. Logo Monogram / Inisial (PNG Transparan)</p>
                       <p className="text-[10px] text-stone">Lambang mahkota / inisial pengantin.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
@@ -1203,11 +1301,11 @@ export default function ThemeStudio() {
                   )}
                 </div>
 
-                {/* 7. Ornamen / Divider Bunga Kustom */}
+                {/* 8. Ornamen / Divider Bunga Kustom */}
                 <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">7. Ornamen / Garis Pemisah Kustom (PNG Transparan)</p>
+                      <p className="text-xs font-medium">8. Ornamen / Garis Pemisah Kustom (PNG Transparan)</p>
                       <p className="text-[10px] text-stone">Ranting bunga / ukiran khusus pemisah antar bagian.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
@@ -1307,6 +1405,23 @@ export default function ThemeStudio() {
               previewDevice === 'mobile' ? 'w-full max-w-[380px] h-[720px]' : 'w-full max-w-[520px] h-[720px]'
             }`}
           >
+            {/* Audio Player Engine */}
+            {customAssets.customMusicUrl && (
+              <audio ref={audioRef} src={customAssets.customMusicUrl} loop preload="auto" />
+            )}
+
+            {/* Floating Music Vinyl Button */}
+            {customAssets.customMusicUrl && (
+              <button
+                type="button"
+                onClick={toggleAudio}
+                className="absolute bottom-16 right-4 z-40 w-10 h-10 rounded-full bg-black/80 border border-gold-deep text-gold-deep flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+                title={isPlayingAudio ? 'Jeda Musik' : 'Putar Musik'}
+              >
+                <Disc size={20} className={isPlayingAudio ? 'animate-spin text-gold' : 'opacity-80'} />
+              </button>
+            )}
+
             {/* Camera / Speaker Island */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-4 bg-[#222222] rounded-b-xl z-50 flex items-center justify-center">
               <div className="w-2.5 h-2.5 rounded-full bg-stone-950 border border-stone-800" />
@@ -1393,7 +1508,12 @@ export default function ThemeStudio() {
 
                     <button
                       type="button"
-                      onClick={() => setPreviewOpened(true)}
+                      onClick={() => {
+                        setPreviewOpened(true)
+                        if (customAssets.customMusicUrl && audioRef.current && !isPlayingAudio) {
+                          audioRef.current.play().then(() => setIsPlayingAudio(true)).catch(() => {})
+                        }
+                      }}
                       className="w-full py-3.5 text-xs uppercase tracking-[0.2em] font-semibold text-white shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
                       style={{ background: hexToRgba(colors.accent, opacities.accent) }}
                     >
@@ -1494,7 +1614,7 @@ export default function ThemeStudio() {
                   </p>
                 </section>
 
-                {/* 2. MEMPELAI (COUPLE) SECTION WITH BOLD DISTINCT ANIMATIONS & CUSTOM FRAME */}
+                {/* 2. MEMPELAI (COUPLE) SECTION WITH 3 DEDICATED LAYOUTS (SIDE-BY-SIDE, STACKED, ARCH) */}
                 <section className="space-y-4">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>
@@ -1502,11 +1622,12 @@ export default function ThemeStudio() {
                     </p>
                   </div>
 
-                  {layoutStyle === 'side_by_side' ? (
+                  {/* LAYOUT OPTION 1: 2 KOLOM BERDAMPINGAN (SIDE-BY-SIDE) */}
+                  {layoutStyle === 'side_by_side' && (
                     <div className="grid grid-cols-2 gap-3">
-                      {/* Bride Card with Distinct Motion */}
+                      {/* Bride Card */}
                       <motion.div
-                        key={`bride-${coupleTransition}-${animKey}`}
+                        key={`bride-sbs-${coupleTransition}-${animKey}`}
                         className="border p-3.5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
@@ -1526,7 +1647,7 @@ export default function ThemeStudio() {
                           ease: 'easeOut',
                         }}
                       >
-                        <div className="aspect-[3/4] relative overflow-hidden mb-2.5">
+                        <div className="aspect-[3/4] relative overflow-hidden mb-2.5 rounded-xs">
                           <img
                             src={customAssets.bridePhotoUrl}
                             alt="Bride"
@@ -1536,7 +1657,6 @@ export default function ThemeStudio() {
                               filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
                             }}
                           />
-                          {/* Custom Couple Frame Overlay if uploaded */}
                           {customAssets.coupleFrameUrl && (
                             <img
                               src={customAssets.coupleFrameUrl}
@@ -1559,9 +1679,9 @@ export default function ThemeStudio() {
                         </p>
                       </motion.div>
 
-                      {/* Groom Card with Distinct Motion */}
+                      {/* Groom Card */}
                       <motion.div
-                        key={`groom-${coupleTransition}-${animKey}`}
+                        key={`groom-sbs-${coupleTransition}-${animKey}`}
                         className="border p-3.5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
@@ -1582,7 +1702,7 @@ export default function ThemeStudio() {
                           ease: 'easeOut',
                         }}
                       >
-                        <div className="aspect-[3/4] relative overflow-hidden mb-2.5">
+                        <div className="aspect-[3/4] relative overflow-hidden mb-2.5 rounded-xs">
                           <img
                             src={customAssets.groomPhotoUrl}
                             alt="Groom"
@@ -1592,7 +1712,6 @@ export default function ThemeStudio() {
                               filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
                             }}
                           />
-                          {/* Custom Couple Frame Overlay if uploaded */}
                           {customAssets.coupleFrameUrl && (
                             <img
                               src={customAssets.coupleFrameUrl}
@@ -1615,64 +1734,217 @@ export default function ThemeStudio() {
                         </p>
                       </motion.div>
                     </div>
-                  ) : (
+                  )}
+
+                  {/* LAYOUT OPTION 2: BERTINGKAT VERTIKAL MEWAH (STACKED) */}
+                  {layoutStyle === 'stacked' && (
                     <div className="space-y-4">
                       {/* Stacked Bride Card */}
                       <motion.div
-                        key={`stacked-bride-${coupleTransition}-${animKey}`}
-                        className="border p-4 text-center rounded-sm backdrop-blur-md relative"
+                        key={`bride-stacked-${coupleTransition}-${animKey}`}
+                        className="border p-5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        initial={
+                          coupleTransition === 'meet_middle' ? { opacity: 0, x: -100 }
+                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.2 }
+                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(30px)' }
+                          : { opacity: 0, y: 40 }
+                        }
+                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.8, ease: 'easeOut' }}
                       >
-                        <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2 relative" style={{ borderColor: accentBorderColor }}>
+                        <p className="text-[10px] uppercase tracking-[0.25em] text-stone mb-3">MEMPELAI WANITA</p>
+                        <div className="aspect-[4/5] max-w-[240px] mx-auto relative overflow-hidden mb-4 rounded-sm border shadow-sm" style={{ borderColor: accentBorderColor }}>
                           <img
                             src={customAssets.bridePhotoUrl}
                             alt="Bride"
                             className="w-full h-full object-cover"
                             style={{
                               transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
+                              filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
                             }}
                           />
+                          {customAssets.coupleFrameUrl && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Couple Frame"
+                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
                         </div>
                         <h4 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
                           {previewData.bride.full}
                         </h4>
-                        <p className="text-xs mt-1" style={{ color: colors.muted }}>
+                        <p className="text-xs mt-1.5 leading-relaxed max-w-xs mx-auto" style={{ color: colors.muted }}>
                           {previewData.bride.parents}
                         </p>
-                        <p className="text-xs mt-2 font-medium" style={{ color: colors.accent }}>
+                        <a
+                          href={`https://instagram.com/${previewData.bride.ig}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-block mt-3 px-3 py-1 text-xs border uppercase tracking-wider font-medium transition-colors"
+                          style={{ color: colors.accent, borderColor: accentBorderColor }}
+                        >
                           @{previewData.bride.ig}
-                        </p>
+                        </a>
                       </motion.div>
+
+                      {/* Stacked Divider */}
+                      <div className="flex items-center justify-center gap-3 py-1">
+                        <div className="h-[1px] w-16" style={{ background: accentSoftColor }} />
+                        <span className="font-display italic text-lg" style={{ color: colors.accent }}>&amp;</span>
+                        <div className="h-[1px] w-16" style={{ background: accentSoftColor }} />
+                      </div>
 
                       {/* Stacked Groom Card */}
                       <motion.div
-                        key={`stacked-groom-${coupleTransition}-${animKey}`}
-                        className="border p-4 text-center rounded-sm backdrop-blur-md relative"
+                        key={`groom-stacked-${coupleTransition}-${animKey}`}
+                        className="border p-5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.1 }}
+                        initial={
+                          coupleTransition === 'meet_middle' ? { opacity: 0, x: 100 }
+                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.2 }
+                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(30px)' }
+                          : { opacity: 0, y: 40 }
+                        }
+                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
                       >
-                        <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2 relative" style={{ borderColor: accentBorderColor }}>
+                        <p className="text-[10px] uppercase tracking-[0.25em] text-stone mb-3">MEMPELAI PRIA</p>
+                        <div className="aspect-[4/5] max-w-[240px] mx-auto relative overflow-hidden mb-4 rounded-sm border shadow-sm" style={{ borderColor: accentBorderColor }}>
                           <img
                             src={customAssets.groomPhotoUrl}
                             alt="Groom"
                             className="w-full h-full object-cover"
                             style={{
                               transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
+                              filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
                             }}
                           />
+                          {customAssets.coupleFrameUrl && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Couple Frame"
+                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
                         </div>
                         <h4 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
                           {previewData.groom.full}
                         </h4>
-                        <p className="text-xs mt-1" style={{ color: colors.muted }}>
+                        <p className="text-xs mt-1.5 leading-relaxed max-w-xs mx-auto" style={{ color: colors.muted }}>
                           {previewData.groom.parents}
                         </p>
-                        <p className="text-xs mt-2 font-medium" style={{ color: colors.accent }}>
+                        <a
+                          href={`https://instagram.com/${previewData.groom.ig}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-block mt-3 px-3 py-1 text-xs border uppercase tracking-wider font-medium transition-colors"
+                          style={{ color: colors.accent, borderColor: accentBorderColor }}
+                        >
+                          @{previewData.groom.ig}
+                        </a>
+                      </motion.div>
+                    </div>
+                  )}
+
+                  {/* LAYOUT OPTION 3: KUBAH LENGKUNG (ARCH WINDOW) */}
+                  {layoutStyle === 'arch' && (
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Arch Bride Card */}
+                      <motion.div
+                        key={`bride-arch-${coupleTransition}-${animKey}`}
+                        className="border p-3 text-center rounded-t-[70px] rounded-b-sm backdrop-blur-md relative overflow-hidden"
+                        style={{ backgroundColor: paperBgColor, borderColor: accentBorderColor }}
+                        initial={
+                          coupleTransition === 'meet_middle' ? { opacity: 0, x: -120 }
+                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.1 }
+                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(30px)' }
+                          : { opacity: 0, y: 40 }
+                        }
+                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.85, ease: 'easeOut' }}
+                      >
+                        <div className="aspect-[3/4] rounded-t-[60px] rounded-b-xs overflow-hidden mb-2.5 relative border border-black/10">
+                          <img
+                            src={customAssets.bridePhotoUrl}
+                            alt="Bride"
+                            className="w-full h-full object-cover"
+                            style={{
+                              transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
+                              filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
+                            }}
+                          />
+                          {customAssets.coupleFrameUrl && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Couple Frame"
+                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
+                        </div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
+                          {previewData.bride.full}
+                        </h4>
+                        <p className="text-[10px] mt-1.5 leading-relaxed" style={{ color: colors.muted }}>
+                          {previewData.bride.parents}
+                        </p>
+                        <p className="text-[10px] mt-2 font-medium" style={{ color: colors.accent }}>
+                          @{previewData.bride.ig}
+                        </p>
+                      </motion.div>
+
+                      {/* Arch Groom Card */}
+                      <motion.div
+                        key={`groom-arch-${coupleTransition}-${animKey}`}
+                        className="border p-3 text-center rounded-t-[70px] rounded-b-sm backdrop-blur-md relative overflow-hidden"
+                        style={{ backgroundColor: paperBgColor, borderColor: accentBorderColor }}
+                        initial={
+                          coupleTransition === 'meet_middle' ? { opacity: 0, x: 120 }
+                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.1 }
+                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(30px)' }
+                          : { opacity: 0, y: 40 }
+                        }
+                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.85, delay: 0.1, ease: 'easeOut' }}
+                      >
+                        <div className="aspect-[3/4] rounded-t-[60px] rounded-b-xs overflow-hidden mb-2.5 relative border border-black/10">
+                          <img
+                            src={customAssets.groomPhotoUrl}
+                            alt="Groom"
+                            className="w-full h-full object-cover"
+                            style={{
+                              transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
+                              filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
+                            }}
+                          />
+                          {customAssets.coupleFrameUrl && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Couple Frame"
+                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
+                        </div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
+                          {previewData.groom.full}
+                        </h4>
+                        <p className="text-[10px] mt-1.5 leading-relaxed" style={{ color: colors.muted }}>
+                          {previewData.groom.parents}
+                        </p>
+                        <p className="text-[10px] mt-2 font-medium" style={{ color: colors.accent }}>
                           @{previewData.groom.ig}
                         </p>
                       </motion.div>
