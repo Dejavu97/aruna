@@ -78,7 +78,7 @@ function Cover({ data, guest, coverImg, onOpen }) {
       <div className="jw-cover-shade" />
       <Petals />
       <motion.div
-        className="jw-cover-body"
+        className="jw-cover-inner"
         initial="hidden"
         animate="visible"
         variants={{
@@ -545,7 +545,7 @@ export default function ThemeAdatJawa({ data, guest = '', preview = false }) {
   }
 
   return (
-    <div className="jw-inv">
+    <div className="jw-inv jw-wrap">
       <aside className="jw-bg" aria-hidden style={{ backgroundImage: `url(${coverImg})` }}>
         <div className="jw-bg-shade" />
       </aside>
