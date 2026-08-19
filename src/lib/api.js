@@ -237,3 +237,31 @@ export async function saveAnnouncement(text) {
   if (!getAdminKey()) throw new Error('Unauthorized')  
   await setDoc(doc(db, 'settings', 'announcement'), { text })  
 }
+
+export async function fetchVouchers() {
+  try {
+    const q = query(collection(db, 'vouchers'))
+    const snap = await getDocs(q)
+    return snap.docs.map(d => ({ code: d.id, ...d.data() }))
+  } catch (err) {
+    console.error('Failed to fetch vouchers:', err)
+    return []
+  }
+}
+
+export async function saveVoucher(code, data) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const cleanCode = code.trim().toUpperCase()
+  const docRef = doc(db, 'vouchers', cleanCode)
+  await setDoc(docRef, { ...data, code: cleanCode, updatedAt: Date.now() })
+  return { success: true }
+}
+
+export async function deleteVoucher(code) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const cleanCode = code.trim().toUpperCase()
+  const docRef = doc(db, 'vouchers', cleanCode)
+  await deleteDoc(docRef)
+  return { success: true }
+}
+
