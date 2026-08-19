@@ -1,31 +1,67 @@
 # Alur Kerja (Workflow) Sistem Aruna
 
-Dokumen ini menjelaskan bagaimana siklus hidup sebuah undangan terbentuk, mulai dari pemesanan hingga undangan disebar oleh pelanggan.
+Dokumen ini menjelaskan bagaimana siklus hidup sebuah undangan terbentuk, mulai dari pemesanan, pengelolaan operasional admin, hingga penyebaran dan pencetakan kartu fisik.
+
+---
 
 ## 1. Pemesanan (Checkout)
-- Pelanggan membuka katalog di halaman `/tema`.
-- Memilih tema dan mengisi form (Nama, Email, Nomor WA, Link Domain, dll).
-- Saat menekan tombol **"Pesan & Bayar"**, sistem akan memanggil fungsi `createInvitation()` di `api.js`.
-- Fungsi ini menghasilkan **Edit Key** (Kunci Rahasia) secara acak.
-- *Edit Key* disimpan ke koleksi Firebase `private_keys`.
-- Data undangan disimpan ke koleksi Firebase `invitations` dengan status `unpaid` (Belum lunas).
-- Pelanggan dialihkan ke halaman Sukses yang berisi tombol chat WA untuk pelunasan.
+- Pelanggan membuka katalog di halaman `/tema` atau mendesain tema sendiri di `/studio`.
+- Pelanggan memilih tema dan mengisi formulir (Data Mempelai, Tanggal, Lokasi, WhatsApp, Tautan URL yang diinginkan).
+- Saat menekan tombol **"Pesan & Bayar"**, sistem memanggil fungsi `createInvitation()` di `api.js`.
+- Sistem menghasilkan **Edit Key** (Kunci Rahasia) dan **Kode Order** (contoh: `AR1024`).
+- Data tersimpan di database Firebase Firestore dengan status `unpaid` (Belum Lunas).
+- Pelanggan diarahkan ke halaman invoice/sukses yang menampilkan rincian rekening transfer & tombol konfirmasi WhatsApp.
 
-## 2. Pengelolaan Admin
-- Admin membuka `/admin` dan login menggunakan kredensial Firebase.
-- Admin melihat pesanan baru di tab "Belum Lunas".
-- Admin menerima pembayaran secara manual via BCA/Gopay dari pelanggan.
-- Admin menekan tombol **"Lunas"** di dashboard. Sistem mengubah status pesanan menjadi `paid`.
-- Admin menekan tombol **"Kirim ke WA Pelanggan"** untuk mengirimkan link Dashboard Kelola (`/kelola/namapelanggan?key=xxx`) kepada pelanggan.
+---
 
-## 3. Self-Service Pelanggan (Dashboard Kelola)
-- Pelanggan membuka link yang dikirim Admin. 
-- *Edit Key* yang ada di URL (contoh: `?key=xxx`) akan otomatis disimpan ke *localStorage* browser pelanggan.
-- Ketika Pelanggan mengedit data (Daftar Tamu, Domain, Balas Ucapan), sistem akan memanggil endpoint Vercel Serverless (`/api/update-invitation`, `/api/add-domain`, dll).
-- Vercel API akan mencocokkan *Edit Key* yang dikirim dengan yang ada di Brankas Firebase (`private_keys`). Jika cocok, perubahan disimpan.
+## 2. Pengelolaan Operasional Admin (`/admin`)
+- Admin login ke panel `/admin` menggunakan kredensial Firebase Auth terenkripsi.
+- **Konfirmasi Pembayaran:** Admin memverifikasi bukti transfer dan menekan tombol **"✓ Tandai Lunas"** untuk mengaktifkan status pesanan menjadi `paid`.
+- **Kirim Link Dashboard:** Admin menekan tombol **"Chat WA"** untuk mengirimkan tautan dashboard kelola kepada pengantin secara otomatis.
+- **Admin Super Bypass:** Admin memiliki hak akses langsung untuk mengecek dashboard kelola (`/kelola/:slug`) dan formulir revisi (`/edit/:slug`) kapan saja tanpa perlu memasukkan kunci edit manual.
+- **1-Click Clone / Duplikasi:** Admin dapat menduplikasi pesanan (misal: acara resepsi terpisah atau keluarga) lengkap dengan 100% data dan foto dalam 1 klik dengan slug baru.
+- **Semi-Automatic WhatsApp Blast Dispatcher:**
+  - Admin membuka modal **"WA Blast"** pada kartu pesanan.
+  - Memilih pesan template (`{nama}`, `{link}`, `{mempelai}`, `{tanggal}`).
+  - Mengimpor daftar tamu dari buku tamu klien atau menempel daftar kontak massal.
+  - Menjalankan pengiriman berurutan dengan tombol cepat `⚡ Kirim Tamu Berikutnya`.
+- **Generator Kartu Cetak Fisik:** Admin dapat membuka modal **"Kartu Cetak"** untuk menghasilkan souvenir tag, nomor meja batch, atau kartu fisik siap cetak berstandar A4.
 
-## 4. Tampilan Undangan Publik
-- Tamu membuka link undangan `aruna.com/u/namapelanggan`.
-- Sistem mengecek hostname. Jika mengakses menggunakan domain kustom (`namapelanggan.com`), sistem memanggil fungsi `fetchInvitationByDomain()` untuk mencari undangan mana yang cocok.
-- UI membaca properti `themeId` dan me-render komponen desain yang sesuai dengan tema.
-- Tamu bisa mengisi Form RSVP dan Ucapan. Aksi ini langsung ditulis ke koleksi `invitations` di Firebase, yang memang sudah diizinkan (allow) di Rules Firestore khusus untuk *field* `wishes` dan `rsvps`.
+---
+
+## 3. Self-Service Pelanggan (Dashboard Kelola `/kelola/:slug`)
+- Pelanggan membuka link dashboard yang diterima dari Admin (`/kelola/:slug?key=xxx`).
+- Kunci edit otomatis tersimpan di browser pelanggan.
+- **Fitur-Fitur Pelanggan:**
+  1. **Buku Tamu & Generator Tautan WA:** Memasukkan nama tamu dan menghasilkan link personal undangan (contoh: `aruna.com/u/sarah-budi?to=Bpk.+Joko`).
+  2. **Rekapitulasi RSVP:** Melihat statistik tamu yang mengonfirmasi hadir, tidak hadir, dan jumlah orang (*heads count*), serta ekspor ke CSV.
+  3. **Check-In Scanner QR:** Menggunakan kamera HP/laptop untuk memindai QR Code tamu di meja penerima tamu saat hari-H resepsi.
+  4. **Balas Ucapan Doa:** Membalas ucapan selamat dari tamu langsung ke halaman undangan.
+  5. **Proteksi Privasi Foto (*Anti-Download*):** Mengaktifkan saklar pengaman untuk menonaktifkan klik kanan dan fitur simpan gambar pada seluruh foto galeri pengantin.
+  6. **Generator Kartu Souvenir & Nomor Meja:** Mengunduh dan mencetak lembar souvenir tag atau nomor meja A4.
+
+---
+
+## 4. Theme Studio & Kustomisasi Desain (`/studio`)
+- Pengguna dapat merancang tema visual sendiri dengan mengubah warna, background, ornamen, dan partikel animasi.
+- **Custom Font Uploader:** Mendukung upload file font kaligrafi sendiri (`.TTF` / `.OTF` / `.WOFF` / `.WOFF2`) yang langsung aktif secara live preview.
+- Tema kustom dapat disimpan ke akun/cloud dan langsung dipesan oleh calon pengantin.
+
+---
+
+## 5. Generator Kartu Fisik & Souvenir QR (`PrintCardModal.jsx`)
+- Terintegrasi di panel Admin dan Dashboard Klien.
+- **Format Cetak Auto-Fit ISO A4:**
+  - **Souvenir Tag (8 per A4):** Grid 2×4 ukuran `88 × 62 mm` dengan QR Code resolusi tinggi.
+  - **Undangan Mini Enclosure:** Format 2 kartu (A5) atau 4 kartu (A6) per lembar A4.
+  - **Nomor Meja Batch:** Generator rentang otomatis (`MEJA 01` – `MEJA 20`) atau custom list, dengan opsi format tegak (A5/A6) atau tenda lipat segitiga 2 sisi.
+  - **Undangan Lipat Bifold:** Format A4 Landscape 2 halaman simetris dengan garis lipatan tengah.
+- **Arsitektur Auto-Fit 100%:** Menggunakan fractional grid tanpa batas tetap piksel sehingga kartu dijamin tidak pernah saling bertabrakan atau meluber saat dicetak.
+
+---
+
+## 6. Tampilan Undangan Publik (`/u/:slug`)
+- Tamu membuka tautan undangan personal.
+- Sistem memuat data undangan, memutar musik latar romantis, dan menyajikan animasi buka undangan.
+- Tamu dapat mengisi RSVP, menulis doa restu, melihat galeri foto, rute navigasi Google Maps, dan membuat frame Instagram Story.
+- Jika fitur Proteksi Foto aktif, sistem melindungi hak cipta foto dengan memblokir klik kanan (*context menu*) dan *drag-and-drop*.
