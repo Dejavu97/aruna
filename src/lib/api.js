@@ -151,6 +151,52 @@ export async function createInvitation(payload) {
   return { ...data, editKey } // Kembalikan editKey ke UI agar bisa disave di localStorage
 }
 
+export async function cloneInvitation(sourceSlug, newSlug) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  
+  const cleanNewSlug = newSlug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-')
+  if (!cleanNewSlug) throw new Error('Tautan baru tidak boleh kosong.')
+
+  // Check if target slug exists
+  const targetDocRef = doc(db, 'invitations', cleanNewSlug)
+  const targetSnap = await getDoc(targetDocRef)
+  if (targetSnap.exists()) {
+    throw new Error(`Tautan /u/${cleanNewSlug} sudah ada di database. Silakan gunakan nama tautan lain.`)
+  }
+
+  // Fetch source invitation
+  const sourceDocRef = doc(db, 'invitations', sourceSlug)
+  const sourceSnap = await getDoc(sourceDocRef)
+  if (!sourceSnap.exists()) {
+    throw new Error('Undangan sumber tidak ditemukan.')
+  }
+
+  const sourceData = sourceSnap.data()
+  const editKey = generateKey()
+  const orderCode = 'AR' + Math.floor(1000 + Math.random() * 9000)
+
+  const clonedData = {
+    ...sourceData,
+    slug: cleanNewSlug,
+    orderCode,
+    status: 'unpaid',
+    createdAt: Date.now(),
+    views: 0,
+    rsvps: [],
+    wishes: [],
+    guests: [],
+    customDomain: '', // Reset custom domain on clone
+  }
+
+  await setDoc(targetDocRef, clonedData)
+
+  // Save edit key to private_keys collection
+  const secretRef = doc(db, 'private_keys', cleanNewSlug)
+  await setDoc(secretRef, { editKey })
+
+  return { ...clonedData, editKey }
+}
+
 export async function fetchInvitation(slug, editKey) {
   const docRef = doc(db, 'invitations', slug)
   const docSnap = await getDoc(docRef)

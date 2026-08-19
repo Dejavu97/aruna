@@ -5,7 +5,7 @@ import {
   Download, MessageCircle, Copy, Check, Trash2, Edit, ExternalLink,
   Eye, Tag, Megaphone, Plus, AlertCircle, RefreshCw, Smartphone, Layers,
   CreditCard, QrCode, Upload, TrendingUp, Settings, ShieldCheck,
-  Printer, Receipt, FileText
+  Printer, Receipt, FileText, CopyPlus
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -31,7 +31,8 @@ import {
   savePaymentSettings,
   fetchDynamicPackages,
   saveDynamicPackages,
-  uploadFile
+  uploadFile,
+  cloneInvitation
 } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
 import { formatRupiah, packages as defaultPackages } from '../data/site'
@@ -85,6 +86,9 @@ export default function Admin() {
   // Modals State
   const [waModalItem, setWaModalItem] = useState(null)
   const [invoiceModalItem, setInvoiceModalItem] = useState(null)
+  const [cloneModalItem, setCloneModalItem] = useState(null)
+  const [newCloneSlug, setNewCloneSlug] = useState('')
+  const [cloning, setCloning] = useState(false)
   const [copied, setCopied] = useState('')
 
   useEffect(() => {
@@ -344,6 +348,29 @@ export default function Admin() {
       load()
     } catch (err) {
       alert('Gagal menghapus tema: ' + err.message)
+    }
+  }
+
+  // Handle Open Clone Modal
+  function handleOpenCloneModal(item) {
+    setCloneModalItem(item)
+    setNewCloneSlug(`${item.slug}-2`)
+  }
+
+  // Handle Clone Invitation Submit
+  async function handleCloneSubmit(e) {
+    e.preventDefault()
+    if (!newCloneSlug.trim() || !cloneModalItem) return
+    setCloning(true)
+    try {
+      const res = await cloneInvitation(cloneModalItem.slug, newCloneSlug)
+      alert(`Undangan berhasil diduplikasi menjadi: /u/${res.slug}`)
+      setCloneModalItem(null)
+      load()
+    } catch (err) {
+      alert('Gagal menduplikasi undangan: ' + err.message)
+    } finally {
+      setCloning(false)
     }
   }
 
@@ -800,6 +827,15 @@ export default function Admin() {
                             className="border border-ink/20 px-3 py-1.5 hover:bg-gold/10 hover:border-gold-deep text-ink inline-flex items-center gap-1 font-semibold"
                           >
                             <Receipt size={12} /> Kwitansi
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleOpenCloneModal(item)}
+                            className="border border-ink/20 px-3 py-1.5 hover:bg-gold/10 hover:border-gold-deep text-ink inline-flex items-center gap-1 font-semibold"
+                            title="Duplikasi seluruh data undangan ini ke slug baru"
+                          >
+                            <CopyPlus size={12} /> Duplikat
                           </button>
 
                           <button
@@ -1581,6 +1617,73 @@ export default function Admin() {
           </div>
         )
       })()}
+
+      {/* CLONE / DUPLICATE INVITATION MODAL */}
+      {cloneModalItem && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-paper border border-ink/20 max-w-md w-full p-6 sm:p-7 rounded-sm space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-ink/10 pb-3">
+              <div className="flex items-center gap-2 text-ink">
+                <CopyPlus className="text-gold-deep" size={18} />
+                <h3 className="font-display text-lg font-bold">Duplikat Undangan</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCloneModalItem(null)}
+                className="text-stone hover:text-ink text-xs font-bold px-2 py-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-2 text-xs text-stone leading-relaxed bg-ivory/40 p-3 border border-ink/10 rounded-xs">
+              <p>
+                Menduplikasi undangan dari: <strong className="text-ink">{cloneModalItem.bride?.nick} &amp; {cloneModalItem.groom?.nick}</strong> (<code>/u/{cloneModalItem.slug}</code>).
+              </p>
+              <p className="text-[11px] text-stone">
+                Seluruh foto, musik, teks acara, dan konfigurasi tema akan disalin 100% ke tautan baru dengan buku tamu / RSVP yang bersih.
+              </p>
+            </div>
+
+            <form onSubmit={handleCloneSubmit} className="space-y-4 pt-1">
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                  Tautan / Slug Baru
+                </label>
+                <div className="flex items-center border border-ink/20 bg-white">
+                  <span className="px-2.5 text-xs text-stone font-mono bg-ivory border-r border-ink/10">/u/</span>
+                  <input
+                    type="text"
+                    value={newCloneSlug}
+                    onChange={(e) => setNewCloneSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '-'))}
+                    placeholder="contoh: sarah-budi-resepsi"
+                    required
+                    className="flex-1 p-2 text-xs font-mono font-bold focus:outline-none"
+                  />
+                </div>
+                <p className="text-[10px] text-stone mt-1">Hanya huruf kecil, angka, dan tanda hubung (-).</p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-ink/10">
+                <button
+                  type="button"
+                  onClick={() => setCloneModalItem(null)}
+                  className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={cloning || !newCloneSlug.trim()}
+                  className="bg-ink text-ivory px-5 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+                >
+                  <CopyPlus size={13} /> {cloning ? 'Menduplikasi...' : 'Duplikat Sekarang'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <SiteFooter />
     </div>
