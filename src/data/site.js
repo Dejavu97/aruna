@@ -149,9 +149,23 @@ export const faqs = [
   },
 ]
 
-export function waLink(text) {
+export function adminWaLink(text) {
   const msg = encodeURIComponent(text)
   return `https://wa.me/${site.whatsapp}?text=${msg}`
+}
+
+export function shareWaLink(text, phone = '') {
+  const msg = encodeURIComponent(text)
+  let cleanPhone = String(phone || '').replace(/[^0-9]/g, '')
+  if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1)
+  return cleanPhone ? `https://wa.me/${cleanPhone}?text=${msg}` : `https://api.whatsapp.com/send?text=${msg}`
+}
+
+export function waLink(text, phone = site.whatsapp) {
+  const msg = encodeURIComponent(text)
+  let cleanPhone = String(phone || '').replace(/[^0-9]/g, '')
+  if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1)
+  return cleanPhone ? `https://wa.me/${cleanPhone}?text=${msg}` : `https://api.whatsapp.com/send?text=${msg}`
 }
 
 export function formatRupiah(n) {

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Check, Copy, Download, FileSpreadsheet, Plus, Search, Send, Share2, Trash2, Upload } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
-import { waLink } from '../data/site'
+import { shareWaLink, waLink } from '../data/site'
 import { backFromInvite, invitePath } from '../lib/nav'
 import { getTheme } from '../data/themes'
 
@@ -58,14 +59,107 @@ export default function Manage() {
       .catch((err) => setError(err.message))
   }, [slug, editKey])
 
-  const guests = useMemo(
-    () =>
-      text
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean),
-    [text],
-  )
+  const [guestSearch, setGuestSearch] = useState('')
+  const [copiedMsg, setCopiedMsg] = useState('')
+  const [importInfo, setImportInfo] = useState('')
+
+  const parseGuest = (line) => {
+    if (!line || !line.trim()) return null
+    const parts = line.split(/[\t;,]/).map((s) => s.trim()).filter(Boolean)
+    if (!parts.length) return null
+    const name = parts[0]
+    let phone = ''
+    if (parts.length > 1) {
+      const cleanPhone = parts[1].replace(/[^0-9+]/g, '')
+      if (cleanPhone.length >= 8) phone = cleanPhone
+    }
+    return { name, phone, raw: line }
+  }
+
+  const parsedGuests = useMemo(() => {
+    return text
+      .split('\n')
+      .map(parseGuest)
+      .filter(Boolean)
+  }, [text])
+
+  const guests = useMemo(() => parsedGuests.map((g) => g.name), [parsedGuests])
+
+  const filteredGuests = useMemo(() => {
+    if (!guestSearch.trim()) return parsedGuests
+    const q = guestSearch.toLowerCase()
+    return parsedGuests.filter((g) => g.name.toLowerCase().includes(q) || g.phone.includes(q))
+  }, [parsedGuests, guestSearch])
+
+  function handleFileUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImportInfo('')
+    const reader = new FileReader()
+    reader.onload = (evt) => {
+      const content = evt.target?.result
+      if (typeof content === 'string') {
+        const lines = content
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter(Boolean)
+        const validLines = lines.filter((l, idx) => {
+          if (idx === 0 && (l.toLowerCase().includes('nama') || l.toLowerCase().includes('name'))) return false
+          return true
+        })
+        setText((prev) => (prev.trim() ? `${prev.trim()}\n${validLines.join('\n')}` : validLines.join('\n')))
+        setImportInfo(`Berhasil mengimpor ${validLines.length} nama tamu dari file.`)
+        setTimeout(() => setImportInfo(''), 4000)
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
+  function removeGuest(targetRaw) {
+    const next = text
+      .split('\n')
+      .filter((l) => l.trim() !== targetRaw.trim())
+      .join('\n')
+    setText(next)
+  }
+
+  function exportGuestsCSV() {
+    const header = ['Nama Tamu', 'No WhatsApp', 'Link Undangan Personal', 'Teks Pesan WA']
+    const rows = parsedGuests.map((g) => {
+      const url = invitationUrl(slug, g.name)
+      const msg = waTemplate.replace(/\[nama\]/gi, g.name).replace(/\[link\]/gi, url)
+      return [
+        `"${g.name.replace(/"/g, '""')}"`,
+        `"${g.phone}"`,
+        `"${url}"`,
+        `"${msg.replace(/"/g, '""')}"`,
+      ]
+    })
+    const csvContent = [header.join(','), ...rows.map((r) => r.join(','))].join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.setAttribute('download', `Daftar_Tamu_${slug}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  async function copyAllMessages() {
+    const allText = parsedGuests
+      .map((g) => {
+        const url = invitationUrl(slug, g.name)
+        const msg = waTemplate.replace(/\[nama\]/gi, g.name).replace(/\[link\]/gi, url)
+        return `━━━━━━━━━━━━━━━━━━━━━\nKepada: ${g.name} ${g.phone ? `(${g.phone})` : ''}\n━━━━━━━━━━━━━━━━━━━━━\n${msg}\n`
+      })
+      .join('\n')
+
+    if (await copyText(allText)) {
+      setCopied('all')
+      setTimeout(() => setCopied(''), 2000)
+    }
+  }
 
   const stats = useMemo(() => {
     const rsvps = item?.rsvps || []
@@ -557,66 +651,185 @@ export default function Manage() {
           )}
 
           {tab === 'tamu' && (
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-gold-deep">Pembuat Link & Sapaan Otomatis</p>
-              <h2 className="mt-1 font-display text-2xl">Bikin link untuk tiap tamu</h2>
-              <p className="mt-2 text-sm text-stone">
-                Ketik nama tamu di bawah ini (satu baris untuk satu nama). Link undangan khusus dengan nama mereka akan otomatis terbentuk di bawah.
-              </p>
-              <textarea
-                className="mt-5 min-h-32 w-full border border-ink/20 bg-transparent p-4 text-base focus:border-ink focus:outline-none"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder={'Bapak Budi & Istri\nKeluarga Besar Wijaya\nAndi (Teman Kantor)'}
-              />
-              
-              <h3 className="mt-8 font-display text-xl">Template Pesan WhatsApp</h3>
-              <p className="mt-2 text-sm text-stone">
-                Gunakan <code className="bg-ink/5 px-1 py-0.5 text-ink">[nama]</code> untuk memanggil nama tamu dan <code className="bg-ink/5 px-1 py-0.5 text-ink">[link]</code> untuk menaruh tautan undangan.
-              </p>
-              <textarea
-                className="mt-3 min-h-32 w-full border border-ink/20 bg-transparent p-4 text-sm focus:border-ink focus:outline-none"
-                value={waTemplate}
-                onChange={(e) => setWaTemplate(e.target.value)}
-              />
-
-              <div className="mt-4 flex flex-wrap items-center gap-4">
-                <button
-                  type="button"
-                  onClick={save}
-                  className="bg-ink px-5 py-3 text-xs uppercase tracking-[0.16em] text-ivory transition-colors hover:bg-gold-deep"
-                >
-                  Simpan Perubahan
-                </button>
-                {saved && !error && <span className="text-xs uppercase tracking-[0.1em] text-green-700">✓ Tersimpan di database</span>}
-                {error && <span className="text-xs text-red-700">{error}</span>}
-              </div>
-              <ul className="mt-8 grid gap-3">
-                {guests.map((name) => {
-                  const url = invitationUrl(slug, name)
-                  const msg = waTemplate.replace(/\[nama\]/gi, name).replace(/\[link\]/gi, url)
-                  return (
-                    <li key={name} className="border border-ink/10 bg-paper p-4">
-                      <p className="font-display text-xl">{name}</p>
-                      <p className="mt-1 break-all text-xs text-stone">{url}</p>
-                      <div className="mt-3 flex flex-wrap gap-3 text-xs uppercase tracking-[0.14em]">
+            <div className="grid gap-8">
+              {/* Header & Upload Bar */}
+              <div className="border border-ink/10 bg-paper p-6">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-gold-deep">Manajemen Tamu &amp; WhatsApp</p>
+                    <h2 className="mt-1 font-display text-2xl">Daftar Tamu &amp; Link Personalisasi</h2>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="inline-flex cursor-pointer items-center gap-2 border border-ink bg-ink px-4 py-2.5 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep transition-colors">
+                      <Upload size={14} /> Import File (CSV / TXT)
+                      <input
+                        type="file"
+                        accept=".csv,.txt,.tsv"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                      />
+                    </label>
+                    {parsedGuests.length > 0 && (
+                      <>
                         <button
                           type="button"
-                          onClick={async () => {
-                            if (await copyText(url)) {
-                              setCopied(name)
-                              setTimeout(() => setCopied(''), 1200)
-                            }
-                          }}
+                          onClick={exportGuestsCSV}
+                          className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
                         >
-                          {copied === name ? 'Tersalin' : 'Salin tautan'}
+                          <Download size={14} /> Download Excel (CSV)
                         </button>
-                        <a href={waLink(msg)}>Kirim WA</a>
-                      </div>
-                    </li>
-                  )
-                })}
-              </ul>
+                        <button
+                          type="button"
+                          onClick={copyAllMessages}
+                          className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
+                        >
+                          <Copy size={14} /> {copied === 'all' ? 'Semua Tersalin!' : 'Salin Semua Pesan'}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {importInfo && (
+                  <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-green-700">
+                    ✓ {importInfo}
+                  </p>
+                )}
+
+                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-stone mb-2">
+                      Input Manual (Nama atau Nama, No WhatsApp)
+                    </label>
+                    <textarea
+                      className="min-h-36 w-full border border-ink/20 bg-transparent p-3 text-sm focus:border-ink focus:outline-none"
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      placeholder={'Bapak Budi & Istri\nKeluarga Besar Wijaya, 08123456789\nAndi (Teman Kantor), 08571234567'}
+                    />
+                    <p className="mt-1 text-[11px] text-stone">
+                      Format per baris: <code className="bg-ink/5 px-1 py-0.5">Nama</code> atau <code className="bg-ink/5 px-1 py-0.5">Nama, 0812xxxxxx</code> (Bisa langsung copy-paste dari Excel).
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-stone mb-2">
+                      Template Pesan WhatsApp
+                    </label>
+                    <textarea
+                      className="min-h-36 w-full border border-ink/20 bg-transparent p-3 text-sm focus:border-ink focus:outline-none"
+                      value={waTemplate}
+                      onChange={(e) => setWaTemplate(e.target.value)}
+                    />
+                    <p className="mt-1 text-[11px] text-stone">
+                      Gunakan <code className="bg-ink/5 px-1 py-0.5">[nama]</code> untuk nama tamu &amp; <code className="bg-ink/5 px-1 py-0.5">[link]</code> untuk tautan undangan.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex flex-wrap items-center justify-between border-t border-ink/10 pt-4 gap-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={save}
+                      className="bg-ink px-6 py-3 text-xs uppercase tracking-[0.16em] text-ivory hover:bg-gold-deep transition-colors"
+                    >
+                      Simpan Daftar &amp; Template
+                    </button>
+                    {saved && !error && <span className="text-xs uppercase tracking-[0.1em] text-green-700 font-medium">✓ Tersimpan di database</span>}
+                    {error && <span className="text-xs text-red-700">{error}</span>}
+                  </div>
+                  <p className="text-xs uppercase tracking-widest text-stone">
+                    Total: <strong>{parsedGuests.length} Tamu</strong>
+                  </p>
+                </div>
+              </div>
+
+              {/* Guest Search & Action Cards */}
+              {parsedGuests.length > 0 && (
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div className="relative flex-1 max-w-sm">
+                      <Search size={14} className="absolute left-3 top-3.5 text-stone" />
+                      <input
+                        type="text"
+                        placeholder="Cari nama atau nomor HP tamu..."
+                        value={guestSearch}
+                        onChange={(e) => setGuestSearch(e.target.value)}
+                        className="w-full border border-ink/20 bg-paper py-2.5 pl-9 pr-3 text-sm focus:border-ink focus:outline-none"
+                      />
+                    </div>
+                    <p className="text-xs text-stone">
+                      Menampilkan {filteredGuests.length} dari {parsedGuests.length} tamu
+                    </p>
+                  </div>
+
+                  <div className="grid gap-3">
+                    {filteredGuests.map((g) => {
+                      const url = invitationUrl(slug, g.name)
+                      const msg = waTemplate.replace(/\[nama\]/gi, g.name).replace(/\[link\]/gi, url)
+                      return (
+                        <div key={g.raw} className="border border-ink/10 bg-paper p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-3 flex-wrap">
+                              <h4 className="font-display text-xl">{g.name}</h4>
+                              {g.phone && (
+                                <span className="bg-ink/5 border border-ink/10 px-2 py-0.5 text-xs text-stone font-mono">
+                                  📱 {g.phone}
+                                </span>
+                              )}
+                            </div>
+                            <p className="mt-1 break-all text-xs text-stone/80">{url}</p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.14em]">
+                            <a
+                              href={shareWaLink(msg, g.phone)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 bg-ink text-ivory px-3 py-2 hover:bg-gold-deep transition-colors"
+                            >
+                              <Send size={12} /> Kirim WA
+                            </a>
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (await copyText(url)) {
+                                  setCopied(g.name)
+                                  setTimeout(() => setCopied(''), 1200)
+                                }
+                              }}
+                              className="inline-flex items-center gap-1.5 border border-ink/20 px-3 py-2 hover:bg-ink/5"
+                            >
+                              <Copy size={12} /> {copied === g.name ? 'Tersalin' : 'Salin Link'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (await copyText(msg)) {
+                                  setCopiedMsg(g.name)
+                                  setTimeout(() => setCopiedMsg(''), 1200)
+                                }
+                              }}
+                              className="inline-flex items-center gap-1.5 border border-ink/20 px-3 py-2 hover:bg-ink/5"
+                            >
+                              <Share2 size={12} /> {copiedMsg === g.name ? 'Pesan Tersalin' : 'Salin Pesan'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeGuest(g.raw)}
+                              className="inline-flex items-center p-2 text-stone hover:text-red-700 border border-transparent hover:border-red-200"
+                              title="Hapus tamu"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
