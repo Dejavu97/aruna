@@ -77,7 +77,6 @@ export async function createInvitation(payload) {
   }
   const data = {
     ...payload,
-    editKey,
     orderCode,
     status: 'unpaid',
     createdAt: Date.now(),
@@ -87,12 +86,11 @@ export async function createInvitation(payload) {
   }
   await setDoc(docRef, data)
   
-  if (getAdminKey()) {
-    const secretRef = doc(db, 'private_keys', payload.slug)
-    await setDoc(secretRef, { editKey })
-  }
+  // Selalu simpan editKey ke brankas rahasia, baik admin maupun pelanggan
+  const secretRef = doc(db, 'private_keys', payload.slug)
+  await setDoc(secretRef, { editKey })
   
-  return data
+  return { ...data, editKey } // Kembalikan editKey ke UI agar bisa disave di localStorage
 }
 
 export async function fetchInvitation(slug, editKey) {

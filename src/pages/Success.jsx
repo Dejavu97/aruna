@@ -109,17 +109,27 @@ Mohon dicek pembayarannya.`
         </div>
 
         {editKey && (
-          <div className="mt-5 border border-ink/10 p-5 text-sm">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-stone">Kode edit — simpan</p>
-            <p className="mt-2 break-all font-mono">{editKey}</p>
-            <div className="mt-3 flex flex-wrap gap-3">
-              <button type="button" className="underline" onClick={() => copy(editKey, 'key')}>
-                {copied === 'key' ? 'Tersalin' : 'Salin kode'}
+          <div className="mt-5 border-l-4 border-red-600 bg-red-50 p-5 text-sm">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-red-800 font-bold">⚠️ SANGAT PENTING: SIMPAN AKSES INI</p>
+            <p className="mt-2 text-red-900 leading-relaxed">
+              Demi keamanan, sistem kami <strong>tidak akan pernah</strong> menampilkan kunci akses ini lagi di masa depan. 
+              Segera salin dan simpan <strong>Kode Edit</strong> atau <strong>Link Dashboard</strong> di bawah ini ke catatan Anda (atau *bookmark* halaman ini).
+            </p>
+            <p className="mt-4 break-all font-mono bg-white p-2 border border-red-200">{editKey}</p>
+            <div className="mt-3 flex flex-wrap gap-3 text-red-800">
+              <button type="button" className="underline font-bold" onClick={() => copy(editKey, 'key')}>
+                {copied === 'key' ? 'Tersalin' : 'Salin Kode Saja'}
               </button>
-              <Link to={`/edit/${slug}?key=${encodeURIComponent(editKey)}`} className="underline">
-                Ubah data undangan
-              </Link>
+              <span>•</span>
+              <button 
+                type="button" 
+                className="underline font-bold" 
+                onClick={() => copy(`${window.location.origin}/kelola/${slug}?key=${encodeURIComponent(editKey)}`, 'link')}
+              >
+                {copied === 'link' ? 'Tersalin' : 'Salin Tautan Lengkap Dashboard'}
+              </button>
             </div>
+            <p className="mt-4 text-[11px] text-red-700">Jika Anda kehilangan akses ini, harap hubungi Admin via WhatsApp untuk meminta kunci baru.</p>
           </div>
         )}
 
