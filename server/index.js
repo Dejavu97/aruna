@@ -208,6 +208,7 @@ app.put('/api/invitations/:slug', async (req, res) => {
     updatedAt: Date.now(),
   }
   if (Array.isArray(body.guests)) next.guests = body.guests
+  if (Array.isArray(body.checkIns)) next.checkIns = body.checkIns
   if (Array.isArray(body.rsvps)) next.rsvps = item.rsvps
   await upsert(next)
   res.json(next)

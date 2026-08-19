@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Images, Heart, Gift as GiftIcon, MailOpen } from 'lucide-react'
+import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Calendar, Images, Heart, Gift as GiftIcon, MailOpen } from 'lucide-react'
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import {
@@ -16,6 +16,7 @@ import {
   pad,
   parseColors,
   qrImageUrl,
+  wazeUrl,
 } from '../lib/utils'
 import { getTheme } from '../data/themes'
 import AttariInvitation from './AttariInvitation'
@@ -429,26 +430,64 @@ function Countdown({ tick, date, data, couple, scene }) {
   )
 }
 
-function Events({ events, isDark, scene }) {
+function Events({ events, isDark, scene, couple }) {
+  const [copiedAddr, setCopiedAddr] = useState('')
   if (!events.length) return null
   return (
     <section className="pad" id="event" data-scene={scene}>
       <p className="kicker center">Waktu & tempat</p>
       <div className="events">
-        {events.map((ev) => (
-          <article key={ev.title} className="event-card">
-            <h3>{ev.title}</h3>
-            <p>{formatLongDate(ev.date)}</p>
-            <p>{formatTime(ev.time)}</p>
-            <strong>{ev.venue}</strong>
-            <p className="addr">{ev.address}</p>
-            {ev.maps && (
-              <a href={ev.maps} target="_blank" rel="noreferrer" className="maps">
-                <MapPin size={14} /> Buka peta
-              </a>
-            )}
-          </article>
-        ))}
+        {events.map((ev) => {
+          const calUrl = googleCalendarUrl({
+            title: `${ev.title} — ${couple || 'Wedding'}`,
+            date: ev.date,
+            time: ev.time,
+            venue: `${ev.venue}, ${ev.address}`,
+            details: `Undangan ${ev.title} pernikahan ${couple || ''}. Lokasi: ${ev.venue} (${ev.address})`,
+          })
+          const waze = wazeUrl(ev.address, ev.venue)
+
+          return (
+            <article key={ev.title} className="event-card">
+              <h3>{ev.title}</h3>
+              <p>{formatLongDate(ev.date)}</p>
+              <p>{formatTime(ev.time)}</p>
+              <strong>{ev.venue}</strong>
+              <p className="addr">{ev.address}</p>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                {ev.maps && (
+                  <a href={ev.maps} target="_blank" rel="noreferrer" className="maps">
+                    <MapPin size={13} /> Google Maps
+                  </a>
+                )}
+                {waze && (
+                  <a href={waze} target="_blank" rel="noreferrer" className="maps">
+                    Waze
+                  </a>
+                )}
+                {calUrl && (
+                  <a href={calUrl} target="_blank" rel="noreferrer" className="maps">
+                    <Calendar size={13} /> Kalender
+                  </a>
+                )}
+                {ev.address && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (await copyText(`${ev.venue}, ${ev.address}`)) {
+                        setCopiedAddr(ev.title)
+                        setTimeout(() => setCopiedAddr(''), 1500)
+                      }
+                    }}
+                    className="maps"
+                  >
+                    <Copy size={13} /> {copiedAddr === ev.title ? 'Tersalin' : 'Salin Alamat'}
+                  </button>
+                )}
+              </div>
+            </article>
+          )
+        })}
       </div>
       <p className="fine">{isDark ? 'Kehadiran Anda adalah kehormatan bagi kami.' : 'Mohon doa restu dan kehadirannya.'}</p>
     </section>
@@ -935,27 +974,65 @@ function HeroAttari({ theme, couple, data, coverImg, scene }) {
   )
 }
 
-function EventsAttari({ events, scene }) {
+function EventsAttari({ events, scene, couple }) {
+  const [copiedAddr, setCopiedAddr] = useState('')
   if (!events.length) return null
   return (
     <section className="pad" id="event" data-scene={scene}>
       <p className="attari-section-kicker">SAVE OUR DATE</p>
       <div className="attari-divider-line" />
       <div className="attari-events-grid">
-        {events.map((ev) => (
-          <article key={ev.title} className="attari-event-card">
-            <h3>{ev.title}</h3>
-            <p className="attari-event-date">{formatLongDate(ev.date)}</p>
-            <p className="attari-event-time">{ev.time}</p>
-            <p className="attari-event-venue">{ev.venue}</p>
-            <p className="attari-event-addr">{ev.address}</p>
-            {ev.maps && (
-              <a href={ev.maps} target="_blank" rel="noreferrer" className="attari-map-btn">
-                GOOGLE MAPS
-              </a>
-            )}
-          </article>
-        ))}
+        {events.map((ev) => {
+          const calUrl = googleCalendarUrl({
+            title: `${ev.title} — ${couple || 'Wedding'}`,
+            date: ev.date,
+            time: ev.time,
+            venue: `${ev.venue}, ${ev.address}`,
+            details: `Undangan ${ev.title} pernikahan ${couple || ''}. Lokasi: ${ev.venue} (${ev.address})`,
+          })
+          const waze = wazeUrl(ev.address, ev.venue)
+
+          return (
+            <article key={ev.title} className="attari-event-card">
+              <h3>{ev.title}</h3>
+              <p className="attari-event-date">{formatLongDate(ev.date)}</p>
+              <p className="attari-event-time">{ev.time}</p>
+              <p className="attari-event-venue">{ev.venue}</p>
+              <p className="attari-event-addr">{ev.address}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: 'auto', paddingTop: '0.8rem' }}>
+                {ev.maps && (
+                  <a href={ev.maps} target="_blank" rel="noreferrer" className="attari-map-btn">
+                    GOOGLE MAPS
+                  </a>
+                )}
+                {waze && (
+                  <a href={waze} target="_blank" rel="noreferrer" className="attari-map-btn">
+                    WAZE
+                  </a>
+                )}
+                {calUrl && (
+                  <a href={calUrl} target="_blank" rel="noreferrer" className="attari-map-btn">
+                    SIMPAN KALENDER
+                  </a>
+                )}
+                {ev.address && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (await copyText(`${ev.venue}, ${ev.address}`)) {
+                        setCopiedAddr(ev.title)
+                        setTimeout(() => setCopiedAddr(''), 1500)
+                      }
+                    }}
+                    className="attari-map-btn"
+                  >
+                    {copiedAddr === ev.title ? 'TERSALIN' : 'SALIN ALAMAT'}
+                  </button>
+                )}
+              </div>
+            </article>
+          )
+        })}
       </div>
     </section>
   )

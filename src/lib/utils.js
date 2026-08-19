@@ -129,6 +129,11 @@ export function qrImageUrl(data, size = 260) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=10&data=${encodeURIComponent(data)}`
 }
 
+export function wazeUrl(address, venue) {
+  const query = encodeURIComponent([venue, address].filter(Boolean).join(', '))
+  return `https://waze.com/ul?q=${query}&navigate=yes`
+}
+
 export function parseColors(value) {
   return String(value || '')
     .split(/[,|\s]+/)

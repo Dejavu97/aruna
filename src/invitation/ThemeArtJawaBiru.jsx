@@ -4,6 +4,7 @@ import {
   Heart, MapPin, Calendar, Clock, Music, Pause, Play, 
   Copy, Check, Send, ChevronRight, User, Users, MessageSquare, Home, Sparkles
 } from 'lucide-react'
+import { copyText, googleCalendarUrl, wazeUrl } from '../lib/utils'
 import './ThemeArtJawaBiru.css'
 
 function formatLongDate(dateStr) {
@@ -448,11 +449,54 @@ export default function ThemeArtJawaBiru({ data, guest = '', preview = false }) 
                           <p className="jb-event-venue">{ev.venue}</p>
                           <p className="jb-event-addr">{ev.address}</p>
 
-                          {ev.maps && (
-                            <a href={ev.maps} target="_blank" rel="noreferrer" className="jb-maps-btn">
-                              <MapPin size={15} /> PETUNJUK LOKASI
-                            </a>
-                          )}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.2rem', alignItems: 'center' }}>
+                            {ev.maps && (
+                              <a href={ev.maps} target="_blank" rel="noreferrer" className="jb-maps-btn" style={{ width: '100%' }}>
+                                <MapPin size={15} /> GOOGLE MAPS
+                              </a>
+                            )}
+                            <div style={{ display: 'flex', gap: '0.4rem', width: '100%', flexWrap: 'wrap' }}>
+                              <a 
+                                href={wazeUrl(ev.address, ev.venue)} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="jb-maps-btn"
+                                style={{ flex: '1 1 auto', fontSize: '0.68rem', padding: '0.6rem 0.8rem' }}
+                              >
+                                WAZE
+                              </a>
+                              <a 
+                                href={googleCalendarUrl({
+                                  title: `${ev.title} — ${data.bride?.nick || ''} & ${data.groom?.nick || ''}`,
+                                  date: ev.date || data.date,
+                                  time: ev.time,
+                                  venue: `${ev.venue}, ${ev.address}`,
+                                  details: `Undangan ${ev.title} pernikahan ${data.bride?.nick || ''} & ${data.groom?.nick || ''}. Lokasi: ${ev.venue}`,
+                                })}
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="jb-maps-btn"
+                                style={{ flex: '1 1 auto', fontSize: '0.68rem', padding: '0.6rem 0.8rem' }}
+                              >
+                                <Calendar size={13} /> KALENDER
+                              </a>
+                              {ev.address && (
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    if (await copyText(`${ev.venue}, ${ev.address}`)) {
+                                      setCopied(ev.title)
+                                      setTimeout(() => setCopied(''), 1500)
+                                    }
+                                  }}
+                                  className="jb-maps-btn"
+                                  style={{ flex: '1 1 auto', fontSize: '0.68rem', padding: '0.6rem 0.8rem' }}
+                                >
+                                  <Copy size={13} /> {copied === ev.title ? 'TERSALIN' : 'SALIN ALAMAT'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </motion.article>
                     )
