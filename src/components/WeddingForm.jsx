@@ -25,9 +25,9 @@ export function blankWedding(themeId) {
     quote: '',
     quoteSource: '',
     story: [
-      { year: '', title: '', body: '' },
-      { year: '', title: '', body: '' },
-      { year: '', title: '', body: '' },
+      { year: '', title: '', body: '', image: '' },
+      { year: '', title: '', body: '', image: '' },
+      { year: '', title: '', body: '', image: '' },
     ],
     events: [
       { title: 'Akad Nikah', date: '', time: '09:00', venue: '', address: '', maps: '' },
@@ -133,7 +133,7 @@ export default function WeddingForm({
       themeId,
       slug,
       packageId: form.packageId || 'lengkap',
-      story: form.story.filter((s) => s.title || s.body),
+      story: form.story.filter((s) => s.title || s.body || s.image),
       banks: form.banks.filter((b) => b.bank && b.number),
       events: form.events.filter((ev) => ev.title && ev.venue),
       wishlist: (form.wishlist || []).filter((w) => w.title),
@@ -354,11 +354,18 @@ export default function WeddingForm({
                   hint="Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa."
                 />
                 {form.story.map((s, i) => (
-                  <div key={i} className="grid gap-3 sm:grid-cols-3">
-                    <Field label="Tahun" value={s.year} onChange={(v) => update(`story.${i}.year`, v)} />
-                    <Field label="Judul" value={s.title} onChange={(v) => update(`story.${i}.title`, v)} />
-                    <Field label="Cerita" value={s.body} onChange={(v) => update(`story.${i}.body`, v)} />
-                  </div>
+                  <Pair key={i} title={`Cerita / Kisah ${i + 1}`}>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Field label="Tahun" value={s.year} onChange={(v) => update(`story.${i}.year`, v)} hint="Contoh: 2019" />
+                      <Field label="Judul" value={s.title} onChange={(v) => update(`story.${i}.title`, v)} hint="Contoh: Awal Bertemu" />
+                    </div>
+                    <Field label="Isi cerita" value={s.body} onChange={(v) => update(`story.${i}.body`, v)} />
+                    <MediaUpload
+                      label="Foto momen cerita (opsional)"
+                      value={s.image}
+                      onChange={(v) => update(`story.${i}.image`, v)}
+                    />
+                  </Pair>
                 ))}
               </>
             )}
