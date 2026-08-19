@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Check, Copy, Download, FileSpreadsheet, Plus, Search, Send, Share2, Trash2, Upload } from 'lucide-react'
+import { Bell, Check, Clock, Copy, Download, FileSpreadsheet, Plus, Search, Send, Share2, Trash2, Upload } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../lib/api'
@@ -10,6 +10,7 @@ import { backFromInvite, invitePath } from '../lib/nav'
 import { getTheme } from '../data/themes'
 
 const defaultWaTemplate = `Kepada Yth. [nama]\n\nDengan hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di pernikahan kami.\n\n[link]`
+const defaultReminderTemplate = `Kepada Yth. [nama]\n\nMengingatkan kembali undangan pernikahan kami yang akan diselenggarakan pada [tanggal].\n\nBagi yang belum sempat konfirmasi, mohon kesediaannya untuk mengisi konfirmasi kehadiran (RSVP) melalui tautan berikut:\n[link]\n\nKehadiran dan doa restu Anda sangat berarti bagi kami. Terima kasih.`
 
 export default function Manage() {
   const { slug } = useParams()
@@ -22,6 +23,9 @@ export default function Manage() {
   const [item, setItem] = useState(null)
   const [text, setText] = useState('')
   const [waTemplate, setWaTemplate] = useState(defaultWaTemplate)
+  const [waReminderTemplate, setWaReminderTemplate] = useState(defaultReminderTemplate)
+  const [messageMode, setMessageMode] = useState('invitation') // 'invitation' | 'reminder'
+  const [statusFilter, setStatusFilter] = useState('all') // 'all' | 'unconfirmed' | 'hadir' | 'tidak' | 'ragu'
   const [customDomain, setCustomDomain] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState('')
@@ -52,6 +56,7 @@ export default function Manage() {
         setItem(data)
         setText((data.guests || []).join('\n'))
         if (data.waTemplate) setWaTemplate(data.waTemplate)
+        if (data.waReminderTemplate) setWaReminderTemplate(data.waReminderTemplate)
         if (data.customDomain) setCustomDomain(data.customDomain)
         setGlobalAnnouncement(ann)
         setError('')
@@ -85,11 +90,61 @@ export default function Manage() {
 
   const guests = useMemo(() => parsedGuests.map((g) => g.name), [parsedGuests])
 
+  const rsvpMap = useMemo(() => {
+    const map = new Map()
+    ;(item?.rsvps || []).forEach((r) => {
+      if (r.name) {
+        map.set(r.name.toLowerCase().trim(), r)
+      }
+    })
+    return map
+  }, [item?.rsvps])
+
+  const guestsWithRsvp = useMemo(() => {
+    return parsedGuests.map((g) => {
+      const rsvp = rsvpMap.get(g.name.toLowerCase().trim()) || null
+      const status = rsvp ? rsvp.status : 'unconfirmed'
+      return { ...g, rsvp, status }
+    })
+  }, [parsedGuests, rsvpMap])
+
+  const unconfirmedCount = useMemo(
+    () => guestsWithRsvp.filter((g) => g.status === 'unconfirmed').length,
+    [guestsWithRsvp],
+  )
+  const hadirCount = useMemo(
+    () => guestsWithRsvp.filter((g) => g.status === 'hadir').length,
+    [guestsWithRsvp],
+  )
+  const tidakCount = useMemo(
+    () => guestsWithRsvp.filter((g) => g.status === 'tidak').length,
+    [guestsWithRsvp],
+  )
+
   const filteredGuests = useMemo(() => {
-    if (!guestSearch.trim()) return parsedGuests
-    const q = guestSearch.toLowerCase()
-    return parsedGuests.filter((g) => g.name.toLowerCase().includes(q) || g.phone.includes(q))
-  }, [parsedGuests, guestSearch])
+    return guestsWithRsvp.filter((g) => {
+      if (statusFilter === 'unconfirmed' && g.status !== 'unconfirmed') return false
+      if (statusFilter === 'hadir' && g.status !== 'hadir') return false
+      if (statusFilter === 'tidak' && g.status !== 'tidak') return false
+      if (statusFilter === 'ragu' && g.status !== 'ragu') return false
+
+      if (guestSearch.trim()) {
+        const q = guestSearch.toLowerCase()
+        return g.name.toLowerCase().includes(q) || g.phone.includes(q)
+      }
+      return true
+    })
+  }, [guestsWithRsvp, statusFilter, guestSearch])
+
+  const composeMessage = (guestName, guestPhone = '', mode = messageMode) => {
+    const url = invitationUrl(slug, guestName)
+    const tpl = mode === 'reminder' ? waReminderTemplate : waTemplate
+    const formattedDate = item?.date ? formatLongDate(item.date) : ''
+    return tpl
+      .replace(/\[nama\]/gi, guestName)
+      .replace(/\[link\]/gi, url)
+      .replace(/\[tanggal\]/gi, formattedDate)
+  }
 
   function handleFileUpload(e) {
     const file = e.target.files?.[0]
@@ -125,13 +180,23 @@ export default function Manage() {
   }
 
   function exportGuestsCSV() {
-    const header = ['Nama Tamu', 'No WhatsApp', 'Link Undangan Personal', 'Teks Pesan WA']
-    const rows = parsedGuests.map((g) => {
+    const header = ['Nama Tamu', 'No WhatsApp', 'Status RSVP', 'Link Undangan Personal', 'Teks Pesan WA']
+    const rows = filteredGuests.map((g) => {
       const url = invitationUrl(slug, g.name)
-      const msg = waTemplate.replace(/\[nama\]/gi, g.name).replace(/\[link\]/gi, url)
+      const msg = composeMessage(g.name, g.phone)
+      const statusLabel =
+        g.status === 'hadir'
+          ? `Hadir (${g.rsvp?.guests || 1} orang)`
+          : g.status === 'tidak'
+          ? 'Tidak Hadir'
+          : g.status === 'ragu'
+          ? 'Ragu-ragu'
+          : 'Belum Konfirmasi'
+
       return [
         `"${g.name.replace(/"/g, '""')}"`,
         `"${g.phone}"`,
+        `"${statusLabel}"`,
         `"${url}"`,
         `"${msg.replace(/"/g, '""')}"`,
       ]
@@ -147,11 +212,11 @@ export default function Manage() {
   }
 
   async function copyAllMessages() {
-    const allText = parsedGuests
+    const targetList = filteredGuests.length > 0 ? filteredGuests : guestsWithRsvp
+    const allText = targetList
       .map((g) => {
-        const url = invitationUrl(slug, g.name)
-        const msg = waTemplate.replace(/\[nama\]/gi, g.name).replace(/\[link\]/gi, url)
-        return `━━━━━━━━━━━━━━━━━━━━━\nKepada: ${g.name} ${g.phone ? `(${g.phone})` : ''}\n━━━━━━━━━━━━━━━━━━━━━\n${msg}\n`
+        const msg = composeMessage(g.name, g.phone)
+        return `━━━━━━━━━━━━━━━━━━━━━\nKepada: ${g.name} ${g.phone ? `(${g.phone})` : ''} [${g.status.toUpperCase()}]\n━━━━━━━━━━━━━━━━━━━━━\n${msg}\n`
       })
       .join('\n')
 
@@ -183,8 +248,8 @@ export default function Manage() {
     setSaved(false)
     setError('')
     try {
-      await updateInvitation(slug, { guests, waTemplate }, editKey)
-      setItem((prev) => ({ ...prev, guests, waTemplate }))
+      await updateInvitation(slug, { guests, waTemplate, waReminderTemplate }, editKey)
+      setItem((prev) => ({ ...prev, guests, waTemplate, waReminderTemplate }))
       setSaved(true)
     } catch (err) {
       setError(err.message)
@@ -657,7 +722,7 @@ export default function Manage() {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <p className="text-[11px] uppercase tracking-[0.18em] text-gold-deep">Manajemen Tamu &amp; WhatsApp</p>
-                    <h2 className="mt-1 font-display text-2xl">Daftar Tamu &amp; Link Personalisasi</h2>
+                    <h2 className="mt-1 font-display text-2xl">Daftar Tamu, RSVP &amp; Pengingat</h2>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <label className="inline-flex cursor-pointer items-center gap-2 border border-ink bg-ink px-4 py-2.5 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep transition-colors">
@@ -683,7 +748,7 @@ export default function Manage() {
                           onClick={copyAllMessages}
                           className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
                         >
-                          <Copy size={14} /> {copied === 'all' ? 'Semua Tersalin!' : 'Salin Semua Pesan'}
+                          <Copy size={14} /> {copied === 'all' ? 'Semua Tersalin!' : messageMode === 'reminder' ? 'Salin Semua Reminder' : 'Salin Semua Pesan'}
                         </button>
                       </>
                     )}
@@ -696,13 +761,14 @@ export default function Manage() {
                   </p>
                 )}
 
+                {/* Input Manual & Template Selector */}
                 <div className="mt-6 grid gap-6 md:grid-cols-2">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-stone mb-2">
                       Input Manual (Nama atau Nama, No WhatsApp)
                     </label>
                     <textarea
-                      className="min-h-36 w-full border border-ink/20 bg-transparent p-3 text-sm focus:border-ink focus:outline-none"
+                      className="min-h-40 w-full border border-ink/20 bg-transparent p-3 text-sm focus:border-ink focus:outline-none"
                       value={text}
                       onChange={(e) => setText(e.target.value)}
                       placeholder={'Bapak Budi & Istri\nKeluarga Besar Wijaya, 08123456789\nAndi (Teman Kantor), 08571234567'}
@@ -713,17 +779,58 @@ export default function Manage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-widest text-stone mb-2">
-                      Template Pesan WhatsApp
-                    </label>
-                    <textarea
-                      className="min-h-36 w-full border border-ink/20 bg-transparent p-3 text-sm focus:border-ink focus:outline-none"
-                      value={waTemplate}
-                      onChange={(e) => setWaTemplate(e.target.value)}
-                    />
-                    <p className="mt-1 text-[11px] text-stone">
-                      Gunakan <code className="bg-ink/5 px-1 py-0.5">[nama]</code> untuk nama tamu &amp; <code className="bg-ink/5 px-1 py-0.5">[link]</code> untuk tautan undangan.
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs uppercase tracking-widest text-stone">
+                        Mode Template Pesan
+                      </label>
+                      <div className="flex gap-1 bg-ivory border border-ink/10 p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setMessageMode('invitation')}
+                          className={`px-2.5 py-1 text-[10px] uppercase tracking-wider font-medium transition-colors ${
+                            messageMode === 'invitation' ? 'bg-ink text-ivory' : 'text-stone hover:text-ink'
+                          }`}
+                        >
+                          Undangan Awal
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMessageMode('reminder')
+                            setStatusFilter('unconfirmed')
+                          }}
+                          className={`px-2.5 py-1 text-[10px] uppercase tracking-wider font-medium transition-colors ${
+                            messageMode === 'reminder' ? 'bg-gold-deep text-ivory' : 'text-stone hover:text-ink'
+                          }`}
+                        >
+                          🔔 Pengingat RSVP
+                        </button>
+                      </div>
+                    </div>
+
+                    {messageMode === 'invitation' ? (
+                      <div>
+                        <textarea
+                          className="min-h-40 w-full border border-ink/20 bg-transparent p-3 text-sm focus:border-ink focus:outline-none"
+                          value={waTemplate}
+                          onChange={(e) => setWaTemplate(e.target.value)}
+                        />
+                        <p className="mt-1 text-[11px] text-stone">
+                          Gunakan <code className="bg-ink/5 px-1 py-0.5">[nama]</code> untuk nama tamu &amp; <code className="bg-ink/5 px-1 py-0.5">[link]</code> untuk tautan undangan.
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <textarea
+                          className="min-h-40 w-full border border-gold-deep/40 bg-gold-deep/5 p-3 text-sm focus:border-gold-deep focus:outline-none"
+                          value={waReminderTemplate}
+                          onChange={(e) => setWaReminderTemplate(e.target.value)}
+                        />
+                        <p className="mt-1 text-[11px] text-stone">
+                          Gunakan <code className="bg-ink/5 px-1 py-0.5">[nama]</code>, <code className="bg-ink/5 px-1 py-0.5">[tanggal]</code>, &amp; <code className="bg-ink/5 px-1 py-0.5">[link]</code> untuk link undangan.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -734,45 +841,105 @@ export default function Manage() {
                       onClick={save}
                       className="bg-ink px-6 py-3 text-xs uppercase tracking-[0.16em] text-ivory hover:bg-gold-deep transition-colors"
                     >
-                      Simpan Daftar &amp; Template
+                      Simpan Perubahan
                     </button>
                     {saved && !error && <span className="text-xs uppercase tracking-[0.1em] text-green-700 font-medium">✓ Tersimpan di database</span>}
                     {error && <span className="text-xs text-red-700">{error}</span>}
                   </div>
-                  <p className="text-xs uppercase tracking-widest text-stone">
-                    Total: <strong>{parsedGuests.length} Tamu</strong>
-                  </p>
+                  <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-stone">
+                    <span>Total: <strong>{parsedGuests.length} Tamu</strong></span>
+                    <span>·</span>
+                    <span className="text-amber-800 font-medium">Belum RSVP: <strong>{unconfirmedCount}</strong></span>
+                  </div>
                 </div>
               </div>
 
-              {/* Guest Search & Action Cards */}
+              {/* Guest Search & Filter Tabs */}
               {parsedGuests.length > 0 && (
                 <div>
                   <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                    <div className="relative flex-1 max-w-sm">
-                      <Search size={14} className="absolute left-3 top-3.5 text-stone" />
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {[
+                        ['all', `Semua (${guestsWithRsvp.length})`],
+                        ['unconfirmed', `⏳ Belum Konfirmasi (${unconfirmedCount})`],
+                        ['hadir', `✓ Sudah Hadir (${hadirCount})`],
+                        ['tidak', `✕ Tidak Hadir (${tidakCount})`],
+                      ].map(([st, label]) => (
+                        <button
+                          key={st}
+                          type="button"
+                          onClick={() => setStatusFilter(st)}
+                          className={`px-3 py-1.5 text-xs tracking-wider transition-colors ${
+                            statusFilter === st
+                              ? 'bg-ink text-ivory font-medium'
+                              : 'bg-paper border border-ink/10 text-stone hover:border-ink/30'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="relative flex-1 max-w-xs">
+                      <Search size={14} className="absolute left-3 top-3 text-stone" />
                       <input
                         type="text"
-                        placeholder="Cari nama atau nomor HP tamu..."
+                        placeholder="Cari nama atau no HP..."
                         value={guestSearch}
                         onChange={(e) => setGuestSearch(e.target.value)}
-                        className="w-full border border-ink/20 bg-paper py-2.5 pl-9 pr-3 text-sm focus:border-ink focus:outline-none"
+                        className="w-full border border-ink/20 bg-paper py-2 pl-9 pr-3 text-xs focus:border-ink focus:outline-none"
                       />
                     </div>
-                    <p className="text-xs text-stone">
-                      Menampilkan {filteredGuests.length} dari {parsedGuests.length} tamu
-                    </p>
                   </div>
+
+                  {messageMode === 'reminder' && (
+                    <div className="bg-amber-50 border border-amber-200 p-3 mb-4 text-xs text-amber-900 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Bell size={14} className="shrink-0" />
+                        <span>Mode <strong>Pengingat RSVP</strong> aktif. Tombol Kirim WA akan mengirimkan teks reminder follow-up.</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setMessageMode('invitation')}
+                        className="text-[11px] underline font-medium"
+                      >
+                        Kembali ke Undangan Awal
+                      </button>
+                    </div>
+                  )}
 
                   <div className="grid gap-3">
                     {filteredGuests.map((g) => {
                       const url = invitationUrl(slug, g.name)
-                      const msg = waTemplate.replace(/\[nama\]/gi, g.name).replace(/\[link\]/gi, url)
+                      const msg = composeMessage(g.name, g.phone)
                       return (
                         <div key={g.raw} className="border border-ink/10 bg-paper p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-3 flex-wrap">
+                            <div className="flex items-center gap-2.5 flex-wrap">
                               <h4 className="font-display text-xl">{g.name}</h4>
+                              
+                              {/* Status Badge */}
+                              {g.status === 'hadir' && (
+                                <span className="bg-green-100 text-green-800 text-[10px] px-2 py-0.5 rounded font-medium">
+                                  ✓ Konfirmasi Hadir ({g.rsvp?.guests || 1} orang)
+                                </span>
+                              )}
+                              {g.status === 'tidak' && (
+                                <span className="bg-stone-200 text-stone-700 text-[10px] px-2 py-0.5 rounded font-medium">
+                                  ✕ Tidak Hadir
+                                </span>
+                              )}
+                              {g.status === 'ragu' && (
+                                <span className="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-medium">
+                                  ? Masih Ragu
+                                </span>
+                              )}
+                              {g.status === 'unconfirmed' && (
+                                <span className="bg-gold/15 text-gold-deep border border-gold/30 text-[10px] px-2 py-0.5 rounded font-medium">
+                                  ⏳ Belum Konfirmasi
+                                </span>
+                              )}
+
                               {g.phone && (
                                 <span className="bg-ink/5 border border-ink/10 px-2 py-0.5 text-xs text-stone font-mono">
                                   📱 {g.phone}
@@ -787,9 +954,19 @@ export default function Manage() {
                               href={shareWaLink(msg, g.phone)}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 bg-ink text-ivory px-3 py-2 hover:bg-gold-deep transition-colors"
+                              className={`inline-flex items-center gap-1.5 px-3 py-2 text-ivory transition-colors ${
+                                messageMode === 'reminder' ? 'bg-gold-deep hover:bg-gold' : 'bg-ink hover:bg-gold-deep'
+                              }`}
                             >
-                              <Send size={12} /> Kirim WA
+                              {messageMode === 'reminder' ? (
+                                <>
+                                  <Bell size={12} /> Kirim Reminder WA
+                                </>
+                              ) : (
+                                <>
+                                  <Send size={12} /> Kirim WA
+                                </>
+                              )}
                             </a>
                             <button
                               type="button"

@@ -298,27 +298,70 @@ app.put('/api/invitations/:slug/guests', async (req, res) => {
   res.json(next)
 })
 
-function injectOg(html, item, origin) {
+function injectOg(html, item, origin, guestName = '') {
   const couple = `${item.bride?.nick || ''} & ${item.groom?.nick || ''}`
   const image = item.gallery?.[0] || item.bride?.photo || `${origin}/themes/${item.themeId}.jpg`
   const abs = image.startsWith('http') ? image : `${origin}${image}`
+  const title = `The Wedding of ${couple}`
+  const desc = guestName 
+    ? `Kepada Yth. ${guestName}, kami mengundang Anda untuk hadir di hari bahagia pernikahan kami.`
+    : `Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di hari bahagia pernikahan kami.`
+
   const tags = [
-    `<title>${couple} — Undangan Pernikahan</title>`,
-    `<meta property="og:title" content="${escapeHtml(couple)}" />`,
-    `<meta property="og:description" content="Undangan pernikahan ${escapeHtml(couple)}" />`,
+    `<title>${escapeHtml(title)}</title>`,
+    `<meta name="description" content="${escapeHtml(desc)}" />`,
+    `<meta property="og:type" content="website" />`,
+    `<meta property="og:title" content="${escapeHtml(title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(desc)}" />`,
     `<meta property="og:image" content="${escapeHtml(abs)}" />`,
+    `<meta property="og:site_name" content="Aruna Undangan" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
-  ].join('')
-  return html.replace('<title>Aruna — Undangan digital yang terasa mahal</title>', tags)
+    `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(desc)}" />`,
+    `<meta name="twitter:image" content="${escapeHtml(abs)}" />`,
+  ].join('\n    ')
+
+  if (html.includes('<title>Aruna — Undangan digital yang terasa mahal</title>')) {
+    return html.replace('<title>Aruna — Undangan digital yang terasa mahal</title>', tags)
+  }
+  return html.replace('</head>', `    ${tags}\n  </head>`)
 }
 
 function escapeHtml(s) {
-  return String(s)
+  return String(s || '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
 }
+
+app.get('/u/:slug', async (req, res, next) => {
+  try {
+    const slug = req.params.slug
+    const item = await findBySlug(slug)
+    const dist = path.join(root, 'dist')
+    const indexPath = fs.existsSync(path.join(dist, 'index.html'))
+      ? path.join(dist, 'index.html')
+      : path.join(root, 'index.html')
+
+    if (fs.existsSync(indexPath)) {
+      let html = fs.readFileSync(indexPath, 'utf8')
+      if (item) {
+        const proto = req.header('x-forwarded-proto') || req.protocol || 'https'
+        const host = req.header('x-forwarded-host') || req.get('host')
+        const origin = `${proto}://${host}`
+        const guestName = req.query.to || ''
+        html = injectOg(html, item, origin, guestName)
+      }
+      res.setHeader('Content-Type', 'text/html; charset=utf-8')
+      res.send(html)
+      return
+    }
+    next()
+  } catch (err) {
+    next()
+  }
+})
 
 if (!onVercel && isProd) {
   const dist = path.join(root, 'dist')
@@ -333,17 +376,12 @@ if (!onVercel && isProd) {
       return
     }
     const index = path.join(dist, 'index.html')
-    const html = fs.readFileSync(index, 'utf8')
-    const match = req.path.match(/^\/u\/([^/]+)$/)
-    if (match) {
-      const item = await findBySlug(match[1])
-      if (item) {
-        const origin = `${req.protocol}://${req.get('host')}`
-        res.send(injectOg(html, item, origin))
-        return
-      }
+    if (fs.existsSync(index)) {
+      const html = fs.readFileSync(index, 'utf8')
+      res.send(html)
+      return
     }
-    res.send(html)
+    next()
   })
 }
 

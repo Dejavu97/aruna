@@ -4,12 +4,13 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/u/(.*)", "destination": "/api" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
-      "includeFiles": "server/**"
+      "includeFiles": "server/**,dist/**"
     }
   }
 }
