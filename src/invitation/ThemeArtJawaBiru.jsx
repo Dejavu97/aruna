@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
-import { MapPin, Calendar, Clock, Heart, MailOpen, Music, Pause, Play, Instagram, ExternalLink } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { MapPin, Clock, MailOpen, Pause, Play, ExternalLink } from 'lucide-react'
 import './ThemeArtJawaBiru.css'
 
 function formatLongDate(dateStr) {
