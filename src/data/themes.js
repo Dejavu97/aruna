@@ -233,6 +233,53 @@ export function hasTheme(id) {
 }
 
 export const demos = {
+  'adat-jawa': demo({
+    themeId: 'adat-jawa',
+    slug: 'ayu-dimas',
+    groom: {
+      nick: 'Dimas',
+      full: 'R. Dimas Suryo Diningrat',
+      parents: 'Putra dari Bpk. R.H. Suryo & Ibu R.Ay. Kusuma',
+      photo: '/themes/adat-jawa.jpg',
+    },
+    bride: {
+      nick: 'Ayu',
+      full: 'R.A. Ayu Sekar Wangi',
+      parents: 'Putri dari Bpk. R.M. Haryo & Ibu R.A. Lestari',
+      photo: '/themes/adat-jawa.jpg',
+    },
+    date: '2026-12-12',
+    quote: 'Tresna iku dudu mung amarga rupa, nanging amarga ati kang tulus.',
+    quoteSource: 'Pepatah Jawa',
+    story: [
+      { year: '2020', title: 'Pitepangan', body: 'Bertemu di keraton.' },
+      { year: '2024', title: 'Lamaran', body: 'Keluarga sepakat.' },
+    ],
+    events: [
+      {
+        title: 'Akad Nikah',
+        date: '2026-12-12',
+        time: '08:00',
+        venue: 'Pendopo Keraton',
+        address: 'Jl. Keraton, Yogyakarta',
+        maps: '#',
+      },
+      {
+        title: 'Resepsi (Panggih)',
+        date: '2026-12-12',
+        time: '11:00',
+        venue: 'Pendopo Keraton',
+        address: 'Jl. Keraton, Yogyakarta',
+        maps: '#',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Ayu Sekar', number: '123456789' },
+    ],
+    gallery: [
+      '/themes/adat-jawa.jpg',
+    ],
+  }),
   'emas-senja': demo({
     themeId: 'emas-senja',
     slug: 'andini-raka',
