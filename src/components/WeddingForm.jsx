@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatRupiah, packages } from '../data/site'
-import { getTheme, themes } from '../data/themes'
+import { getTheme, themes, getThemeFeatures } from '../data/themes'
 import MediaUpload from './MediaUpload'
 import Invitation from '../invitation/Invitation'
 import { slugify } from '../lib/utils'
@@ -75,10 +75,34 @@ export default function WeddingForm({
   onSubmit,
 }) {
   const theme = getTheme(themeId)
+  const features = getThemeFeatures(theme)
   const [step, setStep] = useState(0)
   const [showPreview, setShowPreview] = useState(false)
   const [form, setForm] = useState(initial || blankWedding(themeId))
   const draftKey = `aruna.draft.${themeId}`
+
+  const hasPelengkap = Boolean(
+    features.quote ||
+    features.story?.enabled ||
+    features.banks ||
+    features.gallery ||
+    features.heroImage ||
+    features.backdrop ||
+    features.textColor ||
+    features.qris ||
+    features.music ||
+    features.dressCode ||
+    features.streaming ||
+    features.frameImage ||
+    features.wishlist
+  )
+
+  const steps = [
+    { id: 'pengantin', label: 'Pengantin' },
+    { id: 'acara', label: 'Acara' },
+    ...(hasPelengkap ? [{ id: 'pelengkap', label: 'Pelengkap' }] : []),
+    { id: 'pemesan', label: mode === 'create' ? 'Bayar' : 'Pemesan' },
+  ]
 
   useEffect(() => {
     if (mode !== 'create') return
@@ -125,7 +149,8 @@ export default function WeddingForm({
     }
     if (mode === 'create' && (!form.customerName || !form.customerWhatsapp)) {
       onSubmit(null, 'Nama pemesan dan WhatsApp wajib diisi supaya kami bisa konfirmasi pembayaran.')
-      setStep(3)
+      const pemesanIdx = steps.findIndex(s => s.id === 'pemesan')
+      setStep(pemesanIdx >= 0 ? pemesanIdx : steps.length - 1)
       return
     }
     const payload = {
@@ -140,8 +165,6 @@ export default function WeddingForm({
     }
     onSubmit(payload)
   }
-
-  const steps = ['Pengantin', 'Acara', 'Pelengkap', mode === 'create' ? 'Bayar' : 'Pemesan']
 
   if (showPreview) {
     return (
@@ -197,21 +220,25 @@ export default function WeddingForm({
       </aside>
 
       <form onSubmit={submit} className="border border-ink/10 bg-paper p-5 md:p-8">
-        <ol className="mb-8 grid grid-cols-4 gap-2 text-center text-[10px] uppercase tracking-[0.16em] text-stone">
-          {steps.map((label, i) => (
-            <li key={label}>
+        <ol 
+          className="mb-8 grid gap-2 text-center text-[10px] uppercase tracking-[0.16em] text-stone"
+          style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+        >
+          {steps.map((s, i) => (
+            <li key={s.id}>
               <button
                 type="button"
                 onClick={() => setStep(i)}
                 className={`w-full border-b-2 pb-2 ${step === i ? 'border-gold text-ink' : 'border-ink/10'}`}
               >
-                {label}
+                {s.label}
               </button>
             </li>
           ))}
         </ol>
 
-        {step === 0 && (
+        {/* STEP: PENGANTIN */}
+        {steps[step]?.id === 'pengantin' && (
           <div className="grid gap-6">
             <Pair title="Mempelai wanita">
               <Field label="Nama panggilan" value={form.bride.nick} onChange={(v) => update('bride.nick', v)} />
@@ -251,9 +278,10 @@ export default function WeddingForm({
                 onChange={(v) => update('bride.photo', v)}
               />
               <Field
-                label="Instagram (tanpa @)"
+                label="Akun Instagram (opsional)"
                 value={form.bride.ig}
                 onChange={(v) => update('bride.ig', v)}
+                hint="Contoh: @andini (tanpa spasi)"
               />
             </Pair>
             <Pair title="Mempelai pria">
@@ -263,7 +291,7 @@ export default function WeddingForm({
                   <Field label="Nama lengkap" value={form.groom.full} onChange={(v) => update('groom.full', v)} />
                 </div>
                 <div className="sm:col-span-1">
-                  <Field label="Gelar" value={form.groom.degree} onChange={(v) => update('groom.degree', v)} hint="S.T., M.Eng." />
+                  <Field label="Gelar" value={form.groom.degree} onChange={(v) => update('groom.degree', v)} hint="S.T., M.Sc." />
                 </div>
               </div>
               <div className="mt-2 border-l-2 border-ink/10 pl-4">
@@ -294,9 +322,10 @@ export default function WeddingForm({
                 onChange={(v) => update('groom.photo', v)}
               />
               <Field
-                label="Instagram (tanpa @)"
+                label="Akun Instagram (opsional)"
                 value={form.groom.ig}
                 onChange={(v) => update('groom.ig', v)}
+                hint="Contoh: @raka (tanpa spasi)"
               />
             </Pair>
             <Field label="Tanggal pernikahan" type="date" value={form.date} onChange={(v) => update('date', v)} />
@@ -311,7 +340,8 @@ export default function WeddingForm({
           </div>
         )}
 
-        {step === 1 && (
+        {/* STEP: ACARA */}
+        {steps[step]?.id === 'acara' && (
           <div className="grid gap-6">
             {form.events.map((ev, i) => (
               <Pair key={i} title={`Acara ${i + 1}`}>
@@ -325,7 +355,7 @@ export default function WeddingForm({
                 <Field label="Link Google Maps" value={ev.maps} onChange={(v) => update(`events.${i}.maps`, v)} />
               </Pair>
             ))}
-            {form.events.length < 3 && (
+            {form.events.length < (features.events?.max || 3) && (
               <button
                 type="button"
                 className="text-sm underline"
@@ -337,9 +367,10 @@ export default function WeddingForm({
           </div>
         )}
 
-        {step === 2 && (
+        {/* STEP: PELENGKAP (DYNAMIC BASED ON FEATURES) */}
+        {steps[step]?.id === 'pelengkap' && (
           <div className="grid gap-6">
-            {theme.layout !== 'boarding' && (
+            {features.quote && (
               <>
                 <Field 
                   label="Kutipan" 
@@ -353,6 +384,11 @@ export default function WeddingForm({
                   onChange={(v) => update('quoteSource', v)} 
                   hint="Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa."
                 />
+              </>
+            )}
+
+            {features.story?.enabled && (
+              <>
                 {form.story.map((s, i) => (
                   <Pair key={i} title={`Cerita / Kisah ${i + 1}`}>
                     <div className="grid gap-3 sm:grid-cols-2">
@@ -360,32 +396,39 @@ export default function WeddingForm({
                       <Field label="Judul" value={s.title} onChange={(v) => update(`story.${i}.title`, v)} hint="Contoh: Awal Bertemu" />
                     </div>
                     <Field label="Isi cerita" value={s.body} onChange={(v) => update(`story.${i}.body`, v)} />
-                    <MediaUpload
-                      label="Foto momen cerita (opsional)"
-                      value={s.image}
-                      onChange={(v) => update(`story.${i}.image`, v)}
-                    />
+                    {features.story?.withPhoto && (
+                      <MediaUpload
+                        label="Foto momen cerita (opsional)"
+                        value={s.image}
+                        onChange={(v) => update(`story.${i}.image`, v)}
+                      />
+                    )}
                   </Pair>
                 ))}
               </>
             )}
-            <div className="grid gap-4 sm:grid-cols-2">
-              {form.banks.map((b, i) => (
-                <Pair key={i} title={`Rekening kado ${i + 1}`}>
-                  <Field label="Bank" value={b.bank} onChange={(v) => update(`banks.${i}.bank`, v)} />
-                  <Field label="Nama" value={b.name} onChange={(v) => update(`banks.${i}.name`, v)} />
-                  <Field label="Nomor" value={b.number} onChange={(v) => update(`banks.${i}.number`, v)} />
-                </Pair>
-              ))}
-            </div>
-            {theme.layout !== 'boarding' && (
+
+            {features.banks && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {form.banks.map((b, i) => (
+                  <Pair key={i} title={`Rekening kado ${i + 1}`}>
+                    <Field label="Bank" value={b.bank} onChange={(v) => update(`banks.${i}.bank`, v)} />
+                    <Field label="Nama" value={b.name} onChange={(v) => update(`banks.${i}.name`, v)} />
+                    <Field label="Nomor" value={b.number} onChange={(v) => update(`banks.${i}.number`, v)} />
+                  </Pair>
+                ))}
+              </div>
+            )}
+
+            {features.backdrop && (
               <MediaUpload
                 label="Foto background (otomatis di-blur). Kosong = template tema"
                 value={form.backdrop}
                 onChange={(v) => update('backdrop', v)}
               />
             )}
-            {theme.layout !== 'boarding' && (
+
+            {features.textColor && (
               <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-stone">
                 Warna Teks Utama (Opsional)
                 <select 
@@ -401,25 +444,44 @@ export default function WeddingForm({
                 <span className="normal-case tracking-normal text-[11px]">Gunakan ini jika warna teks bawaan tema bertabrakan dengan foto background.</span>
               </label>
             )}
-            <MediaUpload
-              label="Foto QRIS (opsional)"
-              value={form.qris}
-              onChange={(v) => update('qris', v)}
-            />
-            <MediaUpload
-              label={theme.layout === 'boarding' ? "Gambar utama / Hero" : "Galeri foto"}
-              value={form.gallery}
-              onChange={(v) => update('gallery', v)}
-              multiple={theme.layout !== 'boarding'}
-            />
-            {theme.layout !== 'boarding' && (
+
+            {features.qris && (
+              <MediaUpload
+                label="Foto QRIS (opsional)"
+                value={form.qris}
+                onChange={(v) => update('qris', v)}
+              />
+            )}
+
+            {features.heroImage && (
+              <MediaUpload
+                label="Gambar utama / Tiket Hero"
+                value={form.gallery}
+                onChange={(v) => update('gallery', v)}
+                multiple={false}
+              />
+            )}
+
+            {features.gallery && (
+              <MediaUpload
+                label="Galeri foto"
+                value={form.gallery}
+                onChange={(v) => update('gallery', v)}
+                multiple={true}
+              />
+            )}
+
+            {features.music && (
+              <MediaUpload
+                label="Musik latar (mp3, opsional)"
+                value={form.music}
+                onChange={(v) => update('music', v)}
+                accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
+              />
+            )}
+
+            {features.dressCode && (
               <>
-                <MediaUpload
-                  label="Musik latar (mp3, opsional)"
-                  value={form.music}
-                  onChange={(v) => update('music', v)}
-                  accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg"
-                />
                 <Field label="Hashtag" value={form.hashtag} onChange={(v) => update('hashtag', v)} hint="Contoh: #AndiniRaka" />
                 <Field
                   label="Warna dress code (hex, pisah koma)"
@@ -433,6 +495,11 @@ export default function WeddingForm({
                   onChange={(v) => update('dressNote', v)} 
                   hint="Contoh: Tamu undangan dihimbau memakai warna senada."
                 />
+              </>
+            )}
+
+            {features.streaming && (
+              <>
                 <Field 
                   label="Link live streaming" 
                   value={form.liveUrl} 
@@ -449,6 +516,11 @@ export default function WeddingForm({
                   onChange={(v) => update('liveNote', v)} 
                   hint="Contoh: Siaran langsung akan dimulai 15 menit sebelum akad."
                 />
+              </>
+            )}
+
+            {features.frameImage && (
+              <>
                 <MediaUpload
                   label="Gambar wedding frame (opsional)"
                   value={form.frameImage}
@@ -459,6 +531,11 @@ export default function WeddingForm({
                   value={form.frameLink}
                   onChange={(v) => update('frameLink', v)}
                 />
+              </>
+            )}
+
+            {features.wishlist && (
+              <>
                 <Field label="Alamat kirim kado" value={form.giftAddress} onChange={(v) => update('giftAddress', v)} />
                 {form.wishlist.map((w, i) => (
                   <Pair key={i} title={`Wishlist ${i + 1}`}>
@@ -477,7 +554,8 @@ export default function WeddingForm({
           </div>
         )}
 
-        {step === 3 && (
+        {/* STEP: PEMESAN / BAYAR */}
+        {steps[step]?.id === 'pemesan' && (
           <div className="grid gap-5">
             {mode === 'create' && (
               <div className="grid gap-3">
@@ -566,7 +644,7 @@ export default function WeddingForm({
             >
               Lihat Preview
             </button>
-            {step < 3 ? (
+            {step < steps.length - 1 ? (
               <button
                 type="button"
                 onClick={() => setStep((s) => s + 1)}

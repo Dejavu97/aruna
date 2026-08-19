@@ -243,6 +243,105 @@ export function hasTheme(id) {
   return themes.some((t) => t.id === id)
 }
 
+export function getThemeFeatures(themeOrId) {
+  const theme = typeof themeOrId === 'string' ? getTheme(themeOrId) : (themeOrId || themes[0])
+  const layout = theme.layout || 'classic'
+
+  // Fitur khusus Art Jawa Biru
+  if (layout === 'art-jawa-biru') {
+    return {
+      quote: true,
+      story: { enabled: true, withPhoto: true },
+      events: { enabled: true, max: 3 },
+      gallery: true,
+      banks: true,
+      music: true,
+      qris: true,
+      dressCode: true,
+      streaming: false,
+      wishlist: false,
+      backdrop: false,
+      textColor: false,
+      frameImage: false,
+    }
+  }
+
+  // Fitur khusus Boarding Pass
+  if (layout === 'boarding') {
+    return {
+      quote: false,
+      story: { enabled: false },
+      events: { enabled: true, max: 2 },
+      heroImage: true,
+      gallery: false,
+      banks: true,
+      music: true,
+      qris: true,
+      dressCode: false,
+      streaming: false,
+      wishlist: false,
+      backdrop: false,
+      textColor: false,
+      frameImage: false,
+    }
+  }
+
+  // Fitur khusus Adat Jawa Klasik
+  if (layout === 'adat-jawa') {
+    return {
+      quote: true,
+      story: { enabled: true, withPhoto: false },
+      events: { enabled: true, max: 3 },
+      gallery: true,
+      banks: true,
+      music: true,
+      qris: true,
+      dressCode: false,
+      streaming: false,
+      wishlist: false,
+      backdrop: false,
+      textColor: false,
+      frameImage: false,
+    }
+  }
+
+  // Fitur khusus Attari Elegance
+  if (layout === 'attari') {
+    return {
+      quote: true,
+      story: { enabled: false },
+      events: { enabled: true, max: 3 },
+      gallery: true,
+      banks: true,
+      music: true,
+      qris: true,
+      dressCode: false,
+      streaming: false,
+      wishlist: false,
+      backdrop: false,
+      textColor: false,
+      frameImage: false,
+    }
+  }
+
+  // Default untuk tema klasik / floral / minimalis lainnya
+  return {
+    quote: true,
+    story: { enabled: true, withPhoto: false },
+    events: { enabled: true, max: 3 },
+    gallery: true,
+    banks: true,
+    music: true,
+    qris: true,
+    dressCode: true,
+    streaming: true,
+    wishlist: true,
+    backdrop: true,
+    textColor: true,
+    frameImage: true,
+  }
+}
+
 export const demos = {
   'art-jawa-biru': demo({
     themeId: 'art-jawa-biru',
