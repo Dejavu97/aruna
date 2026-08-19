@@ -142,6 +142,8 @@ function Cover({ data, guest, coverImg, onOpen }) {
 function Hero({ data, bride, groom }) {
   return (
     <section className="jw-hero" id="home">
+      <div className="jw-corner jw-corner-tl" />
+      <div className="jw-corner jw-corner-tr" />
       <div className="jw-gunungan-graphic" />
       <Kicker>THE WEDDING OF</Kicker>
       <h2 className="jw-hero-names">
