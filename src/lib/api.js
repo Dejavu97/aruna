@@ -6,12 +6,23 @@ const ADMIN_KEY = 'aruna.adminKey'
 const EDIT_KEYS = 'aruna.editKeys'
 
 export function getAdminKey() {
-  // If we have a Firebase currentUser, they are admin
-  return auth.currentUser ? 'firebase-admin' : ''
+  if (auth.currentUser) return 'firebase-admin'
+  try {
+    return localStorage.getItem(ADMIN_KEY) || ''
+  } catch {
+    return ''
+  }
 }
 
 export function setAdminKey(key) {
-  if (!key) signOut(auth).catch(() => {})
+  try {
+    if (key) {
+      localStorage.setItem(ADMIN_KEY, key)
+    } else {
+      localStorage.removeItem(ADMIN_KEY)
+      signOut(auth).catch(() => {})
+    }
+  } catch {}
 }
 
 export function rememberEditKey(slug, key) {
@@ -101,6 +112,7 @@ export async function recordInvitationView(slug) {
 export async function loginAdmin(password) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, 'admin@aruna.com', password)
+    setAdminKey('firebase-admin')
     return { key: userCredential.user.uid }
   } catch (err) {
     throw new Error('Kata sandi salah atau akun admin belum dibuat di Firebase.')
@@ -203,8 +215,8 @@ export async function fetchInvitation(slug, editKey) {
   if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
   const data = docSnap.data()
   
-  // Jika editKey diberikan (akses dashboard), maka wajib diverifikasi ke Vercel API
-  if (editKey !== undefined && !getAdminKey()) {
+  // Jika editKey diberikan dan bukan admin, maka wajib diverifikasi ke Vercel API
+  if (editKey !== undefined && !getAdminKey() && !auth.currentUser) {
     const res = await fetch('/api/verify-key', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -219,8 +231,21 @@ export async function fetchInvitation(slug, editKey) {
 export async function fetchAdminInvitations() {
   if (!getAdminKey()) throw new Error('Unauthorized')
   const q = query(collection(db, 'invitations'), orderBy('createdAt', 'desc'))
-  const snap = await getDocs(q)
-  return snap.docs.map(d => ({ slug: d.id, ...d.data() }))
+  const [invSnap, keysSnap] = await Promise.all([
+    getDocs(q),
+    getDocs(collection(db, 'private_keys')).catch(() => ({ docs: [] }))
+  ])
+  const keyMap = {}
+  if (keysSnap?.docs) {
+    keysSnap.docs.forEach(d => {
+      keyMap[d.id] = d.data().editKey || ''
+    })
+  }
+  return invSnap.docs.map(d => ({
+    slug: d.id,
+    ...d.data(),
+    editKey: keyMap[d.id] || d.data().editKey || '',
+  }))
 }
 
 export async function updateInvitation(slug, payload, editKey) {

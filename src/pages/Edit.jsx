@@ -10,7 +10,9 @@ export default function Edit() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const [item, setItem] = useState(null)
-  const [key, setKey] = useState(params.get('key') || getEditKey(slug) || getAdminKey())
+  const fromAdmin = params.get('from') === 'admin' || Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
+  const initialKey = params.get('key') || getEditKey(slug) || (fromAdmin ? 'admin-bypass' : '')
+  const [key, setKey] = useState(initialKey)
   const [typed, setTyped] = useState(key)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -35,12 +37,12 @@ export default function Edit() {
         if (live) setLoading(false)
       }
     }
-    if (key) load()
+    if (key || fromAdmin) load()
     else setLoading(false)
     return () => {
       live = false
     }
-  }, [slug, key])
+  }, [slug, key, fromAdmin])
 
   async function onSubmit(payload, message) {
     if (message || !payload) {
@@ -60,7 +62,6 @@ export default function Edit() {
     }
   }
 
-  const fromAdmin = params.get('from') === 'admin'
   const backHref = fromAdmin
     ? '/admin'
     : key

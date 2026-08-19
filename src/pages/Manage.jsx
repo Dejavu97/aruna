@@ -20,8 +20,9 @@ export default function Manage() {
   const [params] = useSearchParams()
   const queryKey = params.get('key') || ''
   const from = params.get('from') || (getAdminKey() && !queryKey ? 'admin' : '')
-  const editKey = queryKey || getEditKey(slug) || getAdminKey()
-  const isAdmin = from === 'admin' || Boolean(getAdminKey() && from !== 'customer')
+  const adminLoggedIn = Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
+  const editKey = queryKey || getEditKey(slug) || (adminLoggedIn ? 'admin-bypass' : '')
+  const isAdmin = from === 'admin' || adminLoggedIn
 
   const [item, setItem] = useState(null)
   const [text, setText] = useState('')
@@ -58,7 +59,7 @@ export default function Manage() {
   const [globalAnnouncement, setGlobalAnnouncement] = useState('')
 
   useEffect(() => {
-    if (!editKey) return
+    if (!editKey && !isAdmin) return
     Promise.all([
       fetchInvitation(slug, editKey),
       getAnnouncement()
@@ -73,7 +74,7 @@ export default function Manage() {
         setError('')
       })
       .catch((err) => setError(err.message))
-  }, [slug, editKey])
+  }, [slug, editKey, isAdmin])
 
   const [guestSearch, setGuestSearch] = useState('')
   const [copiedMsg, setCopiedMsg] = useState('')
@@ -411,7 +412,7 @@ export default function Manage() {
     }
   }
 
-  if (!editKey) {
+  if (!editKey && !isAdmin) {
     return (
       <div className="grid min-h-dvh place-items-center bg-ivory px-5 text-center">
         <div>
