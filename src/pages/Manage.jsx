@@ -4,6 +4,7 @@ import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCo
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import QrCameraScanner from '../components/QrCameraScanner'
+import WeddingFrameModal from '../components/WeddingFrameModal'
 import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl, uid } from '../lib/utils'
 import { shareWaLink, waLink } from '../data/site'
@@ -43,6 +44,7 @@ export default function Manage() {
   const [checkInFilter, setCheckInFilter] = useState('all') // 'all' | 'checkedIn' | 'notYet'
   const [recentCheckIn, setRecentCheckIn] = useState(null)
   const [showScanner, setShowScanner] = useState(false)
+  const [showStoryModal, setShowStoryModal] = useState(false)
 
   const backHref = backFromInvite(slug, { key: editKey && !isAdmin ? editKey : '', from: isAdmin ? 'admin' : '' })
   const backLabel = isAdmin ? '← Kembali ke admin' : '← Kembali ke halaman bayar'
@@ -591,14 +593,23 @@ export default function Manage() {
                 <p className="mt-4 text-xs text-stone leading-relaxed">
                   Simpan gambar QR Code ini untuk dicetak di undangan fisik atau kartu suvenir.
                 </p>
-                <a 
-                  href={`https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(invitationUrl(slug))}&margin=10`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-4 border border-ink px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-ink hover:text-ivory"
-                >
-                  Buka Resolusi Tinggi
-                </a>
+                <div className="mt-4 flex flex-col gap-2 w-full">
+                  <button
+                    type="button"
+                    onClick={() => setShowStoryModal(true)}
+                    className="bg-gold-deep text-ivory px-4 py-2.5 text-[11px] uppercase tracking-widest hover:bg-gold transition-colors font-medium flex items-center justify-center gap-2"
+                  >
+                    <Camera size={14} /> Buat Story IG &amp; Frame
+                  </button>
+                  <a 
+                    href={`https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(invitationUrl(slug))}&margin=10`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border border-ink/20 px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-ink/5"
+                  >
+                    Download QR Resolusi Tinggi
+                  </a>
+                </div>
               </div>
             </div>
           )}
@@ -1321,6 +1332,14 @@ export default function Manage() {
         <QrCameraScanner
           onScan={handleQrScanned}
           onClose={() => setShowScanner(false)}
+        />
+      )}
+
+      {showStoryModal && item && (
+        <WeddingFrameModal
+          data={item}
+          couple={`${item.bride?.nick || ''} & ${item.groom?.nick || ''}`}
+          onClose={() => setShowStoryModal(false)}
         />
       )}
 

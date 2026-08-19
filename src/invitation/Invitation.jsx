@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Calendar, Images, Heart, Gift as GiftIcon, MailOpen } from 'lucide-react'
+import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Calendar, Images, Heart, Gift as GiftIcon, MailOpen, Camera } from 'lucide-react'
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import {
@@ -23,6 +23,7 @@ import AttariInvitation from './AttariInvitation'
 import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
 import ThemeArtJawaBiru from './ThemeArtJawaBiru'
+import WeddingFrameModal from '../components/WeddingFrameModal'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
@@ -56,6 +57,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
   const [copied, setCopied] = useState('')
   const [musicOn, setMusicOn] = useState(false)
   const [showPass, setShowPass] = useState(false)
+  const [showFrameModal, setShowFrameModal] = useState(false)
   const [local, setLocal] = useState(data)
   const [scene, setScene] = useState('')
   const [sceneB, setSceneB] = useState('')
@@ -197,7 +199,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
             <Reveal><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
             <Reveal><DressCode data={data} scene={scenes.date} /></Reveal>
             <Reveal><Live data={data} scene={scenes.story} /></Reveal>
-            <Reveal><Frame data={data} guest={guest} scene={scenes.gallery} /></Reveal>
+            <Reveal><Frame data={data} guest={guest} couple={couple} onOpen={() => setShowFrameModal(true)} scene={scenes.gallery} /></Reveal>
             {data.gallery?.length > 0 && (
               <Reveal><Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} /></Reveal>
             )}
@@ -239,6 +241,15 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
           guest={guest}
           couple={couple}
           onClose={() => setShowPass(false)}
+        />
+      )}
+
+      {showFrameModal && (
+        <WeddingFrameModal
+          data={data}
+          guest={guest}
+          couple={couple}
+          onClose={() => setShowFrameModal(false)}
         />
       )}
 
@@ -832,20 +843,22 @@ function Live({ data, scene }) {
   )
 }
 
-function Frame({ data, guest, scene }) {
-  if (!data.frameImage && !data.frameLink) return null
+function Frame({ data, guest, couple, onOpen, scene }) {
   return (
-    <section className="pad center" data-scene={scene}>
+    <section className="pad center" id="frame" data-scene={scene}>
       <p className="kicker">Capture your moment</p>
-      <h3 className="sec-title">Wedding frame</h3>
-      <p className="lead">Abadikan momen kehadiranmu dengan frame pernikahan kami.</p>
-      {data.frameImage && <img className="frame-preview" src={data.frameImage} alt="Wedding frame" />}
-      {guest && <p className="fine">Hi, {guest}</p>}
-      {data.frameLink && (
-        <a className="maps" href={data.frameLink} target="_blank" rel="noreferrer">
-          Buka frame
-        </a>
-      )}
+      <h3 className="sec-title">Frame Foto &amp; Story</h3>
+      <p className="lead">Abadikan momen bahagiamu dan buat frame foto atau Instagram Story eksklusif untuk pernikahan kami.</p>
+      <div style={{ marginTop: '1.25rem' }}>
+        <button
+          type="button"
+          className="maps"
+          onClick={onOpen}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.75rem', cursor: 'pointer' }}
+        >
+          <Camera size={16} /> Buat Frame Foto &amp; Story
+        </button>
+      </div>
     </section>
   )
 }
