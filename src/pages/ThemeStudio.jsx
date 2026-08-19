@@ -162,7 +162,7 @@ export default function ThemeStudio() {
   const [particleEffect, setParticleEffect] = useState('gold_dust') // 'none' | 'petals' | 'melati' | 'gold_dust' | 'bokeh'
 
   // Transisi & Animasi Lengkap
-  const [coupleTransition, setCoupleTransition] = useState('meet_middle') // 'meet_middle' | 'scale_up' | 'fade_blur' | 'parallax_float'
+  const [coupleTransition, setCoupleTransition] = useState('meet_middle') // 'meet_middle' | 'scale_up' | 'fade_blur' | 'parallax_float' | 'flip_3d'
   const [ornamentTransition, setOrnamentTransition] = useState('expand_line') // 'expand_line' | 'unfurl' | 'glow_pulse' | 'none'
   const [panelTransition, setPanelTransition] = useState('staggered_slide') // 'staggered_slide' | 'flip_3d' | 'pop_in' | 'instant'
 
@@ -186,7 +186,7 @@ export default function ThemeStudio() {
   })
 
   // Image Adjustment Modal State
-  const [adjustTarget, setAdjustTarget] = useState(null) // { field: 'coverImgUrl', title: 'Sesuaikan Foto Sampul', url: '...', settingsKey: 'coverImgSettings' }
+  const [adjustTarget, setAdjustTarget] = useState(null)
 
   const [saving, setSaving] = useState(false)
   const [savedThemeId, setSavedThemeId] = useState('')
@@ -295,6 +295,13 @@ export default function ThemeStudio() {
 
       const res = await createCustomTheme(themePayload)
       setSavedThemeId(res.id)
+
+      // Save locally to localStorage so it is immediately visible in Order and Catalog
+      try {
+        const savedList = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
+        const updatedList = [res, ...savedList.filter((item) => item.id !== res.id)]
+        localStorage.setItem('aruna_custom_themes', JSON.stringify(updatedList))
+      } catch {}
     } catch (err) {
       setError(err.message || 'Gagal menyimpan tema.')
     } finally {
@@ -688,7 +695,7 @@ export default function ThemeStudio() {
                   <button
                     type="button"
                     onClick={() => setAnimKey((k) => k + 1)}
-                    className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                    className="inline-flex items-center gap-1.5 bg-gold-deep text-ivory px-3 py-1.5 text-xs uppercase tracking-wider hover:bg-gold transition-colors font-medium shadow-xs"
                   >
                     <RotateCcw size={12} /> Putar Ulang Animasi
                   </button>
@@ -699,10 +706,11 @@ export default function ThemeStudio() {
                   <label className="block text-xs uppercase tracking-wider text-stone font-medium">1. Transisi Foto Mempelai</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      ['meet_middle', 'Bertemu di Tengah', 'Foto pria meluncur dari kiri, wanita dari kanan'],
-                      ['scale_up', 'Membesar Halus', 'Foto membesar perlahan 85% ke 100%'],
-                      ['fade_blur', 'Fade & Blur In', 'Foto memudar dari blur ke tajam'],
-                      ['parallax_float', 'Mengambang Santai', 'Foto meluncur naik dari bawah'],
+                      ['meet_middle', 'Bertemu di Tengah', 'Foto pria meluncur dari kiri, wanita dari kanan (Slide & Tilt)'],
+                      ['scale_up', 'Membesar Elastis', 'Foto membesar membal dari ukuran kecil (Spring Pop)'],
+                      ['fade_blur', 'Fade & Blur In', 'Foto memudar dari blur tebal ke tajam (Cinematic De-blur)'],
+                      ['parallax_float', 'Drop dari Atas', 'Foto meluncur turun dari atas (Smooth Fall)'],
+                      ['flip_3d', 'Putar Kartu 3D', 'Kartu berputar 90 derajat secara 3D (3D Flip)'],
                     ].map(([tVal, tLabel, tDesc]) => (
                       <button
                         key={tVal}
@@ -711,11 +719,11 @@ export default function ThemeStudio() {
                           setCoupleTransition(tVal)
                           setAnimKey((k) => k + 1)
                         }}
-                        className={`p-2.5 text-left border rounded-sm transition-colors ${
-                          coupleTransition === tVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
+                        className={`p-2.5 text-left border rounded-sm transition-all ${
+                          coupleTransition === tVal ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
                       >
-                        <p className="text-xs font-medium">{tLabel}</p>
+                        <p className="text-xs font-semibold">{tLabel}</p>
                         <p className="text-[10px] text-stone mt-0.5">{tDesc}</p>
                       </button>
                     ))}
@@ -727,10 +735,10 @@ export default function ThemeStudio() {
                   <label className="block text-xs uppercase tracking-wider text-stone font-medium">2. Transisi Ornamen &amp; Garis</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      ['expand_line', 'Melebar ke Samping', 'Garis / ornamen melebar dari tengah'],
-                      ['unfurl', 'Bunga Mekar', 'Ornamen berputar dan membesar lembut'],
-                      ['glow_pulse', 'Kilau Berdenyut', 'Efek kilau cahaya emas berkedip halus'],
-                      ['none', 'Tanpa Efek', 'Langsung tampil tanpa animasi'],
+                      ['expand_line', 'Melebar ke Samping', 'Garis / ornamen melebar dari tengah (Expand Line)'],
+                      ['unfurl', 'Bunga Mekar 180°', 'Ornamen berputar 180° dan mekar membesar (Rotate Bloom)'],
+                      ['glow_pulse', 'Kilau Berdenyut', 'Efek kilau cahaya emas berkedip lembut terus-menerus (Glow Pulse)'],
+                      ['none', 'Tanpa Efek', 'Langsung tampil instan tanpa animasi'],
                     ].map(([tVal, tLabel, tDesc]) => (
                       <button
                         key={tVal}
@@ -739,11 +747,11 @@ export default function ThemeStudio() {
                           setOrnamentTransition(tVal)
                           setAnimKey((k) => k + 1)
                         }}
-                        className={`p-2.5 text-left border rounded-sm transition-colors ${
-                          ornamentTransition === tVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
+                        className={`p-2.5 text-left border rounded-sm transition-all ${
+                          ornamentTransition === tVal ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
                       >
-                        <p className="text-xs font-medium">{tLabel}</p>
+                        <p className="text-xs font-semibold">{tLabel}</p>
                         <p className="text-[10px] text-stone mt-0.5">{tDesc}</p>
                       </button>
                     ))}
@@ -755,10 +763,10 @@ export default function ThemeStudio() {
                   <label className="block text-xs uppercase tracking-wider text-stone font-medium">3. Transisi Kartu &amp; Panel Acara</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      ['staggered_slide', 'Naik Berurutan', 'Kartu naik perlahan satu per satu'],
-                      ['flip_3d', 'Terbuka 3D', 'Kartu berotasi halus seperti membuka kartu'],
-                      ['pop_in', 'Membal Lembut', 'Kartu membal lembut ke posisi asli'],
-                      ['instant', 'Minimalis Bersih', 'Langsung tampil instan'],
+                      ['staggered_slide', 'Naik Berurutan', 'Kartu meluncur naik dari bawah bertingkat (Staggered Slide)'],
+                      ['flip_3d', 'Terbuka 3D Flip', 'Kartu terbuka berputar 3D seperti pintu (3D Card Open)'],
+                      ['pop_in', 'Membal Elastis', 'Kartu membal lembut ke posisi asli (Elastic Bounce)'],
+                      ['instant', 'Minimalis Bersih', 'Langsung tampil instan tanpa jeda'],
                     ].map(([tVal, tLabel, tDesc]) => (
                       <button
                         key={tVal}
@@ -767,11 +775,11 @@ export default function ThemeStudio() {
                           setPanelTransition(tVal)
                           setAnimKey((k) => k + 1)
                         }}
-                        className={`p-2.5 text-left border rounded-sm transition-colors ${
-                          panelTransition === tVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
+                        className={`p-2.5 text-left border rounded-sm transition-all ${
+                          panelTransition === tVal ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
                       >
-                        <p className="text-xs font-medium">{tLabel}</p>
+                        <p className="text-xs font-semibold">{tLabel}</p>
                         <p className="text-[10px] text-stone mt-0.5">{tDesc}</p>
                       </button>
                     ))}
@@ -1249,8 +1257,18 @@ export default function ThemeStudio() {
 
             {error && <p className="text-xs text-red-600 font-medium">✕ {error}</p>}
             {savedThemeId && (
-              <div className="p-3 bg-green-50 border border-green-200 text-green-800 text-xs rounded-sm">
-                ✓ <strong>Tema Berhasil Disimpan!</strong> ID: <code className="font-mono bg-green-100 px-1 py-0.5">{savedThemeId}</code>
+              <div className="p-3.5 bg-green-50 border border-green-200 text-green-800 text-xs rounded-sm flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">✓ Tema Berhasil Disimpan!</p>
+                  <p className="text-[11px] text-green-700 mt-0.5">ID: <code className="font-mono bg-green-100 px-1 py-0.5">{savedThemeId}</code></p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/pesan/${savedThemeId}`)}
+                  className="bg-green-700 text-white px-3 py-1 text-[11px] uppercase tracking-wider font-semibold hover:bg-green-800"
+                >
+                  Pesan Sekarang →
+                </button>
               </div>
             )}
           </div>
@@ -1422,28 +1440,49 @@ export default function ThemeStudio() {
                     {previewData.bride.nick} &amp; {previewData.groom.nick}
                   </h2>
                   
-                  {/* Ornament with Animated Transition */}
+                  {/* Ornament with Distinct Animation */}
                   {customAssets.customOrnamentUrl ? (
                     <motion.img
-                      key={`orn-${animKey}`}
+                      key={`orn-${ornamentTransition}-${animKey}`}
                       src={customAssets.customOrnamentUrl}
                       alt="Divider"
                       className="mx-auto my-3 object-contain"
                       style={{
                         height: `${(customAssets.customOrnamentSettings?.scale || 1) * 24}px`,
                       }}
-                      initial={ornamentTransition === 'unfurl' ? { scale: 0.5, rotate: -20 } : ornamentTransition === 'expand_line' ? { scaleX: 0 } : { opacity: 0 }}
-                      animate={ornamentTransition === 'unfurl' ? { scale: 1, rotate: 0 } : ornamentTransition === 'expand_line' ? { scaleX: 1 } : { opacity: 1 }}
-                      transition={{ duration: 0.8 }}
+                      initial={
+                        ornamentTransition === 'unfurl' ? { scale: 0, rotate: -180, opacity: 0 }
+                        : ornamentTransition === 'expand_line' ? { scaleX: 0, opacity: 0 }
+                        : { opacity: 0 }
+                      }
+                      animate={
+                        ornamentTransition === 'unfurl' ? { scale: 1, rotate: 0, opacity: 1 }
+                        : ornamentTransition === 'expand_line' ? { scaleX: 1, opacity: 1 }
+                        : ornamentTransition === 'glow_pulse' ? { scale: [0.95, 1.1, 0.95], opacity: 1, filter: ['drop-shadow(0 0 0px gold)', 'drop-shadow(0 0 15px gold)', 'drop-shadow(0 0 0px gold)'] }
+                        : { opacity: 1 }
+                      }
+                      transition={
+                        ornamentTransition === 'glow_pulse'
+                          ? { repeat: Infinity, duration: 2 }
+                          : { duration: 0.85, ease: 'easeOut' }
+                      }
                     />
                   ) : (
                     <motion.div
-                      key={`line-${animKey}`}
-                      className="w-12 h-[1px] mx-auto my-3"
+                      key={`line-${ornamentTransition}-${animKey}`}
+                      className="w-14 h-[1.5px] mx-auto my-3"
                       style={{ background: accentBorderColor }}
-                      initial={ornamentTransition === 'expand_line' ? { scaleX: 0 } : { opacity: 0 }}
-                      animate={ornamentTransition === 'expand_line' ? { scaleX: 1 } : { opacity: 1 }}
-                      transition={{ duration: 0.8 }}
+                      initial={ornamentTransition === 'expand_line' ? { scaleX: 0, opacity: 0 } : { opacity: 0 }}
+                      animate={
+                        ornamentTransition === 'expand_line' ? { scaleX: 1, opacity: 1 }
+                        : ornamentTransition === 'glow_pulse' ? { scale: [0.9, 1.2, 0.9], opacity: 1, boxShadow: ['0 0 0px gold', '0 0 12px gold', '0 0 0px gold'] }
+                        : { opacity: 1 }
+                      }
+                      transition={
+                        ornamentTransition === 'glow_pulse'
+                          ? { repeat: Infinity, duration: 2 }
+                          : { duration: 0.85, ease: 'easeOut' }
+                      }
                     />
                   )}
 
@@ -1455,7 +1494,7 @@ export default function ThemeStudio() {
                   </p>
                 </section>
 
-                {/* 2. MEMPELAI (COUPLE) SECTION WITH REAL-TIME TRIGGERED TRANSITIONS & CUSTOM FRAME */}
+                {/* 2. MEMPELAI (COUPLE) SECTION WITH BOLD DISTINCT ANIMATIONS & CUSTOM FRAME */}
                 <section className="space-y-4">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>
@@ -1465,19 +1504,27 @@ export default function ThemeStudio() {
 
                   {layoutStyle === 'side_by_side' ? (
                     <div className="grid grid-cols-2 gap-3">
-                      {/* Bride Card with Selected Couple Transition */}
+                      {/* Bride Card with Distinct Motion */}
                       <motion.div
                         key={`bride-${coupleTransition}-${animKey}`}
                         className="border p-3.5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
-                          coupleTransition === 'meet_middle' ? { opacity: 0, x: -35 }
-                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.8 }
-                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(10px)' }
-                          : { opacity: 0, y: 35 }
+                          coupleTransition === 'meet_middle' ? { opacity: 0, x: -140, rotate: -8 }
+                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.1, rotate: -20 }
+                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(30px) brightness(200%)', scale: 1.4 }
+                          : coupleTransition === 'parallax_float' ? { opacity: 0, y: -120, rotateX: 60 }
+                          : coupleTransition === 'flip_3d' ? { opacity: 0, rotateY: 90 }
+                          : { opacity: 0, y: 40 }
                         }
-                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
-                        transition={{ duration: 0.85, ease: 'easeOut' }}
+                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, filter: 'blur(0px) brightness(100%)' }}
+                        transition={{
+                          type: coupleTransition === 'scale_up' || coupleTransition === 'meet_middle' ? 'spring' : 'tween',
+                          stiffness: 140,
+                          damping: 14,
+                          duration: coupleTransition === 'fade_blur' ? 1.1 : 0.8,
+                          ease: 'easeOut',
+                        }}
                       >
                         <div className="aspect-[3/4] relative overflow-hidden mb-2.5">
                           <img
@@ -1512,19 +1559,28 @@ export default function ThemeStudio() {
                         </p>
                       </motion.div>
 
-                      {/* Groom Card with Selected Couple Transition */}
+                      {/* Groom Card with Distinct Motion */}
                       <motion.div
                         key={`groom-${coupleTransition}-${animKey}`}
                         className="border p-3.5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
-                          coupleTransition === 'meet_middle' ? { opacity: 0, x: 35 }
-                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.8 }
-                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(10px)' }
-                          : { opacity: 0, y: 35 }
+                          coupleTransition === 'meet_middle' ? { opacity: 0, x: 140, rotate: 8 }
+                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.1, rotate: 20 }
+                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(30px) brightness(200%)', scale: 1.4 }
+                          : coupleTransition === 'parallax_float' ? { opacity: 0, y: -120, rotateX: 60 }
+                          : coupleTransition === 'flip_3d' ? { opacity: 0, rotateY: -90 }
+                          : { opacity: 0, y: 40 }
                         }
-                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
-                        transition={{ duration: 0.85, ease: 'easeOut', delay: 0.1 }}
+                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, filter: 'blur(0px) brightness(100%)' }}
+                        transition={{
+                          type: coupleTransition === 'scale_up' || coupleTransition === 'meet_middle' ? 'spring' : 'tween',
+                          stiffness: 140,
+                          damping: 14,
+                          duration: coupleTransition === 'fade_blur' ? 1.1 : 0.8,
+                          delay: 0.1,
+                          ease: 'easeOut',
+                        }}
                       >
                         <div className="aspect-[3/4] relative overflow-hidden mb-2.5">
                           <img
@@ -1676,7 +1732,7 @@ export default function ThemeStudio() {
                   </div>
                 </motion.section>
 
-                {/* 5. ACARA (EVENTS) WITH PANEL TRANSITIONS */}
+                {/* 5. ACARA (EVENTS) WITH BOLD DISTINCT PANEL TRANSITIONS */}
                 <section className="space-y-3">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>SAVE OUR DATE</p>
@@ -1689,13 +1745,20 @@ export default function ThemeStudio() {
                         className="border p-4 text-center rounded-sm backdrop-blur-md"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
-                          panelTransition === 'flip_3d' ? { opacity: 0, rotateX: 35 }
-                          : panelTransition === 'pop_in' ? { opacity: 0, scale: 0.85 }
+                          panelTransition === 'flip_3d' ? { opacity: 0, rotateX: 85, transformPerspective: 800 }
+                          : panelTransition === 'pop_in' ? { opacity: 0, scale: 0.15 }
                           : panelTransition === 'instant' ? { opacity: 1 }
-                          : { opacity: 0, y: 30 }
+                          : { opacity: 0, y: 100 }
                         }
                         animate={{ opacity: 1, rotateX: 0, scale: 1, y: 0 }}
-                        transition={{ duration: 0.7, delay: i * 0.15 }}
+                        transition={{
+                          type: panelTransition === 'pop_in' || panelTransition === 'staggered_slide' ? 'spring' : 'tween',
+                          stiffness: 160,
+                          damping: 14,
+                          duration: 0.75,
+                          delay: i * 0.16,
+                          ease: 'easeOut',
+                        }}
                       >
                         <h4 className="text-xs uppercase tracking-widest font-semibold" style={{ color: colors.accent }}>{ev.title}</h4>
                         <p className="text-sm font-bold mt-1" style={{ color: colors.fg }}>{ev.time}</p>

@@ -26,6 +26,7 @@ export default function App() {
       <Route path="/tema/:themeId" element={<ThemePreview />} />
       <Route path="/studio" element={<ThemeStudio />} />
       <Route path="/studio/:themeId" element={<ThemeStudio />} />
+      <Route path="/pesan" element={<Order />} />
       <Route path="/pesan/:themeId" element={<Order />} />
       <Route path="/berhasil/:slug" element={<Success />} />
       <Route path="/edit/:slug" element={<Edit />} />

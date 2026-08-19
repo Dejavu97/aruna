@@ -73,8 +73,9 @@ export default function WeddingForm({
   submitting = false,
   error = '',
   onSubmit,
+  customThemes = [],
 }) {
-  const theme = getTheme(themeId)
+  const theme = getTheme(themeId, customThemes)
   const features = getThemeFeatures(theme)
   const [step, setStep] = useState(0)
   const [showPreview, setShowPreview] = useState(false)
@@ -200,14 +201,19 @@ export default function WeddingForm({
               Lihat preview dulu
             </Link>
             <div className="mt-8 grid gap-2">
-              <p className="text-xs uppercase tracking-[0.2em] text-stone">Ganti tema</p>
-              <div className="flex flex-wrap gap-2">
-                {themes.map((t) => (
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-[0.2em] text-stone">Ganti tema</p>
+                <Link to="/studio" className="text-[10px] text-gold-deep font-semibold uppercase tracking-wider hover:underline">
+                  + Buat di Studio
+                </Link>
+              </div>
+              <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-1">
+                {[...themes, ...customThemes].map((t) => (
                   <Link
                     key={t.id}
                     to={`/pesan/${t.id}`}
-                    className={`px-3 py-1 text-xs uppercase tracking-[0.14em] ${
-                      t.id === theme.id ? 'bg-ink text-ivory' : 'border border-ink/15'
+                    className={`px-3 py-1 text-xs uppercase tracking-[0.14em] transition-colors ${
+                      t.id === theme.id ? 'bg-ink text-ivory font-medium' : 'border border-ink/15 hover:border-ink/40'
                     }`}
                   >
                     {t.name}
