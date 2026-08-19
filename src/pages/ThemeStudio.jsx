@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Sparkles, Palette, Type, Layout, Image as ImageIcon, Music, 
-  Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet, Monitor,
-  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, CornerDownRight
+  Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet,
+  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -12,7 +12,7 @@ import { createCustomTheme, fetchCustomTheme, uploadFile } from '../lib/api'
 import { themes } from '../data/themes'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Starter Presets
+// Starter Presets (No emojis)
 const themePresets = [
   {
     name: 'Terracotta Boho',
@@ -81,15 +81,16 @@ export default function ThemeStudio() {
   const [params] = useSearchParams()
   const starterId = params.get('from') || ''
 
-  // Custom Theme State
+  // Custom Theme Meta
   const [themeName, setThemeName] = useState('Tema Eksklusif Saya')
   const [creatorName, setCreatorName] = useState('')
-  const [themeDesc, setThemeDesc] = useState('Tema custom rancangan sendiri dengan sentuhan elegan.')
+  const [themeDesc, setThemeDesc] = useState('Tema custom rancangan sendiri dengan sentuhan estetis.')
   const [isPublic, setIsPublic] = useState(true)
 
   const [activeTab, setActiveTab] = useState('preset') // 'preset' | 'color' | 'font' | 'cover' | 'ornament' | 'particle' | 'assets'
-  const [previewDevice, setPreviewDevice] = useState('mobile') // 'mobile' | 'tablet' | 'desktop'
+  const [previewDevice, setPreviewDevice] = useState('mobile') // 'mobile' | 'tablet'
   const [previewOpened, setPreviewOpened] = useState(false)
+  const [copiedBank, setCopiedBank] = useState('')
 
   // Visual Properties
   const [colors, setColors] = useState({
@@ -110,17 +111,21 @@ export default function ThemeStudio() {
   })
 
   const [coverStyle, setCoverStyle] = useState('fullscreen') // 'fullscreen' | 'arch' | 'classic' | 'envelope'
-  const [openingAnimation, setOpeningAnimation] = useState('fade') // 'fade' | 'curtain' | 'zoom' | 'envelope'
+  const [openingAnimation, setOpeningAnimation] = useState('fade') // 'fade' | 'curtain' | 'zoom'
   const [ornamentStyle, setOrnamentStyle] = useState('gold_flourish') // 'gold_flourish' | 'botanical' | 'batik' | 'clean_line' | 'islamic' | 'none'
   const [layoutStyle, setLayoutStyle] = useState('side_by_side') // 'side_by_side' | 'stacked' | 'arch'
   const [particleEffect, setParticleEffect] = useState('gold_dust') // 'none' | 'petals' | 'melati' | 'gold_dust' | 'bokeh'
 
-  // Custom Uploaded Assets
+  // Comprehensive Custom Uploaded Assets
   const [customAssets, setCustomAssets] = useState({
-    monogramUrl: '',
-    bgTextureUrl: '',
-    customOrnamentUrl: '',
     coverImgUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
+    bgTextureUrl: '',
+    bgOverlayOpacity: 0.85,
+    monogramUrl: '',
+    customOrnamentUrl: '',
+    cardBgUrl: '',
+    frameImageUrl: '',
+    customMusicUrl: '',
   })
 
   const [saving, setSaving] = useState(false)
@@ -219,36 +224,88 @@ export default function ThemeStudio() {
     }
   }
 
-  // Simulated Demo Wedding Data for Live Preview
+  // Ultra-Complete Dummy Preview Data
   const previewData = {
-    bride: { nick: 'Siti', full: 'Siti Sarah, S.E.', parents: 'Putri dari Bapak Ahmad & Ibu Nurul' },
-    groom: { nick: 'Budi', full: 'Budi Santoso, S.Kom.', parents: 'Putra dari Bapak Joko & Ibu Sri' },
+    bride: {
+      nick: 'Sarah',
+      full: 'dr. Siti Sarah, Sp.A',
+      parents: 'Putri pertama dari Bapak H. Ahmad Subardjo & Ibu Hj. Nurul Hidayati',
+      photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+      ig: 'sitisarah',
+    },
+    groom: {
+      nick: 'Budi',
+      full: 'dr. Budi Santoso, Sp.OT',
+      parents: 'Putra kedua dari Bapak Ir. Joko Wahyudi & Ibu Hj. Sri Rahayu',
+      photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+      ig: 'budisantoso',
+    },
     date: '2026-11-20',
-    quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri...',
+    quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.',
     quoteSource: 'QS. Ar-Rum: 21',
+    story: [
+      { year: '2022', title: 'Pertemuan Pertama', desc: 'Awal mula kami bertemu di Rumah Sakit Siloam saat masa residensi spesialis.' },
+      { year: '2024', title: 'Momen Lamaran', desc: 'Di hadapan kedua keluarga besar, kami mengikat janji untuk melangkah bersama.' },
+      { year: '2026', title: 'Menuju Pelaminan', desc: 'Bismillah, kami menyatukan langkah dalam ikatan suci pernikahan.' },
+    ],
     events: [
-      { title: 'Akad Nikah', date: '2026-11-20', time: '08:00 WIB', venue: 'Masjid Agung', address: 'Jl. Pemuda No. 1' },
-      { title: 'Resepsi Pernikahan', date: '2026-11-20', time: '11:00 - 13:00 WIB', venue: 'Grand Ballroom Hotel', address: 'Jl. Sudirman No. 99' },
+      {
+        title: 'Akad Nikah',
+        date: '2026-11-20',
+        time: '08:00 - 10:00 WIB',
+        venue: 'Masjid Agung Al-Azhar',
+        address: 'Jl. Sisingamangaraja No. 1, Kebayoran Baru, Jakarta Selatan',
+        maps: 'https://maps.google.com',
+      },
+      {
+        title: 'Resepsi Pernikahan',
+        date: '2026-11-20',
+        time: '11:00 - 14:00 WIB',
+        venue: 'Grand Ballroom Hotel Mulia',
+        address: 'Jl. Asia Afrika No. 8, Senayan, Jakarta Pusat',
+        maps: 'https://maps.google.com',
+      },
+    ],
+    gallery: [
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80',
+    ],
+    wishes: [
+      { name: 'dr. Hendra Pratama', status: '✓ Konfirmasi Hadir', msg: 'Selamat Sarah dan Budi! Semoga menjadi keluarga yang sakinah mawaddah warahmah.', reply: 'Terima kasih banyak dok, aamiin!' },
+      { name: 'Keluarga Besar Subardjo', status: '✓ Konfirmasi Hadir', msg: 'Semoga lancar sampai hari H ya anak-anakku.', reply: 'Aamiin ya rabbal alamin om & tante.' },
+      { name: 'Rina & Kevin', status: '✓ Konfirmasi Hadir', msg: 'Cant wait for the big day! Samawa dokter berdua!', reply: '' },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Siti Sarah', number: '5420198821' },
+      { bank: 'Mandiri', name: 'Budi Santoso', number: '1370019283741' },
     ],
   }
 
   const activeDisplayFont = fonts.customGoogleFont?.trim() ? `"${fonts.customGoogleFont.trim()}", serif` : fonts.display
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] text-ink flex flex-col font-body">
+    <div className="min-h-screen bg-[#F8F7F4] text-ink flex flex-col font-body">
       {/* Studio Header */}
       <header className="sticky top-0 z-50 bg-paper border-b border-ink/10 px-4 py-3 sm:px-6 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link to="/themes" className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-stone hover:text-ink">
-              <ArrowLeft size={16} /> Katalog Tema
-            </Link>
-            <span className="text-stone/40">|</span>
+            <button
+              type="button"
+              onClick={() => navigate('/tema')}
+              className="inline-flex items-center gap-1.5 border border-ink/20 px-3 py-1.5 text-xs uppercase tracking-wider text-ink hover:bg-ink/5 transition-colors font-medium"
+            >
+              <ArrowLeft size={14} /> Kembali ke Katalog
+            </button>
+            <span className="text-stone/30">|</span>
             <div className="flex items-center gap-2">
-              <Sparkles size={18} className="text-gold-deep" />
-              <h1 className="font-display text-lg font-semibold tracking-wide">Aruna Theme Studio</h1>
-              <span className="bg-gold-deep/15 text-gold-deep text-[10px] px-2 py-0.5 rounded font-medium uppercase tracking-wider">
-                Creative Builder
+              <Sparkles size={16} className="text-gold-deep" />
+              <h1 className="font-display text-lg font-semibold tracking-wide">Theme Studio</h1>
+              <span className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep text-[10px] px-2 py-0.5 font-medium uppercase tracking-wider">
+                Visual Customizer
               </span>
             </div>
           </div>
@@ -266,8 +323,8 @@ export default function ThemeStudio() {
             {savedThemeId && (
               <button
                 type="button"
-                onClick={() => navigate(`/buat?theme=${savedThemeId}`)}
-                className="inline-flex items-center gap-1.5 bg-green-700 text-ivory px-4 py-2 text-xs uppercase tracking-widest hover:bg-green-800 transition-colors font-medium"
+                onClick={() => navigate(`/pesan/${savedThemeId}`)}
+                className="inline-flex items-center gap-1.5 bg-gold-deep text-ivory px-4 py-2 text-xs uppercase tracking-widest hover:bg-gold transition-colors font-medium"
               >
                 <Check size={14} /> Pakai Buat Undangan
               </button>
@@ -278,7 +335,7 @@ export default function ThemeStudio() {
 
       {/* Main Studio Workspace: Split Screen */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid lg:grid-cols-12 gap-6 items-start">
-        {/* LEFT COLUMN: Customizer Controls (7 Cols) */}
+        {/* LEFT COLUMN: Customizer Controls (5 Cols) */}
         <div className="lg:col-span-6 xl:col-span-5 bg-paper border border-ink/10 shadow-sm flex flex-col overflow-hidden">
           {/* Customizer Navigation Tabs */}
           <div className="flex border-b border-ink/10 overflow-x-auto text-[11px] uppercase tracking-wider font-medium bg-ivory/40">
@@ -288,7 +345,7 @@ export default function ThemeStudio() {
               ['font', 'Font'],
               ['cover', 'Cover'],
               ['ornament', 'Ornamen'],
-              ['particle', 'Efek'],
+              ['particle', 'Efek Partikel'],
               ['assets', 'Upload Aset'],
             ].map(([tab, label]) => (
               <button
@@ -310,7 +367,7 @@ export default function ThemeStudio() {
             {activeTab === 'preset' && (
               <div>
                 <h3 className="font-display text-lg mb-1">Preset Gaya Awal</h3>
-                <p className="text-xs text-stone mb-4">Pilih racikan gaya siap pakai lalu modifikasi sesuka hatimu:</p>
+                <p className="text-xs text-stone mb-4">Pilih racikan dasar lalu sesuaikan setiap detailnya:</p>
 
                 <div className="grid grid-cols-2 gap-3">
                   {themePresets.map((p) => (
@@ -318,7 +375,7 @@ export default function ThemeStudio() {
                       key={p.name}
                       type="button"
                       onClick={() => applyPreset(p)}
-                      className="border border-ink/15 p-3 text-left hover:border-gold-deep transition-all rounded bg-ivory/30 group"
+                      className="border border-ink/15 p-3 text-left hover:border-gold-deep transition-all rounded-sm bg-ivory/30 group"
                     >
                       <div className="flex items-center gap-1.5 mb-2">
                         <span className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ background: p.colors.bg }} />
@@ -331,29 +388,33 @@ export default function ThemeStudio() {
                   ))}
                 </div>
 
-                <div className="mt-6 border-t border-ink/10 pt-4">
-                  <label className="block text-xs uppercase tracking-wider text-stone mb-1">Nama Tema Anda</label>
-                  <input
-                    type="text"
-                    value={themeName}
-                    onChange={(e) => setThemeName(e.target.value)}
-                    className="w-full border border-ink/20 p-2.5 text-sm bg-transparent focus:border-ink focus:outline-none"
-                    placeholder="Contoh: Terracotta Dream"
-                  />
+                <div className="mt-6 border-t border-ink/10 pt-4 space-y-3">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-stone mb-1">Nama Tema</label>
+                    <input
+                      type="text"
+                      value={themeName}
+                      onChange={(e) => setThemeName(e.target.value)}
+                      className="w-full border border-ink/20 p-2.5 text-sm bg-transparent focus:border-ink focus:outline-none"
+                      placeholder="Contoh: Terracotta Luxury"
+                    />
+                  </div>
 
-                  <label className="block text-xs uppercase tracking-wider text-stone mt-3 mb-1">Nama Kreator (Opsional)</label>
-                  <input
-                    type="text"
-                    value={creatorName}
-                    onChange={(e) => setCreatorName(e.target.value)}
-                    className="w-full border border-ink/20 p-2.5 text-sm bg-transparent focus:border-ink focus:outline-none"
-                    placeholder="Contoh: by Sarah & Dimas"
-                  />
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-stone mb-1">Nama Desainer / Pengantin</label>
+                    <input
+                      type="text"
+                      value={creatorName}
+                      onChange={(e) => setCreatorName(e.target.value)}
+                      className="w-full border border-ink/20 p-2.5 text-sm bg-transparent focus:border-ink focus:outline-none"
+                      placeholder="Contoh: Sarah & Dimas"
+                    />
+                  </div>
 
-                  <div className="mt-4 flex items-center justify-between bg-ivory/60 border border-ink/10 p-3 rounded">
+                  <div className="flex items-center justify-between bg-ivory/60 border border-ink/10 p-3">
                     <div>
                       <p className="text-xs font-medium">Tampilkan di Koleksi Komunitas</p>
-                      <p className="text-[10px] text-stone">Calon pengantin lain bisa melihat dan memakai tema ini.</p>
+                      <p className="text-[10px] text-stone">Calon pengantin lain bisa melihat dan memakai tema ini di katalog.</p>
                     </div>
                     <input
                       type="checkbox"
@@ -377,11 +438,12 @@ export default function ThemeStudio() {
                     ['bg', 'Background Utama', colors.bg],
                     ['paper', 'Kartu Kontainer', colors.paper],
                     ['accent', 'Aksen / Emas', colors.accent],
+                    ['accentSoft', 'Aksen Lembut', colors.accentSoft],
                     ['fg', 'Warna Teks Utama', colors.fg],
                     ['muted', 'Warna Teks Redup', colors.muted],
                     ['cover', 'Warna Sampul', colors.cover],
                   ].map(([key, label, val]) => (
-                    <div key={key} className="border border-ink/15 p-2.5 rounded bg-ivory/20 flex items-center justify-between">
+                    <div key={key} className="border border-ink/15 p-2.5 rounded-sm bg-ivory/20 flex items-center justify-between">
                       <div>
                         <p className="text-[11px] font-medium">{label}</p>
                         <p className="text-[10px] font-mono text-stone">{val}</p>
@@ -419,7 +481,7 @@ export default function ThemeStudio() {
                         key={fVal}
                         type="button"
                         onClick={() => setFonts((prev) => ({ ...prev, display: fVal, customGoogleFont: '' }))}
-                        className={`p-2.5 text-left border rounded text-xs transition-colors ${
+                        className={`p-2.5 text-left border rounded-sm text-xs transition-colors ${
                           fonts.display === fVal && !fonts.customGoogleFont ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
                       >
@@ -432,7 +494,7 @@ export default function ThemeStudio() {
 
                 <div className="border-t border-ink/10 pt-4">
                   <label className="block text-xs uppercase tracking-wider text-stone mb-1">
-                    Atau Ketik Nama Google Font Sendiri (Bebas)
+                    Atau Ketik Nama Google Font Sendiri
                   </label>
                   <input
                     type="text"
@@ -442,7 +504,7 @@ export default function ThemeStudio() {
                     placeholder="Contoh: Pinyon Script, Italiana, Bodoni Moda..."
                   />
                   <p className="text-[10px] text-stone mt-1">
-                    Cukup masukkan nama font dari Google Fonts, sistem otomatis me-load secara live!
+                    Cukup masukkan nama font dari Google Fonts, sistem otomatis me-load secara live.
                   </p>
                 </div>
               </div>
@@ -456,14 +518,14 @@ export default function ThemeStudio() {
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     {[
                       ['fullscreen', 'Fullscreen Cinematic', 'Foto penuh dengan nama besar'],
-                      ['arch', 'Arch Window', 'Foto dalam bingkai lengkung kafe'],
+                      ['arch', 'Arch Window', 'Foto dalam bingkai lengkung arsitektur'],
                       ['classic', 'Classic Gold Frame', 'Bingkai sudut ukiran mewah'],
                     ].map(([cVal, cLabel, cDesc]) => (
                       <button
                         key={cVal}
                         type="button"
                         onClick={() => setCoverStyle(cVal)}
-                        className={`p-3 text-left border rounded transition-colors ${
+                        className={`p-3 text-left border rounded-sm transition-colors ${
                           coverStyle === cVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
                       >
@@ -486,7 +548,7 @@ export default function ThemeStudio() {
                         key={aVal}
                         type="button"
                         onClick={() => setOpeningAnimation(aVal)}
-                        className={`p-3 text-left border rounded transition-colors ${
+                        className={`p-3 text-left border rounded-sm transition-colors ${
                           openingAnimation === aVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
                       >
@@ -516,7 +578,7 @@ export default function ThemeStudio() {
                         key={oVal}
                         type="button"
                         onClick={() => setOrnamentStyle(oVal)}
-                        className={`p-3 text-left border rounded transition-colors ${
+                        className={`p-3 text-left border rounded-sm transition-colors ${
                           ornamentStyle === oVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
                       >
@@ -539,7 +601,7 @@ export default function ThemeStudio() {
                         key={lVal}
                         type="button"
                         onClick={() => setLayoutStyle(lVal)}
-                        className={`p-3 text-left border rounded transition-colors ${
+                        className={`p-3 text-left border rounded-sm transition-colors ${
                           layoutStyle === lVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
                       >
@@ -560,17 +622,17 @@ export default function ThemeStudio() {
 
                 <div className="grid grid-cols-2 gap-2.5">
                   {[
-                    ['gold_dust', '✨ Debu Emas Berkilau', 'Partikel emas berkilauan melayang ke atas'],
-                    ['petals', '🌸 Kelopak Mawar/Sakura', 'Kelopak bunga berjatuhan lembut'],
-                    ['melati', '🌿 Ronce Melati Halus', 'Bunga melati putih berjatuhan santai'],
-                    ['bokeh', '⚪ Warm Bokeh Light', 'Lingkaran cahaya hangat mengambang'],
-                    ['none', '🚫 Tanpa Partikel', 'Layar polos bersih tanpa animasi partikel'],
+                    ['gold_dust', 'Debu Emas Berkilau', 'Partikel emas berkilauan melayang ke atas'],
+                    ['petals', 'Kelopak Mawar/Sakura', 'Kelopak bunga berjatuhan lembut'],
+                    ['melati', 'Ronce Melati Halus', 'Bunga melati putih berjatuhan santai'],
+                    ['bokeh', 'Warm Bokeh Light', 'Lingkaran cahaya hangat mengambang'],
+                    ['none', 'Tanpa Partikel', 'Layar polos bersih tanpa animasi partikel'],
                   ].map(([pVal, pLabel, pDesc]) => (
                     <button
                       key={pVal}
                       type="button"
                       onClick={() => setParticleEffect(pVal)}
-                      className={`p-3 text-left border rounded transition-colors ${
+                      className={`p-3 text-left border rounded-sm transition-colors ${
                         particleEffect === pVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                       }`}
                     >
@@ -582,18 +644,75 @@ export default function ThemeStudio() {
               </div>
             )}
 
-            {/* TAB 7: UPLOAD ASET PRIBADI */}
+            {/* TAB 7: UPLOAD ASET PRIBADI LENGKAP */}
             {activeTab === 'assets' && (
               <div className="space-y-4">
-                <h3 className="font-display text-lg mb-1">Upload Aset Desain Sendiri</h3>
-                <p className="text-xs text-stone mb-4">Unggah logo inisial keluarga, gambar background watercolor, atau cover sendiri:</p>
+                <h3 className="font-display text-lg mb-1">Upload Aset Desain Lengkap</h3>
+                <p className="text-xs text-stone mb-4">Unggah gambar latar sampul, latar belakang undangan, logo inisial, dan ornamen buatan sendiri:</p>
 
-                {/* Monogram Logo */}
-                <div className="border border-ink/15 p-4 rounded bg-ivory/30">
+                {/* 1. Background Cover Utama */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <p className="text-xs font-medium">Logo Monogram / Inisial (PNG Transparan)</p>
-                      <p className="text-[10px] text-stone">Tampil di header cover dan stempel penutup.</p>
+                      <p className="text-xs font-medium">1. Gambar Latar Sampul (Cover Background)</p>
+                      <p className="text-[10px] text-stone">Foto latar belakang layar pembuka undangan.</p>
+                    </div>
+                    <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
+                      {uploadingAsset === 'coverImgUrl' ? 'Mengunggah...' : 'Upload Foto'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleAssetUpload('coverImgUrl', e)}
+                      />
+                    </label>
+                  </div>
+                  {customAssets.coverImgUrl && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <img src={customAssets.coverImgUrl} alt="Cover" className="w-14 h-9 object-cover border" />
+                      <span className="text-[10px] text-green-700 font-medium">✓ Foto Sampul Terpasang</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Background Latar Isi Undangan */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <p className="text-xs font-medium">2. Gambar Latar Undangan (Body Background Texture)</p>
+                      <p className="text-[10px] text-stone">Motif watercolor/batik/gedung untuk latar belakang isi.</p>
+                    </div>
+                    <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
+                      {uploadingAsset === 'bgTextureUrl' ? 'Mengunggah...' : 'Upload Gambar'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleAssetUpload('bgTextureUrl', e)}
+                      />
+                    </label>
+                  </div>
+                  {customAssets.bgTextureUrl && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <img src={customAssets.bgTextureUrl} alt="Texture" className="w-14 h-9 object-cover border" />
+                      <span className="text-[10px] text-green-700 font-medium">✓ Latar Isi Terpasang</span>
+                      <button
+                        type="button"
+                        onClick={() => setCustomAssets((prev) => ({ ...prev, bgTextureUrl: '' }))}
+                        className="text-[10px] text-red-600 underline ml-auto"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Logo Monogram / Inisial Pengantin */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <p className="text-xs font-medium">3. Logo Monogram / Inisial (PNG Transparan)</p>
+                      <p className="text-[10px] text-stone">Lambang mahkota / inisial pengantin.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
                       {uploadingAsset === 'monogramUrl' ? 'Mengunggah...' : 'Upload PNG'}
@@ -609,31 +728,45 @@ export default function ThemeStudio() {
                     <div className="mt-2 flex items-center gap-2">
                       <img src={customAssets.monogramUrl} alt="Monogram" className="w-10 h-10 object-contain border p-1 bg-white" />
                       <span className="text-[10px] text-green-700 font-medium">✓ Monogram Aktif</span>
+                      <button
+                        type="button"
+                        onClick={() => setCustomAssets((prev) => ({ ...prev, monogramUrl: '' }))}
+                        className="text-[10px] text-red-600 underline ml-auto"
+                      >
+                        Hapus
+                      </button>
                     </div>
                   )}
                 </div>
 
-                {/* Custom Cover Photo */}
-                <div className="border border-ink/15 p-4 rounded bg-ivory/30">
+                {/* 4. Ornamen / Divider Bunga Kustom */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <p className="text-xs font-medium">Foto Sampul Utama (Cover Image)</p>
-                      <p className="text-[10px] text-stone">Foto pembuka layar saat undangan pertama dibuka.</p>
+                      <p className="text-xs font-medium">4. Ornamen / Garis Pemisah Kustom (PNG Transparan)</p>
+                      <p className="text-[10px] text-stone">Ranting bunga / ukiran khusus untuk pemisah antar bagian.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
-                      {uploadingAsset === 'coverImgUrl' ? 'Mengunggah...' : 'Upload Foto'}
+                      {uploadingAsset === 'customOrnamentUrl' ? 'Mengunggah...' : 'Upload PNG'}
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/png,image/webp"
                         className="hidden"
-                        onChange={(e) => handleAssetUpload('coverImgUrl', e)}
+                        onChange={(e) => handleAssetUpload('customOrnamentUrl', e)}
                       />
                     </label>
                   </div>
-                  {customAssets.coverImgUrl && (
+                  {customAssets.customOrnamentUrl && (
                     <div className="mt-2 flex items-center gap-2">
-                      <img src={customAssets.coverImgUrl} alt="Cover" className="w-12 h-8 object-cover border" />
-                      <span className="text-[10px] text-green-700 font-medium">✓ Foto Cover Terpasang</span>
+                      <img src={customAssets.customOrnamentUrl} alt="Ornament" className="h-8 object-contain border p-1 bg-white" />
+                      <span className="text-[10px] text-green-700 font-medium">✓ Ornamen Kustom Aktif</span>
+                      <button
+                        type="button"
+                        onClick={() => setCustomAssets((prev) => ({ ...prev, customOrnamentUrl: '' }))}
+                        className="text-[10px] text-red-600 underline ml-auto"
+                      >
+                        Hapus
+                      </button>
                     </div>
                   )}
                 </div>
@@ -642,25 +775,25 @@ export default function ThemeStudio() {
 
             {error && <p className="text-xs text-red-600 font-medium">✕ {error}</p>}
             {savedThemeId && (
-              <div className="p-3 bg-green-50 border border-green-200 text-green-800 text-xs rounded">
+              <div className="p-3 bg-green-50 border border-green-200 text-green-800 text-xs rounded-sm">
                 ✓ <strong>Tema Berhasil Disimpan!</strong> ID: <code className="font-mono bg-green-100 px-1 py-0.5">{savedThemeId}</code>
               </div>
             )}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Interactive Live Preview (7 Cols) */}
+        {/* RIGHT COLUMN: Full Comprehensive Live Preview (7 Cols) */}
         <div className="lg:col-span-6 xl:col-span-7 flex flex-col items-center sticky top-20">
           {/* Device Switcher Toolbar */}
           <div className="flex items-center justify-between w-full max-w-sm mb-3">
             <span className="text-[11px] uppercase tracking-wider text-stone font-medium">
-              Live Preview
+              Live Interactive Preview
             </span>
-            <div className="flex items-center gap-1 bg-paper border border-ink/15 p-0.5 rounded">
+            <div className="flex items-center gap-1 bg-paper border border-ink/15 p-0.5 rounded-sm">
               <button
                 type="button"
                 onClick={() => setPreviewDevice('mobile')}
-                className={`p-1.5 rounded transition-colors ${previewDevice === 'mobile' ? 'bg-ink text-ivory' : 'text-stone hover:text-ink'}`}
+                className={`p-1.5 rounded-sm transition-colors ${previewDevice === 'mobile' ? 'bg-ink text-ivory' : 'text-stone hover:text-ink'}`}
                 title="Tampilan HP"
               >
                 <Smartphone size={14} />
@@ -668,7 +801,7 @@ export default function ThemeStudio() {
               <button
                 type="button"
                 onClick={() => setPreviewDevice('tablet')}
-                className={`p-1.5 rounded transition-colors ${previewDevice === 'tablet' ? 'bg-ink text-ivory' : 'text-stone hover:text-ink'}`}
+                className={`p-1.5 rounded-sm transition-colors ${previewDevice === 'tablet' ? 'bg-ink text-ivory' : 'text-stone hover:text-ink'}`}
                 title="Tampilan Tablet"
               >
                 <Tablet size={14} />
@@ -678,23 +811,26 @@ export default function ThemeStudio() {
 
           {/* Device Frame Simulation */}
           <div
-            className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#2B2B2B] rounded-[40px] transition-all duration-300 ${
-              previewDevice === 'mobile' ? 'w-full max-w-[370px] h-[680px]' : 'w-full max-w-[500px] h-[680px]'
+            className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 ${
+              previewDevice === 'mobile' ? 'w-full max-w-[380px] h-[720px]' : 'w-full max-w-[520px] h-[720px]'
             }`}
           >
-            {/* Speaker / Camera Notch */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-5 bg-[#2B2B2B] rounded-b-xl z-50 flex items-center justify-center">
-              <div className="w-3 h-3 rounded-full bg-stone-900 border border-stone-800" />
+            {/* Camera / Speaker Island */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-4 bg-[#222222] rounded-b-xl z-50 flex items-center justify-center">
+              <div className="w-2.5 h-2.5 rounded-full bg-stone-950 border border-stone-800" />
             </div>
 
             {/* Atmosphere Particles Layer */}
             <AtmosphereParticles effect={particleEffect} accentColor={colors.accent} />
 
-            {/* Interactive Invitation Preview Frame */}
+            {/* Interactive Full Invitation Preview Container */}
             <div
-              className="w-full h-full overflow-y-auto"
+              className="w-full h-full overflow-y-auto relative scroll-smooth"
               style={{
                 backgroundColor: colors.bg,
+                backgroundImage: customAssets.bgTextureUrl ? `url(${customAssets.bgTextureUrl})` : 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 color: colors.fg,
                 fontFamily: fonts.body,
               }}
@@ -705,7 +841,7 @@ export default function ThemeStudio() {
                   <motion.div
                     className="absolute inset-0 z-30 flex flex-col justify-end p-6 text-center overflow-hidden"
                     style={{
-                      backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 60%, ${colors.cover} 100%), url(${customAssets.coverImgUrl})`,
+                      backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 60%, ${colors.cover} 100%), url(${customAssets.coverImgUrl})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                     }}
@@ -717,9 +853,12 @@ export default function ThemeStudio() {
                         : { opacity: 0, y: -40, filter: 'blur(10px)', transition: { duration: 0.8 } }
                     }
                   >
-                    {customAssets.monogramUrl && (
+                    {customAssets.monogramUrl ? (
                       <img src={customAssets.monogramUrl} alt="Logo" className="w-16 h-16 mx-auto mb-3 object-contain drop-shadow" />
+                    ) : (
+                      <div className="w-10 h-[1px] mx-auto mb-3" style={{ background: colors.accent }} />
                     )}
+
                     <p className="text-[10px] uppercase tracking-[0.3em] text-white/80">THE WEDDING OF</p>
                     <h2
                       className="text-4xl sm:text-5xl text-white my-2 italic drop-shadow"
@@ -730,15 +869,15 @@ export default function ThemeStudio() {
                     <div className="w-12 h-[1px] mx-auto my-2" style={{ background: colors.accent }} />
                     <p className="text-xs uppercase tracking-widest text-white/90 mb-6">Sabtu, 20 November 2026</p>
 
-                    <div className="bg-white/10 backdrop-blur-md border border-white/20 p-3 rounded mb-6 text-left">
+                    <div className="bg-white/10 backdrop-blur-md border border-white/20 p-3.5 rounded-sm mb-6 text-left">
                       <p className="text-[10px] text-white/70">Kepada Yth.</p>
-                      <p className="text-xs font-semibold text-white">Bapak/Ibu/Saudara/i</p>
+                      <p className="text-sm font-semibold text-white">Bapak Joko Wahyudi &amp; Keluarga</p>
                     </div>
 
                     <button
                       type="button"
                       onClick={() => setPreviewOpened(true)}
-                      className="w-full py-3 text-xs uppercase tracking-[0.2em] font-semibold text-white shadow-lg transition-transform active:scale-95"
+                      className="w-full py-3.5 text-xs uppercase tracking-[0.2em] font-semibold text-white shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
                       style={{ background: colors.accent }}
                     >
                       Buka Undangan
@@ -747,8 +886,8 @@ export default function ThemeStudio() {
                 )}
               </AnimatePresence>
 
-              {/* MAIN CONTENT LAYER AFTER OPENED */}
-              <div className="p-6 space-y-8 pt-10">
+              {/* FULL MAIN INVITATION CONTENT (AFTER OPENED) */}
+              <div className="p-5 sm:p-6 space-y-10 pt-10 pb-20">
                 {/* Reset Preview Button Floating inside */}
                 <div className="flex justify-between items-center pb-2 border-b border-black/10">
                   <span className="text-[10px] uppercase tracking-wider" style={{ color: colors.muted }}>
@@ -757,97 +896,310 @@ export default function ThemeStudio() {
                   <button
                     type="button"
                     onClick={() => setPreviewOpened(false)}
-                    className="text-[10px] underline"
+                    className="text-[10px] underline font-medium"
                     style={{ color: colors.accent }}
                   >
-                    Tutup Cover
+                    Tutup Sampul
                   </button>
                 </div>
 
-                {/* Hero Header */}
-                <section className="text-center">
+                {/* 1. HERO HEADER */}
+                <section className="text-center pt-2">
                   {customAssets.monogramUrl && (
-                    <img src={customAssets.monogramUrl} alt="Logo" className="w-12 h-12 mx-auto mb-2 object-contain" />
+                    <img src={customAssets.monogramUrl} alt="Logo" className="w-14 h-14 mx-auto mb-3 object-contain" />
                   )}
-                  <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>WALIMATUL 'URS</p>
-                  <h2 className="text-3xl italic my-1" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
+                  <p className="text-[10px] uppercase tracking-[0.28em]" style={{ color: colors.muted }}>
+                    WALIMATUL 'URS
+                  </p>
+                  <h2 className="text-3xl sm:text-4xl italic my-2" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
                     {previewData.bride.nick} &amp; {previewData.groom.nick}
                   </h2>
-                  <div className="w-10 h-[1px] mx-auto my-2" style={{ background: colors.accent }} />
-                  <p className="text-xs leading-relaxed" style={{ color: colors.muted }}>
-                    {previewData.quote}
+                  
+                  {customAssets.customOrnamentUrl ? (
+                    <img src={customAssets.customOrnamentUrl} alt="Divider" className="h-6 mx-auto my-3 object-contain" />
+                  ) : (
+                    <div className="w-12 h-[1px] mx-auto my-3" style={{ background: colors.accent }} />
+                  )}
+
+                  <p className="text-xs leading-relaxed max-w-xs mx-auto italic" style={{ color: colors.muted }}>
+                    "{previewData.quote}"
+                  </p>
+                  <p className="text-[10px] uppercase tracking-widest mt-2 font-medium" style={{ color: colors.accent }}>
+                    {previewData.quoteSource}
                   </p>
                 </section>
 
-                {/* Mempelai (Couple) Section */}
+                {/* 2. MEMPELAI (COUPLE) SECTION */}
                 <section className="space-y-4">
                   <div className="text-center">
-                    <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: colors.muted }}>PASANGAN MEMPELAI</p>
+                    <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>
+                      PASANGAN MEMPELAI
+                    </p>
                   </div>
 
                   {layoutStyle === 'side_by_side' ? (
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="border p-3 text-center" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
-                        <div className="aspect-[3/4] bg-stone-200 overflow-hidden mb-2">
-                          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Bride" className="w-full h-full object-cover" />
+                      {/* Bride Card */}
+                      <div className="border p-3.5 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                        <div className="aspect-[3/4] overflow-hidden mb-2.5">
+                          <img src={previewData.bride.photo} alt="Bride" className="w-full h-full object-cover" />
                         </div>
-                        <h4 className="text-sm font-semibold uppercase tracking-wider" style={{ fontFamily: activeDisplayFont }}>{previewData.bride.full}</h4>
-                        <p className="text-[10px] mt-1" style={{ color: colors.muted }}>{previewData.bride.parents}</p>
+                        <h4 className="text-xs font-bold uppercase tracking-wider" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
+                          {previewData.bride.full}
+                        </h4>
+                        <p className="text-[10px] mt-1.5 leading-relaxed" style={{ color: colors.muted }}>
+                          {previewData.bride.parents}
+                        </p>
+                        <p className="text-[10px] mt-2 font-medium" style={{ color: colors.accent }}>
+                          @{previewData.bride.ig}
+                        </p>
                       </div>
-                      <div className="border p-3 text-center" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
-                        <div className="aspect-[3/4] bg-stone-200 overflow-hidden mb-2">
-                          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Groom" className="w-full h-full object-cover" />
+
+                      {/* Groom Card */}
+                      <div className="border p-3.5 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                        <div className="aspect-[3/4] overflow-hidden mb-2.5">
+                          <img src={previewData.groom.photo} alt="Groom" className="w-full h-full object-cover" />
                         </div>
-                        <h4 className="text-sm font-semibold uppercase tracking-wider" style={{ fontFamily: activeDisplayFont }}>{previewData.groom.full}</h4>
-                        <p className="text-[10px] mt-1" style={{ color: colors.muted }}>{previewData.groom.parents}</p>
+                        <h4 className="text-xs font-bold uppercase tracking-wider" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
+                          {previewData.groom.full}
+                        </h4>
+                        <p className="text-[10px] mt-1.5 leading-relaxed" style={{ color: colors.muted }}>
+                          {previewData.groom.parents}
+                        </p>
+                        <p className="text-[10px] mt-2 font-medium" style={{ color: colors.accent }}>
+                          @{previewData.groom.ig}
+                        </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <div className="border p-4 text-center" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
-                        <h4 className="text-base font-semibold" style={{ fontFamily: activeDisplayFont }}>{previewData.bride.full}</h4>
-                        <p className="text-xs" style={{ color: colors.muted }}>{previewData.bride.parents}</p>
+                    <div className="space-y-4">
+                      {/* Stacked Bride Card */}
+                      <div className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                        <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2" style={{ borderColor: colors.accent }}>
+                          <img src={previewData.bride.photo} alt="Bride" className="w-full h-full object-cover" />
+                        </div>
+                        <h4 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
+                          {previewData.bride.full}
+                        </h4>
+                        <p className="text-xs mt-1" style={{ color: colors.muted }}>
+                          {previewData.bride.parents}
+                        </p>
+                        <p className="text-xs mt-2 font-medium" style={{ color: colors.accent }}>
+                          @{previewData.bride.ig}
+                        </p>
                       </div>
-                      <div className="border p-4 text-center" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
-                        <h4 className="text-base font-semibold" style={{ fontFamily: activeDisplayFont }}>{previewData.groom.full}</h4>
-                        <p className="text-xs" style={{ color: colors.muted }}>{previewData.groom.parents}</p>
+
+                      {/* Stacked Groom Card */}
+                      <div className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                        <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2" style={{ borderColor: colors.accent }}>
+                          <img src={previewData.groom.photo} alt="Groom" className="w-full h-full object-cover" />
+                        </div>
+                        <h4 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
+                          {previewData.groom.full}
+                        </h4>
+                        <p className="text-xs mt-1" style={{ color: colors.muted }}>
+                          {previewData.groom.parents}
+                        </p>
+                        <p className="text-xs mt-2 font-medium" style={{ color: colors.accent }}>
+                          @{previewData.groom.ig}
+                        </p>
                       </div>
                     </div>
                   )}
                 </section>
 
-                {/* Acara (Events) Section */}
+                {/* 3. KISAH CINTA (LOVE STORY TIMELINE) */}
                 <section className="space-y-3">
                   <div className="text-center">
-                    <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: colors.muted }}>SAVE OUR DATE</p>
+                    <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>OUR LOVE STORY</p>
+                    <h3 className="text-lg font-display mt-0.5" style={{ color: colors.fg }}>Perjalanan Cinta Kami</h3>
                   </div>
-                  {previewData.events.map((ev) => (
-                    <div key={ev.title} className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
-                      <h4 className="text-xs uppercase tracking-widest font-semibold" style={{ color: colors.accent }}>{ev.title}</h4>
-                      <p className="text-sm font-bold mt-1" style={{ color: colors.fg }}>{ev.time}</p>
-                      <p className="text-xs font-medium mt-0.5">{ev.venue}</p>
-                      <p className="text-[11px]" style={{ color: colors.muted }}>{ev.address}</p>
-                      <button
-                        type="button"
-                        className="mt-3 inline-block text-[10px] uppercase tracking-wider px-3 py-1.5 border"
-                        style={{ color: colors.accent, borderColor: colors.accent }}
-                      >
-                        Google Maps
-                      </button>
-                    </div>
-                  ))}
+                  <div className="space-y-2.5">
+                    {previewData.story.map((st) => (
+                      <div key={st.year} className="border p-3 rounded-sm text-left flex gap-3" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                        <span className="font-bold text-xs font-mono" style={{ color: colors.accent }}>{st.year}</span>
+                        <div>
+                          <p className="text-xs font-semibold" style={{ color: colors.fg }}>{st.title}</p>
+                          <p className="text-[11px] leading-relaxed mt-0.5" style={{ color: colors.muted }}>{st.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </section>
 
-                {/* Watermark Footer */}
-                <footer className="text-center pt-6 border-t border-black/10">
-                  <p className="text-[11px] italic" style={{ fontFamily: activeDisplayFont }}>
-                    {previewData.bride.nick} &amp; {previewData.groom.nick}
+                {/* 4. COUNTDOWN TIMER */}
+                <section className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                  <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>MENGHITUNG HARI</p>
+                  <div className="grid grid-cols-4 gap-2 mt-3">
+                    {[
+                      ['88', 'Hari'],
+                      ['14', 'Jam'],
+                      ['32', 'Menit'],
+                      ['45', 'Detik'],
+                    ].map(([num, lbl]) => (
+                      <div key={lbl} className="p-2 border rounded-sm" style={{ borderColor: colors.accentSoft, backgroundColor: colors.bg }}>
+                        <p className="text-lg font-bold font-mono" style={{ color: colors.accent }}>{num}</p>
+                        <p className="text-[9px] uppercase tracking-wider" style={{ color: colors.muted }}>{lbl}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* 5. ACARA (EVENTS) */}
+                <section className="space-y-3">
+                  <div className="text-center">
+                    <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>SAVE OUR DATE</p>
+                    <h3 className="text-lg font-display mt-0.5" style={{ color: colors.fg }}>Rangkaian Acara</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {previewData.events.map((ev) => (
+                      <div key={ev.title} className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                        <h4 className="text-xs uppercase tracking-widest font-semibold" style={{ color: colors.accent }}>{ev.title}</h4>
+                        <p className="text-sm font-bold mt-1" style={{ color: colors.fg }}>{ev.time}</p>
+                        <p className="text-xs font-semibold mt-1" style={{ color: colors.fg }}>{ev.venue}</p>
+                        <p className="text-[11px] leading-relaxed mt-0.5" style={{ color: colors.muted }}>{ev.address}</p>
+                        <div className="mt-3 flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            className="text-[10px] uppercase tracking-wider px-3 py-1.5 border font-medium"
+                            style={{ color: colors.accent, borderColor: colors.accent }}
+                          >
+                            Google Maps
+                          </button>
+                          <button
+                            type="button"
+                            className="text-[10px] uppercase tracking-wider px-3 py-1.5 border font-medium"
+                            style={{ color: colors.accent, borderColor: colors.accent }}
+                          >
+                            Waze
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* 6. GALERI PREWEDDING */}
+                <section className="space-y-3">
+                  <div className="text-center">
+                    <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>MOMENT OF LOVE</p>
+                    <h3 className="text-lg font-display mt-0.5" style={{ color: colors.fg }}>Galeri Foto</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {previewData.gallery.map((imgUrl, i) => (
+                      <div key={i} className="aspect-[4/5] overflow-hidden border" style={{ borderColor: colors.accentSoft }}>
+                        <img src={imgUrl} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* 7. DOA & UCAPAN (WISHES & RSVP) */}
+                <section className="border p-4 text-center rounded-sm space-y-3" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>RSVP &amp; UCAPAN</p>
+                    <h3 className="text-base font-display mt-0.5" style={{ color: colors.fg }}>Kirim Doa &amp; Konfirmasi</h3>
+                  </div>
+                  <div className="space-y-2 text-left">
+                    {previewData.wishes.map((w, idx) => (
+                      <div key={idx} className="border-l-2 pl-3 py-1.5" style={{ borderColor: colors.accent }}>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-semibold" style={{ color: colors.fg }}>{w.name}</p>
+                          <span className="text-[9px] text-green-700 font-medium">{w.status}</span>
+                        </div>
+                        <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: colors.muted }}>"{w.msg}"</p>
+                        {w.reply && (
+                          <div className="mt-1 bg-black/5 p-1.5 rounded-xs text-[10px]" style={{ color: colors.fg }}>
+                            <span className="font-semibold" style={{ color: colors.accent }}>Balasan: </span>
+                            {w.reply}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* 8. TANDA KASIH (WEDDING GIFT) */}
+                <section className="border p-4 text-center rounded-sm space-y-3" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>WEDDING GIFT</p>
+                    <h3 className="text-base font-display mt-0.5" style={{ color: colors.fg }}>Tanda Kasih</h3>
+                    <p className="text-[11px] mt-1" style={{ color: colors.muted }}>
+                      Doa restu Anda adalah kado terindah bagi kami.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {previewData.banks.map((b) => (
+                      <div key={b.number} className="border p-3 text-center rounded-sm" style={{ borderColor: colors.accentSoft, backgroundColor: colors.bg }}>
+                        <p className="text-xs font-bold" style={{ color: colors.fg }}>{b.bank}</p>
+                        <p className="font-mono text-sm font-semibold my-1" style={{ color: colors.accent }}>{b.number}</p>
+                        <p className="text-[10px]" style={{ color: colors.muted }}>a.n. {b.name}</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(b.number)
+                            setCopiedBank(b.bank)
+                            setTimeout(() => setCopiedBank(''), 1500)
+                          }}
+                          className="mt-2 text-[10px] uppercase tracking-wider px-3 py-1 border font-medium"
+                          style={{ color: colors.accent, borderColor: colors.accent }}
+                        >
+                          {copiedBank === b.bank ? 'Tersalin' : 'Salin Rekening'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* 9. PHOTOBOOTH & STORY CARD */}
+                <section className="border p-4 text-center rounded-sm" style={{ backgroundColor: colors.paper, borderColor: colors.accentSoft }}>
+                  <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>CAPTURE THE MOMENT</p>
+                  <h3 className="text-base font-display mt-0.5" style={{ color: colors.fg }}>Frame Foto &amp; Story</h3>
+                  <p className="text-[11px] mt-1" style={{ color: colors.muted }}>
+                    Abadikan momen bahagiamu dan buat frame foto Instagram Story eksklusif.
                   </p>
-                  <p className="text-[9px] uppercase tracking-widest mt-1" style={{ color: colors.muted }}>
-                    Dibuat dengan Aruna
+                  <button
+                    type="button"
+                    className="mt-3 text-[10px] uppercase tracking-wider px-4 py-2 font-medium text-white shadow-sm"
+                    style={{ background: colors.accent }}
+                  >
+                    Buat Frame Foto &amp; Story
+                  </button>
+                </section>
+
+                {/* 10. PENUTUP & WATERMARK */}
+                <footer className="text-center pt-8 border-t border-black/10 space-y-2">
+                  <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>KAMI YANG BERBAHAGIA</p>
+                  <h3 className="text-2xl italic" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
+                    {previewData.bride.nick} &amp; {previewData.groom.nick}
+                  </h3>
+                  <p className="text-[9px] uppercase tracking-widest font-medium mt-3" style={{ color: colors.accent }}>
+                    Aruna
                   </p>
                 </footer>
               </div>
+
+              {/* Floating Bottom Navigation Simulation */}
+              <nav
+                className="absolute inset-x-0 bottom-0 py-2.5 px-4 flex justify-around items-center border-t backdrop-blur-md z-20"
+                style={{ backgroundColor: `${colors.paper}EE`, borderColor: colors.accentSoft }}
+              >
+                <div className="flex flex-col items-center text-[9px] font-medium" style={{ color: colors.accent }}>
+                  <Users size={14} /> Mempelai
+                </div>
+                <div className="flex flex-col items-center text-[9px] font-medium" style={{ color: colors.muted }}>
+                  <CalendarDays size={14} /> Acara
+                </div>
+                <div className="flex flex-col items-center text-[9px] font-medium" style={{ color: colors.muted }}>
+                  <Images size={14} /> Galeri
+                </div>
+                <div className="flex flex-col items-center text-[9px] font-medium" style={{ color: colors.muted }}>
+                  <Heart size={14} /> RSVP
+                </div>
+                <div className="flex flex-col items-center text-[9px] font-medium" style={{ color: colors.muted }}>
+                  <Gift size={14} /> Kado
+                </div>
+              </nav>
             </div>
           </div>
         </div>
