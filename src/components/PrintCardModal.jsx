@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Printer, Download, QrCode, Sparkles, Check, Copy, Sliders, Layers, Upload, RefreshCw, Image as ImageIcon, Plus, Trash2, FileText, CheckCircle2 } from 'lucide-react'
+import { Printer, Download, QrCode, Sparkles, Check, Copy, Sliders, Layers, Upload, RefreshCw, Image as ImageIcon, Plus, Trash2, FileText, CheckCircle2, Scissors } from 'lucide-react'
 import { formatLongDate, invitationUrl, copyText } from '../lib/utils'
 import { uploadFile } from '../lib/api'
 
 // Preset background textures
 const bgTexturePresets = [
   { id: 'none', label: 'Polos Minimalis', url: '' },
-  { id: 'linen', label: 'Tekstur Kertas Linen', url: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=600&q=75' },
+  { id: 'linen', label: 'Kertas Linen', url: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=600&q=75' },
   { id: 'marble', label: 'Marmer Mewah', url: 'https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=600&q=75' },
   { id: 'gold-leaf', label: 'Emas Elegan', url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=75' },
   { id: 'floral', label: 'Bunga Pastel', url: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=600&q=75' },
@@ -17,6 +17,10 @@ export default function PrintCardModal({ item, onClose }) {
   const [themeStyle, setThemeStyle] = useState('gold-ivory') // 'gold-ivory' | 'monochrome' | 'sage-green' | 'royal-navy'
   const [activeTab, setActiveTab] = useState('text') // 'text' | 'image' | 'table' | 'layout'
   
+  // Layout density options
+  const [enclosureLayout, setEnclosureLayout] = useState('2-per-page') // '2-per-page' (A5) | '4-per-page' (A6)
+  const [tableLayout, setTableLayout] = useState('2-per-page') // '2-per-page' (A5) | '4-per-page' (A6) | 'tent-fold' (Tenda Lipat)
+
   // Custom Texts
   const [formData, setFormData] = useState({
     kicker: '',
@@ -44,9 +48,9 @@ export default function PrintCardModal({ item, onClose }) {
   const [showPhoto, setShowPhoto] = useState(false)
   const [photoUrl, setPhotoUrl] = useState('')
   const [photoShape, setPhotoShape] = useState('circle') // 'circle' | 'arch' | 'square'
-  const [photoSize, setPhotoSize] = useState(80) // px or %
+  const [photoSize, setPhotoSize] = useState(65) // px
   const [bgTextureUrl, setBgTextureUrl] = useState('')
-  const [bgOverlayOpacity, setBgOverlayOpacity] = useState(85) // 0 - 100
+  const [bgOverlayOpacity, setBgOverlayOpacity] = useState(88) // 0 - 100
   const [uploadingImage, setUploadingImage] = useState(false)
 
   // Table Cards Batch State
@@ -54,7 +58,7 @@ export default function PrintCardModal({ item, onClose }) {
   const [tablePrefix, setTablePrefix] = useState('MEJA ')
   const [tableStart, setTableStart] = useState(1)
   const [tableEnd, setTableEnd] = useState(8)
-  const [customTableListText, setCustomTableListText] = useState('MEJA VIP 1\nMEJA VIP 2\nMEJA KELUARGA\nMEJA REKAN KERJA\nMEJA SAHABAT')
+  const [customTableListText, setCustomTableListText] = useState('MEJA VIP 1\nMEJA VIP 2\nMEJA KELUARGA BESAR\nMEJA REKAN KERJA\nMEJA SAHABAT KAMPUS\nMEJA SAHABAT SMA')
 
   const [copied, setCopied] = useState(false)
   const [autoFilled, setAutoFilled] = useState(false)
@@ -72,7 +76,7 @@ export default function PrintCardModal({ item, onClose }) {
     const resepsi = item.events?.[1] || {}
     
     setFormData({
-      kicker: cardType === 'souvenir' ? 'Wedding Souvenir' : 'Undangan Pernikahan',
+      kicker: cardType === 'souvenir' ? 'Wedding Souvenir' : cardType === 'table' ? 'Nomor Meja Resepsi' : 'Undangan Pernikahan',
       brideNick: bNick,
       groomNick: gNick,
       brideFull: item.bride?.full || bNick,
@@ -89,7 +93,7 @@ export default function PrintCardModal({ item, onClose }) {
       resepsiVenue: resepsi.venue || item.location || 'Grand Ballroom',
       resepsiAddress: resepsi.address || '',
       quote: item.quote || 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri...',
-      subtitle: cardType === 'souvenir' ? 'Thank you for celebrating our special day with us' : 'Pindai QR Code untuk melihat undangan digital & konfirmasi kehadiran',
+      subtitle: cardType === 'souvenir' ? 'Terima kasih atas kehadiran & doa restu Anda' : cardType === 'table' ? 'Selamat Menikmati Jamuan' : 'Pindai QR Code untuk melihat undangan digital & konfirmasi kehadiran',
       footerNote: 'Mohon doa restu dan kehadiran Anda · Aruna Digital Invitation',
     })
 
@@ -118,34 +122,38 @@ export default function PrintCardModal({ item, onClose }) {
           badge: 'bg-black text-white',
           ornament: 'border-black',
           overlay: 'bg-white',
+          cutLine: 'border-dashed border-stone-400',
         }
       case 'sage-green':
         return {
           cardBg: 'bg-[#F4F7F4] text-[#2D3B2D] border-[#8FA88F]',
           accent: 'text-[#557555]',
-          border: 'border-[#8FA88F]/40',
+          border: 'border-[#8FA88F]/50',
           badge: 'bg-[#557555] text-white',
           ornament: 'border-[#557555]',
           overlay: 'bg-[#F4F7F4]',
+          cutLine: 'border-dashed border-[#8FA88F]/60',
         }
       case 'royal-navy':
         return {
           cardBg: 'bg-[#0F172A] text-[#F8FAFC] border-[#C5A059]',
           accent: 'text-[#E2C275]',
-          border: 'border-[#C5A059]/40',
+          border: 'border-[#C5A059]/50',
           badge: 'bg-[#C5A059] text-[#0F172A]',
           ornament: 'border-[#C5A059]',
           overlay: 'bg-[#0F172A]',
+          cutLine: 'border-dashed border-[#C5A059]/60',
         }
       case 'gold-ivory':
       default:
         return {
-          cardBg: 'bg-[#FAF8F5] text-[#2C241D] border-[#C5A059]/60',
+          cardBg: 'bg-[#FAF8F5] text-[#2C241D] border-[#C5A059]/70',
           accent: 'text-[#96742E]',
-          border: 'border-[#C5A059]/30',
+          border: 'border-[#C5A059]/40',
           badge: 'bg-[#96742E] text-white',
           ornament: 'border-[#C5A059]',
           overlay: 'bg-[#FAF8F5]',
+          cutLine: 'border-dashed border-[#C5A059]/60',
         }
     }
   }
@@ -220,163 +228,245 @@ export default function PrintCardModal({ item, onClose }) {
   }
 
   // Render photo component
-  const renderPhotoBadge = () => {
+  const renderPhotoBadge = (customSize = null) => {
     if (!showPhoto || !photoUrl) return null
+    const size = customSize || photoSize
     const shapeClass = photoShape === 'circle' ? 'rounded-full' : photoShape === 'arch' ? 'rounded-t-full rounded-b-xs' : 'rounded-xs'
     return (
-      <div className={`overflow-hidden border-2 border-current/30 shadow-xs my-1 mx-auto ${shapeClass}`} style={{ width: `${photoSize}px`, height: `${photoSize}px` }}>
+      <div className={`overflow-hidden border-2 border-current/30 shadow-xs my-0.5 mx-auto ${shapeClass}`} style={{ width: `${size}px`, height: `${size}px` }}>
         <img src={photoUrl} alt="Couple" className="w-full h-full object-cover object-top" />
       </div>
     )
   }
 
-  // Card Content Renderers
-  const renderCard = (tableLabel = '', idx = 1) => {
+  // ----------------------------------------------------
+  // CARD RENDERERS (EXACT PRINT DIMENSIONS)
+  // ----------------------------------------------------
+
+  // 1. SOUVENIR TAG CARD (Landscape 88mm x 62mm - Fits 8 per A4 Portrait Sheet)
+  const renderSouvenirCard = (idx = 1) => {
     const bgStyle = bgTextureUrl ? {
       backgroundImage: `url(${bgTextureUrl})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     } : {}
 
-    // SOUVENIR TAG (9 x 6 cm / 2x4 Grid A4)
-    if (cardType === 'souvenir') {
-      return (
-        <div
-          key={idx}
-          style={bgStyle}
-          className={`relative p-3.5 rounded-xs border-2 flex flex-col items-center justify-between text-center transition-all overflow-hidden ${styles.cardBg} ${styles.border} w-[215px] h-[300px] shadow-xs print:shadow-none print:m-0 print:border`}
-        >
-          {/* Overlay when background texture is active */}
-          {bgTextureUrl && (
-            <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
-          )}
-
-          <div className="relative z-10 w-full space-y-0.5">
-            <p className="text-[8px] uppercase tracking-[0.25em] font-semibold opacity-70">{formData.kicker || 'Wedding Souvenir'}</p>
-            <h4 className="font-display text-xl font-bold italic tracking-wide">{formData.brideNick} &amp; {formData.groomNick}</h4>
-            <div className="w-6 h-[1px] bg-current opacity-30 mx-auto my-0.5" />
-            <p className="text-[8px] opacity-80 leading-tight italic px-1 line-clamp-2">{formData.subtitle || 'Thank you for celebrating with us'}</p>
-          </div>
-
-          <div className="relative z-10 my-0.5 flex flex-col items-center">
-            {renderPhotoBadge()}
-            <div className="p-1.5 bg-white rounded-xs border border-black/10 shadow-xs mt-1">
-              <img src={qrCodeUrl} alt="QR Code" className="w-16 h-16 object-contain" />
-            </div>
-            <p className="text-[7px] uppercase tracking-widest opacity-70 font-semibold mt-1">Scan Galeri &amp; Doa</p>
-          </div>
-
-          <div className="relative z-10 w-full pt-1 border-t border-current/15">
-            <p className="text-[8px] uppercase tracking-widest font-semibold opacity-80">{formData.eventDate || 'Tanggal Acara'}</p>
-            <p className="text-[6px] uppercase tracking-wider opacity-60 mt-0.5">Aruna Digital</p>
-          </div>
-        </div>
-      )
-    }
-
-    // MINI ENCLOSURE CARD (10 x 15 cm / Postcard)
-    if (cardType === 'enclosure') {
-      return (
-        <div
-          key={idx}
-          style={bgStyle}
-          className={`relative p-5 rounded-xs border-2 flex flex-col items-center justify-between text-center transition-all overflow-hidden ${styles.cardBg} ${styles.border} w-[280px] h-[410px] shadow-xs print:shadow-none print:m-0 print:border`}
-        >
-          {bgTextureUrl && (
-            <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
-          )}
-
-          <div className="relative z-10 space-y-1 w-full">
-            <div className="w-8 h-8 mx-auto rounded-full border border-current/30 flex items-center justify-center font-display text-xs font-bold italic">
-              {formData.brideNick[0] || 'S'}&amp;{formData.groomNick[0] || 'B'}
-            </div>
-            <p className="text-[8px] uppercase tracking-[0.25em] font-semibold opacity-70">{formData.kicker || 'Undangan Pernikahan'}</p>
-            <h3 className="font-display text-xl font-bold tracking-tight">{couple}</h3>
-            {formData.brideParents && (
-              <p className="text-[7px] opacity-75 italic leading-tight line-clamp-1">{formData.brideParents}</p>
-            )}
-            <p className="text-[9px] font-semibold opacity-90">{formData.eventDate}</p>
-          </div>
-
-          <div className="relative z-10 space-y-1 flex flex-col items-center w-full">
-            {renderPhotoBadge()}
-            <div className="p-2 bg-white rounded-xs border border-black/10 shadow-xs">
-              <img src={qrCodeUrl} alt="QR Code" className="w-24 h-24 object-contain" />
-            </div>
-            <p className="text-[8px] leading-relaxed max-w-[220px] opacity-80 italic">{formData.subtitle}</p>
-          </div>
-
-          <div className="relative z-10 w-full pt-1.5 border-t border-current/15 text-[8px] font-mono opacity-70 break-all">
-            {fullUrl}
-          </div>
-        </div>
-      )
-    }
-
-    // TABLE TENT CARD (Nomor Meja)
-    if (cardType === 'table') {
-      const currentTable = tableLabel || formData.kicker || 'MEJA 01'
-      return (
-        <div
-          key={idx}
-          style={bgStyle}
-          className={`relative p-5 rounded-xs border-2 flex flex-col items-center justify-between text-center transition-all overflow-hidden ${styles.cardBg} ${styles.border} w-[280px] h-[390px] shadow-xs print:shadow-none print:m-0 print:border`}
-        >
-          {bgTextureUrl && (
-            <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
-          )}
-
-          <div className="relative z-10 space-y-0.5 w-full">
-            <p className="text-[8px] uppercase tracking-[0.25em] font-semibold opacity-70">The Wedding Of {couple}</p>
-            <div className="w-10 h-[1px] bg-current opacity-30 mx-auto my-1" />
-          </div>
-
-          {/* Big Table Number */}
-          <div className="relative z-10 space-y-1 my-1 w-full">
-            <h2 className="font-display text-3xl font-black uppercase tracking-wider">{currentTable}</h2>
-            <p className="text-[10px] italic opacity-85">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
-            {renderPhotoBadge()}
-          </div>
-
-          <div className="relative z-10 space-y-1 flex flex-col items-center">
-            <div className="p-1.5 bg-white rounded-xs border border-black/10 shadow-xs">
-              <img src={qrCodeUrl} alt="QR Code" className="w-20 h-20 object-contain" />
-            </div>
-            <p className="text-[8px] uppercase tracking-wider opacity-75 font-semibold">Scan untuk Foto &amp; Ucapan Live</p>
-          </div>
-
-          <p className="relative z-10 text-[8px] font-semibold opacity-60 uppercase tracking-widest">{formData.eventDate}</p>
-        </div>
-      )
-    }
-
-    // BIFOLD FOLDABLE INVITATION (2 Halaman Lipat A4 Landscape)
     return (
       <div
         key={idx}
         style={bgStyle}
-        className={`relative p-6 rounded-xs border-2 grid grid-cols-2 gap-4 text-center transition-all overflow-hidden ${styles.cardBg} ${styles.border} w-full max-w-[590px] min-h-[390px] mx-auto shadow-xs print:shadow-none print:m-0 print:border print:w-full print:max-w-none`}
+        className={`relative box-border p-2.5 rounded-xs border flex flex-col justify-between text-left overflow-hidden ${styles.cardBg} ${styles.border} w-[88mm] h-[62mm] shadow-xs print:shadow-none print:m-0`}
+      >
+        {bgTextureUrl && (
+          <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
+        )}
+
+        {/* Top: Kicker & Couple Name */}
+        <div className="relative z-10 flex items-start justify-between gap-1 border-b border-current/15 pb-1">
+          <div>
+            <p className="text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70 leading-none">{formData.kicker || 'WEDDING SOUVENIR'}</p>
+            <h4 className="font-display text-[15px] font-bold tracking-tight leading-tight mt-0.5">{formData.brideNick} &amp; {formData.groomNick}</h4>
+          </div>
+          <span className="text-[7.5px] font-semibold opacity-75 font-mono">{formData.eventDate}</span>
+        </div>
+
+        {/* Middle: Content + QR Code */}
+        <div className="relative z-10 grid grid-cols-12 gap-2 items-center my-0.5">
+          <div className="col-span-8 space-y-1">
+            <p className="text-[8px] opacity-85 leading-tight italic line-clamp-2">
+              "{formData.subtitle || 'Terima kasih atas kehadiran dan doa restu Anda'}"
+            </p>
+            {renderPhotoBadge(38)}
+          </div>
+          <div className="col-span-4 flex flex-col items-center justify-center text-center">
+            <div className="p-1 bg-white rounded-xs border border-black/10 shadow-xs">
+              <img src={qrCodeUrl} alt="QR" className="w-[34px] h-[34px] object-contain" />
+            </div>
+            <p className="text-[5.5px] uppercase tracking-widest font-bold opacity-75 mt-0.5">Scan Galeri &amp; Doa</p>
+          </div>
+        </div>
+
+        {/* Bottom Footer */}
+        <div className="relative z-10 flex items-center justify-between pt-1 border-t border-current/15 text-[6.5px] opacity-70">
+          <span>{fullUrl.replace(/^https?:\/\//, '')}</span>
+          <span className="font-semibold uppercase tracking-wider">Aruna Digital</span>
+        </div>
+      </div>
+    )
+  }
+
+  // 2. MINI ENCLOSURE CARD (A5 or A6)
+  const renderEnclosureCard = (sizeMode = '2-per-page', idx = 1) => {
+    const isA6 = sizeMode === '4-per-page'
+    const bgStyle = bgTextureUrl ? {
+      backgroundImage: `url(${bgTextureUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    } : {}
+
+    // A6 Size (88mm x 128mm - 4 per A4) or A5 Size (130mm x 185mm - 2 per A4)
+    const cardDimClass = isA6 ? 'w-[88mm] h-[128mm] p-3' : 'w-[130mm] h-[185mm] p-5'
+
+    return (
+      <div
+        key={idx}
+        style={bgStyle}
+        className={`relative box-border rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} ${cardDimClass} shadow-xs print:shadow-none print:m-0`}
+      >
+        {bgTextureUrl && (
+          <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
+        )}
+
+        <div className="relative z-10 space-y-1 w-full">
+          <div className={`mx-auto rounded-full border border-current/30 flex items-center justify-center font-display font-bold italic ${isA6 ? 'w-6 h-6 text-[9px]' : 'w-9 h-9 text-xs'}`}>
+            {formData.brideNick[0] || 'S'}&amp;{formData.groomNick[0] || 'B'}
+          </div>
+          <p className={`uppercase tracking-[0.25em] font-semibold opacity-70 ${isA6 ? 'text-[7px]' : 'text-[9px]'}`}>{formData.kicker || 'UNDANGAN PERNIKAHAN'}</p>
+          <h3 className={`font-display font-bold tracking-tight ${isA6 ? 'text-[15px]' : 'text-[22px]'}`}>{couple}</h3>
+          {formData.brideParents && !isA6 && (
+            <p className="text-[8px] opacity-75 italic leading-tight line-clamp-1">{formData.brideParents}</p>
+          )}
+          <p className={`font-semibold opacity-90 ${isA6 ? 'text-[8px]' : 'text-[10px]'}`}>{formData.eventDate}</p>
+        </div>
+
+        <div className="relative z-10 space-y-1 flex flex-col items-center w-full my-1">
+          {renderPhotoBadge(isA6 ? 42 : 65)}
+          <div className={`bg-white rounded-xs border border-black/10 shadow-xs ${isA6 ? 'p-1.5' : 'p-2'}`}>
+            <img src={qrCodeUrl} alt="QR Code" className={isA6 ? 'w-16 h-16 object-contain' : 'w-24 h-24 object-contain'} />
+          </div>
+          <p className={`leading-relaxed opacity-85 italic px-2 ${isA6 ? 'text-[7px] max-w-[80mm]' : 'text-[9px] max-w-[110mm]'}`}>{formData.subtitle}</p>
+        </div>
+
+        <div className={`relative z-10 w-full pt-1.5 border-t border-current/15 font-mono opacity-70 break-all ${isA6 ? 'text-[6.5px]' : 'text-[8.5px]'}`}>
+          {fullUrl}
+        </div>
+      </div>
+    )
+  }
+
+  // 3. TABLE CARD (Nomor Meja: A5 Standing or Tent Fold)
+  const renderTableCard = (tableLabel = 'MEJA 01', layoutMode = '2-per-page', idx = 1) => {
+    const isA6 = layoutMode === '4-per-page'
+    const isTent = layoutMode === 'tent-fold'
+    const currentTable = tableLabel || 'MEJA 01'
+
+    const bgStyle = bgTextureUrl ? {
+      backgroundImage: `url(${bgTextureUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    } : {}
+
+    // Tent Fold Card (180mm x 125mm folded horizontally)
+    if (isTent) {
+      return (
+        <div
+          key={idx}
+          style={bgStyle}
+          className={`relative box-border rounded-xs border grid grid-rows-2 text-center overflow-hidden ${styles.cardBg} ${styles.border} w-[180mm] h-[125mm] shadow-xs print:shadow-none print:m-0`}
+        >
+          {bgTextureUrl && (
+            <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
+          )}
+
+          {/* Top Half (Front Face) */}
+          <div className="relative z-10 p-3 flex flex-col items-center justify-between border-b border-dashed border-current/40">
+            <p className="text-[7.5px] uppercase tracking-[0.2em] font-semibold opacity-70">{couple} · {formData.eventDate}</p>
+            <div className="my-auto">
+              <h2 className="font-display text-2xl font-black uppercase tracking-wider">{currentTable}</h2>
+              <p className="text-[8px] italic opacity-80">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="p-0.5 bg-white rounded-xs border border-black/10">
+                <img src={qrCodeUrl} alt="QR" className="w-6 h-6 object-contain" />
+              </div>
+              <span className="text-[6.5px] uppercase tracking-wider opacity-70 font-semibold">Scan Galeri &amp; Doa</span>
+            </div>
+          </div>
+
+          {/* Bottom Half (Back Face - Inverted for folding) */}
+          <div className="relative z-10 p-3 flex flex-col items-center justify-between">
+            <p className="text-[7.5px] uppercase tracking-[0.2em] font-semibold opacity-70">{couple} · {formData.eventDate}</p>
+            <div className="my-auto">
+              <h2 className="font-display text-2xl font-black uppercase tracking-wider">{currentTable}</h2>
+              <p className="text-[8px] italic opacity-80">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
+            </div>
+            <p className="text-[6.5px] uppercase tracking-widest opacity-60">Aruna Digital Wedding</p>
+          </div>
+        </div>
+      )
+    }
+
+    // Standing Card (A5: 130mm x 185mm or A6: 88mm x 128mm)
+    const cardDimClass = isA6 ? 'w-[88mm] h-[128mm] p-3' : 'w-[130mm] h-[185mm] p-5'
+
+    return (
+      <div
+        key={idx}
+        style={bgStyle}
+        className={`relative box-border rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} ${cardDimClass} shadow-xs print:shadow-none print:m-0`}
+      >
+        {bgTextureUrl && (
+          <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
+        )}
+
+        <div className="relative z-10 space-y-0.5 w-full">
+          <p className={`uppercase tracking-[0.25em] font-semibold opacity-70 ${isA6 ? 'text-[7px]' : 'text-[9px]'}`}>The Wedding Of {couple}</p>
+          <div className="w-8 h-[1px] bg-current opacity-30 mx-auto my-1" />
+        </div>
+
+        {/* Big Table Number */}
+        <div className="relative z-10 space-y-1 my-auto w-full">
+          <h2 className={`font-display font-black uppercase tracking-wider ${isA6 ? 'text-2xl' : 'text-4xl'}`}>{currentTable}</h2>
+          <p className={`italic opacity-85 ${isA6 ? 'text-[8px]' : 'text-[10px]'}`}>{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
+          {renderPhotoBadge(isA6 ? 38 : 55)}
+        </div>
+
+        <div className="relative z-10 space-y-1 flex flex-col items-center">
+          <div className="p-1.5 bg-white rounded-xs border border-black/10 shadow-xs">
+            <img src={qrCodeUrl} alt="QR Code" className={isA6 ? 'w-14 h-14 object-contain' : 'w-20 h-20 object-contain'} />
+          </div>
+          <p className={`uppercase tracking-wider opacity-75 font-semibold ${isA6 ? 'text-[6.5px]' : 'text-[8px]'}`}>Scan untuk Foto &amp; Ucapan Live</p>
+        </div>
+
+        <p className={`relative z-10 font-semibold opacity-60 uppercase tracking-widest ${isA6 ? 'text-[7px]' : 'text-[8.5px]'}`}>{formData.eventDate}</p>
+      </div>
+    )
+  }
+
+  // 4. BIFOLD FOLDABLE INVITATION (A4 Landscape: 280mm x 190mm)
+  const renderBifoldCard = (idx = 1) => {
+    const bgStyle = bgTextureUrl ? {
+      backgroundImage: `url(${bgTextureUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    } : {}
+
+    return (
+      <div
+        key={idx}
+        style={bgStyle}
+        className={`relative box-border p-5 rounded-xs border-2 grid grid-cols-2 gap-4 text-center overflow-hidden ${styles.cardBg} ${styles.border} w-[280mm] h-[190mm] shadow-xs print:shadow-none print:m-0 print:border`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
         )}
 
         {/* Left Panel: Akad & Quotes */}
-        <div className="relative z-10 flex flex-col items-center justify-between pr-3 border-r border-dashed border-current/30">
+        <div className="relative z-10 flex flex-col items-center justify-between pr-4 border-r border-dashed border-current/40">
           <div className="space-y-1 w-full">
-            <p className="text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">Undangan Pernikahan</p>
-            <h4 className="font-display text-lg font-bold">{couple}</h4>
+            <p className="text-[8.5px] uppercase tracking-[0.2em] font-semibold opacity-70">Undangan Pernikahan</p>
+            <h4 className="font-display text-xl font-bold">{couple}</h4>
             <div className="w-8 h-[1px] bg-current opacity-30 mx-auto my-1" />
             {formData.quote && (
-              <p className="text-[7.5px] opacity-75 italic leading-tight px-1 line-clamp-3">“{formData.quote}”</p>
+              <p className="text-[8px] opacity-75 italic leading-relaxed px-2 line-clamp-3">“{formData.quote}”</p>
             )}
           </div>
 
-          <div className="space-y-1 text-[8.5px] opacity-85 leading-relaxed px-1 w-full py-1">
-            <p className="font-bold text-[9.5px] uppercase tracking-wider">{formData.akadTitle}</p>
+          <div className="space-y-1 text-[9px] opacity-90 leading-relaxed px-2 w-full py-1">
+            <p className="font-bold text-[10px] uppercase tracking-wider">{formData.akadTitle}</p>
             <p className="font-semibold">{formData.eventDate} · {formData.akadTime}</p>
             <p className="line-clamp-2">{formData.akadVenue}</p>
-            {formData.akadAddress && <p className="text-[7.5px] opacity-70 line-clamp-1">{formData.akadAddress}</p>}
+            {formData.akadAddress && <p className="text-[8px] opacity-70 line-clamp-1">{formData.akadAddress}</p>}
           </div>
 
           <div className="pt-2 border-t border-current/15 w-full space-y-1">
@@ -388,42 +478,63 @@ export default function PrintCardModal({ item, onClose }) {
         </div>
 
         {/* Right Panel: Resepsi & Digital RSVP */}
-        <div className="relative z-10 flex flex-col items-center justify-between pl-3">
+        <div className="relative z-10 flex flex-col items-center justify-between pl-4">
           <div className="space-y-1 w-full">
-            <div className="w-7 h-7 mx-auto rounded-full border border-current/30 flex items-center justify-center font-display text-[10px] font-bold italic mb-0.5">
+            <div className="w-8 h-8 mx-auto rounded-full border border-current/30 flex items-center justify-center font-display text-[11px] font-bold italic mb-0.5">
               {formData.brideNick[0] || 'S'}&amp;{formData.groomNick[0] || 'B'}
             </div>
-            <p className="text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">{formData.resepsiTitle}</p>
-            <p className="font-semibold text-[8.5px]">{formData.eventDate} · {formData.resepsiTime}</p>
-            <p className="text-[8.5px] font-bold line-clamp-2">{formData.resepsiVenue}</p>
-            {renderPhotoBadge()}
+            <p className="text-[8.5px] uppercase tracking-[0.2em] font-semibold opacity-70">{formData.resepsiTitle}</p>
+            <p className="font-semibold text-[9.5px]">{formData.eventDate} · {formData.resepsiTime}</p>
+            <p className="text-[9.5px] font-bold line-clamp-2">{formData.resepsiVenue}</p>
+            {renderPhotoBadge(45)}
           </div>
 
-          <div className="space-y-1 text-[8px] opacity-80 leading-relaxed px-1 w-full">
+          <div className="space-y-1 text-[8.5px] opacity-80 leading-relaxed px-2 w-full">
             <p className="italic leading-tight line-clamp-2">{formData.footerNote}</p>
           </div>
 
           <div className="pt-2 border-t border-current/15 w-full space-y-1">
-            <p className="text-[7.5px] uppercase tracking-widest opacity-70 font-semibold">Konfirmasi RSVP &amp; Ucapan</p>
+            <p className="text-[7.5px] uppercase tracking-widest opacity-70 font-semibold">Konfirmasi RSVP &amp; Ucapan Live</p>
             <div className="p-1 bg-white rounded-xs border border-black/10 inline-block">
               <img src={qrCodeUrl} alt="QR Code" className="w-14 h-14 object-contain" />
             </div>
-            <p className="font-mono text-[7px] opacity-60 break-all">{fullUrl}</p>
+            <p className="font-mono text-[7.5px] opacity-60 break-all">{fullUrl}</p>
           </div>
         </div>
       </div>
     )
   }
 
+  // Calculate items per sheet based on card type & layout mode
+  const getItemsPerSheet = () => {
+    if (cardType === 'souvenir') return 8
+    if (cardType === 'bifold') return 1
+    if (cardType === 'enclosure') return enclosureLayout === '4-per-page' ? 4 : 2
+    if (cardType === 'table') return tableLayout === '4-per-page' ? 4 : 2
+    return 2
+  }
+
+  const itemsPerSheet = getItemsPerSheet()
+
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto print:p-0 print:bg-white print:fixed print:inset-0">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto print:p-0 print:bg-white print:fixed print:inset-0">
       
-      {/* PRINT CSS INJECTION */}
+      {/* ---------------------------------------------------- */}
+      {/* EXACT ISO A4 PRINT CSS RULES                         */}
+      {/* ---------------------------------------------------- */}
       <style>{`
         @media print {
           @page {
             size: ${cardType === 'bifold' ? 'A4 landscape' : 'A4 portrait'};
             margin: 8mm;
+          }
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+            width: 100% !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           body * {
             visibility: hidden;
@@ -437,15 +548,35 @@ export default function PrintCardModal({ item, onClose }) {
             top: 0;
             width: 100% !important;
             max-width: none !important;
-            padding: 0 !important;
             margin: 0 !important;
-            background: white !important;
+            padding: 0 !important;
+            background: #fff !important;
           }
-          .print-sheet {
+          .print-sheet-portrait {
+            width: 194mm !important;
+            height: 280mm !important;
+            max-height: 280mm !important;
             page-break-after: always;
             break-after: page;
+            margin: 0 auto !important;
             padding: 0 !important;
-            margin: 0 0 15mm 0 !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+          }
+          .print-sheet-landscape {
+            width: 280mm !important;
+            height: 194mm !important;
+            max-height: 194mm !important;
+            page-break-after: always;
+            break-after: page;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+          }
+          .print-sheet:last-child {
+            page-break-after: avoid;
+            break-after: avoid;
           }
           .no-print {
             display: none !important;
@@ -453,10 +584,10 @@ export default function PrintCardModal({ item, onClose }) {
         }
       `}</style>
 
-      <div className="bg-paper border border-ink/20 max-w-6xl w-full p-5 sm:p-7 rounded-sm shadow-2xl space-y-5 my-auto max-h-[96vh] flex flex-col print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-none">
+      <div className="bg-paper border border-ink/20 max-w-6xl w-full p-4 sm:p-6 rounded-sm shadow-2xl space-y-4 my-auto max-h-[96vh] flex flex-col print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-none">
         
         {/* Top Header (Hidden on Print) */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/10 pb-3.5 print:hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/10 pb-3 print:hidden">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gold-deep/10 text-gold-deep flex items-center justify-center border border-gold-deep/20">
               <Printer size={20} />
@@ -464,7 +595,7 @@ export default function PrintCardModal({ item, onClose }) {
             <div>
               <h3 className="font-display text-lg font-bold text-ink">Generator Kartu Cetak &amp; Souvenir QR</h3>
               <p className="text-xs text-stone">
-                Desain siap cetak format A4 presisi untuk souvenir, nomor meja batch, &amp; kartu undangan fisik.
+                Ukuran kertas A4 presisi (210 × 297 mm) untuk souvenir tag, nomor meja batch, &amp; kartu undangan.
               </p>
             </div>
           </div>
@@ -473,7 +604,7 @@ export default function PrintCardModal({ item, onClose }) {
             <button
               type="button"
               onClick={handleAutoFill}
-              className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep px-3 py-2 text-xs font-semibold uppercase tracking-wider hover:bg-gold-deep hover:text-white transition-colors inline-flex items-center gap-1.5"
+              className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep px-3 py-1.5 text-xs font-semibold uppercase tracking-wider hover:bg-gold-deep hover:text-white transition-colors inline-flex items-center gap-1.5"
               title="Ambil dan sinkronkan seluruh teks dari undangan digital pengantin"
             >
               <RefreshCw size={13} className={autoFilled ? 'animate-spin text-green-700' : ''} />
@@ -502,16 +633,16 @@ export default function PrintCardModal({ item, onClose }) {
         <div className="grid lg:grid-cols-12 gap-5 flex-1 overflow-y-auto pr-1 print:block">
           
           {/* Controls Sidebar (Hidden on Print) - 5 Cols */}
-          <div className="lg:col-span-5 space-y-4 print:hidden">
+          <div className="lg:col-span-5 space-y-3.5 print:hidden">
             
             {/* 1. Card Type Selection */}
-            <div className="bg-ivory/50 p-3.5 border border-ink/10 rounded-xs space-y-2">
-              <label className="block text-[11px] uppercase tracking-wider text-stone font-bold">1. Jenis Kartu Fisik</label>
+            <div className="bg-ivory/50 p-3 border border-ink/10 rounded-xs space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-wider text-stone font-bold">1. Jenis Kartu Fisik</label>
               <div className="grid grid-cols-2 gap-1.5">
                 {[
                   ['souvenir', 'Souvenir Tag (8 per A4)'],
                   ['enclosure', 'Undangan Mini (Postcard)'],
-                  ['table', 'Nomor Meja Batch (2 per A4)'],
+                  ['table', 'Nomor Meja Batch'],
                   ['bifold', 'Undangan Lipat (Bifold A4)'],
                 ].map(([cVal, cLbl]) => (
                   <button
@@ -528,9 +659,61 @@ export default function PrintCardModal({ item, onClose }) {
               </div>
             </div>
 
+            {/* Layout Density Options for Table & Enclosure */}
+            {cardType === 'enclosure' && (
+              <div className="bg-ivory/50 p-3 border border-ink/10 rounded-xs space-y-1.5">
+                <label className="block text-[10px] uppercase tracking-wider text-stone font-bold">Pilihan Ukuran per Lembar A4</label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setEnclosureLayout('2-per-page')}
+                    className={`py-1.5 px-2 text-[10.5px] font-semibold border rounded-xs ${enclosureLayout === '2-per-page' ? 'bg-gold-deep text-white border-gold-deep' : 'bg-white border-ink/15 text-stone'}`}
+                  >
+                    2 Kartu per A4 (A5 Besar)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEnclosureLayout('4-per-page')}
+                    className={`py-1.5 px-2 text-[10.5px] font-semibold border rounded-xs ${enclosureLayout === '4-per-page' ? 'bg-gold-deep text-white border-gold-deep' : 'bg-white border-ink/15 text-stone'}`}
+                  >
+                    4 Kartu per A4 (A6 Saku)
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {cardType === 'table' && (
+              <div className="bg-ivory/50 p-3 border border-ink/10 rounded-xs space-y-1.5">
+                <label className="block text-[10px] uppercase tracking-wider text-stone font-bold">Format Kartu Meja</label>
+                <div className="grid grid-cols-3 gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setTableLayout('2-per-page')}
+                    className={`py-1.5 px-1 text-[10px] font-semibold border rounded-xs ${tableLayout === '2-per-page' ? 'bg-gold-deep text-white border-gold-deep' : 'bg-white border-ink/15 text-stone'}`}
+                  >
+                    2 per A4 (A5)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTableLayout('4-per-page')}
+                    className={`py-1.5 px-1 text-[10px] font-semibold border rounded-xs ${tableLayout === '4-per-page' ? 'bg-gold-deep text-white border-gold-deep' : 'bg-white border-ink/15 text-stone'}`}
+                  >
+                    4 per A4 (A6)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTableLayout('tent-fold')}
+                    className={`py-1.5 px-1 text-[10px] font-semibold border rounded-xs ${tableLayout === 'tent-fold' ? 'bg-gold-deep text-white border-gold-deep' : 'bg-white border-ink/15 text-stone'}`}
+                  >
+                    Tenda Lipat (2/A4)
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* 2. Color Theme */}
-            <div className="bg-ivory/50 p-3.5 border border-ink/10 rounded-xs space-y-2">
-              <label className="block text-[11px] uppercase tracking-wider text-stone font-bold">2. Tema Warna Kartu</label>
+            <div className="bg-ivory/50 p-3 border border-ink/10 rounded-xs space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-wider text-stone font-bold">2. Tema Warna Kartu</label>
               <div className="grid grid-cols-2 gap-1.5">
                 {[
                   ['gold-ivory', 'Gold Ivory (Mewah)'],
@@ -542,7 +725,7 @@ export default function PrintCardModal({ item, onClose }) {
                     key={sVal}
                     type="button"
                     onClick={() => setThemeStyle(sVal)}
-                    className={`py-1.5 px-2 text-left text-[11px] font-semibold border rounded-xs transition-colors ${
+                    className={`py-1.5 px-2 text-left text-[10.5px] font-semibold border rounded-xs transition-colors ${
                       themeStyle === sVal ? 'bg-gold-deep text-white border-gold-deep' : 'bg-white border-ink/15 text-stone hover:text-ink'
                     }`}
                   >
@@ -726,8 +909,8 @@ export default function PrintCardModal({ item, onClose }) {
                         </div>
                         <input
                           type="range"
-                          min="50"
-                          max="130"
+                          min="35"
+                          max="110"
                           step="5"
                           value={photoSize}
                           onChange={(e) => setPhotoSize(parseInt(e.target.value))}
@@ -846,7 +1029,7 @@ export default function PrintCardModal({ item, onClose }) {
                       </div>
                     </div>
                     <p className="text-[10px] text-stone">
-                      Akan dicetak sebanyak <strong>{tableList.length} kartu meja</strong> ({Math.ceil(tableList.length / 2)} lembar A4).
+                      Akan dicetak sebanyak <strong>{tableList.length} kartu meja</strong> ({Math.ceil(tableList.length / itemsPerSheet)} lembar A4).
                     </p>
                   </div>
                 ) : (
@@ -860,7 +1043,7 @@ export default function PrintCardModal({ item, onClose }) {
                       className="w-full border border-ink/20 p-2 bg-white font-mono text-xs"
                     />
                     <p className="text-[10px] text-stone">
-                      Total: <strong>{tableList.length} kartu meja</strong> ({Math.ceil(tableList.length / 2)} lembar A4).
+                      Total: <strong>{tableList.length} kartu meja</strong> ({Math.ceil(tableList.length / itemsPerSheet)} lembar A4).
                     </p>
                   </div>
                 )}
@@ -893,56 +1076,75 @@ export default function PrintCardModal({ item, onClose }) {
           </div>
 
           {/* Preview & Print Sheet Area - 7 Cols */}
-          <div className="lg:col-span-7 bg-black/5 p-4 sm:p-6 rounded-sm border border-ink/10 flex flex-col items-center justify-start overflow-y-auto max-h-[80vh] print:bg-white print:p-0 print:border-none print:w-full print:max-h-none print-area-wrapper">
+          <div className="lg:col-span-7 bg-black/5 p-3 sm:p-5 rounded-sm border border-ink/10 flex flex-col items-center justify-start overflow-y-auto max-h-[82vh] print:bg-white print:p-0 print:border-none print:w-full print:max-h-none print-area-wrapper">
             
-            <div className="mb-3 text-center border-b border-dashed pb-2 w-full print:hidden">
-              <p className="text-[10px] uppercase tracking-widest text-stone font-bold">
-                Pratinjau Lembar Cetak A4 ({cardType === 'souvenir' ? '8 Kartu per A4' : cardType === 'table' ? `${tableList.length} Kartu Meja` : cardType === 'bifold' ? 'Undangan Lipat A4' : '2 Kartu per A4'})
+            <div className="mb-3 text-center border-b border-dashed pb-2 w-full print:hidden flex items-center justify-between">
+              <p className="text-[10.5px] uppercase tracking-widest text-stone font-bold">
+                Pratinjau Kertas Cetak A4 ({cardType === 'souvenir' ? '8 Kartu per A4' : cardType === 'table' ? `${tableList.length} Kartu Meja (${itemsPerSheet} per A4)` : cardType === 'bifold' ? 'Undangan Lipat A4 Landscape' : `${itemsPerSheet} Kartu per A4`})
               </p>
+              <span className="text-[9.5px] font-mono bg-ink/5 px-2 py-0.5 rounded text-stone">ISO A4 (210×297mm)</span>
             </div>
 
-            {/* SOUVENIR GRID (8 KARTU PER LEMBAR A4) */}
+            {/* SOUVENIR GRID (8 KARTU PER LEMBAR A4 PORTRAIT) */}
             {cardType === 'souvenir' && (
-              <div className="print-sheet bg-white p-5 rounded-xs shadow-md border border-black/10 w-full max-w-[580px] print:shadow-none print:border-none print:p-0 print:max-w-none print:w-full">
-                <div className="grid grid-cols-2 gap-3.5 print:grid-cols-2 print:gap-4 justify-items-center">
-                  {Array.from({ length: 8 }).map((_, idx) => renderCard('', idx + 1))}
+              <div className="print-sheet-portrait print-sheet bg-white p-3.5 sm:p-4 rounded-xs shadow-md border border-black/15 w-[194mm] min-h-[275mm] box-border print:shadow-none print:border-none print:p-0 print:w-[194mm] flex flex-col justify-between">
+                <div className="grid grid-cols-2 gap-x-[6mm] gap-y-[4.5mm] justify-items-center">
+                  {Array.from({ length: 8 }).map((_, idx) => renderSouvenirCard(idx + 1))}
                 </div>
-                <div className="hidden print:block pt-3 text-center text-[7.5px] text-stone uppercase tracking-widest border-t border-dashed mt-4">
-                  Gunting mengikuti garis tepi kartu · Aruna Digital Wedding Invitation
+                <div className="pt-2 text-center text-[7.5px] text-stone uppercase tracking-widest border-t border-dashed mt-auto">
+                  ✂ Gunting mengikuti garis tepi kartu · Aruna Digital Wedding Invitation
                 </div>
               </div>
             )}
 
-            {/* MINI ENCLOSURE (2 KARTU PER LEMBAR A4) */}
+            {/* MINI ENCLOSURE (2 OR 4 PER LEMBAR A4 PORTRAIT) */}
             {cardType === 'enclosure' && (
-              <div className="print-sheet bg-white p-5 rounded-xs shadow-md border border-black/10 w-full max-w-[620px] print:shadow-none print:border-none print:p-0 print:max-w-none print:w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-4 justify-items-center">
-                  {Array.from({ length: 2 }).map((_, idx) => renderCard('', idx + 1))}
-                </div>
-                <div className="hidden print:block pt-3 text-center text-[7.5px] text-stone uppercase tracking-widest border-t border-dashed mt-4">
-                  Potong mengikuti garis tepi kartu · Aruna Digital Wedding Invitation
+              <div className="print-sheet-portrait print-sheet bg-white p-4 rounded-xs shadow-md border border-black/15 w-[194mm] min-h-[275mm] box-border print:shadow-none print:border-none print:p-0 print:w-[194mm] flex flex-col justify-between">
+                {enclosureLayout === '4-per-page' ? (
+                  <div className="grid grid-cols-2 gap-x-[6mm] gap-y-[6mm] justify-items-center my-auto">
+                    {Array.from({ length: 4 }).map((_, idx) => renderEnclosureCard('4-per-page', idx + 1))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-y-[6mm] justify-items-center my-auto">
+                    {Array.from({ length: 2 }).map((_, idx) => renderEnclosureCard('2-per-page', idx + 1))}
+                  </div>
+                )}
+                <div className="pt-2 text-center text-[7.5px] text-stone uppercase tracking-widest border-t border-dashed mt-auto">
+                  ✂ Potong mengikuti garis tepi kartu · Aruna Digital Wedding Invitation
                 </div>
               </div>
             )}
 
-            {/* TABLE CARDS BATCH (PAGINATED 2 PER A4 SHEET) */}
+            {/* TABLE CARDS BATCH (PAGINATED SHEETS OF A4 PORTRAIT) */}
             {cardType === 'table' && (
               <div className="w-full space-y-6 print:space-y-0">
-                {Array.from({ length: Math.ceil(tableList.length / 2) }).map((_, sheetIdx) => {
-                  const itemsOnThisSheet = tableList.slice(sheetIdx * 2, sheetIdx * 2 + 2)
+                {Array.from({ length: Math.ceil(tableList.length / itemsPerSheet) }).map((_, sheetIdx) => {
+                  const itemsOnThisSheet = tableList.slice(sheetIdx * itemsPerSheet, sheetIdx * itemsPerSheet + itemsPerSheet)
                   return (
                     <div
                       key={sheetIdx}
-                      className="print-sheet bg-white p-5 rounded-xs shadow-md border border-black/10 w-full max-w-[620px] mx-auto print:shadow-none print:border-none print:p-0 print:max-w-none print:w-full"
+                      className="print-sheet-portrait print-sheet bg-white p-4 rounded-xs shadow-md border border-black/15 w-[194mm] min-h-[275mm] box-border mx-auto print:shadow-none print:border-none print:p-0 print:w-[194mm] flex flex-col justify-between"
                     >
                       <div className="mb-2 text-center text-[9px] text-stone font-mono uppercase tracking-wider print:hidden">
                         Lembar A4 Halaman #{sheetIdx + 1}
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-4 justify-items-center">
-                        {itemsOnThisSheet.map((tblName, idx) => renderCard(tblName, `tbl_${sheetIdx}_${idx}`))}
-                      </div>
-                      <div className="hidden print:block pt-3 text-center text-[7.5px] text-stone uppercase tracking-widest border-t border-dashed mt-4">
-                        Gunting &amp; Lipat Kartu Meja · Aruna Digital Wedding Invitation
+
+                      {tableLayout === '4-per-page' ? (
+                        <div className="grid grid-cols-2 gap-x-[6mm] gap-y-[6mm] justify-items-center my-auto">
+                          {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, '4-per-page', `tbl_${sheetIdx}_${idx}`))}
+                        </div>
+                      ) : tableLayout === 'tent-fold' ? (
+                        <div className="grid grid-cols-1 gap-y-[8mm] justify-items-center my-auto">
+                          {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, 'tent-fold', `tbl_${sheetIdx}_${idx}`))}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 gap-y-[6mm] justify-items-center my-auto">
+                          {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, '2-per-page', `tbl_${sheetIdx}_${idx}`))}
+                        </div>
+                      )}
+
+                      <div className="pt-2 text-center text-[7.5px] text-stone uppercase tracking-widest border-t border-dashed mt-auto">
+                        ✂ Gunting &amp; Lipat Kartu Meja · Aruna Digital Wedding Invitation
                       </div>
                     </div>
                   )
@@ -950,12 +1152,14 @@ export default function PrintCardModal({ item, onClose }) {
               </div>
             )}
 
-            {/* BIFOLD FOLDABLE INVITATION (1 A4 LANDSCAPE) */}
+            {/* BIFOLD FOLDABLE INVITATION (A4 LANDSCAPE: 280mm x 194mm) */}
             {cardType === 'bifold' && (
-              <div className="print-sheet bg-white p-5 rounded-xs shadow-md border border-black/10 w-full max-w-[640px] print:shadow-none print:border-none print:p-0 print:max-w-none print:w-full">
-                {renderCard('', 1)}
-                <div className="hidden print:block pt-3 text-center text-[7.5px] text-stone uppercase tracking-widest border-t border-dashed mt-4">
-                  Lipat dua mengikuti garis putus-putus tengah · Aruna Digital Wedding Invitation
+              <div className="print-sheet-landscape print-sheet bg-white p-4 rounded-xs shadow-md border border-black/15 w-[280mm] min-h-[190mm] box-border print:shadow-none print:border-none print:p-0 print:w-[280mm] flex flex-col justify-between">
+                <div className="my-auto flex justify-center">
+                  {renderBifoldCard(1)}
+                </div>
+                <div className="pt-2 text-center text-[7.5px] text-stone uppercase tracking-widest border-t border-dashed mt-auto">
+                  ✂ Lipat dua mengikuti garis putus-putus tengah · Aruna Digital Wedding Invitation
                 </div>
               </div>
             )}
