@@ -158,6 +158,19 @@
   box-shadow: 0 4px 15px rgba(92,58,33,0.2);
 }
 
+/* Gunungan Graphic */
+.jw-gunungan-graphic {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 1.5rem;
+  background-image: url('/themes/gunungan.jpg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+}
+
 /* Hero */
 .jw-hero {
   text-align: center;
