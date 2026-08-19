@@ -252,14 +252,14 @@ export const demos = {
       nick: 'Yogi',
       full: 'Yogi Pradipta, S.Kom',
       parents: 'Bpk. Haryanto & Ibu Sulastri',
-      photo: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=600&q=80',
+      photo: '/themes/jawa-biru/groom.jpg',
       ig: '@yogiprad'
     },
     bride: {
       nick: 'Ratna',
       full: 'Ratna Dewi, S.E',
       parents: 'Bpk. Widodo & Ibu Sri Mulyani',
-      photo: 'https://images.unsplash.com/photo-1541250848049-b4f7141dca3f?auto=format&fit=crop&w=600&q=80',
+      photo: '/themes/jawa-biru/bride.jpg',
       ig: '@ratnadew'
     },
     date: '2026-11-20',

@@ -44,7 +44,7 @@ function Cover({ data, coverImg, onOpen }) {
 
         {/* Pendopo / Rumah Jawa */}
         <motion.img 
-          src="/themes/pendopo_biru.jpg" 
+          src="/themes/jawa-biru/house.jpg" 
           alt="Pendopo" 
           className="ab-pendopo"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -95,7 +95,7 @@ function Couple({ data }) {
   return (
     <section className="ab-pad ab-bg-dark" style={{ position: 'relative' }}>
       {/* Background Batik overlay for dark section */}
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/themes/bg_jawa_biru.jpg)', backgroundSize: 'cover', opacity: 0.1, mixBlendMode: 'screen', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/themes/jawa-biru/bg_batik.jpg)', backgroundSize: 'cover', opacity: 0.1, mixBlendMode: 'screen', pointerEvents: 'none' }} />
       
       <div className="ab-text-center" style={{ position: 'relative', zIndex: 1 }}>
         <Kicker>PASANGAN MEMPELAI</Kicker>
@@ -109,7 +109,8 @@ function Couple({ data }) {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.8, delay: idx * 0.2 }}
             >
-              <div className="ab-photo-frame">
+              <div className="ab-photo-wrap">
+                <div className="ab-photo-frame-img" />
                 <div className="ab-photo-inner">
                   <img src={item.who.photo} alt={item.who.nick} />
                 </div>
@@ -171,7 +172,7 @@ function Events({ events }) {
   if (!events || !events.length) return null
   return (
     <section className="ab-pad ab-bg-dark" style={{ position: 'relative' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/themes/bg_jawa_biru.jpg)', backgroundSize: 'cover', opacity: 0.05, mixBlendMode: 'screen', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/themes/jawa-biru/bg_batik.jpg)', backgroundSize: 'cover', opacity: 0.05, mixBlendMode: 'screen', pointerEvents: 'none' }} />
       <div className="ab-text-center" style={{ position: 'relative', zIndex: 1, marginBottom: '2rem' }}>
         <Kicker>SAVE THE DATE</Kicker>
       </div>
@@ -269,7 +270,7 @@ export default function ThemeArtJawaBiru({ theme, data }) {
             <h2 className="ab-title" style={{ fontSize: '2rem', marginBottom: '1rem' }}>Terima Kasih</h2>
             <p>Atas doa & restu yang diberikan.</p>
             <div style={{ marginTop: '2rem' }}>
-              <img src="/themes/bunga_biru.jpg" alt="Bunga" style={{ width: '100px', mixBlendMode: 'multiply' }} />
+              <img src="/themes/jawa-biru/ornament.jpg" alt="Bunga" style={{ width: '100px', mixBlendMode: 'multiply' }} />
             </div>
           </section>
         </motion.div>

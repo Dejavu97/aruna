@@ -30,7 +30,7 @@
 }
 .ab-bg-batik {
   background-color: var(--ab-dark);
-  background-image: url('/themes/bg_jawa_biru.jpg');
+  background-image: url('/themes/jawa-biru/bg_batik.jpg');
   background-size: cover;
   background-position: center;
   background-blend-mode: overlay;
@@ -55,7 +55,7 @@
 .ab-cover-bg {
   position: absolute;
   inset: 0;
-  background-image: url('/themes/bg_jawa_biru.jpg');
+  background-image: url('/themes/jawa-biru/bg_batik.jpg');
   background-size: cover;
   background-position: center;
   z-index: 0;
@@ -76,28 +76,26 @@
 .ab-pendopo {
   width: 250px;
   height: auto;
-  /* Since it has a white background and navy lines:
-     Using multiply on a light background works perfectly. */
   mix-blend-mode: multiply;
   margin-bottom: 1rem;
 }
 
-/* Floral Corner */
+/* Floral/Ornament Corner */
 .ab-floral-corner {
   position: absolute;
-  width: 200px;
-  height: 200px;
-  background-image: url('/themes/bunga_biru.jpg');
+  width: 150px;
+  height: 150px;
+  background-image: url('/themes/jawa-biru/ornament.jpg');
   background-size: contain;
   background-repeat: no-repeat;
   mix-blend-mode: multiply;
   z-index: 5;
   pointer-events: none;
 }
-.ab-floral-tl { top: -20px; left: -20px; transform: rotate(0deg); }
-.ab-floral-tr { top: -20px; right: -20px; transform: scaleX(-1); }
-.ab-floral-bl { bottom: -20px; left: -20px; transform: scaleY(-1); }
-.ab-floral-br { bottom: -20px; right: -20px; transform: scale(-1, -1); }
+.ab-floral-tl { top: 0; left: 0; transform: rotate(0deg); }
+.ab-floral-tr { top: 0; right: 0; transform: scaleX(-1); }
+.ab-floral-bl { bottom: 0; left: 0; transform: scaleY(-1); }
+.ab-floral-br { bottom: 0; right: 0; transform: scale(-1, -1); }
 
 /* Typography */
 .ab-title {
@@ -158,21 +156,31 @@
   align-items: center;
   text-align: center;
 }
-.ab-photo-frame {
-  width: 220px;
-  height: 280px;
-  border: 3px solid var(--ab-dark);
-  border-radius: 130px 130px 0 0;
-  padding: 8px;
-  margin-bottom: 1.5rem;
+.ab-photo-wrap {
   position: relative;
-  background: var(--ab-light);
+  width: 240px;
+  height: 280px;
+  margin: 0 auto 1.5rem;
+  background: transparent;
+}
+.ab-photo-frame-img {
+  position: absolute;
+  inset: 0;
+  background-image: url('/themes/jawa-biru/frame.jpg');
+  background-size: 100% 100%;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 2;
 }
 .ab-photo-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: 120px 120px 0 0;
+  position: absolute;
+  left: 20%;
+  top: 25%;
+  width: 60%;
+  height: 65%;
+  border-radius: 130px 130px 0 0;
   overflow: hidden;
+  z-index: 1;
 }
 .ab-photo-inner img {
   width: 100%;
