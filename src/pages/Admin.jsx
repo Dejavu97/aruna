@@ -5,7 +5,7 @@ import {
   Download, MessageCircle, Copy, Check, Trash2, Edit, ExternalLink,
   Eye, Tag, Megaphone, Plus, AlertCircle, RefreshCw, Smartphone, Layers,
   CreditCard, QrCode, Upload, TrendingUp, Settings, ShieldCheck,
-  Printer, Receipt, FileText, CopyPlus
+  Printer, Receipt, FileText, CopyPlus, Send, Share2, ListChecks
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -89,6 +89,15 @@ export default function Admin() {
   const [cloneModalItem, setCloneModalItem] = useState(null)
   const [newCloneSlug, setNewCloneSlug] = useState('')
   const [cloning, setCloning] = useState(false)
+  
+  // WA Blast Dispatcher State
+  const [blastModalItem, setBlastModalItem] = useState(null)
+  const [blastTemplate, setBlastTemplate] = useState(
+    `Kepada Yth.\nBapak/Ibu/Saudara/i {nama}\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir dan memberikan doa restu pada acara pernikahan kami:\n\n💍 {mempelai}\n📅 {tanggal}\n\nBerikut tautan undangan digital Anda:\n👉 {link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan untuk hadir. Terima kasih! 🙏✨`
+  )
+  const [blastInputText, setBlastInputText] = useState('')
+  const [blastQueue, setBlastQueue] = useState([])
+  const [blastSentMap, setBlastSentMap] = useState({})
   const [copied, setCopied] = useState('')
 
   useEffect(() => {
@@ -371,6 +380,84 @@ export default function Admin() {
       alert('Gagal menduplikasi undangan: ' + err.message)
     } finally {
       setCloning(false)
+    }
+  }
+
+  // Handle Open WA Blast Modal
+  function handleOpenBlastModal(item) {
+    setBlastModalItem(item)
+    setBlastSentMap({})
+    if (Array.isArray(item.guests) && item.guests.length > 0) {
+      const parsed = item.guests.map((g, idx) => ({
+        id: 'g_' + idx,
+        name: typeof g === 'string' ? g : g.name || 'Tamu',
+        phone: typeof g === 'object' ? g.phone || '' : '',
+        sent: false,
+      }))
+      setBlastQueue(parsed)
+      setBlastInputText(parsed.map(p => `${p.name}, ${p.phone}`).join('\n'))
+    } else {
+      setBlastQueue([])
+      setBlastInputText('')
+    }
+  }
+
+  // Handle Parse / Generate Blast Queue from Text
+  function handleGenerateBlastQueue() {
+    if (!blastInputText.trim()) return
+    const lines = blastInputText.split('\n').map(l => l.trim()).filter(Boolean)
+    const list = lines.map((line, idx) => {
+      const parts = line.includes('\t') ? line.split('\t') : line.split(',')
+      const name = (parts[0] || '').trim()
+      const phone = (parts[1] || '').trim()
+      return {
+        id: 'b_' + idx + '_' + Math.random().toString(36).slice(2, 6),
+        name: name || 'Tamu',
+        phone,
+        sent: false,
+      }
+    })
+    setBlastQueue(list)
+  }
+
+  // Handle Send Single WhatsApp in Blast Queue
+  function handleSendSingleBlast(contact) {
+    if (!blastModalItem) return
+    const phone = (contact.phone || '').replace(/[^0-9]/g, '')
+    const cleanPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone
+    const guestUrl = `${invitationUrl(blastModalItem.slug)}?to=${encodeURIComponent(contact.name)}`
+    const couple = `${blastModalItem.bride?.nick || ''} & ${blastModalItem.groom?.nick || ''}`
+    const dateStr = formatLongDate(blastModalItem.date)
+
+    const text = blastTemplate
+      .replace(/{nama}/g, contact.name)
+      .replace(/{link}/g, guestUrl)
+      .replace(/{mempelai}/g, couple)
+      .replace(/{tanggal}/g, dateStr)
+
+    setBlastSentMap(prev => ({ ...prev, [contact.id]: true }))
+    setBlastQueue(prev => prev.map(c => c.id === contact.id ? { ...c, sent: true } : c))
+
+    const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`
+    window.open(waLink, '_blank')
+  }
+
+  // Handle Send Next Unsent Contact
+  function handleSendNextBlast() {
+    const nextUnsent = blastQueue.find(c => !c.sent && !blastSentMap[c.id])
+    if (nextUnsent) {
+      handleSendSingleBlast(nextUnsent)
+    } else {
+      alert('Semua kontak dalam antrean telah selesai dikirim!')
+    }
+  }
+
+  // Copy All Personalized Links
+  async function handleCopyAllBlastLinks() {
+    if (!blastModalItem || blastQueue.length === 0) return
+    const allLinksText = blastQueue.map(c => `${c.name}: ${invitationUrl(blastModalItem.slug)}?to=${encodeURIComponent(c.name)}`).join('\n')
+    if (await copyText(allLinksText)) {
+      alert('Seluruh tautan undangan tamu berhasil disalin ke clipboard!')
     }
   }
 
@@ -836,6 +923,15 @@ export default function Admin() {
                             title="Duplikasi seluruh data undangan ini ke slug baru"
                           >
                             <CopyPlus size={12} /> Duplikat
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleOpenBlastModal(item)}
+                            className="border border-green-300 bg-green-50 text-green-800 hover:bg-green-100 px-3 py-1.5 inline-flex items-center gap-1 font-semibold shadow-xs"
+                            title="Kirim undangan massal semi-otomatis ke daftar kontak tamu"
+                          >
+                            <Send size={12} /> WA Blast
                           </button>
 
                           <button
@@ -1684,6 +1780,226 @@ export default function Admin() {
           </div>
         </div>
       )}
+
+      {/* WHATSAPP BLAST DISPATCHER MODAL */}
+      {blastModalItem && (() => {
+        const total = blastQueue.length
+        const sentCount = blastQueue.filter((c) => c.sent || blastSentMap[c.id]).length
+        const percent = total > 0 ? Math.round((sentCount / total) * 100) : 0
+        const hasUnsent = blastQueue.some((c) => !c.sent && !blastSentMap[c.id])
+
+        return (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+            <div className="bg-paper border border-ink/20 max-w-3xl w-full p-6 sm:p-8 rounded-sm shadow-2xl space-y-6 my-auto max-h-[92vh] flex flex-col">
+              
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-ink/10 pb-3">
+                <div className="flex items-center gap-2 text-ink">
+                  <div className="w-8 h-8 rounded-full bg-green-100 text-green-800 flex items-center justify-center">
+                    <Send size={16} />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-lg font-bold">WhatsApp Dispatcher (Semi-Otomatis)</h3>
+                    <p className="text-xs text-stone">
+                      Undangan: <strong className="text-ink">{blastModalItem.bride?.nick} &amp; {blastModalItem.groom?.nick}</strong> ({invitationUrl(blastModalItem.slug)})
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setBlastModalItem(null)}
+                  className="text-stone hover:text-ink text-xs font-bold px-2 py-1"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Modal Body Scrollable */}
+              <div className="space-y-5 overflow-y-auto flex-1 pr-1">
+                
+                {/* 1. Template Pesan */}
+                <div className="bg-ivory/50 p-4 border border-ink/10 rounded-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[11px] uppercase tracking-wider text-stone font-bold">
+                      Format Template Pesan WhatsApp
+                    </label>
+                    <span className="text-[10px] text-stone">Gunakan: &#123;nama&#125;, &#123;link&#125;, &#123;mempelai&#125;, &#123;tanggal&#125;</span>
+                  </div>
+                  <textarea
+                    rows={4}
+                    value={blastTemplate}
+                    onChange={(e) => setBlastTemplate(e.target.value)}
+                    className="w-full border border-ink/20 p-2.5 text-xs bg-white focus:outline-none focus:border-ink font-mono leading-relaxed"
+                  />
+                </div>
+
+                {/* 2. Input Kontak Tamu */}
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="block text-[11px] uppercase tracking-wider text-stone font-bold">
+                      Daftar Kontak Tamu (Nama &amp; Nomor WhatsApp)
+                    </label>
+                    {Array.isArray(blastModalItem.guests) && blastModalItem.guests.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const parsed = blastModalItem.guests.map((g, idx) => ({
+                            id: 'g_' + idx,
+                            name: typeof g === 'string' ? g : g.name || 'Tamu',
+                            phone: typeof g === 'object' ? g.phone || '' : '',
+                            sent: false,
+                          }))
+                          setBlastQueue(parsed)
+                          setBlastInputText(parsed.map(p => `${p.name}, ${p.phone}`).join('\n'))
+                        }}
+                        className="text-[11px] text-gold-deep hover:underline font-semibold"
+                      >
+                        + Import dari Buku Tamu ({blastModalItem.guests.length} Tamu)
+                      </button>
+                    )}
+                  </div>
+
+                  <textarea
+                    rows={3}
+                    placeholder={`Tempel daftar tamu di sini, contoh:\nBudi Santoso, 08123456789\nKeluarga Bpk. Hendra, 08571234567\ndr. Anita Wijaya, 08781234567`}
+                    value={blastInputText}
+                    onChange={(e) => setBlastInputText(e.target.value)}
+                    className="w-full border border-ink/20 p-2.5 text-xs bg-white focus:outline-none font-mono"
+                  />
+
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={handleGenerateBlastQueue}
+                      className="bg-ink text-ivory px-3.5 py-1.5 text-xs uppercase tracking-wider font-semibold hover:bg-gold-deep transition-colors"
+                    >
+                      Muat / Update Antrean Tamu
+                    </button>
+                    {blastQueue.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleCopyAllBlastLinks}
+                        className="text-xs text-stone hover:text-ink underline"
+                      >
+                        Salin Semua Link Tamu
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. Antrean Pengiriman */}
+                {blastQueue.length > 0 && (
+                  <div className="border border-ink/15 bg-white p-4 rounded-xs space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ink/10 pb-3">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-ink">
+                          Progress Pengiriman: {sentCount} / {total} Tamu ({percent}%)
+                        </p>
+                        <div className="w-48 h-2 bg-black/10 rounded-full overflow-hidden mt-1">
+                          <div
+                            className="h-full bg-green-600 transition-all duration-300"
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {hasUnsent && (
+                          <button
+                            type="button"
+                            onClick={handleSendNextBlast}
+                            className="bg-green-700 text-white px-4 py-2 text-xs uppercase tracking-wider font-bold hover:bg-green-800 transition-colors inline-flex items-center gap-1.5 shadow-xs animate-pulse"
+                          >
+                            <Send size={13} /> Kirim Tamu Berikutnya
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBlastSentMap({})
+                            setBlastQueue((prev) => prev.map((c) => ({ ...c, sent: false })))
+                          }}
+                          className="text-[11px] text-stone hover:text-red-700 px-2 py-1"
+                        >
+                          Reset Status
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Table Queue */}
+                    <div className="max-h-56 overflow-y-auto">
+                      <table className="w-full text-xs text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-ink/15 text-[10px] uppercase tracking-wider text-stone bg-ivory/50">
+                            <th className="py-2 px-2">No</th>
+                            <th className="py-2 px-2">Nama Tamu</th>
+                            <th className="py-2 px-2">No. WhatsApp</th>
+                            <th className="py-2 px-2">Status</th>
+                            <th className="py-2 px-2 text-right">Aksi</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-ink/10">
+                          {blastQueue.map((contact, idx) => {
+                            const isSent = contact.sent || blastSentMap[contact.id]
+                            return (
+                              <tr key={contact.id} className={isSent ? 'bg-green-50/40' : 'hover:bg-ivory/30'}>
+                                <td className="py-2 px-2 font-mono text-stone">{idx + 1}</td>
+                                <td className="py-2 px-2 font-bold text-ink">{contact.name}</td>
+                                <td className="py-2 px-2 font-mono text-stone">{contact.phone || '—'}</td>
+                                <td className="py-2 px-2">
+                                  {isSent ? (
+                                    <span className="inline-block bg-green-100 text-green-800 text-[10px] uppercase font-bold px-2 py-0.5 rounded-xs border border-green-300">
+                                      ✓ Terkirim
+                                    </span>
+                                  ) : (
+                                    <span className="inline-block bg-amber-100 text-amber-900 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-xs border border-amber-300">
+                                      Menunggu
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-2 px-2 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSendSingleBlast(contact)}
+                                    className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-wider rounded-xs transition-colors ${
+                                      isSent
+                                        ? 'border border-ink/20 text-stone hover:text-ink'
+                                        : 'bg-green-700 text-white hover:bg-green-800 shadow-xs'
+                                    }`}
+                                  >
+                                    {isSent ? 'Kirim Ulang' : 'Kirim WA'}
+                                  </button>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                )}
+
+              </div>
+
+              {/* Modal Footer */}
+              <div className="pt-3 border-t border-ink/10 flex items-center justify-between">
+                <p className="text-[11px] text-stone">
+                  Tips: Klik tombol <strong>Kirim Tamu Berikutnya</strong> untuk alur kirim berurutan yang super cepat dan aman.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setBlastModalItem(null)}
+                  className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5"
+                >
+                  Tutup
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )
+      })()}
 
       <SiteFooter />
     </div>
