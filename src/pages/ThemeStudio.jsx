@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Sparkles, Palette, Type, Layout, Image as ImageIcon, Music, 
   Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet,
-  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3, Wand2
+  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3, Wand2, RotateCcw
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -113,6 +113,7 @@ export default function ThemeStudio() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const starterId = params.get('from') || ''
+  const previewScrollRef = useRef(null)
 
   // Custom Theme Meta
   const [themeName, setThemeName] = useState('Tema Eksklusif Saya')
@@ -124,6 +125,7 @@ export default function ThemeStudio() {
   const [previewDevice, setPreviewDevice] = useState('mobile') // 'mobile' | 'tablet'
   const [previewOpened, setPreviewOpened] = useState(false)
   const [copiedBank, setCopiedBank] = useState('')
+  const [animKey, setAnimKey] = useState(1) // for re-triggering animations on option switch
 
   // Visual Colors & Individual Transparency (0% - 100%)
   const [colors, setColors] = useState({
@@ -175,6 +177,8 @@ export default function ThemeStudio() {
     monogramSettings: { scale: 1, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
     customOrnamentUrl: '',
     customOrnamentSettings: { scale: 1, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
+    coupleFrameUrl: '',
+    coupleFrameSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     bridePhotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
     bridePhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     groomPhotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
@@ -229,6 +233,7 @@ export default function ThemeStudio() {
     if (p.coupleTransition) setCoupleTransition(p.coupleTransition)
     if (p.ornamentTransition) setOrnamentTransition(p.ornamentTransition)
     if (p.panelTransition) setPanelTransition(p.panelTransition)
+    setAnimKey((k) => k + 1)
   }
 
   async function handleAssetUpload(field, e) {
@@ -440,7 +445,7 @@ export default function ThemeStudio() {
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-3 whitespace-nowrap border-b-2 transition-colors ${
+                className={`px-3.5 py-3 whitespace-nowrap border-b-2 transition-colors ${
                   activeTab === tab ? 'border-gold-deep text-ink bg-paper font-semibold' : 'border-transparent text-stone hover:text-ink'
                 }`}
               >
@@ -675,9 +680,18 @@ export default function ThemeStudio() {
             {/* TAB 5: TRANSISI & ANIMASI DETAIL */}
             {activeTab === 'transition' && (
               <div className="space-y-6">
-                <div>
-                  <h3 className="font-display text-lg mb-1">Pengaturan Efek Transisi</h3>
-                  <p className="text-xs text-stone mb-4">Pilih efek transisi gerak untuk foto pasangan, ornamen, dan kartu acara:</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-display text-lg mb-1">Pengaturan Efek Transisi</h3>
+                    <p className="text-xs text-stone">Pilih efek gerak animasi yang langsung aktif di layar preview:</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAnimKey((k) => k + 1)}
+                    className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                  >
+                    <RotateCcw size={12} /> Putar Ulang Animasi
+                  </button>
                 </div>
 
                 {/* 1. Transisi Foto Pasangan */}
@@ -686,14 +700,17 @@ export default function ThemeStudio() {
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       ['meet_middle', 'Bertemu di Tengah', 'Foto pria meluncur dari kiri, wanita dari kanan'],
-                      ['scale_up', 'Membesar Halus', 'Foto membesar perlahan 90% ke 100%'],
+                      ['scale_up', 'Membesar Halus', 'Foto membesar perlahan 85% ke 100%'],
                       ['fade_blur', 'Fade & Blur In', 'Foto memudar dari blur ke tajam'],
-                      ['parallax_float', 'Mengambang Santai', 'Foto melayang halus saat di-scroll'],
+                      ['parallax_float', 'Mengambang Santai', 'Foto meluncur naik dari bawah'],
                     ].map(([tVal, tLabel, tDesc]) => (
                       <button
                         key={tVal}
                         type="button"
-                        onClick={() => setCoupleTransition(tVal)}
+                        onClick={() => {
+                          setCoupleTransition(tVal)
+                          setAnimKey((k) => k + 1)
+                        }}
                         className={`p-2.5 text-left border rounded-sm transition-colors ${
                           coupleTransition === tVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
@@ -718,7 +735,10 @@ export default function ThemeStudio() {
                       <button
                         key={tVal}
                         type="button"
-                        onClick={() => setOrnamentTransition(tVal)}
+                        onClick={() => {
+                          setOrnamentTransition(tVal)
+                          setAnimKey((k) => k + 1)
+                        }}
                         className={`p-2.5 text-left border rounded-sm transition-colors ${
                           ornamentTransition === tVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
@@ -743,7 +763,10 @@ export default function ThemeStudio() {
                       <button
                         key={tVal}
                         type="button"
-                        onClick={() => setPanelTransition(tVal)}
+                        onClick={() => {
+                          setPanelTransition(tVal)
+                          setAnimKey((k) => k + 1)
+                        }}
                         className={`p-2.5 text-left border rounded-sm transition-colors ${
                           panelTransition === tVal ? 'border-gold-deep bg-gold-deep/10 font-semibold' : 'border-ink/15 hover:border-ink/40'
                         }`}
@@ -840,13 +863,13 @@ export default function ThemeStudio() {
               </div>
             )}
 
-            {/* TAB 8: UPLOAD ASET DENGAN TOMBOL EDIT DI SETIAP FOTO & VIDEO */}
+            {/* TAB 8: UPLOAD ASET DENGAN 2 PILIHAN BG (FOTO/VIDEO) & UPLOAD FRAME PENGANTIN */}
             {activeTab === 'assets' && (
               <div className="space-y-5">
                 <div>
-                  <h3 className="font-display text-lg mb-1">Upload Aset &amp; Sesuaikan Ukuran</h3>
+                  <h3 className="font-display text-lg mb-1">Upload Aset &amp; Frame Pengantin</h3>
                   <p className="text-xs text-stone mb-4">
-                    Unggah seluruh gambar dan video kalian. Setiap gambar dilengkapi tombol edit untuk mengatur zoom dan posisi fokus:
+                    Unggah gambar latar, video latar, frame foto pengantin, dan logo inisial. Setiap gambar dilengkapi tombol edit ukuran dan posisi:
                   </p>
                 </div>
 
@@ -855,7 +878,7 @@ export default function ThemeStudio() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium">1. Foto Sampul Pembuka (Cover)</p>
-                      <p className="text-[10px] text-stone">Foto latar belakang layar pertama undangan.</p>
+                      <p className="text-[10px] text-stone">Foto latar belakang layar pembuka undangan.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
                       {uploadingAsset === 'coverImgUrl' ? 'Mengunggah...' : 'Upload Foto'}
@@ -891,85 +914,137 @@ export default function ThemeStudio() {
                   )}
                 </div>
 
-                {/* 2. Video Latar Belakang Gerak */}
-                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-medium">2. Video Latar Belakang Gerak (Motion Video)</p>
-                      <p className="text-[10px] text-stone">Video latar belakang berulang (looping MP4).</p>
-                    </div>
-                    <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
-                      {uploadingAsset === 'bgVideoUrl' ? 'Mengunggah...' : 'Upload MP4'}
-                      <input
-                        type="file"
-                        accept="video/mp4,video/webm"
-                        className="hidden"
-                        onChange={(e) => handleAssetUpload('bgVideoUrl', e)}
-                      />
-                    </label>
+                {/* 2. DUA PILIHAN BACKGROUND LATAR BELAKANG UNDANGAN: FOTO ATAU VIDEO */}
+                <div className="border border-ink/20 p-4 rounded-sm bg-ivory/40 space-y-4">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-ink">2. Latar Belakang Isi Undangan (Dua Pilihan)</h4>
+                    <p className="text-[11px] text-stone mt-0.5">Pilih ingin menggunakan Gambar/Foto statis ATAU Video gerak (looping MP4):</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {videoPresets.map((vp) => (
-                      <button
-                        key={vp.name}
-                        type="button"
-                        onClick={() => setCustomAssets((prev) => ({ ...prev, bgVideoUrl: vp.url }))}
-                        className={`p-2 text-left border rounded-sm text-[10px] uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
-                          customAssets.bgVideoUrl === vp.url ? 'bg-ink text-ivory border-ink font-semibold' : 'border-ink/15 text-stone hover:border-ink/30'
-                        }`}
-                      >
-                        <Film size={12} /> {vp.name}
-                      </button>
-                    ))}
+                  {/* Option A: Gambar / Foto Background */}
+                  <div className="border border-ink/15 p-3 rounded-sm bg-paper space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold">Pilihan A: Gambar / Foto Latar (Image)</span>
+                      <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
+                        {uploadingAsset === 'bgTextureUrl' ? 'Mengunggah...' : 'Upload Gambar'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleAssetUpload('bgTextureUrl', e)}
+                        />
+                      </label>
+                    </div>
+                    {customAssets.bgTextureUrl && (
+                      <div className="flex items-center justify-between pt-1 border-t border-ink/10">
+                        <div className="flex items-center gap-2">
+                          <img src={customAssets.bgTextureUrl} alt="Texture" className="w-12 h-8 object-cover border" />
+                          <span className="text-[10px] text-green-700 font-medium">✓ Gambar Latar Terpasang</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setAdjustTarget({
+                                field: 'bgTextureUrl',
+                                title: 'Sesuaikan Gambar Latar Isi',
+                                url: customAssets.bgTextureUrl,
+                                settingsKey: 'bgTextureSettings',
+                              })
+                            }
+                            className="inline-flex items-center gap-1 border border-ink/20 px-2 py-0.5 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                          >
+                            <Sliders size={11} /> Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCustomAssets((prev) => ({ ...prev, bgTextureUrl: '' }))}
+                            className="text-[10px] text-red-600 underline font-medium"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {customAssets.bgVideoUrl && (
-                    <div className="flex items-center justify-between bg-paper p-2 border border-ink/10">
-                      <span className="text-[10px] text-green-700 font-medium">✓ Video Latar Belakang Aktif</span>
-                      <button
-                        type="button"
-                        onClick={() => setCustomAssets((prev) => ({ ...prev, bgVideoUrl: '' }))}
-                        className="text-[10px] text-red-600 underline font-medium"
-                      >
-                        Hapus Video
-                      </button>
+                  {/* Option B: Video Background */}
+                  <div className="border border-ink/15 p-3 rounded-sm bg-paper space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold">Pilihan B: Video Gerak Latar Belakang (Motion Video)</span>
+                      <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
+                        {uploadingAsset === 'bgVideoUrl' ? 'Mengunggah...' : 'Upload MP4'}
+                        <input
+                          type="file"
+                          accept="video/mp4,video/webm"
+                          className="hidden"
+                          onChange={(e) => handleAssetUpload('bgVideoUrl', e)}
+                        />
+                      </label>
                     </div>
-                  )}
+
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {videoPresets.map((vp) => (
+                        <button
+                          key={vp.name}
+                          type="button"
+                          onClick={() => setCustomAssets((prev) => ({ ...prev, bgVideoUrl: vp.url }))}
+                          className={`p-2 text-left border rounded-sm text-[10px] uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
+                            customAssets.bgVideoUrl === vp.url ? 'bg-ink text-ivory border-ink font-semibold' : 'border-ink/15 text-stone hover:border-ink/30'
+                          }`}
+                        >
+                          <Film size={12} /> {vp.name}
+                        </button>
+                      ))}
+                    </div>
+
+                    {customAssets.bgVideoUrl && (
+                      <div className="flex items-center justify-between pt-1 border-t border-ink/10">
+                        <span className="text-[10px] text-green-700 font-medium">✓ Video Gerak Aktif</span>
+                        <button
+                          type="button"
+                          onClick={() => setCustomAssets((prev) => ({ ...prev, bgVideoUrl: '' }))}
+                          className="text-[10px] text-red-600 underline font-medium"
+                        >
+                          Hapus Video
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* 3. Background Gambar Latar Isi Undangan */}
+                {/* 3. BINGKAI / FRAME FOTO MEMPELAI KUSTOM */}
                 <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium">3. Gambar Latar Undangan (Body Background)</p>
-                      <p className="text-[10px] text-stone">Motif watercolor/batik/gedung untuk latar belakang isi.</p>
+                      <p className="text-xs font-medium">3. Bingkai / Frame Foto Mempelai (PNG Transparan)</p>
+                      <p className="text-[10px] text-stone">Bingkai kubah emas / ornamen bunga untuk melingkari foto pengantin.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
-                      {uploadingAsset === 'bgTextureUrl' ? 'Mengunggah...' : 'Upload Gambar'}
+                      {uploadingAsset === 'coupleFrameUrl' ? 'Mengunggah...' : 'Upload PNG'}
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/png,image/webp"
                         className="hidden"
-                        onChange={(e) => handleAssetUpload('bgTextureUrl', e)}
+                        onChange={(e) => handleAssetUpload('coupleFrameUrl', e)}
                       />
                     </label>
                   </div>
-                  {customAssets.bgTextureUrl && (
+                  {customAssets.coupleFrameUrl && (
                     <div className="flex items-center justify-between bg-paper p-2 border border-ink/10">
                       <div className="flex items-center gap-2">
-                        <img src={customAssets.bgTextureUrl} alt="Texture" className="w-14 h-9 object-cover border" />
-                        <span className="text-[10px] text-green-700 font-medium">✓ Latar Isi Terpasang</span>
+                        <img src={customAssets.coupleFrameUrl} alt="Frame" className="w-10 h-10 object-contain border p-1 bg-white" />
+                        <span className="text-[10px] text-green-700 font-medium">✓ Frame Pengantin Terpasang</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() =>
                             setAdjustTarget({
-                              field: 'bgTextureUrl',
-                              title: 'Sesuaikan Gambar Latar Isi',
-                              url: customAssets.bgTextureUrl,
-                              settingsKey: 'bgTextureSettings',
+                              field: 'coupleFrameUrl',
+                              title: 'Sesuaikan Bingkai Foto Mempelai',
+                              url: customAssets.coupleFrameUrl,
+                              settingsKey: 'coupleFrameSettings',
                             })
                           }
                           className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
@@ -978,7 +1053,7 @@ export default function ThemeStudio() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setCustomAssets((prev) => ({ ...prev, bgTextureUrl: '' }))}
+                          onClick={() => setCustomAssets((prev) => ({ ...prev, coupleFrameUrl: '' }))}
                           className="text-[10px] text-red-600 underline font-medium"
                         >
                           Hapus
@@ -1237,6 +1312,7 @@ export default function ThemeStudio() {
 
             {/* Interactive Full Invitation Preview Container */}
             <div
+              ref={previewScrollRef}
               className="w-full h-full overflow-y-auto relative scroll-smooth z-10"
               style={{
                 backgroundColor: customAssets.bgVideoUrl ? 'transparent' : mainBgColor,
@@ -1349,6 +1425,7 @@ export default function ThemeStudio() {
                   {/* Ornament with Animated Transition */}
                   {customAssets.customOrnamentUrl ? (
                     <motion.img
+                      key={`orn-${animKey}`}
                       src={customAssets.customOrnamentUrl}
                       alt="Divider"
                       className="mx-auto my-3 object-contain"
@@ -1356,17 +1433,16 @@ export default function ThemeStudio() {
                         height: `${(customAssets.customOrnamentSettings?.scale || 1) * 24}px`,
                       }}
                       initial={ornamentTransition === 'unfurl' ? { scale: 0.5, rotate: -20 } : ornamentTransition === 'expand_line' ? { scaleX: 0 } : { opacity: 0 }}
-                      whileInView={ornamentTransition === 'unfurl' ? { scale: 1, rotate: 0 } : ornamentTransition === 'expand_line' ? { scaleX: 1 } : { opacity: 1 }}
-                      viewport={{ once: true }}
+                      animate={ornamentTransition === 'unfurl' ? { scale: 1, rotate: 0 } : ornamentTransition === 'expand_line' ? { scaleX: 1 } : { opacity: 1 }}
                       transition={{ duration: 0.8 }}
                     />
                   ) : (
                     <motion.div
+                      key={`line-${animKey}`}
                       className="w-12 h-[1px] mx-auto my-3"
                       style={{ background: accentBorderColor }}
                       initial={ornamentTransition === 'expand_line' ? { scaleX: 0 } : { opacity: 0 }}
-                      whileInView={ornamentTransition === 'expand_line' ? { scaleX: 1 } : { opacity: 1 }}
-                      viewport={{ once: true }}
+                      animate={ornamentTransition === 'expand_line' ? { scaleX: 1 } : { opacity: 1 }}
                       transition={{ duration: 0.8 }}
                     />
                   )}
@@ -1379,7 +1455,7 @@ export default function ThemeStudio() {
                   </p>
                 </section>
 
-                {/* 2. MEMPELAI (COUPLE) SECTION WITH DYNAMIC TRANSITIONS */}
+                {/* 2. MEMPELAI (COUPLE) SECTION WITH REAL-TIME TRIGGERED TRANSITIONS & CUSTOM FRAME */}
                 <section className="space-y-4">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>
@@ -1391,19 +1467,19 @@ export default function ThemeStudio() {
                     <div className="grid grid-cols-2 gap-3">
                       {/* Bride Card with Selected Couple Transition */}
                       <motion.div
-                        className="border p-3.5 text-center rounded-sm backdrop-blur-md"
+                        key={`bride-${coupleTransition}-${animKey}`}
+                        className="border p-3.5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
-                          coupleTransition === 'meet_middle' ? { opacity: 0, x: -30 }
-                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.85 }
-                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(8px)' }
-                          : { opacity: 0, y: 30 }
+                          coupleTransition === 'meet_middle' ? { opacity: 0, x: -35 }
+                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.8 }
+                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(10px)' }
+                          : { opacity: 0, y: 35 }
                         }
-                        whileInView={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
+                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.85, ease: 'easeOut' }}
                       >
-                        <div className="aspect-[3/4] overflow-hidden mb-2.5">
+                        <div className="aspect-[3/4] relative overflow-hidden mb-2.5">
                           <img
                             src={customAssets.bridePhotoUrl}
                             alt="Bride"
@@ -1413,6 +1489,17 @@ export default function ThemeStudio() {
                               filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
                             }}
                           />
+                          {/* Custom Couple Frame Overlay if uploaded */}
+                          {customAssets.coupleFrameUrl && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Couple Frame"
+                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
                         </div>
                         <h4 className="text-xs font-bold uppercase tracking-wider" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
                           {previewData.bride.full}
@@ -1427,19 +1514,19 @@ export default function ThemeStudio() {
 
                       {/* Groom Card with Selected Couple Transition */}
                       <motion.div
-                        className="border p-3.5 text-center rounded-sm backdrop-blur-md"
+                        key={`groom-${coupleTransition}-${animKey}`}
+                        className="border p-3.5 text-center rounded-sm backdrop-blur-md relative overflow-hidden"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
-                          coupleTransition === 'meet_middle' ? { opacity: 0, x: 30 }
-                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.85 }
-                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(8px)' }
-                          : { opacity: 0, y: 30 }
+                          coupleTransition === 'meet_middle' ? { opacity: 0, x: 35 }
+                          : coupleTransition === 'scale_up' ? { opacity: 0, scale: 0.8 }
+                          : coupleTransition === 'fade_blur' ? { opacity: 0, filter: 'blur(10px)' }
+                          : { opacity: 0, y: 35 }
                         }
-                        whileInView={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.1 }}
+                        animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.85, ease: 'easeOut', delay: 0.1 }}
                       >
-                        <div className="aspect-[3/4] overflow-hidden mb-2.5">
+                        <div className="aspect-[3/4] relative overflow-hidden mb-2.5">
                           <img
                             src={customAssets.groomPhotoUrl}
                             alt="Groom"
@@ -1449,6 +1536,17 @@ export default function ThemeStudio() {
                               filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
                             }}
                           />
+                          {/* Custom Couple Frame Overlay if uploaded */}
+                          {customAssets.coupleFrameUrl && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Couple Frame"
+                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
                         </div>
                         <h4 className="text-xs font-bold uppercase tracking-wider" style={{ fontFamily: activeDisplayFont, color: colors.fg }}>
                           {previewData.groom.full}
@@ -1465,14 +1563,14 @@ export default function ThemeStudio() {
                     <div className="space-y-4">
                       {/* Stacked Bride Card */}
                       <motion.div
-                        className="border p-4 text-center rounded-sm backdrop-blur-md"
+                        key={`stacked-bride-${coupleTransition}-${animKey}`}
+                        className="border p-4 text-center rounded-sm backdrop-blur-md relative"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                       >
-                        <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2" style={{ borderColor: accentBorderColor }}>
+                        <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2 relative" style={{ borderColor: accentBorderColor }}>
                           <img
                             src={customAssets.bridePhotoUrl}
                             alt="Bride"
@@ -1495,14 +1593,14 @@ export default function ThemeStudio() {
 
                       {/* Stacked Groom Card */}
                       <motion.div
-                        className="border p-4 text-center rounded-sm backdrop-blur-md"
+                        key={`stacked-groom-${coupleTransition}-${animKey}`}
+                        className="border p-4 text-center rounded-sm backdrop-blur-md relative"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.1 }}
                       >
-                        <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2" style={{ borderColor: accentBorderColor }}>
+                        <div className="w-24 h-24 rounded-full mx-auto overflow-hidden mb-3 border-2 relative" style={{ borderColor: accentBorderColor }}>
                           <img
                             src={customAssets.groomPhotoUrl}
                             alt="Groom"
@@ -1540,7 +1638,7 @@ export default function ThemeStudio() {
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ root: previewScrollRef, once: false }}
                         transition={{ duration: 0.6, delay: i * 0.1 }}
                       >
                         <span className="font-bold text-xs font-mono" style={{ color: colors.accent }}>{st.year}</span>
@@ -1559,7 +1657,7 @@ export default function ThemeStudio() {
                   style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
+                  viewport={{ root: previewScrollRef, once: false }}
                   transition={{ duration: 0.7 }}
                 >
                   <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>MENGHITUNG HARI</p>
@@ -1587,18 +1685,17 @@ export default function ThemeStudio() {
                   <div className="space-y-3">
                     {previewData.events.map((ev, i) => (
                       <motion.div
-                        key={ev.title}
+                        key={`${ev.title}-${panelTransition}-${animKey}`}
                         className="border p-4 text-center rounded-sm backdrop-blur-md"
                         style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                         initial={
-                          panelTransition === 'flip_3d' ? { opacity: 0, rotateX: 30 }
-                          : panelTransition === 'pop_in' ? { opacity: 0, scale: 0.9 }
+                          panelTransition === 'flip_3d' ? { opacity: 0, rotateX: 35 }
+                          : panelTransition === 'pop_in' ? { opacity: 0, scale: 0.85 }
                           : panelTransition === 'instant' ? { opacity: 1 }
                           : { opacity: 0, y: 30 }
                         }
-                        whileInView={{ opacity: 1, rotateX: 0, scale: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: i * 0.15 }}
+                        animate={{ opacity: 1, rotateX: 0, scale: 1, y: 0 }}
+                        transition={{ duration: 0.7, delay: i * 0.15 }}
                       >
                         <h4 className="text-xs uppercase tracking-widest font-semibold" style={{ color: colors.accent }}>{ev.title}</h4>
                         <p className="text-sm font-bold mt-1" style={{ color: colors.fg }}>{ev.time}</p>
@@ -1639,7 +1736,7 @@ export default function ThemeStudio() {
                         style={{ borderColor: accentSoftColor }}
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
+                        viewport={{ root: previewScrollRef, once: false }}
                         transition={{ duration: 0.6, delay: i * 0.08 }}
                       >
                         <img src={imgUrl} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
@@ -1654,7 +1751,7 @@ export default function ThemeStudio() {
                   style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ root: previewScrollRef, once: false }}
                   transition={{ duration: 0.7 }}
                 >
                   <div>
@@ -1686,7 +1783,7 @@ export default function ThemeStudio() {
                   style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ root: previewScrollRef, once: false }}
                   transition={{ duration: 0.7 }}
                 >
                   <div>
@@ -1725,7 +1822,7 @@ export default function ThemeStudio() {
                   style={{ backgroundColor: paperBgColor, borderColor: accentSoftColor }}
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ root: previewScrollRef, once: false }}
                   transition={{ duration: 0.7 }}
                 >
                   <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>CAPTURE THE MOMENT</p>
