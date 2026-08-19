@@ -115,19 +115,19 @@ export default function ImageAdjustModal({ imageUrl, title = 'Sesuaikan Foto', c
 
         {/* Controls Toolbar */}
         <div className="mt-4 space-y-3 bg-ivory/60 border border-ink/10 p-3.5 rounded-sm">
-          {/* Zoom Slider */}
+          {/* Zoom Slider (0.1x to 4.0x) */}
           <div className="flex items-center gap-3">
             <span className="text-[11px] uppercase tracking-wider text-stone w-24 font-medium">Ukuran (Zoom)</span>
             <input
               type="range"
-              min="0.5"
-              max="2.5"
-              step="0.05"
+              min="0.1"
+              max="4.0"
+              step="0.02"
               value={scale}
               onChange={(e) => setScale(parseFloat(e.target.value))}
               className="flex-1 accent-gold-deep cursor-pointer"
             />
-            <span className="text-xs font-mono text-stone w-10 text-right">{Math.round(scale * 100)}%</span>
+            <span className="text-xs font-mono text-stone w-12 text-right">{Math.round(scale * 100)}%</span>
           </div>
 
           {/* Brightness Slider */}

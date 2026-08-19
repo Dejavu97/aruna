@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Sparkles, Palette, Type, Layout, Image as ImageIcon, Music, 
   Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet,
-  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3, Wand2, RotateCcw, Disc
+  Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3, Wand2, RotateCcw, Disc, Layers
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -177,6 +177,9 @@ export default function ThemeStudio() {
   const [ornamentTransition, setOrnamentTransition] = useState('expand_line') // 'expand_line' | 'unfurl' | 'glow_pulse' | 'none'
   const [panelTransition, setPanelTransition] = useState('staggered_slide') // 'staggered_slide' | 'flip_3d' | 'pop_in' | 'instant'
 
+  // Layering order for frame: 'frame_front' (Frame di atas foto) | 'photo_front' (Foto di atas frame)
+  const [frameLayerOrder, setFrameLayerOrder] = useState('frame_front')
+
   // Comprehensive Custom Uploaded Assets with Adjuster Settings
   const [customAssets, setCustomAssets] = useState({
     coverImgUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
@@ -189,7 +192,7 @@ export default function ThemeStudio() {
     customOrnamentUrl: '',
     customOrnamentSettings: { scale: 1, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
     coupleFrameUrl: '',
-    coupleFrameSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
+    coupleFrameSettings: { scale: 1.05, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
     bridePhotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
     bridePhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     groomPhotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
@@ -314,6 +317,7 @@ export default function ThemeStudio() {
         coupleTransition,
         ornamentTransition,
         panelTransition,
+        frameLayerOrder,
         customAssets,
         cover: customAssets.coverImgUrl || '/themes/emas-senja.jpg',
         tags: ['komunitas', 'custom', isPublic ? 'publik' : 'privat'],
@@ -1119,12 +1123,12 @@ export default function ThemeStudio() {
                   )}
                 </div>
 
-                {/* 4. BINGKAI / FRAME FOTO MEMPELAI KUSTOM */}
-                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-2.5">
+                {/* 4. BINGKAI / FRAME FOTO MEMPELAI KUSTOM + PILIHAN POSISI LAYER */}
+                <div className="border border-ink/15 p-4 rounded-sm bg-ivory/30 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium">4. Bingkai / Frame Foto Mempelai (PNG Transparan)</p>
-                      <p className="text-[10px] text-stone">Bingkai kubah emas / ornamen bunga untuk melingkari foto pengantin.</p>
+                      <p className="text-[10px] text-stone">Bingkai mahkota / ornamen bunga untuk melingkari foto pengantin.</p>
                     </div>
                     <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors">
                       {uploadingAsset === 'coupleFrameUrl' ? 'Mengunggah...' : 'Upload PNG'}
@@ -1136,6 +1140,41 @@ export default function ThemeStudio() {
                       />
                     </label>
                   </div>
+
+                  {/* Pilihan Posisi Layer Bingkai (Depan / Belakang Foto) */}
+                  <div className="pt-2 border-t border-ink/10 space-y-2">
+                    <span className="text-[11px] uppercase tracking-wider text-stone font-medium block">
+                      Posisi Layer Bingkai:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setFrameLayerOrder('frame_front')}
+                        className={`p-2 text-left border rounded-sm text-xs transition-all ${
+                          frameLayerOrder === 'frame_front'
+                            ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold'
+                            : 'border-ink/15 text-stone hover:border-ink/30'
+                        }`}
+                      >
+                        <p className="text-xs">Frame di Atas Foto</p>
+                        <p className="text-[10px] text-stone">Frame menutupi tepi foto (Overlay)</p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setFrameLayerOrder('photo_front')}
+                        className={`p-2 text-left border rounded-sm text-xs transition-all ${
+                          frameLayerOrder === 'photo_front'
+                            ? 'border-gold-deep bg-gold-deep/10 ring-1 ring-gold-deep font-semibold'
+                            : 'border-ink/15 text-stone hover:border-ink/30'
+                        }`}
+                      >
+                        <p className="text-xs">Foto di Atas Frame</p>
+                        <p className="text-[10px] text-stone">Frame menjadi latar belakang foto</p>
+                      </button>
+                    </div>
+                  </div>
+
                   {customAssets.coupleFrameUrl && (
                     <div className="flex items-center justify-between bg-paper p-2 border border-ink/10">
                       <div className="flex items-center gap-2">
@@ -1148,14 +1187,14 @@ export default function ThemeStudio() {
                           onClick={() =>
                             setAdjustTarget({
                               field: 'coupleFrameUrl',
-                              title: 'Sesuaikan Bingkai Foto Mempelai',
+                              title: 'Sesuaikan Ukuran & Posisi Bingkai',
                               url: customAssets.coupleFrameUrl,
                               settingsKey: 'coupleFrameSettings',
                             })
                           }
                           className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
                         >
-                          <Sliders size={12} /> Edit
+                          <Sliders size={12} /> Edit Ukuran Bebas
                         </button>
                         <button
                           type="button"
@@ -1274,29 +1313,20 @@ export default function ThemeStudio() {
                         <img src={customAssets.monogramUrl} alt="Monogram" className="w-10 h-10 object-contain border p-1 bg-white" />
                         <span className="text-[10px] text-green-700 font-medium">✓ Monogram Aktif</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setAdjustTarget({
-                              field: 'monogramUrl',
-                              title: 'Sesuaikan Ukuran Logo Monogram',
-                              url: customAssets.monogramUrl,
-                              settingsKey: 'monogramSettings',
-                            })
-                          }
-                          className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
-                        >
-                          <Sliders size={12} /> Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setCustomAssets((prev) => ({ ...prev, monogramUrl: '' }))}
-                          className="text-[10px] text-red-600 underline font-medium"
-                        >
-                          Hapus
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAdjustTarget({
+                            field: 'monogramUrl',
+                            title: 'Sesuaikan Ukuran Logo Monogram',
+                            url: customAssets.monogramUrl,
+                            settingsKey: 'monogramSettings',
+                          })
+                        }
+                        className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                      >
+                        <Sliders size={12} /> Edit
+                      </button>
                     </div>
                   )}
                 </div>
@@ -1324,29 +1354,20 @@ export default function ThemeStudio() {
                         <img src={customAssets.customOrnamentUrl} alt="Ornament" className="h-8 object-contain border p-1 bg-white" />
                         <span className="text-[10px] text-green-700 font-medium">✓ Ornamen Aktif</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setAdjustTarget({
-                              field: 'customOrnamentUrl',
-                              title: 'Sesuaikan Ukuran Ornamen',
-                              url: customAssets.customOrnamentUrl,
-                              settingsKey: 'customOrnamentSettings',
-                            })
-                          }
-                          className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
-                        >
-                          <Sliders size={12} /> Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setCustomAssets((prev) => ({ ...prev, customOrnamentUrl: '' }))}
-                          className="text-[10px] text-red-600 underline font-medium"
-                        >
-                          Hapus
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAdjustTarget({
+                            field: 'customOrnamentUrl',
+                            title: 'Sesuaikan Ukuran Ornamen',
+                            url: customAssets.customOrnamentUrl,
+                            settingsKey: 'customOrnamentSettings',
+                          })
+                        }
+                        className="inline-flex items-center gap-1 border border-ink/20 px-2.5 py-1 text-[10px] uppercase tracking-wider hover:bg-ink/5 font-medium"
+                      >
+                        <Sliders size={12} /> Edit
+                      </button>
                     </div>
                   )}
                 </div>
@@ -1614,7 +1635,7 @@ export default function ThemeStudio() {
                   </p>
                 </section>
 
-                {/* 2. MEMPELAI (COUPLE) SECTION WITH 3 DEDICATED LAYOUTS (SIDE-BY-SIDE, STACKED, ARCH) */}
+                {/* 2. MEMPELAI (COUPLE) SECTION WITH FLEXIBLE LAYERING & SCALING */}
                 <section className="space-y-4">
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: colors.muted }}>
@@ -1647,21 +1668,36 @@ export default function ThemeStudio() {
                           ease: 'easeOut',
                         }}
                       >
-                        <div className="aspect-[3/4] relative overflow-hidden mb-2.5 rounded-xs">
+                        <div className="aspect-[3/4] relative mb-2.5 rounded-xs overflow-hidden flex items-center justify-center">
+                          {/* UNDERLAY FRAME (If Photo is in Front) */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Frame Underlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
+
+                          {/* Bride Photo */}
                           <img
                             src={customAssets.bridePhotoUrl}
                             alt="Bride"
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2' : 'relative z-0'}`}
                             style={{
                               transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
                               filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
                             }}
                           />
-                          {customAssets.coupleFrameUrl && (
+
+                          {/* OVERLAY FRAME (If Frame is in Front) */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Couple Frame"
-                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              alt="Frame Overlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
                                 transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
                               }}
@@ -1702,21 +1738,36 @@ export default function ThemeStudio() {
                           ease: 'easeOut',
                         }}
                       >
-                        <div className="aspect-[3/4] relative overflow-hidden mb-2.5 rounded-xs">
+                        <div className="aspect-[3/4] relative mb-2.5 rounded-xs overflow-hidden flex items-center justify-center">
+                          {/* UNDERLAY FRAME (If Photo is in Front) */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Frame Underlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
+
+                          {/* Groom Photo */}
                           <img
                             src={customAssets.groomPhotoUrl}
                             alt="Groom"
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2' : 'relative z-0'}`}
                             style={{
                               transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
                               filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
                             }}
                           />
-                          {customAssets.coupleFrameUrl && (
+
+                          {/* OVERLAY FRAME (If Frame is in Front) */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Couple Frame"
-                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              alt="Frame Overlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
                                 transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
                               }}
@@ -1754,21 +1805,35 @@ export default function ThemeStudio() {
                         transition={{ duration: 0.8, ease: 'easeOut' }}
                       >
                         <p className="text-[10px] uppercase tracking-[0.25em] text-stone mb-3">MEMPELAI WANITA</p>
-                        <div className="aspect-[4/5] max-w-[240px] mx-auto relative overflow-hidden mb-4 rounded-sm border shadow-sm" style={{ borderColor: accentBorderColor }}>
+                        <div className="aspect-[4/5] max-w-[240px] mx-auto relative mb-4 rounded-sm border shadow-sm flex items-center justify-center overflow-hidden" style={{ borderColor: accentBorderColor }}>
+                          {/* UNDERLAY FRAME */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Frame Underlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
+
                           <img
                             src={customAssets.bridePhotoUrl}
                             alt="Bride"
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2.5' : 'relative z-0'}`}
                             style={{
                               transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
                               filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
                             }}
                           />
-                          {customAssets.coupleFrameUrl && (
+
+                          {/* OVERLAY FRAME */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Couple Frame"
-                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              alt="Frame Overlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
                                 transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
                               }}
@@ -1814,21 +1879,35 @@ export default function ThemeStudio() {
                         transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
                       >
                         <p className="text-[10px] uppercase tracking-[0.25em] text-stone mb-3">MEMPELAI PRIA</p>
-                        <div className="aspect-[4/5] max-w-[240px] mx-auto relative overflow-hidden mb-4 rounded-sm border shadow-sm" style={{ borderColor: accentBorderColor }}>
+                        <div className="aspect-[4/5] max-w-[240px] mx-auto relative mb-4 rounded-sm border shadow-sm flex items-center justify-center overflow-hidden" style={{ borderColor: accentBorderColor }}>
+                          {/* UNDERLAY FRAME */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Frame Underlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
+
                           <img
                             src={customAssets.groomPhotoUrl}
                             alt="Groom"
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2.5' : 'relative z-0'}`}
                             style={{
                               transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
                               filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
                             }}
                           />
-                          {customAssets.coupleFrameUrl && (
+
+                          {/* OVERLAY FRAME */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Couple Frame"
-                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              alt="Frame Overlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
                                 transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
                               }}
@@ -1871,21 +1950,35 @@ export default function ThemeStudio() {
                         animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
                         transition={{ duration: 0.85, ease: 'easeOut' }}
                       >
-                        <div className="aspect-[3/4] rounded-t-[60px] rounded-b-xs overflow-hidden mb-2.5 relative border border-black/10">
+                        <div className="aspect-[3/4] rounded-t-[60px] rounded-b-xs overflow-hidden mb-2.5 relative border border-black/10 flex items-center justify-center">
+                          {/* UNDERLAY FRAME */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Frame Underlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
+
                           <img
                             src={customAssets.bridePhotoUrl}
                             alt="Bride"
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2' : 'relative z-0'}`}
                             style={{
                               transform: `translate(${customAssets.bridePhotoSettings?.posX || 0}px, ${customAssets.bridePhotoSettings?.posY || 0}px) scale(${customAssets.bridePhotoSettings?.scale || 1})`,
                               filter: `brightness(${customAssets.bridePhotoSettings?.brightness || 100}%) blur(${customAssets.bridePhotoSettings?.blur || 0}px)`,
                             }}
                           />
-                          {customAssets.coupleFrameUrl && (
+
+                          {/* OVERLAY FRAME */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Couple Frame"
-                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              alt="Frame Overlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
                                 transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
                               }}
@@ -1917,21 +2010,35 @@ export default function ThemeStudio() {
                         animate={{ opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' }}
                         transition={{ duration: 0.85, delay: 0.1, ease: 'easeOut' }}
                       >
-                        <div className="aspect-[3/4] rounded-t-[60px] rounded-b-xs overflow-hidden mb-2.5 relative border border-black/10">
+                        <div className="aspect-[3/4] rounded-t-[60px] rounded-b-xs overflow-hidden mb-2.5 relative border border-black/10 flex items-center justify-center">
+                          {/* UNDERLAY FRAME */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'photo_front' && (
+                            <img
+                              src={customAssets.coupleFrameUrl}
+                              alt="Frame Underlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0 select-none"
+                              style={{
+                                transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
+                              }}
+                            />
+                          )}
+
                           <img
                             src={customAssets.groomPhotoUrl}
                             alt="Groom"
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover select-none ${frameLayerOrder === 'photo_front' ? 'relative z-10 p-2' : 'relative z-0'}`}
                             style={{
                               transform: `translate(${customAssets.groomPhotoSettings?.posX || 0}px, ${customAssets.groomPhotoSettings?.posY || 0}px) scale(${customAssets.groomPhotoSettings?.scale || 1})`,
                               filter: `brightness(${customAssets.groomPhotoSettings?.brightness || 100}%) blur(${customAssets.groomPhotoSettings?.blur || 0}px)`,
                             }}
                           />
-                          {customAssets.coupleFrameUrl && (
+
+                          {/* OVERLAY FRAME */}
+                          {customAssets.coupleFrameUrl && frameLayerOrder === 'frame_front' && (
                             <img
                               src={customAssets.coupleFrameUrl}
-                              alt="Couple Frame"
-                              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                              alt="Frame Overlay"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
                               style={{
                                 transform: `translate(${customAssets.coupleFrameSettings?.posX || 0}px, ${customAssets.coupleFrameSettings?.posY || 0}px) scale(${customAssets.coupleFrameSettings?.scale || 1})`,
                               }}
