@@ -4,7 +4,8 @@ import {
   Sparkles, DollarSign, Users, CheckCircle, Clock, Search, Filter,
   Download, MessageCircle, Copy, Check, Trash2, Edit, ExternalLink,
   Eye, Tag, Megaphone, Plus, AlertCircle, RefreshCw, Smartphone, Layers,
-  CreditCard, QrCode, Upload, TrendingUp, Settings, ShieldCheck
+  CreditCard, QrCode, Upload, TrendingUp, Settings, ShieldCheck,
+  Printer, Receipt, FileText
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -81,8 +82,9 @@ export default function Admin() {
   const [adminPackages, setAdminPackages] = useState(defaultPackages)
   const [savingPackages, setSavingPackages] = useState(false)
 
-  // WhatsApp Action Modal State
+  // Modals State
   const [waModalItem, setWaModalItem] = useState(null)
+  const [invoiceModalItem, setInvoiceModalItem] = useState(null)
   const [copied, setCopied] = useState('')
 
   useEffect(() => {
@@ -794,6 +796,14 @@ export default function Admin() {
 
                           <button
                             type="button"
+                            onClick={() => setInvoiceModalItem(item)}
+                            className="border border-ink/20 px-3 py-1.5 hover:bg-gold/10 hover:border-gold-deep text-ink inline-flex items-center gap-1 font-semibold"
+                          >
+                            <Receipt size={12} /> Kwitansi
+                          </button>
+
+                          <button
+                            type="button"
                             className="px-2.5 py-1.5 text-stone hover:text-ink"
                             onClick={() => setOpen(open === item.slug ? null : item.slug)}
                           >
@@ -1414,6 +1424,163 @@ export default function Admin() {
           </div>
         </div>
       )}
+
+      {/* INVOICE & KWITANSI RESMI MODAL */}
+      {invoiceModalItem && (() => {
+        const pack = adminPackages.find((p) => p.id === invoiceModalItem.packageId) || defaultPackages.find((p) => p.id === invoiceModalItem.packageId)
+        const isPaid = invoiceModalItem.status === 'paid'
+        const invNumber = `INV/AR-${invoiceModalItem.orderCode || '0000'}/${new Date(invoiceModalItem.createdAt || Date.now()).getFullYear()}`
+        const invDate = formatLongDate(new Date(invoiceModalItem.createdAt || Date.now()).toISOString())
+        const price = pack ? pack.price : 0
+
+        return (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto print:p-0 print:bg-white print:fixed print:inset-0">
+            <div className="bg-paper border border-ink/20 max-w-2xl w-full p-6 sm:p-8 rounded-sm shadow-2xl space-y-6 my-auto print:border-none print:shadow-none print:p-4 print:m-0 print:max-w-none">
+              
+              {/* Modal Top Actions (Hidden on Print) */}
+              <div className="flex items-center justify-between border-b border-ink/10 pb-3 print:hidden">
+                <div className="flex items-center gap-2 text-ink">
+                  <Receipt className="text-gold-deep" size={18} />
+                  <span className="font-display font-bold text-base">Kwitansi &amp; Invoice Resmi</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="bg-ink text-ivory px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1.5 hover:bg-gold-deep transition-colors"
+                  >
+                    <Printer size={13} /> Cetak / Simpan PDF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInvoiceModalItem(null)}
+                    className="text-stone hover:text-ink text-xs font-bold px-2 py-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              {/* PRINTABLE INVOICE CONTENT */}
+              <div className="space-y-6 print:space-y-4">
+                {/* Header Brand */}
+                <div className="flex flex-wrap items-start justify-between gap-4 border-b border-ink/15 pb-5">
+                  <div>
+                    <p className="font-display text-3xl font-bold tracking-tight text-ink">ARUNA</p>
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-gold-deep font-semibold">Digital Wedding Invitation</p>
+                    <p className="text-xs text-stone mt-1">halo@aruna.undangan · WhatsApp: 0851-5744-0439</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-mono text-xs font-bold text-ink">{invNumber}</p>
+                    <p className="text-xs text-stone mt-0.5">Tanggal: {invDate}</p>
+                    <div className="mt-2">
+                      <span
+                        className={`inline-block px-3 py-1 text-xs uppercase tracking-widest font-bold border ${
+                          isPaid
+                            ? 'bg-green-100 text-green-900 border-green-400'
+                            : 'bg-amber-100 text-amber-900 border-amber-400'
+                        }`}
+                      >
+                        {isPaid ? '✓ LUNAS / PAID' : 'MENUNGGU PEMBAYARAN'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer & Event Details */}
+                <div className="grid grid-cols-2 gap-4 text-xs bg-ivory/40 p-4 border border-ink/10 rounded-xs">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-stone font-semibold">Ditagihkan Kepada:</p>
+                    <p className="font-bold text-ink text-sm mt-0.5">{invoiceModalItem.customerName || 'Calon Pengantin'}</p>
+                    <p className="text-stone font-mono">{invoiceModalItem.customerWhatsapp || '-'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase tracking-wider text-stone font-semibold">Mempelai &amp; Tanggal Acara:</p>
+                    <p className="font-bold text-ink text-sm mt-0.5">{invoiceModalItem.bride?.nick} &amp; {invoiceModalItem.groom?.nick}</p>
+                    <p className="text-stone">{formatLongDate(invoiceModalItem.date)}</p>
+                  </div>
+                </div>
+
+                {/* Itemized Table */}
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-ink/20 text-[10px] uppercase tracking-wider text-stone">
+                      <th className="py-2">Rincian Item</th>
+                      <th className="py-2 text-center">Qty</th>
+                      <th className="py-2 text-right">Harga</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-ink/10">
+                    <tr>
+                      <td className="py-3">
+                        <p className="font-bold text-ink">{pack?.name || 'Paket Undangan Digital'}</p>
+                        <p className="text-stone text-[11px]">Tema: {getTheme(invoiceModalItem.themeId, customThemesList).name} · Tautan: /u/{invoiceModalItem.slug}</p>
+                      </td>
+                      <td className="py-3 text-center">1</td>
+                      <td className="py-3 text-right font-mono font-semibold">{formatRupiah(price)}</td>
+                    </tr>
+                    {invoiceModalItem.voucher && (
+                      <tr>
+                        <td className="py-2 text-green-700">Voucher Diskon ({invoiceModalItem.voucher})</td>
+                        <td className="py-2 text-center text-green-700">-</td>
+                        <td className="py-2 text-right text-green-700 font-mono">-</td>
+                      </tr>
+                    )}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-ink/20 font-bold">
+                      <td className="py-3 uppercase tracking-wider">Total Pembayaran</td>
+                      <td className="py-3 text-center">-</td>
+                      <td className="py-3 text-right text-base font-mono text-ink">{formatRupiah(price)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+
+                {/* Footer Signature & Stamp */}
+                <div className="flex items-end justify-between pt-4 border-t border-ink/10 text-xs">
+                  <div className="text-stone text-[11px] max-w-xs space-y-1">
+                    <p>Terima kasih atas kepercayaan Anda menggunakan layanan undangan digital Aruna.</p>
+                    <p className="text-[10px] italic">Kwitansi ini sah dan diterbitkan secara digital oleh sistem Aruna.</p>
+                  </div>
+                  <div className="text-center font-body">
+                    <div className="w-28 h-12 mx-auto flex items-center justify-center border border-dashed border-green-600/50 rounded-xs bg-green-50/50 mb-1">
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-green-800 rotate-[-4deg]">
+                        ARUNA VERIFIED
+                      </span>
+                    </div>
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-stone">Finance &amp; Billing Aruna</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Bottom Actions (Hidden on Print) */}
+              <div className="pt-3 border-t border-ink/10 flex flex-wrap items-center justify-between gap-3 print:hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const phone = (invoiceModalItem.customerWhatsapp || '').replace(/[^0-9]/g, '')
+                    const cleanPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone
+                    const msg = `Halo Kak ${invoiceModalItem.customerName || ''}! Berikut tanda terima resmi pembayaran undangan digital Aruna:\n\n📄 *Nomor Kwitansi:* ${invNumber}\n💍 *Mempelai:* ${invoiceModalItem.bride?.nick} & ${invoiceModalItem.groom?.nick}\n📦 *Paket:* ${pack?.name || invoiceModalItem.packageId}\n💰 *Total:* ${formatRupiah(price)}\n✅ *Status:* ${isPaid ? 'LUNAS' : 'MENUNGGU PEMBAYARAN'}\n\nTerima kasih telah mempercayakan momen bahagia Anda bersama Aruna! 🙏✨`
+                    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank')
+                  }}
+                  className="bg-green-700 text-white px-4 py-2 text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1.5 hover:bg-green-800 transition-colors shadow-xs"
+                >
+                  <MessageCircle size={14} /> Kirim Bukti Kwitansi ke WA Klien
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setInvoiceModalItem(null)}
+                  className="border border-ink/20 px-4 py-2 text-xs font-semibold uppercase tracking-wider hover:bg-ink/5"
+                >
+                  Tutup
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )
+      })()}
 
       <SiteFooter />
     </div>
