@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { getDemoBySlug, getTheme } from '../data/themes'
-import { fetchInvitation } from '../lib/api'
+import { fetchInvitation, recordInvitationView } from '../lib/api'
 import { guestFromSearch } from '../lib/utils'
 import Invitation from '../invitation/Invitation'
 
@@ -21,6 +21,12 @@ export default function InvitationPage() {
         if (live) {
           setData(item)
           setMissing(false)
+          // Increment visitor counter once per tab session
+          const sessionKey = `aruna_view_${slug}`
+          if (!sessionStorage.getItem(sessionKey)) {
+            sessionStorage.setItem(sessionKey, '1')
+            recordInvitationView(slug)
+          }
         }
       } catch {
         if (live && !demo) setMissing(true)

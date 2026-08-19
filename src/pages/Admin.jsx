@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import {
   Sparkles, DollarSign, Users, CheckCircle, Clock, Search, Filter,
   Download, MessageCircle, Copy, Check, Trash2, Edit, ExternalLink,
-  Eye, Tag, Megaphone, Plus, AlertCircle, RefreshCw, Smartphone, Layers
+  Eye, Tag, Megaphone, Plus, AlertCircle, RefreshCw, Smartphone, Layers,
+  CreditCard, QrCode, Upload, TrendingUp, Settings, ShieldCheck
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -24,10 +25,15 @@ import {
   fetchCustomThemes,
   fetchVouchers,
   saveVoucher,
-  deleteVoucher
+  deleteVoucher,
+  fetchSettings,
+  savePaymentSettings,
+  fetchDynamicPackages,
+  saveDynamicPackages,
+  uploadFile
 } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
-import { formatRupiah, packages } from '../data/site'
+import { formatRupiah, packages as defaultPackages } from '../data/site'
 import { invitePath } from '../lib/nav'
 
 export default function Admin() {
@@ -41,7 +47,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(true)
   
   // Navigation Tabs
-  const [mainTab, setMainTab] = useState('orders') // 'orders' | 'themes' | 'vouchers' | 'announcement'
+  const [mainTab, setMainTab] = useState('orders') // 'orders' | 'themes' | 'vouchers' | 'payment' | 'pricing' | 'announcement'
   const [orderTab, setOrderTab] = useState('all') // 'all' | 'unpaid' | 'paid' | 'past'
   
   // Search & Filter
@@ -59,6 +65,22 @@ export default function Admin() {
   const [newVoucherQuota, setNewVoucherQuota] = useState('100')
   const [savingVoucher, setSavingVoucher] = useState(false)
 
+  // Payment Settings State
+  const [paymentSettings, setPaymentSettings] = useState({
+    banks: [
+      { bank: 'BCA', number: '5420198821', name: 'PT Aruna Digital Nusantara' },
+      { bank: 'Mandiri', number: '1370019283741', name: 'PT Aruna Digital Nusantara' },
+      { bank: 'BSI', number: '7190823412', name: 'PT Aruna Digital Nusantara' },
+    ],
+    qrisUrl: '',
+  })
+  const [uploadingQris, setUploadingQris] = useState(false)
+  const [savingPayment, setSavingPayment] = useState(false)
+
+  // Dynamic Packages State
+  const [adminPackages, setAdminPackages] = useState(defaultPackages)
+  const [savingPackages, setSavingPackages] = useState(false)
+
   // WhatsApp Action Modal State
   const [waModalItem, setWaModalItem] = useState(null)
   const [copied, setCopied] = useState('')
@@ -74,14 +96,23 @@ export default function Admin() {
   async function load() {
     try {
       setLoading(true)
-      const [fetchedItems, fetchedAnnouncement, fetchedThemes, fetchedVouchers] = await Promise.all([
+      const [
+        fetchedItems,
+        fetchedAnnouncement,
+        fetchedThemes,
+        fetchedVouchers,
+        fetchedPayment,
+        fetchedPkgs
+      ] = await Promise.all([
         fetchAdminInvitations().catch(() => []),
         getAnnouncement().catch(() => ''),
         fetchCustomThemes().catch(() => []),
         fetchVouchers().catch(() => []),
+        fetchSettings().catch(() => null),
+        fetchDynamicPackages().catch(() => null),
       ])
 
-      // Also merge local custom themes if any
+      // Merge local custom themes
       let localThemes = []
       try {
         localThemes = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
@@ -98,6 +129,14 @@ export default function Admin() {
       setAnnouncement(fetchedAnnouncement || '')
       setCustomThemesList(mergedThemes)
       setVouchersList(fetchedVouchers || [])
+      
+      if (fetchedPayment && Array.isArray(fetchedPayment.banks)) {
+        setPaymentSettings(fetchedPayment)
+      }
+      if (fetchedPkgs && Array.isArray(fetchedPkgs)) {
+        setAdminPackages(fetchedPkgs)
+      }
+
       setError('')
     } catch (err) {
       console.error(err)
@@ -137,9 +176,10 @@ export default function Admin() {
     let pastCount = 0
     let totalGuests = 0
     let totalAttending = 0
+    let totalViews = 0
 
     items.forEach((item) => {
-      const pack = packages.find((p) => p.id === item.packageId)
+      const pack = adminPackages.find((p) => p.id === item.packageId) || defaultPackages.find((p) => p.id === item.packageId)
       const price = pack ? pack.price : 0
       const isPast = new Date(item.date).getTime() < now
 
@@ -157,6 +197,7 @@ export default function Admin() {
       const rsvps = item.rsvps || []
       const guests = item.guests || []
       totalGuests += guests.length
+      totalViews += Number(item.views || 0)
 
       rsvps.forEach((r) => {
         if (r.status === 'hadir') {
@@ -173,9 +214,10 @@ export default function Admin() {
       pastCount,
       totalGuests,
       totalAttending,
+      totalViews,
       customThemesCount: customThemesList.length,
     }
-  }, [items, customThemesList])
+  }, [items, customThemesList, adminPackages])
 
   // Filtered & Searched Orders
   const filteredOrders = useMemo(() => {
@@ -222,6 +264,7 @@ export default function Admin() {
       'Paket',
       'Status Pembayaran',
       'Tanggal Acara',
+      'Pengunjung (Views)',
       'Slug URL',
       'Total RSVP',
       'Total Ucapan',
@@ -236,6 +279,7 @@ export default function Admin() {
       it.packageId || '',
       it.status === 'paid' ? 'Lunas' : 'Belum Bayar',
       it.date || '',
+      it.views || 0,
       invitationUrl(it.slug),
       it.rsvps?.length || 0,
       it.wishes?.length || 0,
@@ -278,6 +322,17 @@ export default function Admin() {
     }
   }
 
+  // Handle Delete Voucher
+  async function handleDeleteVoucher(code) {
+    if (!confirm(`Hapus voucher ${code}?`)) return
+    try {
+      await deleteVoucher(code)
+      load()
+    } catch (err) {
+      alert('Gagal menghapus voucher: ' + err.message)
+    }
+  }
+
   // Handle Delete Custom Theme
   async function handleDeleteCustomTheme(themeId, themeName) {
     if (!confirm(`Hapus tema kustom "${themeName || themeId}"? Tema ini akan dihapus dari katalog dan database.`)) return
@@ -290,14 +345,44 @@ export default function Admin() {
     }
   }
 
-  // Handle Delete Voucher
-  async function handleDeleteVoucher(code) {
-    if (!confirm(`Hapus voucher ${code}?`)) return
+  // Handle Save Payment Settings
+  async function handleSavePayment() {
+    setSavingPayment(true)
     try {
-      await deleteVoucher(code)
-      load()
+      await savePaymentSettings(paymentSettings)
+      alert('Pengaturan rekening & QRIS pembayaran berhasil disimpan!')
     } catch (err) {
-      alert('Gagal menghapus voucher: ' + err.message)
+      alert('Gagal menyimpan: ' + err.message)
+    } finally {
+      setSavingPayment(false)
+    }
+  }
+
+  // Handle Upload QRIS
+  async function handleUploadQris(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingQris(true)
+    try {
+      const res = await uploadFile(file)
+      setPaymentSettings((prev) => ({ ...prev, qrisUrl: res.url }))
+    } catch (err) {
+      alert('Gagal upload QRIS: ' + err.message)
+    } finally {
+      setUploadingQris(false)
+    }
+  }
+
+  // Handle Save Packages Pricing
+  async function handleSavePackages() {
+    setSavingPackages(true)
+    try {
+      await saveDynamicPackages(adminPackages)
+      alert('Pengaturan harga paket berhasil diperbarui!')
+    } catch (err) {
+      alert('Gagal menyimpan paket: ' + err.message)
+    } finally {
+      setSavingPackages(false)
     }
   }
 
@@ -307,7 +392,7 @@ export default function Admin() {
     const cleanPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone
     const clientUrl = `${window.location.origin}/kelola/${item.slug}?key=${item.editKey || ''}`
     const invUrl = invitationUrl(item.slug)
-    const pack = packages.find((p) => p.id === item.packageId)
+    const pack = adminPackages.find((p) => p.id === item.packageId) || defaultPackages.find((p) => p.id === item.packageId)
     const priceText = pack ? formatRupiah(pack.price) : ''
 
     let message = ''
@@ -411,49 +496,59 @@ export default function Admin() {
         </div>
 
         {/* 1. TOP METRICS & REVENUE ANALYTICS */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
           {/* Total Revenue */}
-          <div className="bg-paper border border-ink/15 p-4 sm:p-5 rounded-sm shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-stone text-xs uppercase tracking-wider font-medium">
+          <div className="bg-paper border border-ink/15 p-4 rounded-sm shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-stone text-[11px] uppercase tracking-wider font-medium">
               <span>Omset Lunas</span>
-              <DollarSign size={16} className="text-green-700" />
+              <DollarSign size={15} className="text-green-700" />
             </div>
-            <p className="text-2xl font-bold font-display text-green-800">
+            <p className="text-xl sm:text-2xl font-bold font-display text-green-800">
               {formatRupiah(analytics.totalRevenue)}
             </p>
             <p className="text-[10px] text-stone">Dari {analytics.paidCount + analytics.pastCount} order lunas</p>
           </div>
 
           {/* Total Orders */}
-          <div className="bg-paper border border-ink/15 p-4 sm:p-5 rounded-sm shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-stone text-xs uppercase tracking-wider font-medium">
+          <div className="bg-paper border border-ink/15 p-4 rounded-sm shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-stone text-[11px] uppercase tracking-wider font-medium">
               <span>Total Pesanan</span>
-              <Layers size={16} className="text-gold-deep" />
+              <Layers size={15} className="text-gold-deep" />
             </div>
-            <p className="text-2xl font-bold font-display text-ink">{analytics.totalOrders}</p>
+            <p className="text-xl sm:text-2xl font-bold font-display text-ink">{analytics.totalOrders}</p>
             <p className="text-[10px] text-stone">
-              {analytics.unpaidCount} belum bayar · {analytics.paidCount} lunas aktif
+              {analytics.unpaidCount} belum bayar · {analytics.paidCount} lunas
             </p>
           </div>
 
           {/* Guest Attendance */}
-          <div className="bg-paper border border-ink/15 p-4 sm:p-5 rounded-sm shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-stone text-xs uppercase tracking-wider font-medium">
-              <span>Konfirmasi Tamu</span>
-              <Users size={16} className="text-blue-700" />
+          <div className="bg-paper border border-ink/15 p-4 rounded-sm shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-stone text-[11px] uppercase tracking-wider font-medium">
+              <span>Konfirmasi Hadir</span>
+              <Users size={15} className="text-blue-700" />
             </div>
-            <p className="text-2xl font-bold font-display text-blue-900">{analytics.totalAttending}</p>
-            <p className="text-[10px] text-stone">Total tamu hadir di seluruh acara</p>
+            <p className="text-xl sm:text-2xl font-bold font-display text-blue-900">{analytics.totalAttending}</p>
+            <p className="text-[10px] text-stone">Total tamu terdaftar RSVP</p>
+          </div>
+
+          {/* Total Views / Visitor Count */}
+          <div className="bg-paper border border-ink/15 p-4 rounded-sm shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-stone text-[11px] uppercase tracking-wider font-medium">
+              <span>Total Pengunjung</span>
+              <Eye size={15} className="text-purple-700" />
+            </div>
+            <p className="text-xl sm:text-2xl font-bold font-display text-purple-900">{analytics.totalViews}</p>
+            <p className="text-[10px] text-stone">Akumulasi views undangan</p>
           </div>
 
           {/* Custom Studio Themes */}
-          <div className="bg-paper border border-ink/15 p-4 sm:p-5 rounded-sm shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-stone text-xs uppercase tracking-wider font-medium">
+          <div className="bg-paper border border-ink/15 p-4 rounded-sm shadow-xs space-y-1 col-span-2 md:col-span-1">
+            <div className="flex items-center justify-between text-stone text-[11px] uppercase tracking-wider font-medium">
               <span>Tema Studio</span>
-              <Sparkles size={16} className="text-gold-deep" />
+              <Sparkles size={15} className="text-gold-deep" />
             </div>
-            <p className="text-2xl font-bold font-display text-ink">{analytics.customThemesCount}</p>
-            <p className="text-[10px] text-stone">Tema hasil kreasi komunitas</p>
+            <p className="text-xl sm:text-2xl font-bold font-display text-ink">{analytics.customThemesCount}</p>
+            <p className="text-[10px] text-stone">Tema hasil kreasi kustom</p>
           </div>
         </div>
 
@@ -463,6 +558,8 @@ export default function Admin() {
             ['orders', `Daftar Pesanan (${items.length})`],
             ['themes', `Tema Kustom Studio (${customThemesList.length})`],
             ['vouchers', `Voucher Diskon (${vouchersList.length})`],
+            ['payment', 'Rekening & QRIS'],
+            ['pricing', 'Paket & Harga'],
             ['announcement', 'Spanduk Pengumuman'],
           ].map(([tKey, tLabel]) => (
             <button
@@ -504,9 +601,9 @@ export default function Admin() {
                   className="border border-ink/15 bg-transparent py-2 px-3 text-xs focus:border-ink focus:outline-none"
                 >
                   <option value="all">Semua Paket</option>
-                  <option value="essential">Paket Essential</option>
-                  <option value="signature">Paket Signature</option>
-                  <option value="royal">Paket Royal</option>
+                  <option value="hemat">Paket Hemat</option>
+                  <option value="lengkap">Paket Lengkap</option>
+                  <option value="premium">Paket Premium</option>
                 </select>
               </div>
             </div>
@@ -541,7 +638,7 @@ export default function Admin() {
               <div className="grid gap-4">
                 {filteredOrders.map((item) => {
                   const theme = getTheme(item.themeId, customThemesList)
-                  const pack = packages.find((p) => p.id === item.packageId)
+                  const pack = adminPackages.find((p) => p.id === item.packageId) || defaultPackages.find((p) => p.id === item.packageId)
                   const hadir = (item.rsvps || []).filter((r) => r.status === 'hadir')
                   const heads = hadir.reduce((n, r) => n + Number(r.guests || 1), 0)
                   const totalPrice = pack ? pack.price : 0
@@ -571,6 +668,9 @@ export default function Admin() {
                             </span>
                             <span className="text-xs font-mono font-semibold text-stone">
                               {item.orderCode || 'NO-CODE'} · {theme.name}
+                            </span>
+                            <span className="text-[11px] font-mono text-purple-800 bg-purple-50 px-2 py-0.5 border border-purple-200 rounded-xs flex items-center gap-1 font-semibold">
+                              <Eye size={12} /> {item.views || 0} views
                             </span>
                             {item.customDomain && (
                               <span className="px-2 py-0.5 text-[10px] bg-gold-deep/10 text-gold-deep uppercase tracking-wider font-semibold border border-gold-deep/30">
@@ -947,7 +1047,273 @@ export default function Admin() {
           </div>
         )}
 
-        {/* TAB 4: SPANDUK PENGUMUMAN GLOBAL */}
+        {/* TAB 4: REKENING & QRIS PEMBAYARAN */}
+        {mainTab === 'payment' && (
+          <div className="space-y-6 max-w-4xl">
+            <div>
+              <h2 className="font-display text-2xl font-bold">Pengaturan Rekening &amp; QRIS Pembayaran</h2>
+              <p className="text-xs text-stone mt-0.5">
+                Data rekening dan barcode QRIS ini akan otomatis tampil di halaman checkout dan instruksi transfer pelanggan.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Daftar Rekening Bank */}
+              <div className="bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-display text-base font-bold flex items-center gap-2">
+                    <CreditCard size={18} className="text-gold-deep" /> Rekening Bank Pembayaran
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPaymentSettings((prev) => ({
+                        ...prev,
+                        banks: [...(prev.banks || []), { bank: 'Bank Baru', number: '', name: 'PT Aruna Digital' }],
+                      }))
+                    }
+                    className="text-[10px] uppercase tracking-wider font-semibold text-gold-deep hover:underline"
+                  >
+                    + Tambah Bank
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {(paymentSettings.banks || []).map((b, idx) => (
+                    <div key={idx} className="border border-ink/15 p-3 rounded-xs space-y-2 bg-ivory/20">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] uppercase tracking-wider font-semibold text-stone">Bank #{idx + 1}</span>
+                        {(paymentSettings.banks || []).length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setPaymentSettings((prev) => ({
+                                ...prev,
+                                banks: prev.banks.filter((_, i) => i !== idx),
+                              }))
+                            }
+                            className="text-[10px] text-red-600 underline"
+                          >
+                            Hapus
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] uppercase text-stone mb-0.5">Nama Bank</label>
+                          <input
+                            type="text"
+                            value={b.bank}
+                            onChange={(e) => {
+                              const val = e.target.value
+                              setPaymentSettings((prev) => {
+                                const n = [...prev.banks]
+                                n[idx].bank = val
+                                return { ...prev, banks: n }
+                              })
+                            }}
+                            className="w-full border border-ink/20 p-1.5 text-xs bg-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase text-stone mb-0.5">Nomor Rekening</label>
+                          <input
+                            type="text"
+                            value={b.number}
+                            onChange={(e) => {
+                              const val = e.target.value
+                              setPaymentSettings((prev) => {
+                                const n = [...prev.banks]
+                                n[idx].number = val
+                                return { ...prev, banks: n }
+                              })
+                            }}
+                            className="w-full border border-ink/20 p-1.5 text-xs bg-white font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] uppercase text-stone mb-0.5">Atas Nama (A.N.)</label>
+                        <input
+                          type="text"
+                          value={b.name}
+                          onChange={(e) => {
+                            const val = e.target.value
+                            setPaymentSettings((prev) => {
+                              const n = [...prev.banks]
+                              n[idx].name = val
+                              return { ...prev, banks: n }
+                            })
+                          }}
+                          className="w-full border border-ink/20 p-1.5 text-xs bg-white"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Upload QRIS Barcode */}
+              <div className="bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-4">
+                <h3 className="font-display text-base font-bold flex items-center gap-2">
+                  <QrCode size={18} className="text-gold-deep" /> Barcode QRIS Statis / Dinamis
+                </h3>
+                <p className="text-xs text-stone">
+                  Upload gambar QRIS agar pelanggan bisa langsung scan bayar melalui Gopay, OVO, ShopeePay, Dana, atau Mobile Banking.
+                </p>
+
+                <div className="border border-dashed border-ink/20 p-4 text-center rounded-sm space-y-3 bg-ivory/30">
+                  {paymentSettings.qrisUrl ? (
+                    <div className="space-y-2">
+                      <img
+                        src={paymentSettings.qrisUrl}
+                        alt="QRIS"
+                        className="max-h-48 mx-auto object-contain border p-2 bg-white shadow-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPaymentSettings((prev) => ({ ...prev, qrisUrl: '' }))}
+                        className="text-xs text-red-600 underline"
+                      >
+                        Hapus Gambar QRIS
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 py-4">
+                      <QrCode size={36} className="mx-auto text-stone/50" />
+                      <p className="text-xs text-stone">Belum ada gambar QRIS yang diunggah.</p>
+                    </div>
+                  )}
+
+                  <label className="inline-flex items-center gap-1.5 bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer hover:bg-gold-deep transition-colors">
+                    <Upload size={14} /> {uploadingQris ? 'Mengunggah...' : 'Upload Gambar QRIS'}
+                    <input type="file" accept="image/*" onChange={handleUploadQris} className="hidden" />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSavePayment}
+              disabled={savingPayment}
+              className="bg-ink text-ivory px-6 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50"
+            >
+              {savingPayment ? 'Menyimpan...' : 'Simpan Pengaturan Pembayaran'}
+            </button>
+          </div>
+        )}
+
+        {/* TAB 5: PENGATURAN PAKET & HARGA */}
+        {mainTab === 'pricing' && (
+          <div className="space-y-6 max-w-4xl">
+            <div>
+              <h2 className="font-display text-2xl font-bold">Pengaturan Harga &amp; Paket Layanan</h2>
+              <p className="text-xs text-stone mt-0.5">
+                Ubah nominal harga setiap paket. Perubahan akan langsung aktif di halaman depan dan form pemesanan.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              {adminPackages.map((pkg, idx) => (
+                <div key={pkg.id} className="bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-3 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs uppercase font-bold text-stone">ID: {pkg.id}</span>
+                      {pkg.popular && (
+                        <span className="bg-gold-deep text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-bold">
+                          Populer
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Nama Paket</label>
+                      <input
+                        type="text"
+                        value={pkg.name}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setAdminPackages((prev) => {
+                            const n = [...prev]
+                            n[idx].name = val
+                            return n
+                          })
+                        }}
+                        className="w-full border border-ink/20 p-2 text-sm font-bold bg-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Harga Paket (Rp)</label>
+                      <input
+                        type="number"
+                        value={pkg.price}
+                        onChange={(e) => {
+                          const val = Number(e.target.value) || 0
+                          setAdminPackages((prev) => {
+                            const n = [...prev]
+                            n[idx].price = val
+                            return n
+                          })
+                        }}
+                        className="w-full border border-ink/20 p-2 text-base font-mono font-bold text-green-800 bg-white"
+                      />
+                      <p className="text-[10px] text-stone mt-0.5">{formatRupiah(pkg.price)}</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Keterangan Singkat</label>
+                      <textarea
+                        rows={2}
+                        value={pkg.blurb || ''}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setAdminPackages((prev) => {
+                            const n = [...prev]
+                            n[idx].blurb = val
+                            return n
+                          })
+                        }}
+                        className="w-full border border-ink/20 p-2 text-xs bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-ink/10 flex items-center justify-between text-xs">
+                    <span className="text-stone">Tandai Populer:</span>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(pkg.popular)}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        setAdminPackages((prev) => {
+                          const n = [...prev]
+                          n[idx].popular = checked
+                          return n
+                        })
+                      }}
+                      className="w-4 h-4 accent-gold-deep cursor-pointer"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSavePackages}
+              disabled={savingPackages}
+              className="bg-ink text-ivory px-6 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50"
+            >
+              {savingPackages ? 'Menyimpan...' : 'Simpan Harga Paket'}
+            </button>
+          </div>
+        )}
+
+        {/* TAB 6: SPANDUK PENGUMUMAN GLOBAL */}
         {mainTab === 'announcement' && (
           <div className="bg-paper border border-ink/15 p-6 rounded-sm shadow-xs space-y-4 max-w-3xl">
             <div className="flex items-center gap-2 text-gold-deep">

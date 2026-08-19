@@ -35,10 +35,68 @@ function readEditKeys() {
 const generateKey = () => Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
 
 export async function fetchSettings() {
+  try {
+    const docRef = doc(db, 'settings', 'payment')
+    const snap = await getDoc(docRef)
+    if (snap.exists()) {
+      return snap.data()
+    }
+  } catch (err) {
+    console.warn('Firestore payment settings fetch:', err)
+  }
   return {
-    bank: null
+    bank: {
+      bank: 'BCA',
+      number: '5420198821',
+      name: 'PT Aruna Digital Nusantara',
+    },
+    banks: [
+      { bank: 'BCA', number: '5420198821', name: 'PT Aruna Digital Nusantara' },
+      { bank: 'Mandiri', number: '1370019283741', name: 'PT Aruna Digital Nusantara' },
+      { bank: 'BSI', number: '7190823412', name: 'PT Aruna Digital Nusantara' },
+    ],
+    qrisUrl: '',
   }
 }
+
+export async function savePaymentSettings(settings) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const docRef = doc(db, 'settings', 'payment')
+  await setDoc(docRef, settings)
+  return { success: true }
+}
+
+export async function fetchDynamicPackages() {
+  try {
+    const docRef = doc(db, 'settings', 'packages')
+    const snap = await getDoc(docRef)
+    if (snap.exists() && Array.isArray(snap.data().packages)) {
+      return snap.data().packages
+    }
+  } catch {}
+  return null
+}
+
+export async function saveDynamicPackages(packagesList) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const docRef = doc(db, 'settings', 'packages')
+  await setDoc(docRef, { packages: packagesList, updatedAt: Date.now() })
+  return { success: true }
+}
+
+export async function recordInvitationView(slug) {
+  try {
+    const docRef = doc(db, 'invitations', slug)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      const currentViews = docSnap.data().views || 0
+      await updateDoc(docRef, { views: currentViews + 1 })
+    }
+  } catch (err) {
+    // Silent non-blocking
+  }
+}
+
 
 export async function loginAdmin(password) {
   try {
