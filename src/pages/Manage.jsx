@@ -5,6 +5,7 @@ import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import QrCameraScanner from '../components/QrCameraScanner'
 import WeddingFrameModal from '../components/WeddingFrameModal'
+import PrintCardModal from '../components/PrintCardModal'
 import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl, uid } from '../lib/utils'
 import { shareWaLink, waLink } from '../data/site'
@@ -45,6 +46,7 @@ export default function Manage() {
   const [recentCheckIn, setRecentCheckIn] = useState(null)
   const [showScanner, setShowScanner] = useState(false)
   const [showStoryModal, setShowStoryModal] = useState(false)
+  const [showPrintCardModal, setShowPrintCardModal] = useState(false)
 
   const backHref = backFromInvite(slug, { key: editKey && !isAdmin ? editKey : '', from: isAdmin ? 'admin' : '' })
   const backLabel = isAdmin ? '← Kembali ke admin' : '← Kembali ke halaman bayar'
@@ -492,6 +494,13 @@ export default function Manage() {
             >
               Edit data
             </Link>
+            <button
+              type="button"
+              onClick={() => setShowPrintCardModal(true)}
+              className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep px-3 py-2 font-semibold inline-flex items-center gap-1 hover:bg-gold-deep hover:text-white transition-colors"
+            >
+              <QrCode size={13} /> Kartu Souvenir &amp; QR
+            </button>
             <button type="button" onClick={reload} className="border border-ink/20 px-3 py-2">
               Segarkan
             </button>
@@ -1340,6 +1349,13 @@ export default function Manage() {
           data={item}
           couple={`${item.bride?.nick || ''} & ${item.groom?.nick || ''}`}
           onClose={() => setShowStoryModal(false)}
+        />
+      )}
+
+      {showPrintCardModal && item && (
+        <PrintCardModal
+          item={item}
+          onClose={() => setShowPrintCardModal(false)}
         />
       )}
 

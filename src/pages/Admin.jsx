@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
+import PrintCardModal from '../components/PrintCardModal'
 import { getTheme, themes } from '../data/themes'
 import { auth } from '../lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -87,6 +88,7 @@ export default function Admin() {
   const [waModalItem, setWaModalItem] = useState(null)
   const [invoiceModalItem, setInvoiceModalItem] = useState(null)
   const [cloneModalItem, setCloneModalItem] = useState(null)
+  const [printCardModalItem, setPrintCardModalItem] = useState(null)
   const [newCloneSlug, setNewCloneSlug] = useState('')
   const [cloning, setCloning] = useState(false)
   
@@ -932,6 +934,15 @@ export default function Admin() {
                             title="Kirim undangan massal semi-otomatis ke daftar kontak tamu"
                           >
                             <Send size={12} /> WA Blast
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setPrintCardModalItem(item)}
+                            className="border border-ink/20 px-3 py-1.5 hover:bg-gold/10 hover:border-gold-deep text-ink inline-flex items-center gap-1 font-semibold"
+                            title="Cetak kartu souvenir, mini invitation, atau nomor meja siap potong"
+                          >
+                            <QrCode size={12} /> Kartu Cetak
                           </button>
 
                           <button
@@ -2000,6 +2011,14 @@ export default function Admin() {
           </div>
         )
       })()}
+
+      {/* PRINT-READY PHYSICAL CARD & QR SOUVENIR MODAL */}
+      {printCardModalItem && (
+        <PrintCardModal
+          item={printCardModalItem}
+          onClose={() => setPrintCardModalItem(null)}
+        />
+      )}
 
       <SiteFooter />
     </div>
