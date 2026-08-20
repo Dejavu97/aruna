@@ -1,22 +1,22 @@
 /* ===================================================
    THE WEDDING GAZETTE · RETRO EDITORIAL BROADSHEET
    10-Scene Theatrical Fairytale of Newsprint
-   Aruna Digital Wedding Engine
+   Aruna Digital Wedding Engine · Fully Decorated Edition
    =================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700;1,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Special+Elite&display=swap');
 
 :root {
-  --gz-bg: #EAE1D0;
-  --gz-paper: #F8F2E6;
-  --gz-paper-crease: #EDE2CD;
-  --gz-paper-dark: #DCCBB3;
-  --gz-ink: #18130F;
-  --gz-ink-soft: #382F26;
+  --gz-bg: #E7DECD;
+  --gz-paper: #FAF4E8;
+  --gz-paper-crease: #EDE1CB;
+  --gz-paper-dark: #D8C5AD;
+  --gz-ink: #16110D;
+  --gz-ink-soft: #382D24;
   --gz-muted: #6B5B4E;
-  --gz-border: #241A13;
-  --gz-red: #8F1D1D;
-  --gz-gold: #A37016;
+  --gz-border: #221811;
+  --gz-red: #8B1A1A;
+  --gz-gold: #9E6B15;
   --gz-font-headline: 'Playfair Display', 'Cinzel', Georgia, serif;
   --gz-font-serif: 'Newsreader', Georgia, serif;
   --gz-font-mono: 'Courier Prime', 'Special Elite', monospace;
@@ -42,7 +42,7 @@
   background-image: url('/themes/koran/pattern_bg.jpg');
   background-size: 320px;
   background-repeat: repeat;
-  opacity: 0.16;
+  opacity: 0.18;
   pointer-events: none;
   z-index: 0;
 }
@@ -68,7 +68,7 @@
   background-image: url('/themes/koran/newspaper_layout.jpg');
   background-size: cover;
   background-position: center;
-  opacity: 0.28;
+  opacity: 0.32;
   filter: contrast(1.15) sepia(0.35);
   transform: scale(1.08);
 }
@@ -79,11 +79,13 @@
   width: 100%;
   max-width: 490px;
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
+  background-size: 280px;
   border: 3px double var(--gz-border);
   border-radius: 4px;
   padding: 2.25rem 1.75rem 2rem;
   text-align: center;
-  box-shadow: 0 30px 70px -15px rgba(24, 19, 15, 0.5), 0 0 0 1px rgba(36, 26, 19, 0.2);
+  box-shadow: 0 30px 70px -15px rgba(22, 17, 13, 0.5), 0 0 0 1px rgba(34, 24, 17, 0.25);
 }
 
 .gz-stamp-ribbon {
@@ -97,7 +99,7 @@
   text-transform: uppercase;
   padding: 0.35rem 1.15rem;
   margin-bottom: 1.15rem;
-  box-shadow: 0 4px 12px rgba(143, 29, 29, 0.4);
+  box-shadow: 0 4px 12px rgba(139, 26, 26, 0.4);
 }
 
 .gz-masthead-hero-img {
@@ -143,6 +145,8 @@
 
 .gz-press-pass {
   background: var(--gz-paper-crease);
+  background-image: url('/themes/koran/pattern_bg.jpg');
+  background-size: 240px;
   border: 1px dashed var(--gz-border);
   padding: 0.85rem 1.25rem;
   margin-bottom: 1.4rem;
@@ -182,7 +186,7 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   cursor: pointer;
-  box-shadow: 0 8px 25px rgba(24, 19, 15, 0.4);
+  box-shadow: 0 8px 25px rgba(22, 17, 13, 0.4);
   transition: all 0.25s ease;
 }
 
@@ -192,7 +196,7 @@
 }
 
 /* ===================================================
-   MAIN EDITORIAL BROADSHEET (AFTER UNROLL)
+   MAIN EDITORIAL BROADSHEET CONTAINER
    =================================================== */
 .gz-stage {
   max-width: 780px;
@@ -216,7 +220,7 @@
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 15px rgba(24, 19, 15, 0.2);
+  box-shadow: 0 4px 15px rgba(22, 17, 13, 0.2);
 }
 
 .gz-ticker-badge {
@@ -231,11 +235,14 @@
 /* Header Masthead */
 .gz-masthead-box {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
+  background-size: 300px;
   border: 3px double var(--gz-border);
   padding: 1.5rem 1.25rem 1.15rem;
   text-align: center;
   margin-bottom: 2rem;
-  box-shadow: 0 8px 25px rgba(24, 19, 15, 0.08);
+  box-shadow: 0 8px 25px rgba(22, 17, 13, 0.08);
+  position: relative;
 }
 
 .gz-masthead-title {
@@ -282,33 +289,81 @@
   text-transform: uppercase;
 }
 
-/* Dividers & Flourishes */
+/* Flourish Ribbon Dividers */
 .gz-flourish-divider {
   width: 100%;
-  max-width: 240px;
-  height: 20px;
+  max-width: 260px;
+  height: 22px;
   object-fit: contain;
-  margin: 0.5rem auto 1rem;
-  opacity: 0.85;
-  filter: contrast(1.1) sepia(0.25);
+  margin: 1.5rem auto;
+  opacity: 0.9;
+  filter: contrast(1.15) sepia(0.25);
+  display: block;
 }
 
-.gz-double-rule {
-  border-top: 3px double var(--gz-border);
-  margin: 2rem 0;
+/* ===================================================
+   PANEL BOX DECORATION SYSTEM (NEVER PLAIN)
+   =================================================== */
+.gz-panel-box {
+  background-color: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
+  background-size: 280px;
+  border: 2px solid var(--gz-border);
+  position: relative;
+  padding: 2rem 1.65rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 10px 30px rgba(22, 17, 13, 0.09);
+}
+
+/* Ornate Corner Brackets on all Panels */
+.gz-panel-box::before {
+  content: '❖';
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 0.9rem;
+  color: var(--gz-red);
+  line-height: 1;
+}
+
+.gz-panel-box::after {
+  content: '❖';
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.9rem;
+  color: var(--gz-red);
+  line-height: 1;
+}
+
+.gz-panel-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.gz-panel-header::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 2px;
+  background: var(--gz-red);
+  margin: 0.5rem auto 0;
+}
+
+.gz-role-badge {
+  font-family: var(--gz-font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--gz-red);
+  margin-bottom: 0.25rem;
 }
 
 /* ===================================================
    SCENE 2: LEAD ARTICLE (Headline & Hero)
    =================================================== */
-.gz-lead-card {
-  background: var(--gz-paper);
-  border: 2px solid var(--gz-border);
-  padding: 1.75rem 1.5rem;
-  margin-bottom: 2.5rem;
-  box-shadow: 0 10px 30px rgba(24, 19, 15, 0.08);
-}
-
 .gz-lead-headline {
   font-family: var(--gz-font-headline);
   font-size: clamp(2rem, 7.5vw, 3.2rem);
@@ -325,6 +380,7 @@
   border: 2px solid var(--gz-border);
   padding: 6px;
   background: var(--gz-paper-crease);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   margin-bottom: 1.25rem;
 }
 
@@ -357,6 +413,7 @@
 /* Weather Widget */
 .gz-weather-card {
   background: var(--gz-paper-crease);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 1px solid var(--gz-border);
   padding: 0.85rem 1.25rem;
   display: flex;
@@ -392,7 +449,7 @@
 .gz-profiles-grid {
   display: grid;
   gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -402,13 +459,31 @@
 }
 
 .gz-profile-card {
-  background: var(--gz-paper);
+  background: var(--gz-paper-crease);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+}
+
+.gz-profile-card::before {
+  content: '❦';
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  color: var(--gz-red);
+}
+
+.gz-profile-card::after {
+  content: '❦';
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  color: var(--gz-red);
 }
 
 .gz-profile-photo-vignette {
@@ -416,7 +491,7 @@
   height: 180px;
   border: 2px solid var(--gz-border);
   padding: 4px;
-  background: var(--gz-paper-crease);
+  background: var(--gz-paper);
   margin-bottom: 1rem;
 }
 
@@ -425,16 +500,6 @@
   height: 100%;
   object-fit: cover;
   filter: contrast(1.1) sepia(0.2);
-}
-
-.gz-role-badge {
-  font-family: var(--gz-font-mono);
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--gz-red);
-  margin-bottom: 0.25rem;
 }
 
 .gz-profile-name {
@@ -462,7 +527,7 @@
   text-decoration: none;
   border: 1px solid var(--gz-border);
   padding: 0.35rem 0.85rem;
-  background: var(--gz-paper-crease);
+  background: var(--gz-paper);
   transition: all 0.2s ease;
 }
 
@@ -471,17 +536,26 @@
   color: var(--gz-paper);
 }
 
+/* Center Sketch Caricature Box */
+.gz-sketch-feature-box {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
+  padding: 1.25rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.gz-sketch-feature-img {
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  border: 1px solid var(--gz-border);
+  filter: contrast(1.12) sepia(0.2);
+}
+
 /* ===================================================
    SCENE 4: EDITORIAL OPINION & HOROSCOPE (Quote)
    =================================================== */
-.gz-opinion-card {
-  background: var(--gz-paper-crease);
-  border: 2px solid var(--gz-border);
-  padding: 2.25rem 1.75rem;
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
 .gz-horoscope-circle {
   width: 74px;
   height: 74px;
@@ -489,6 +563,7 @@
   border-radius: 50%;
   border: 2px solid var(--gz-border);
   margin: 0 auto 1.25rem;
+  filter: contrast(1.15) sepia(0.2);
 }
 
 .gz-opinion-quote {
@@ -498,27 +573,23 @@
   line-height: 1.8;
   color: var(--gz-ink);
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .gz-opinion-cite {
+  display: block;
   font-family: var(--gz-font-headline);
   font-size: 0.82rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--gz-red);
+  text-align: center;
 }
 
 /* ===================================================
    SCENE 5: COMIC STRIP (Cerita Cinta Bergambar)
    =================================================== */
-.gz-comic-card {
-  background: var(--gz-paper);
-  border: 2px solid var(--gz-border);
-  padding: 1.75rem 1.35rem;
-  margin-bottom: 2.5rem;
-}
-
 .gz-comic-banner {
   font-family: var(--gz-font-headline);
   font-size: 1.15rem;
@@ -528,6 +599,15 @@
   border-bottom: 2px solid var(--gz-border);
   padding-bottom: 0.5rem;
   margin-bottom: 1.25rem;
+}
+
+.gz-comic-art-strip {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border: 2px solid var(--gz-border);
+  margin-bottom: 1.25rem;
+  filter: contrast(1.1) sepia(0.2);
 }
 
 .gz-comic-grid {
@@ -545,8 +625,10 @@
   border: 2px solid var(--gz-border);
   padding: 0.85rem;
   background: var(--gz-paper-crease);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .gz-comic-step {
@@ -587,13 +669,28 @@
 }
 
 .gz-event-card {
-  background: var(--gz-paper);
+  background: var(--gz-paper-crease);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+}
+
+.gz-event-stamp-badge {
+  display: inline-block;
+  border: 1px dashed var(--gz-red);
+  color: var(--gz-red);
+  font-family: var(--gz-font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 0.2rem 0.6rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
 }
 
 .gz-event-title {
@@ -658,7 +755,7 @@
   background: var(--gz-paper);
   border: 2px solid var(--gz-border);
   padding: 1.25rem;
-  margin-bottom: 2.5rem;
+  margin-top: 1rem;
   text-align: center;
 }
 
@@ -673,14 +770,6 @@
 /* ===================================================
    SCENE 7: COUNTDOWN & CROSSWORD (Hitung Mundur & TTS)
    =================================================== */
-.gz-countdown-card {
-  background: var(--gz-paper-crease);
-  border: 2px solid var(--gz-border);
-  padding: 2.25rem 1.5rem;
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
 .gz-countdown-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -690,9 +779,10 @@
 }
 
 .gz-digit-box {
-  background: var(--gz-paper);
+  background: var(--gz-paper-crease);
   border: 2px solid var(--gz-border);
   padding: 0.85rem 0.25rem;
+  text-align: center;
 }
 
 .gz-digit-val {
@@ -713,7 +803,7 @@
 }
 
 .gz-crossword-card {
-  background: var(--gz-paper);
+  background: var(--gz-paper-crease);
   border: 2px solid var(--gz-border);
   padding: 1.5rem;
   margin-top: 1.5rem;
@@ -737,7 +827,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.85rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -771,11 +861,26 @@
    SCENE 9: CLASSIFIED ADS & DIGITAL GIFTS (Amplop)
    =================================================== */
 .gz-bank-card {
-  background: var(--gz-paper);
+  background: var(--gz-paper-crease);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.65rem 1.35rem;
   text-align: center;
   margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.gz-bank-card::before {
+  content: '✂ - - - - - - - - - - - - - - - - - - - - - - - - - - - -';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  font-family: var(--gz-font-mono);
+  font-size: 0.65rem;
+  color: var(--gz-muted);
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .gz-bank-name {
@@ -806,7 +911,7 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.55rem 1.25rem;
-  background: var(--gz-paper-crease);
+  background: var(--gz-paper);
   border: 1px solid var(--gz-border);
   font-family: var(--gz-font-mono);
   font-size: 0.72rem;
@@ -825,10 +930,12 @@
    SCENE 10: TELEGRAM & RSVP GUESTBOOK
    =================================================== */
 .gz-form-card {
-  background: var(--gz-paper);
+  background: var(--gz-paper-crease);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 2.25rem 1.65rem;
   margin-bottom: 2rem;
+  position: relative;
 }
 
 .gz-input-group {
@@ -855,7 +962,7 @@
   border: 1px solid var(--gz-border);
   font-family: var(--gz-font-mono);
   font-size: 0.85rem;
-  background: var(--gz-paper-crease);
+  background: var(--gz-paper);
   color: var(--gz-ink);
 }
 
@@ -895,7 +1002,7 @@
 }
 
 .gz-feed-item {
-  background: var(--gz-paper-crease);
+  background: var(--gz-paper);
   border: 1px solid var(--gz-border);
   padding: 1.15rem 1.25rem;
   text-align: left;
@@ -937,7 +1044,7 @@
 }
 
 .gz-reply-box {
-  background: var(--gz-paper);
+  background: var(--gz-paper-crease);
   border: 1px dashed var(--gz-border);
   padding: 0.65rem 0.95rem;
   margin-top: 0.65rem;
@@ -956,12 +1063,13 @@
   height: 46px;
   border-radius: 50%;
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   color: var(--gz-ink);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(24, 19, 15, 0.35);
+  box-shadow: 0 6px 20px rgba(22, 17, 13, 0.35);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -977,13 +1085,15 @@
   transform: translateX(-50%);
   z-index: 50;
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
+  background-size: 200px;
   border: 2px solid var(--gz-border);
   border-radius: 50px;
   padding: 0.35rem 0.65rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  box-shadow: 0 10px 35px rgba(24, 19, 15, 0.35);
+  box-shadow: 0 10px 35px rgba(22, 17, 13, 0.35);
 }
 
 .gz-nav-item {

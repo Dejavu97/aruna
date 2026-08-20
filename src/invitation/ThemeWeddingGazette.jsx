@@ -259,7 +259,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
 
           {/* Toast Notification */}
           {toast && (
-            <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#18130F] text-[#F8F2E6] px-5 py-2.5 rounded font-mono text-xs shadow-2xl border border-white/20">
+            <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#16110D] text-[#FAF4E8] px-5 py-2.5 rounded font-mono text-xs shadow-2xl border border-white/20">
               ✓ {toast}
             </div>
           )}
@@ -300,12 +300,15 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
           </header>
 
           {/* ===================================================
-              SCENE 2: FRONT PAGE LEAD STORY (Hero Section)
+              SCENE 2: LEAD ARTICLE (Headline & Hero)
               =================================================== */}
-          <motion.section className="gz-lead-card" {...fadeUp}>
-            <h2 className="gz-lead-headline">
-              THE GRAND WEDDING OF {data.bride?.nick || 'ANDINI'} &amp; {data.groom?.nick || 'DIMAS'}
-            </h2>
+          <motion.section className="gz-panel-box" {...fadeUp}>
+            <div className="gz-panel-header">
+              <p className="gz-role-badge">BERITA UTAMA HARI INI</p>
+              <h2 className="gz-lead-headline">
+                THE GRAND WEDDING OF {data.bride?.nick || 'ANDINI'} &amp; {data.groom?.nick || 'DIMAS'}
+              </h2>
+            </div>
 
             {/* Lead Photo Frame (Asset: couple_main.jpg) */}
             <div className="gz-lead-photo-frame">
@@ -318,7 +321,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
               </p>
             </div>
 
-            <p className="text-justify text-sm leading-relaxed text-[#382F26]">
+            <p className="text-justify text-sm leading-relaxed text-[#382D24]">
               <span className="gz-drop-cap">D</span>engan rasa syukur yang mendalam, kami mengabarkan kepada seluruh keluarga besar, sahabat, dan kerabat tercinta bahwa hari penyatuan janji suci kami akan segera dilangsungkan dengan penuh kegembiraan dan limpahan berkah.
             </p>
 
@@ -335,18 +338,18 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
           <img src={A.ornaments} alt="" className="gz-flourish-divider" />
 
           {/* ===================================================
-              SCENE 3: EXCLUSIVE INTERVIEW (The Bride & Groom)
+              SCENE 3: EXCLUSIVE INTERVIEW (The Couple Profiles)
               =================================================== */}
-          <section id="couple">
-            <motion.div className="text-center mb-6" {...fadeUp}>
+          <section id="couple" className="gz-panel-box">
+            <div className="gz-panel-header">
               <p className="gz-role-badge">FEATURED PROFILES · EXCLUSIVE INTERVIEW</p>
               <h3 className="font-serif font-black text-3xl uppercase">Mempelai Berbahagia</h3>
               <p className="text-xs text-stone-600 font-mono">Dua Tokoh Utama dalam Berita Hari Ini</p>
-            </motion.div>
+            </div>
 
             <div className="gz-profiles-grid">
               {/* THE GROOM */}
-              <motion.div className="gz-profile-card" {...fadeUp}>
+              <div className="gz-profile-card">
                 <div className="gz-profile-photo-vignette">
                   <img
                     src={data.groom?.photo || A.couple}
@@ -369,10 +372,10 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                     <span>📷</span> @{String(data.groom.ig).replace(/^@/, '')}
                   </a>
                 )}
-              </motion.div>
+              </div>
 
               {/* THE BRIDE */}
-              <motion.div className="gz-profile-card" {...fadeUp}>
+              <div className="gz-profile-card">
                 <div className="gz-profile-photo-vignette">
                   <img
                     src={data.bride?.photo || A.couple}
@@ -395,27 +398,48 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                     <span>📷</span> @{String(data.bride.ig).replace(/^@/, '')}
                   </a>
                 )}
-              </motion.div>
+              </div>
+            </div>
+
+            {/* Hand-Drawn Caricature Sketch Feature */}
+            <div className="gz-sketch-feature-box">
+              <p className="gz-role-badge">SKETSA POTRET RESMI REDAKSI</p>
+              <img src={A.sketch} alt="Sketsa Pengantin" className="gz-sketch-feature-img" />
+              <p className="text-xs font-mono text-stone-600 mt-2">
+                "Dua hati yang dipersatukan dalam ikatan cinta abadi."
+              </p>
             </div>
           </section>
+
+          <img src={A.ornaments} alt="" className="gz-flourish-divider" />
 
           {/* ===================================================
               SCENE 4: EDITORIAL OPINION & HOROSCOPE (Quote)
               =================================================== */}
-          <motion.section className="gz-opinion-card" {...fadeUp}>
+          <motion.section className="gz-panel-box" {...fadeUp}>
+            <div className="gz-panel-header">
+              <p className="gz-role-badge">KOLOM REDAKSI · AYAT SUCI &amp; FILOSOFI</p>
+            </div>
             <img src={A.horoscope} alt="Horoscope" className="gz-horoscope-circle" />
-            <p className="gz-role-badge">KOLOM REDAKSI · AYAT SUCI &amp; FILOSOFI</p>
             <blockquote className="gz-opinion-quote">
               "{data.quote || 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.'}"
             </blockquote>
             <cite className="gz-opinion-cite">— {data.quoteSource || 'QS. Ar-Rum: 21'}</cite>
           </motion.section>
 
+          <img src={A.ornaments} alt="" className="gz-flourish-divider" />
+
           {/* ===================================================
               SCENE 5: COMIC STRIP LOVE STORY (Linimasa Komik)
               =================================================== */}
-          <motion.section id="story" className="gz-comic-card" {...fadeUp}>
-            <p className="gz-comic-banner">THE SUNDAY COMICS: "THE STORY OF US"</p>
+          <motion.section id="story" className="gz-panel-box" {...fadeUp}>
+            <div className="gz-panel-header">
+              <p className="gz-role-badge">THE SUNDAY COMICS SPECIAL</p>
+              <h3 className="font-serif font-black text-2xl uppercase">"The Story of Us"</h3>
+            </div>
+
+            {/* Comic Strip Header Illustration */}
+            <img src={A.comic} alt="Comic Strip" className="gz-comic-art-strip" />
 
             <div className="gz-comic-grid">
               {(data.story || [
@@ -444,15 +468,17 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             </div>
           </motion.section>
 
+          <img src={A.ornaments} alt="" className="gz-flourish-divider" />
+
           {/* ===================================================
               SCENE 6: SPECIAL BULLETIN & HAND-DRAWN MAP (Acara & Peta)
               =================================================== */}
-          <section id="event">
-            <motion.div className="text-center mb-6" {...fadeUp}>
+          <section id="event" className="gz-panel-box">
+            <div className="gz-panel-header">
               <p className="gz-role-badge">OFFICIAL DISPATCH · ITINERARY</p>
               <h3 className="font-serif font-black text-3xl uppercase">Waktu &amp; Tempat Acara</h3>
               <p className="text-xs text-stone-600 font-mono">Maklumat Resmi Agenda Pernikahan</p>
-            </motion.div>
+            </div>
 
             <div className="gz-events-grid">
               {(data.events || [
@@ -473,8 +499,9 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                   maps: 'https://maps.google.com',
                 },
               ]).map((ev, idx) => (
-                <motion.div key={idx} className="gz-event-card" {...fadeUp}>
+                <div key={idx} className="gz-event-card">
                   <div>
+                    <span className="gz-event-stamp-badge">DISPATCH #{idx + 1}</span>
                     <h4 className="gz-event-title">{ev.title}</h4>
                     <p className="gz-event-date">{formatLongDate(ev.date || data.date)}</p>
                     <p className="gz-event-time">{ev.time || '09.00 WIB - Selesai'}</p>
@@ -487,12 +514,12 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                       <MapPin size={13} /> BUKA GOOGLE MAPS
                     </a>
                   )}
-                </motion.div>
+                </div>
               ))}
             </div>
 
             {/* Hand-Drawn Vintage Wedding Map Feature (Asset: vintage_map.jpg) */}
-            <motion.div className="gz-map-feature-card" {...fadeUp}>
+            <div className="gz-map-feature-card">
               <p className="gz-role-badge">VINTAGE ROUTE MAP &amp; GUIDE</p>
               <img
                 src={A.map}
@@ -502,15 +529,19 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
               <p className="text-xs font-mono text-stone-600 mt-2">
                 Peta Ilustrasi Lokasi: Ikuti petunjuk rute menuju tempat perhelatan resepsi pernikahan.
               </p>
-            </motion.div>
+            </div>
           </section>
+
+          <img src={A.ornaments} alt="" className="gz-flourish-divider" />
 
           {/* ===================================================
               SCENE 7: COUNTDOWN & CROSSWORD (Hitung Mundur & TTS)
               =================================================== */}
-          <motion.section className="gz-countdown-card" {...fadeUp}>
-            <p className="gz-role-badge">COUNTDOWN TO SHOWTIME</p>
-            <h3 className="font-serif font-black text-3xl uppercase">Menghitung Waktu Bersejarah</h3>
+          <motion.section className="gz-panel-box" {...fadeUp}>
+            <div className="gz-panel-header">
+              <p className="gz-role-badge">COUNTDOWN TO SHOWTIME</p>
+              <h3 className="font-serif font-black text-3xl uppercase">Menghitung Waktu Bersejarah</h3>
+            </div>
 
             <div className="gz-countdown-grid">
               <div className="gz-digit-box">
@@ -531,19 +562,21 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
               </div>
             </div>
 
-            <a
-              href={googleCalendarUrl({
-                title: `The Wedding of ${couple}`,
-                details: `Pernikahan ${couple}. Informasi: ${typeof window !== 'undefined' ? window.location.href : ''}`,
-                location: data.events?.[0]?.venue || data.location || '',
-                date: data.date,
-              })}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 border-2 border-black bg-[#FAF4E8] px-5 py-2 font-mono text-xs font-bold uppercase hover:bg-black hover:text-[#FAF4E8] transition-colors"
-            >
-              <Calendar size={13} /> SIMPAN KE GOOGLE CALENDAR
-            </a>
+            <div className="text-center mt-3">
+              <a
+                href={googleCalendarUrl({
+                  title: `The Wedding of ${couple}`,
+                  details: `Pernikahan ${couple}. Informasi: ${typeof window !== 'undefined' ? window.location.href : ''}`,
+                  location: data.events?.[0]?.venue || data.location || '',
+                  date: data.date,
+                })}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 border-2 border-black bg-[#FAF4E8] px-5 py-2.5 font-mono text-xs font-bold uppercase hover:bg-black hover:text-[#FAF4E8] transition-colors"
+              >
+                <Calendar size={14} /> SIMPAN KE GOOGLE CALENDAR
+              </a>
+            </div>
 
             {/* Wedding Crossword Feature (Asset: crossword.jpg) */}
             <div className="gz-crossword-card">
@@ -559,26 +592,27 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             </div>
           </motion.section>
 
+          <img src={A.ornaments} alt="" className="gz-flourish-divider" />
+
           {/* ===================================================
               SCENE 8: PHOTO ROTOGRAVURE (Galeri Foto)
               =================================================== */}
-          <section id="gallery">
-            <motion.div className="text-center mb-6" {...fadeUp}>
+          <section id="gallery" className="gz-panel-box">
+            <div className="gz-panel-header">
               <p className="gz-role-badge">PHOTO ROTOGRAVURE SECTION</p>
               <h3 className="font-serif font-black text-3xl uppercase">Galeri Momen</h3>
               <p className="text-xs text-stone-600 font-mono">Dokumentasi Potret Prewedding</p>
-            </motion.div>
+            </div>
 
             <div className="gz-gallery-grid">
               {galleryPhotos.map((src, idx) => (
-                <motion.div
+                <div
                   key={idx}
                   className="gz-gallery-cell"
                   onClick={() => setLightbox(idx)}
-                  {...fadeUp}
                 >
                   <img src={src} alt={`Gallery ${idx + 1}`} loading="lazy" />
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -605,24 +639,26 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             )}
           </section>
 
+          <img src={A.ornaments} alt="" className="gz-flourish-divider" />
+
           {/* ===================================================
               SCENE 9: CLASSIFIED ADS & WEDDING GIFT (Amplop Digital)
               =================================================== */}
-          <section id="gift">
-            <motion.div className="text-center mb-6" {...fadeUp}>
+          <section id="gift" className="gz-panel-box">
+            <div className="gz-panel-header">
               <p className="gz-role-badge">CLASSIFIED ADVERTISEMENTS · WEDDING GIFT</p>
               <h3 className="font-serif font-black text-3xl uppercase">Amplop Digital &amp; Kado</h3>
               <p className="text-xs text-stone-600 max-w-md mx-auto mt-1 font-mono">
                 Doa restu Anda adalah hadiah terindah. Bagi yang ingin memberikan tanda kasih secara digital dapat melalui kolom warta perbendaharaan:
               </p>
-            </motion.div>
+            </div>
 
             <div className="max-w-md mx-auto">
               {(data.banks || [
                 { bank: 'BCA', name: data.groom?.nick || 'Dimas Pratama', number: '7281920391' },
                 { bank: 'Bank Mandiri', name: data.bride?.nick || 'Andini Putri', number: '1370019283741' },
               ]).map((b, idx) => (
-                <motion.div key={idx} className="gz-bank-card" {...fadeUp}>
+                <div key={idx} className="gz-bank-card">
                   <p className="gz-bank-name">{b.bank}</p>
                   <p className="gz-acc-num">{b.number}</p>
                   <p className="gz-acc-holder">a.n. {b.name}</p>
@@ -641,25 +677,27 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                       </>
                     )}
                   </button>
-                </motion.div>
+                </div>
               ))}
             </div>
           </section>
 
+          <img src={A.ornaments} alt="" className="gz-flourish-divider" />
+
           {/* ===================================================
               SCENE 10: TELEGRAM & RSVP GUESTBOOK (Buku Tamu)
               =================================================== */}
-          <section id="rsvp">
-            <motion.div className="text-center mb-6" {...fadeUp}>
+          <section id="rsvp" className="gz-panel-box">
+            <div className="gz-panel-header">
               <p className="gz-role-badge">TELEGRAM DISPATCH · PRESS GUESTBOOK</p>
               <h3 className="font-serif font-black text-3xl uppercase">Konfirmasi &amp; Doa Restu</h3>
               <p className="text-xs text-stone-600 font-mono">Kirimkan Telegram Ucapan Selamat</p>
-            </motion.div>
+            </div>
 
             {/* RSVP Form */}
-            <motion.div className="gz-form-card" {...fadeUp}>
+            <div className="gz-form-card">
               <div className="flex items-center gap-2 mb-3">
-                <Ticket size={18} className="text-[#8F1D1D]" />
+                <Ticket size={18} className="text-[#8B1A1A]" />
                 <h4 className="font-serif font-bold text-lg uppercase">Konfirmasi Kehadiran (RSVP Ticket)</h4>
               </div>
               {rsvpSuccess && (
@@ -713,10 +751,10 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                   {submittingRsvp ? 'MENGIRIM TELEGRAM...' : 'KIRIM KONFIRMASI RSVP'}
                 </button>
               </form>
-            </motion.div>
+            </div>
 
             {/* Telegram Wishes Form & Feed */}
-            <motion.div className="gz-form-card" {...fadeUp}>
+            <div className="gz-form-card">
               <h4 className="font-serif font-bold text-lg mb-3 uppercase">Kirim Kawat Doa &amp; Harapan</h4>
               {wishSuccess && (
                 <div className="p-3 mb-4 bg-[#E0EED4] text-[#2D5A1E] text-xs border border-[#2D5A1E]/30 font-mono">
@@ -766,20 +804,20 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                     <p className="gz-feed-text">{w.message || w.text}</p>
                     {w.reply && (
                       <div className="gz-reply-box">
-                        <p className="font-bold text-[10px] uppercase text-[#8F1D1D]">Balasan Redaksi / Mempelai:</p>
+                        <p className="font-bold text-[10px] uppercase text-[#8B1A1A]">Balasan Redaksi / Mempelai:</p>
                         <p>{w.reply}</p>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </section>
 
           {/* ===================================================
               SCENE 11: EVENING EDITION CLOSING (Penutup)
               =================================================== */}
-          <footer className="text-center pt-8 pb-16 border-t-2 border-[#241A13]">
+          <footer className="text-center pt-8 pb-16 border-t-2 border-[#221811]">
             <p className="gz-role-badge">★ EDITION CLOSED · THANK YOU ★</p>
             <h3 className="font-serif font-black text-3xl uppercase mt-1 mb-2">{couple}</h3>
             <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
