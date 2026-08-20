@@ -23,11 +23,17 @@ import AttariInvitation from './AttariInvitation'
 import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
 import ThemeArtJawaBiru from './ThemeArtJawaBiru'
+import ThemeRoyalBunny from './ThemeRoyalBunny'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
+
+  // Tema Royal Bunny Fairytale
+  if (theme.layout === 'royal-bunny' || theme.id === 'royal-bunny') {
+    return <ThemeRoyalBunny data={data} guest={guest} preview={preview} theme={theme} />
+  }
 
   // Tema Adat Jawa
   if (theme.layout === 'adat-jawa') {

@@ -9,6 +9,32 @@ const galleryClassic = [
 
 export const themes = [
   {
+    id: 'royal-bunny',
+    name: 'Royal Bunny Fairytale',
+    tag: 'Premium',
+    tags: ['premium', 'imut', 'kelinci', 'fairytale', 'elegan', 'romantis'],
+    popular: true,
+    collection: 'premium',
+    description: 'Tema dongeng kelinci kerajaan (Royal Bunny & Romantic Garden) yang imut, manis, namun tetap sangat mewah dan berkelas.',
+    cover: '/themes/kelinci/cover.jpg',
+    layout: 'royal-bunny',
+    opener: 'The Fairytale Wedding of',
+    fonts: {
+      display: '"Playfair Display", "Cinzel", serif',
+      script: '"Alex Brush", cursive',
+      body: '"Plus Jakarta Sans", sans-serif',
+    },
+    colors: {
+      bg: '#FAF7F2',
+      paper: '#FFFFFF',
+      fg: '#2D241E',
+      muted: '#8C7A6B',
+      accent: '#C48B9F',
+      accentSoft: '#FDEEF2',
+      cover: '#FAF7F2',
+    },
+  },
+  {
     id: 'art-jawa-biru',
     name: 'Art Jawa Biru',
     tag: 'Premium',
@@ -851,6 +877,74 @@ export const demos = {
     ],
     banks: [
       { bank: 'BCA', name: 'Gilang Saputra', number: '1234567890' },
+    ],
+  }),
+  'royal-bunny': demo({
+    themeId: 'royal-bunny',
+    slug: 'sarah-budi-bunny',
+    groom: {
+      nick: 'Budi',
+      full: 'Budi Santoso, S.Kom.',
+      parents: 'Putra tercinta dari Bpk. Hendra Santoso & Ibu Susi Wardani',
+      photo: '/themes/kelinci/groom_suit.jpg',
+      ig: 'budisantoso',
+    },
+    bride: {
+      nick: 'Sarah',
+      full: 'Sarah Anindya, S.Ds.',
+      parents: 'Putri tercinta dari Bpk. Ir. Wijaya Kusuma & Ibu Ratna Dewi',
+      photo: '/themes/kelinci/bride_veil.jpg',
+      ig: 'sarahanindya',
+    },
+    date: '2026-10-24',
+    quote: 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.',
+    quoteSource: 'QS. Ar-Rum: 21',
+    story: [
+      {
+        year: '2022',
+        title: 'Awal Bertemu di Taman Musim Semi',
+        text: 'Sebuah perjumpaan tak terduga yang menumbuhkan rasa hangat dan benih-benih cinta yang tulus.',
+      },
+      {
+        year: '2024',
+        title: 'Mengikat Janji Bersama',
+        text: 'Di bawah naungan bunga-bunga bermekaran, kami saling mengucap janji untuk saling menemani seumur hidup.',
+      },
+      {
+        year: '2026',
+        title: 'Menuju Mahligai Pernikahan',
+        text: 'Hari bahagia di mana kami melangkah bersama membangun masa depan penuh cinta dan berkah.',
+      },
+    ],
+    gallery: [
+      '/themes/kelinci/couple_main.jpg',
+      '/themes/kelinci/holding_paws.jpg',
+      '/themes/kelinci/formal_rabbits.jpg',
+      '/themes/kelinci/hero_garden.jpg',
+      '/themes/kelinci/bride_veil.jpg',
+      '/themes/kelinci/groom_suit.jpg',
+    ],
+    events: [
+      {
+        title: 'Akad Nikah',
+        date: '2026-10-24',
+        time: '08:00 - 10:00 WIB',
+        venue: 'Garden Pavilion & Sanctuary',
+        address: 'Jl. Taman Bunga Asri No. 8, Kebayoran Baru, Jakarta Selatan',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+      {
+        title: 'Resepsi Pernikahan',
+        date: '2026-10-24',
+        time: '11:00 - 14:00 WIB',
+        venue: 'Royal Botanical Grand Ballroom',
+        address: 'Jl. Taman Bunga Asri No. 8, Kebayoran Baru, Jakarta Selatan',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Budi Santoso', number: '8720194821' },
+      { bank: 'Bank Mandiri', name: 'Sarah Anindya', number: '1370019283741' },
     ],
   }),
 }

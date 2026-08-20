@@ -1,0 +1,970 @@
+/* ===================================================
+   ROYAL BUNNY FAIRYTALE THEME STYLES
+   =================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --rb-bg: #FAF7F2;
+  --rb-paper: #FFFFFF;
+  --rb-paper-soft: #FFF9F8;
+  --rb-ink: #2D241E;
+  --rb-muted: #8C7A6B;
+  --rb-gold: #C5A059;
+  --rb-gold-soft: #EFE4D1;
+  --rb-rose: #C48B9F;
+  --rb-rose-soft: #FDEEF2;
+  --rb-rose-deep: #9A5A72;
+  --rb-border: rgba(196, 139, 159, 0.25);
+  --rb-font-serif: 'Playfair Display', 'Cinzel', Georgia, serif;
+  --rb-font-script: 'Alex Brush', cursive;
+  --rb-font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.rb-container {
+  background-color: var(--rb-bg);
+  color: var(--rb-ink);
+  font-family: var(--rb-font-sans);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background Texture */
+.rb-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/themes/kelinci/pattern_bg.jpg');
+  background-size: 280px;
+  background-repeat: repeat;
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===================================================
+   COVER SECTION (AMPLOP SEGEL KELINCI EMAS)
+   =================================================== */
+.rb-cover-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: radial-gradient(circle at center, #FFFDFB 0%, #F5EFE6 100%);
+  overflow: hidden;
+}
+
+.rb-cover-bg-image {
+  position: absolute;
+  inset: 0;
+  background-image: url('/themes/kelinci/hero_garden.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px) saturate(0.85);
+  opacity: 0.25;
+  transform: scale(1.05);
+}
+
+.rb-cover-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--rb-border);
+  border-radius: 20px;
+  padding: 2.5rem 1.75rem;
+  text-align: center;
+  box-shadow: 0 20px 45px -10px rgba(45, 36, 30, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  backdrop-filter: blur(16px);
+}
+
+.rb-cover-badge {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--rb-gold);
+  padding: 3px;
+  background: #FFF9F5;
+  box-shadow: 0 8px 20px rgba(196, 139, 159, 0.25);
+  overflow: hidden;
+}
+
+.rb-cover-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.rb-cover-kicker {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--rb-rose-deep);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.rb-cover-names {
+  font-family: var(--rb-font-serif);
+  font-size: clamp(2rem, 7vw, 2.75rem);
+  font-weight: 600;
+  color: var(--rb-ink);
+  line-height: 1.15;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.rb-cover-amp {
+  font-family: var(--rb-font-script);
+  font-size: 2.2rem;
+  color: var(--rb-gold);
+  font-weight: 400;
+  display: inline-block;
+  margin: 0 0.35rem;
+  vertical-align: middle;
+}
+
+.rb-cover-date {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--rb-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.rb-guest-box {
+  background: var(--rb-rose-soft);
+  border: 1px solid var(--rb-border);
+  border-radius: 12px;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.rb-guest-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--rb-muted);
+  margin-bottom: 0.25rem;
+}
+
+.rb-guest-name {
+  font-family: var(--rb-font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--rb-rose-deep);
+  line-height: 1.3;
+}
+
+.rb-open-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  background: linear-gradient(135deg, var(--rb-rose-deep) 0%, var(--rb-rose) 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  box-shadow: 0 10px 25px -5px rgba(154, 90, 114, 0.4);
+  transition: all 0.3s ease;
+}
+
+.rb-open-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -5px rgba(154, 90, 114, 0.55);
+}
+
+/* ===================================================
+   HERO SECTION (TAMAN BUNGA KELINCI ROMANTIS)
+   =================================================== */
+.rb-hero {
+  position: relative;
+  text-align: center;
+  padding: 5rem 1.5rem 3.5rem;
+  overflow: hidden;
+}
+
+.rb-hero-arch-wrap {
+  position: relative;
+  max-width: 320px;
+  margin: 0 auto 2rem;
+}
+
+.rb-hero-arch-image {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  border-radius: 160px 160px 16px 16px;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 20px 40px rgba(45, 36, 30, 0.12);
+}
+
+.rb-hero-frame-border {
+  position: absolute;
+  inset: -10px;
+  border: 1px dashed var(--rb-gold);
+  border-radius: 170px 170px 24px 24px;
+  pointer-events: none;
+}
+
+.rb-hero-title-script {
+  font-family: var(--rb-font-script);
+  font-size: clamp(2.2rem, 8vw, 3.2rem);
+  color: var(--rb-gold);
+  margin-bottom: -0.5rem;
+  line-height: 1;
+}
+
+.rb-hero-names {
+  font-family: var(--rb-font-serif);
+  font-size: clamp(2.2rem, 8vw, 3.5rem);
+  font-weight: 600;
+  color: var(--rb-ink);
+  letter-spacing: 0.02em;
+  margin: 0.5rem 0;
+  line-height: 1.15;
+}
+
+.rb-hero-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--rb-rose-deep);
+  box-shadow: 0 4px 15px rgba(196, 139, 159, 0.12);
+  margin-top: 0.75rem;
+}
+
+/* ===================================================
+   SECTION HEADINGS & DECORATION
+   =================================================== */
+.rb-section {
+  padding: 4rem 1.25rem;
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.rb-section-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.rb-section-kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--rb-rose-deep);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.rb-section-title {
+  font-family: var(--rb-font-serif);
+  font-size: clamp(1.75rem, 5vw, 2.35rem);
+  font-weight: 600;
+  color: var(--rb-ink);
+  line-height: 1.2;
+}
+
+.rb-floral-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0.85rem auto 0;
+}
+
+.rb-floral-divider::before,
+.rb-floral-divider::after {
+  content: '';
+  width: 45px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rb-gold));
+}
+
+.rb-floral-divider::after {
+  background: linear-gradient(90deg, var(--rb-gold), transparent);
+}
+
+.rb-floral-divider img {
+  width: 18px;
+  height: 18px;
+  opacity: 0.85;
+}
+
+/* ===================================================
+   QUOTE & VERSE SECTION
+   =================================================== */
+.rb-quote-card {
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  border-radius: 20px;
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(45, 36, 30, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.rb-quote-illustration {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--rb-gold-soft);
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(196, 139, 159, 0.18);
+}
+
+.rb-quote-illustration img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rb-quote-text {
+  font-family: var(--rb-font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--rb-ink);
+  margin-bottom: 1rem;
+}
+
+.rb-quote-source {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--rb-rose-deep);
+  font-weight: 700;
+}
+
+/* ===================================================
+   COUPLE PROFILES (BRIDE & GROOM ARCH CARDS)
+   =================================================== */
+.rb-couple-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 640px) {
+  .rb-couple-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.rb-person-card {
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(45, 36, 30, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.rb-person-card:hover {
+  transform: translateY(-4px);
+}
+
+.rb-person-photo-arch {
+  width: 140px;
+  height: 180px;
+  border-radius: 80px 80px 12px 12px;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 10px 25px rgba(196, 139, 159, 0.2);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  background: var(--rb-rose-soft);
+}
+
+.rb-person-photo-arch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.rb-person-role {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--rb-rose-deep);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.rb-person-name {
+  font-family: var(--rb-font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--rb-ink);
+  margin-bottom: 0.5rem;
+  line-height: 1.25;
+}
+
+.rb-person-parents {
+  font-size: 0.78rem;
+  color: var(--rb-muted);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.rb-person-ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--rb-rose-deep);
+  text-decoration: none;
+  padding: 0.4rem 0.85rem;
+  background: var(--rb-rose-soft);
+  border-radius: 50px;
+  border: 1px solid var(--rb-border);
+  transition: all 0.2s ease;
+}
+
+.rb-person-ig:hover {
+  background: var(--rb-rose-deep);
+  color: #FFFFFF;
+}
+
+/* ===================================================
+   COUNTDOWN & SAVE THE DATE
+   =================================================== */
+.rb-countdown-wrap {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(253,238,242,0.85));
+  border: 1px solid var(--rb-border);
+  border-radius: 20px;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(196, 139, 159, 0.12);
+  margin-bottom: 2.5rem;
+}
+
+.rb-countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.65rem;
+  max-width: 400px;
+  margin: 1.5rem auto;
+}
+
+.rb-count-box {
+  background: #FFFFFF;
+  border: 1px solid var(--rb-border);
+  border-radius: 12px;
+  padding: 0.85rem 0.35rem;
+  box-shadow: 0 4px 15px rgba(45, 36, 30, 0.05);
+}
+
+.rb-count-num {
+  font-family: var(--rb-font-serif);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--rb-rose-deep);
+  line-height: 1;
+}
+
+.rb-count-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--rb-muted);
+  margin-top: 0.35rem;
+  font-weight: 600;
+}
+
+.rb-cal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--rb-paper);
+  color: var(--rb-ink);
+  border: 1px solid var(--rb-border);
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(45, 36, 30, 0.06);
+  transition: all 0.2s ease;
+}
+
+.rb-cal-btn:hover {
+  background: var(--rb-rose-soft);
+  color: var(--rb-rose-deep);
+  border-color: var(--rb-rose);
+}
+
+/* ===================================================
+   EVENT CARDS (AKAD & RESEPSI)
+   =================================================== */
+.rb-events-grid {
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .rb-events-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.rb-event-card {
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  border-radius: 20px;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(45, 36, 30, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.rb-event-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--rb-rose-soft);
+  border: 1px solid var(--rb-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rb-rose-deep);
+  margin: 0 auto 1rem;
+}
+
+.rb-event-title {
+  font-family: var(--rb-font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--rb-ink);
+  margin-bottom: 0.75rem;
+}
+
+.rb-event-datetime {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--rb-rose-deep);
+  margin-bottom: 0.35rem;
+}
+
+.rb-event-time {
+  font-size: 0.78rem;
+  color: var(--rb-muted);
+  margin-bottom: 1.25rem;
+}
+
+.rb-event-venue {
+  font-family: var(--rb-font-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--rb-ink);
+  margin-bottom: 0.35rem;
+}
+
+.rb-event-addr {
+  font-size: 0.78rem;
+  color: var(--rb-muted);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.rb-event-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.rb-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.15rem;
+  background: var(--rb-rose-deep);
+  color: #FFFFFF;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.rb-map-btn:hover {
+  background: var(--rb-ink);
+}
+
+/* ===================================================
+   LOVE STORY (FAIRYTALE TIMELINE)
+   =================================================== */
+.rb-story-timeline {
+  display: grid;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.rb-story-card {
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(45, 36, 30, 0.04);
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.rb-story-year-badge {
+  background: var(--rb-rose-soft);
+  border: 1px solid var(--rb-border);
+  color: var(--rb-rose-deep);
+  font-family: var(--rb-font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.rb-story-content h4 {
+  font-family: var(--rb-font-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--rb-ink);
+  margin-bottom: 0.35rem;
+}
+
+.rb-story-content p {
+  font-size: 0.8rem;
+  color: var(--rb-muted);
+  line-height: 1.6;
+}
+
+/* ===================================================
+   GALLERY & LIGHTBOX
+   =================================================== */
+.rb-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .rb-gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+}
+
+.rb-gallery-thumb {
+  aspect-ratio: 4/5;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 8px 20px rgba(45, 36, 30, 0.08);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.rb-gallery-thumb:hover {
+  transform: scale(1.03);
+}
+
+.rb-gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===================================================
+   DIGITAL GIFT & AMPLOP (TANDA KASIH)
+   =================================================== */
+.rb-bank-card {
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  border-radius: 18px;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(45, 36, 30, 0.05);
+  margin-bottom: 1.25rem;
+}
+
+.rb-bank-logo-text {
+  font-family: var(--rb-font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--rb-rose-deep);
+  margin-bottom: 0.75rem;
+}
+
+.rb-bank-number {
+  font-family: var(--rb-font-sans);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--rb-ink);
+  margin-bottom: 0.25rem;
+}
+
+.rb-bank-holder {
+  font-size: 0.8rem;
+  color: var(--rb-muted);
+  margin-bottom: 1rem;
+}
+
+.rb-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.25rem;
+  background: var(--rb-rose-soft);
+  color: var(--rb-rose-deep);
+  border: 1px solid var(--rb-border);
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rb-copy-btn:hover {
+  background: var(--rb-rose-deep);
+  color: #FFFFFF;
+}
+
+/* ===================================================
+   RSVP & LIVE WISHES FORM
+   =================================================== */
+.rb-form-card {
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 10px 30px rgba(45, 36, 30, 0.05);
+  margin-bottom: 2rem;
+}
+
+.rb-input-group {
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.rb-input-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--rb-muted);
+  margin-bottom: 0.4rem;
+}
+
+.rb-input-text,
+.rb-select,
+.rb-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(196, 139, 159, 0.35);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-family: var(--rb-font-sans);
+  background: #FAFAFA;
+  color: var(--rb-ink);
+  transition: border-color 0.2s ease;
+}
+
+.rb-input-text:focus,
+.rb-select:focus,
+.rb-textarea:focus {
+  outline: none;
+  border-color: var(--rb-rose-deep);
+  background: #FFFFFF;
+}
+
+.rb-submit-btn {
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  background: var(--rb-rose-deep);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(154, 90, 114, 0.3);
+  transition: all 0.2s ease;
+}
+
+.rb-submit-btn:hover {
+  background: var(--rb-ink);
+}
+
+.rb-wishes-list {
+  display: grid;
+  gap: 0.85rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+
+.rb-wish-item {
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  border-left: 3px solid var(--rb-rose);
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
+  text-align: left;
+}
+
+.rb-wish-author {
+  font-family: var(--rb-font-serif);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--rb-ink);
+}
+
+.rb-wish-status-tag {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 50px;
+  margin-left: 0.5rem;
+}
+
+.rb-wish-status-hadir {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.rb-wish-status-tidak {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.rb-wish-text {
+  font-size: 0.8rem;
+  color: var(--rb-muted);
+  line-height: 1.6;
+  margin-top: 0.4rem;
+}
+
+.rb-wish-reply {
+  background: var(--rb-rose-soft);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  margin-top: 0.65rem;
+  font-size: 0.75rem;
+  border-left: 2px solid var(--rb-rose-deep);
+}
+
+.rb-wish-reply-title {
+  font-weight: 700;
+  color: var(--rb-rose-deep);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.2rem;
+}
+
+/* ===================================================
+   FLOATING AUDIO & BOTTOM NAV
+   =================================================== */
+.rb-audio-btn {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.25rem;
+  z-index: 40;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--rb-paper);
+  border: 1px solid var(--rb-border);
+  color: var(--rb-rose-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(45, 36, 30, 0.15);
+  cursor: pointer;
+}
+
+.rb-nav-bar {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--rb-border);
+  border-radius: 50px;
+  padding: 0.4rem 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 10px 35px rgba(45, 36, 30, 0.15);
+  backdrop-filter: blur(12px);
+}
+
+.rb-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 50px;
+  color: var(--rb-muted);
+  text-decoration: none;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.2s ease;
+}
+
+.rb-nav-item:hover,
+.rb-nav-item.active {
+  color: var(--rb-rose-deep);
+  background: var(--rb-rose-soft);
+}

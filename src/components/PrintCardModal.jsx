@@ -6,6 +6,7 @@ import { uploadFile } from '../lib/api'
 // Preset background textures
 const bgTexturePresets = [
   { id: 'none', label: 'Polos Minimalis', url: '' },
+  { id: 'bunny-garden', label: 'Taman Kelinci', url: '/themes/kelinci/pattern_bg.jpg' },
   { id: 'linen', label: 'Kertas Linen', url: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=600&q=75' },
   { id: 'marble', label: 'Marmer Mewah', url: 'https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=600&q=75' },
   { id: 'gold-leaf', label: 'Emas Elegan', url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=75' },
