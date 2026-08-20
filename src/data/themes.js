@@ -9,6 +9,32 @@ const galleryClassic = [
 
 export const themes = [
   {
+    id: 'wedding-gazette',
+    name: 'The Wedding Gazette',
+    tag: 'Vintage Newspaper',
+    tags: ['vintage', 'koran', 'newspaper', 'retro', 'editorial', 'koleksi', 'unik'],
+    popular: true,
+    collection: 'premium',
+    description: 'Tema Koran Vintage (The Wedding Gazette) editorial klasik lengkap dengan headline berita, komik cinta, teka-teki, dan tiket RSVP.',
+    cover: '/themes/koran/masthead.jpg',
+    layout: 'wedding-gazette',
+    opener: 'Extra! Extra! Read All About It!',
+    fonts: {
+      display: '"Playfair Display", "Cinzel", serif',
+      script: '"Newsreader", serif',
+      body: '"Courier Prime", monospace',
+    },
+    colors: {
+      bg: '#F4EFE6',
+      paper: '#FFFDF8',
+      fg: '#1C1815',
+      muted: '#786C62',
+      accent: '#A62B2B',
+      accentSoft: '#F7F1E5',
+      cover: '#F4EFE6',
+    },
+  },
+  {
     id: 'royal-bunny',
     name: 'Royal Bunny Fairytale',
     tag: 'Premium',
@@ -286,6 +312,24 @@ export function hasTheme(id, customThemes = []) {
 export function getThemeFeatures(themeOrId) {
   const theme = typeof themeOrId === 'string' ? getTheme(themeOrId) : (themeOrId || themes[0])
   const layout = theme.layout || 'classic'
+
+  if (layout === 'wedding-gazette' || layout === 'koran-vintage') {
+    return {
+      quote: true,
+      story: { enabled: true, withPhoto: true },
+      events: { enabled: true, max: 3 },
+      gallery: true,
+      banks: true,
+      music: true,
+      qris: true,
+      dressCode: false,
+      streaming: false,
+      wishlist: false,
+      backdrop: false,
+      textColor: false,
+      frameImage: false,
+    }
+  }
 
   if (layout === 'royal-bunny') {
     return {
@@ -896,6 +940,75 @@ export const demos = {
     ],
     banks: [
       { bank: 'BCA', name: 'Gilang Saputra', number: '1234567890' },
+    ],
+  }),
+  'wedding-gazette': demo({
+    themeId: 'wedding-gazette',
+    slug: 'andini-dimas-gazette',
+    music: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=piano-moment-9835.mp3',
+    groom: {
+      nick: 'Dimas',
+      full: 'Dimas Pratama, S.T.',
+      parents: 'Putra tercinta dari Bpk. Ir. Bambang Haryo & Ibu Sri Wahyuni',
+      photo: '/themes/koran/couple_main.jpg',
+      ig: 'dimaspratama',
+    },
+    bride: {
+      nick: 'Andini',
+      full: 'Andini Putri, S.Ds.',
+      parents: 'Putri tercinta dari Bpk. Dr. Suryo Broto & Ibu Ratna Kemala',
+      photo: '/themes/koran/couple_main.jpg',
+      ig: 'andiniputri',
+    },
+    date: '2026-11-28',
+    quote: 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.',
+    quoteSource: 'QS. Ar-Rum: 21',
+    story: [
+      {
+        year: '2021',
+        title: 'Headline: Awal Perjumpaan Bersejarah',
+        text: 'Sebuah pertemuan tak terduga yang membuka lembaran percakapan hangat dan rasa saling mengagumi.',
+      },
+      {
+        year: '2024',
+        title: 'Editorial: Janji Setia Dua Hati',
+        text: 'Di hadapan kedua keluarga, kami mengikrarkan komitmen suci untuk melangkah bersama menuju masa depan.',
+      },
+      {
+        year: '2026',
+        title: 'Extra Edition: Menuju Mahligai Pelaminan',
+        text: 'Hari bahagia yang dinantikan tiba untuk menyatukan dua jiwa dalam ikatan suci pernikahan penuh berkah.',
+      },
+    ],
+    gallery: [
+      '/themes/koran/couple_main.jpg',
+      '/themes/koran/couple_sketch.jpg',
+      '/themes/koran/vintage_map.jpg',
+      '/themes/koran/comic_panels.jpg',
+      '/themes/koran/editorial_ads.jpg',
+      '/themes/koran/crossword.jpg',
+    ],
+    events: [
+      {
+        title: 'Akad Nikah',
+        date: '2026-11-28',
+        time: '08:00 - 10:00 WIB',
+        venue: 'Masjid Agung Al-Barkah',
+        address: 'Jl. Pemuda No. 45, Kebayoran, Jakarta Selatan',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+      {
+        title: 'Resepsi Pernikahan',
+        date: '2026-11-28',
+        time: '11:00 - 14:00 WIB',
+        venue: 'Grand Heritage Ballroom & Garden',
+        address: 'Jl. Pemuda No. 45, Kebayoran, Jakarta Selatan',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Dimas Pratama', number: '7281920391' },
+      { bank: 'Bank Mandiri', name: 'Andini Putri', number: '1370019283741' },
     ],
   }),
   'royal-bunny': demo({

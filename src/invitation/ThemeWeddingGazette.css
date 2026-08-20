@@ -1,0 +1,937 @@
+/* ===================================================
+   THE WEDDING GAZETTE (VINTAGE NEWSPAPER THEME)
+   Aruna Digital Wedding · Editorial Heritage Design
+   =================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=ChosunKg&family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Special+Elite&family=UnifrakturMaguntia&display=swap');
+
+:root {
+  --news-bg: #F4EFE6;
+  --news-paper: #FFFDF8;
+  --news-paper-aged: #F7F1E5;
+  --news-ink: #1C1815;
+  --news-ink-soft: #423B35;
+  --news-muted: #786C62;
+  --news-border: #2C2621;
+  --news-border-light: rgba(44, 38, 33, 0.25);
+  --news-red: #A62B2B;
+  --news-gold: #B8860B;
+  --news-font-headline: 'Playfair Display', 'Cinzel', Georgia, serif;
+  --news-font-body: 'Newsreader', Georgia, serif;
+  --news-font-mono: 'Courier Prime', 'Special Elite', monospace;
+  --news-font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --news-font-gothic: 'UnifrakturMaguntia', 'Cinzel', serif;
+}
+
+/* Base Newspaper Page */
+.news-world {
+  background-color: var(--news-bg);
+  color: var(--news-ink);
+  font-family: var(--news-font-body);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Halftone Newsprint Paper Texture */
+.news-world::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/themes/koran/pattern_bg.jpg');
+  background-size: 380px;
+  background-repeat: repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===================================================
+   SCENE 1: THE EXTRA! EXTRA! FRONT PAGE COVER
+   =================================================== */
+.news-cover-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: radial-gradient(circle at center, #FAF5EB 0%, #EBDDC9 100%);
+  overflow: hidden;
+}
+
+.news-cover-bg-halftone {
+  position: absolute;
+  inset: 0;
+  background-image: url('/themes/koran/newspaper_layout.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.18;
+  filter: contrast(1.2) sepia(0.3);
+  transform: scale(1.05);
+}
+
+.news-folded-broadsheet {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 480px;
+  background: #FFFDF9;
+  border: 3px double var(--news-border);
+  border-radius: 4px;
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+  box-shadow: 0 25px 60px -15px rgba(28, 24, 21, 0.35), 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.news-breaking-banner {
+  display: inline-block;
+  background: var(--news-red);
+  color: #FFFFFF;
+  font-family: var(--news-font-headline);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 0.35rem 1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 3px 10px rgba(166, 43, 43, 0.3);
+}
+
+.news-masthead-title {
+  font-family: var(--news-font-headline);
+  font-size: clamp(2rem, 7.5vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--news-ink);
+  line-height: 1.05;
+  margin: 0.25rem 0 0.5rem;
+  border-bottom: 2px solid var(--news-border);
+  padding-bottom: 0.5rem;
+}
+
+.news-masthead-subbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--news-font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--news-border);
+  padding: 0.35rem 0;
+  margin-bottom: 1.25rem;
+  color: var(--news-muted);
+}
+
+.news-cover-headline {
+  font-family: var(--news-font-headline);
+  font-size: clamp(1.6rem, 5.5vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--news-ink);
+  margin-bottom: 0.75rem;
+}
+
+.news-lead-summary {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--news-ink-soft);
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.news-press-pass-box {
+  background: var(--news-paper-aged);
+  border: 1px dashed var(--news-border);
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.news-press-pass-label {
+  font-family: var(--news-font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--news-muted);
+}
+
+.news-press-pass-guest {
+  font-family: var(--news-font-headline);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--news-ink);
+  margin-top: 0.15rem;
+}
+
+.news-read-gazette-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.95rem 1.5rem;
+  background: var(--news-ink);
+  color: #FFFFFF;
+  border: 1px solid var(--news-border);
+  font-family: var(--news-font-headline);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(28, 24, 21, 0.25);
+  transition: all 0.25s ease;
+}
+
+.news-read-gazette-btn:hover {
+  background: var(--news-red);
+  transform: translateY(-2px);
+}
+
+/* ===================================================
+   MAIN EDITORIAL CONTAINER
+   =================================================== */
+.news-broadsheet-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 6rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Broadsheet Top Header (Masthead) */
+.news-editorial-masthead {
+  border-bottom: 3px double var(--news-border);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.news-gazette-big-logo {
+  font-family: var(--news-font-headline);
+  font-size: clamp(2.4rem, 9.5vw, 4rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--news-ink);
+  margin: 0.25rem 0;
+}
+
+.news-dateline-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--news-border);
+  border-bottom: 1px solid var(--news-border);
+  padding: 0.4rem 0.25rem;
+  font-family: var(--news-font-mono);
+  font-size: 0.7rem;
+  color: var(--news-ink-soft);
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+}
+
+/* Section Header Typography */
+.news-section-kicker {
+  font-family: var(--news-font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--news-red);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.news-section-title {
+  font-family: var(--news-font-headline);
+  font-size: clamp(1.85rem, 6vw, 2.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: var(--news-ink);
+  margin-bottom: 0.5rem;
+}
+
+.news-double-divider {
+  border-top: 3px double var(--news-border);
+  margin: 1.5rem 0;
+}
+
+.news-single-divider {
+  border-top: 1px solid var(--news-border);
+  margin: 1.25rem 0;
+}
+
+/* ===================================================
+   SCENE 2: FRONT PAGE LEAD STORY (Hero Section)
+   =================================================== */
+.news-lead-hero-box {
+  background: #FFFDF8;
+  border: 1px solid var(--news-border);
+  padding: 1.75rem 1.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 10px 30px rgba(28, 24, 21, 0.06);
+}
+
+.news-lead-headline-main {
+  font-family: var(--news-font-headline);
+  font-size: clamp(2rem, 7.5vw, 3.2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.08;
+  text-align: center;
+  margin-bottom: 1.25rem;
+  color: var(--news-ink);
+}
+
+.news-lead-photo-frame {
+  position: relative;
+  border: 1px solid var(--news-border);
+  padding: 8px;
+  background: #FFFFFF;
+  margin-bottom: 1.25rem;
+}
+
+.news-lead-photo-frame img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  filter: contrast(1.08) grayscale(0.2);
+}
+
+.news-photo-caption {
+  font-family: var(--news-font-mono);
+  font-size: 0.72rem;
+  color: var(--news-muted);
+  font-style: italic;
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+/* Weather & Stock Bulletin Widget */
+.news-weather-widget {
+  background: var(--news-paper-aged);
+  border: 1px solid var(--news-border);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.news-weather-icon {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--news-border);
+}
+
+.news-weather-text h5 {
+  font-family: var(--news-font-headline);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.news-weather-text p {
+  font-family: var(--news-font-mono);
+  font-size: 0.72rem;
+  color: var(--news-ink-soft);
+}
+
+/* ===================================================
+   SCENE 3: EXCLUSIVE INTERVIEW (The Bride & The Groom)
+   =================================================== */
+.news-couple-columns-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .news-couple-columns-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.news-profile-column-card {
+  background: #FFFDF8;
+  border: 1px solid var(--news-border);
+  padding: 1.75rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.news-profile-photo-engraved {
+  width: 140px;
+  height: 180px;
+  border: 2px solid var(--news-border);
+  padding: 4px;
+  background: #FFFFFF;
+  margin-bottom: 1rem;
+}
+
+.news-profile-photo-engraved img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.1) grayscale(0.25);
+}
+
+.news-profile-role-tag {
+  font-family: var(--news-font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--news-red);
+  margin-bottom: 0.25rem;
+}
+
+.news-profile-fullname {
+  font-family: var(--news-font-headline);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--news-ink);
+  margin-bottom: 0.4rem;
+}
+
+.news-profile-parents {
+  font-size: 0.82rem;
+  color: var(--news-ink-soft);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.news-profile-ig-press {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--news-font-mono);
+  font-size: 0.72rem;
+  color: var(--news-ink);
+  text-decoration: none;
+  border: 1px solid var(--news-border);
+  padding: 0.35rem 0.85rem;
+  background: var(--news-paper-aged);
+  transition: all 0.2s ease;
+}
+
+.news-profile-ig-press:hover {
+  background: var(--news-ink);
+  color: #FFFFFF;
+}
+
+/* ===================================================
+   SCENE 4: EDITORIAL OPINION & HOROSCOPE (Quote)
+   =================================================== */
+.news-editorial-opinion-box {
+  background: var(--news-paper-aged);
+  border: 2px solid var(--news-border);
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.news-opinion-horoscope-img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--news-border);
+  margin: 0 auto 1.25rem;
+}
+
+.news-opinion-quote-text {
+  font-family: var(--news-font-body);
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.8;
+  color: var(--news-ink);
+  margin-bottom: 1rem;
+}
+
+.news-opinion-author-cite {
+  font-family: var(--news-font-headline);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--news-red);
+}
+
+/* ===================================================
+   SCENE 5: COMIC STRIP LOVE STORY (Linimasa Komik)
+   =================================================== */
+.news-comic-strip-container {
+  background: #FFFDF8;
+  border: 2px solid var(--news-border);
+  padding: 1.75rem 1.35rem;
+  margin-bottom: 2.5rem;
+}
+
+.news-comic-strip-banner {
+  font-family: var(--news-font-headline);
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  border-bottom: 2px solid var(--news-border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.news-comic-panels-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .news-comic-panels-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.news-comic-panel-card {
+  border: 2px solid var(--news-border);
+  padding: 0.85rem;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+}
+
+.news-comic-panel-num {
+  font-family: var(--news-font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--news-red);
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.news-comic-panel-card h4 {
+  font-family: var(--news-font-headline);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.news-comic-panel-card p {
+  font-size: 0.78rem;
+  color: var(--news-ink-soft);
+  line-height: 1.55;
+}
+
+/* ===================================================
+   SCENE 6: SPECIAL BULLETIN (Jadwal Acara & Peta)
+   =================================================== */
+.news-events-bulletin-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .news-events-bulletin-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.news-bulletin-card {
+  background: #FFFDF8;
+  border: 1px solid var(--news-border);
+  padding: 1.75rem 1.35rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.news-bulletin-title {
+  font-family: var(--news-font-headline);
+  font-size: 1.45rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--news-ink);
+  margin-bottom: 0.75rem;
+}
+
+.news-bulletin-datetime {
+  font-family: var(--news-font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--news-red);
+  margin-bottom: 0.25rem;
+}
+
+.news-bulletin-time {
+  font-family: var(--news-font-mono);
+  font-size: 0.78rem;
+  color: var(--news-muted);
+  margin-bottom: 1rem;
+}
+
+.news-bulletin-venue {
+  font-family: var(--news-font-headline);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.news-bulletin-addr {
+  font-size: 0.8rem;
+  color: var(--news-ink-soft);
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+.news-map-dispatch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.25rem;
+  background: var(--news-ink);
+  color: #FFFFFF;
+  font-family: var(--news-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  margin: 0 auto;
+  transition: all 0.2s ease;
+}
+
+.news-map-dispatch-btn:hover {
+  background: var(--news-red);
+}
+
+/* ===================================================
+   SCENE 7: COUNTDOWN & CROSSWORD (Hitung Mundur)
+   =================================================== */
+.news-countdown-dispatch-box {
+  background: var(--news-paper-aged);
+  border: 2px solid var(--news-border);
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.news-countdown-digit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  max-width: 420px;
+  margin: 1.5rem auto;
+}
+
+.news-digit-cell {
+  background: #FFFFFF;
+  border: 2px solid var(--news-border);
+  padding: 0.85rem 0.25rem;
+}
+
+.news-digit-number {
+  font-family: var(--news-font-mono);
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--news-ink);
+  line-height: 1;
+}
+
+.news-digit-label {
+  font-family: var(--news-font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--news-muted);
+  margin-top: 0.35rem;
+}
+
+/* ===================================================
+   SCENE 8: PHOTO ROTOGRAVURE (Galeri Foto)
+   =================================================== */
+.news-gallery-rotogravure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .news-gallery-rotogravure-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.15rem;
+  }
+}
+
+.news-gallery-art-cell {
+  aspect-ratio: 4/5;
+  border: 2px solid var(--news-border);
+  padding: 4px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.news-gallery-art-cell:hover {
+  transform: scale(1.03);
+}
+
+.news-gallery-art-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.2) contrast(1.05);
+}
+
+/* ===================================================
+   SCENE 9: CLASSIFIED ADS & WEDDING GIFT (Amplop Digital)
+   =================================================== */
+.news-classified-card {
+  background: #FFFDF8;
+  border: 1px solid var(--news-border);
+  padding: 1.65rem 1.35rem;
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.news-classified-bank-title {
+  font-family: var(--news-font-headline);
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--news-ink);
+  margin-bottom: 0.5rem;
+}
+
+.news-classified-acc-num {
+  font-family: var(--news-font-mono);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--news-ink);
+  margin-bottom: 0.25rem;
+}
+
+.news-classified-holder {
+  font-size: 0.85rem;
+  color: var(--news-muted);
+  margin-bottom: 1rem;
+}
+
+.news-copy-wire-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.25rem;
+  background: var(--news-paper-aged);
+  border: 1px solid var(--news-border);
+  font-family: var(--news-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.news-copy-wire-btn:hover {
+  background: var(--news-ink);
+  color: #FFFFFF;
+}
+
+/* ===================================================
+   SCENE 10: TELEGRAM & RSVP GUESTBOOK (Buku Tamu)
+   =================================================== */
+.news-telegram-form-card {
+  background: #FFFDF8;
+  border: 2px solid var(--news-border);
+  padding: 2.25rem 1.65rem;
+  margin-bottom: 2rem;
+}
+
+.news-input-row {
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.news-input-label {
+  display: block;
+  font-family: var(--news-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--news-muted);
+  margin-bottom: 0.35rem;
+}
+
+.news-text-input,
+.news-select-input,
+.news-textarea-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--news-border);
+  font-family: var(--news-font-mono);
+  font-size: 0.85rem;
+  background: #FFFFFF;
+  color: var(--news-ink);
+}
+
+.news-text-input:focus,
+.news-select-input:focus,
+.news-textarea-input:focus {
+  outline: none;
+  background: #FFFDF0;
+  border-color: var(--news-red);
+}
+
+.news-telegram-submit-btn {
+  width: 100%;
+  padding: 0.95rem 1.5rem;
+  background: var(--news-ink);
+  color: #FFFFFF;
+  border: 1px solid var(--news-border);
+  font-family: var(--news-font-headline);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.news-telegram-submit-btn:hover {
+  background: var(--news-red);
+}
+
+/* Telegram Stream List */
+.news-telegram-feed {
+  display: grid;
+  gap: 1rem;
+  max-height: 440px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+
+.news-telegram-item {
+  background: var(--news-paper-aged);
+  border: 1px solid var(--news-border);
+  padding: 1.15rem 1.25rem;
+  text-align: left;
+}
+
+.news-telegram-sender {
+  font-family: var(--news-font-headline);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--news-ink);
+}
+
+.news-status-pill {
+  display: inline-block;
+  font-family: var(--news-font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--news-border);
+  margin-left: 0.5rem;
+}
+
+.news-status-pill-hadir {
+  background: #E8F5E9;
+  color: #1B5E20;
+}
+
+.news-status-pill-tidak {
+  background: #FFEBEE;
+  color: #B71C1C;
+}
+
+.news-telegram-body {
+  font-size: 0.85rem;
+  color: var(--news-ink-soft);
+  line-height: 1.6;
+  margin-top: 0.4rem;
+}
+
+.news-reply-bubble {
+  background: #FFFFFF;
+  border: 1px dashed var(--news-border);
+  padding: 0.65rem 0.95rem;
+  margin-top: 0.65rem;
+  font-size: 0.8rem;
+}
+
+/* ===================================================
+   FLOATING AUDIO & BOTTOM NAV
+   =================================================== */
+.news-audio-toggle {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.25rem;
+  z-index: 50;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--news-paper);
+  border: 2px solid var(--news-border);
+  color: var(--news-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(28, 24, 21, 0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.news-audio-toggle:hover {
+  transform: scale(1.08);
+}
+
+.news-floating-navbar {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: rgba(255, 253, 248, 0.96);
+  border: 2px solid var(--news-border);
+  border-radius: 50px;
+  padding: 0.4rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 10px 35px rgba(28, 24, 21, 0.25);
+  backdrop-filter: blur(12px);
+}
+
+.news-nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 50px;
+  color: var(--news-muted);
+  text-decoration: none;
+  font-family: var(--news-font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.news-nav-link:hover,
+.news-nav-link.active {
+  color: var(--news-ink);
+  background: var(--news-paper-aged);
+}

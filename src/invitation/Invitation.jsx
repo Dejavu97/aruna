@@ -24,11 +24,17 @@ import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
 import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 import ThemeRoyalBunny from './ThemeRoyalBunny'
+import ThemeWeddingGazette from './ThemeWeddingGazette'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
+
+  // Tema Vintage Newspaper / The Wedding Gazette
+  if (theme.layout === 'wedding-gazette' || theme.id === 'wedding-gazette' || theme.id === 'koran-vintage') {
+    return <ThemeWeddingGazette data={data} guest={guest} preview={preview} theme={theme} />
+  }
 
   // Tema Royal Bunny Fairytale
   if (theme.layout === 'royal-bunny' || theme.id === 'royal-bunny') {
