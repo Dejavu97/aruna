@@ -19,6 +19,7 @@ export const themes = [
     cover: '/themes/kelinci/cover.jpg',
     layout: 'royal-bunny',
     opener: 'The Fairytale Wedding of',
+    music: '/music/tiny_paws.mp3',
     fonts: {
       display: '"Playfair Display", "Cinzel", serif',
       script: '"Alex Brush", cursive',
@@ -285,6 +286,24 @@ export function hasTheme(id, customThemes = []) {
 export function getThemeFeatures(themeOrId) {
   const theme = typeof themeOrId === 'string' ? getTheme(themeOrId) : (themeOrId || themes[0])
   const layout = theme.layout || 'classic'
+
+  if (layout === 'royal-bunny') {
+    return {
+      quote: true,
+      story: { enabled: true, withPhoto: true },
+      events: { enabled: true, max: 3 },
+      gallery: true,
+      banks: true,
+      music: true,
+      qris: true,
+      dressCode: false,
+      streaming: false,
+      wishlist: false,
+      backdrop: false,
+      textColor: false,
+      frameImage: false,
+    }
+  }
 
   // Fitur khusus Art Jawa Biru
   if (layout === 'art-jawa-biru') {
@@ -882,6 +901,7 @@ export const demos = {
   'royal-bunny': demo({
     themeId: 'royal-bunny',
     slug: 'sarah-budi-bunny',
+    music: '/music/tiny_paws.mp3',
     groom: {
       nick: 'Budi',
       full: 'Budi Santoso, S.Kom.',

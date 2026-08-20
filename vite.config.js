@@ -10,6 +10,9 @@ export default defineConfig({
   server: {
     port: 5173,
     host: '127.0.0.1',
+    watch: {
+      ignored: ['**/scripts/verify-shots/**'],
+    },
     proxy: {
       '/api': 'http://127.0.0.1:8787',
       '/uploads': 'http://127.0.0.1:8787',

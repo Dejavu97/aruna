@@ -1,1161 +1,1349 @@
 /* ===================================================
-   ROYAL BUNNY KINGDOM — IMMERSIVE FAIRYTALE WEDDING THEME
-   Senior Creative Frontend & Motion Design
+   ROYAL BUNNY KINGDOM — scene-based fairytale invitation
+   Isolated theme. Prefix: .rb-
    =================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Great+Vibes&family=Nunito:wght@400;500;600;700&display=swap');
 
-:root {
-  --rb-kingdom-bg: #FAF6F0;
-  --rb-kingdom-cream: #FFFDF9;
-  --rb-gold-bright: #D4AF37;
-  --rb-gold-rich: #C5A059;
-  --rb-gold-pale: #F4E8D4;
-  --rb-rose-royal: #C48B9F;
-  --rb-rose-soft: #FDF2F5;
-  --rb-rose-deep: #8E4A62;
-  --rb-ink-royal: #2C221E;
-  --rb-muted-royal: #7D6E65;
-  --rb-border-gold: rgba(197, 160, 89, 0.4);
-  --rb-border-rose: rgba(196, 139, 159, 0.35);
-  --rb-font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
-  --rb-font-serif: 'Playfair Display', Georgia, serif;
-  --rb-font-script: 'Alex Brush', cursive;
-  --rb-font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
-}
-
-/* Base Container & Seamless Pattern Watermark */
 .rb-world {
-  background-color: var(--rb-kingdom-bg);
-  color: var(--rb-ink-royal);
-  font-family: var(--rb-font-sans);
-  min-height: 100vh;
+  --rb-cream: #fbf6ee;
+  --rb-paper: #fffaf3;
+  --rb-ink: #4a3b32;
+  --rb-muted: #8a7568;
+  --rb-blush: #d4a5a8;
+  --rb-rose: #c48b90;
+  --rb-rose-deep: #9a5d66;
+  --rb-sage: #7d8f6a;
+  --rb-sage-deep: #5c6b4a;
+  --rb-peach: #e8c4a0;
+  --rb-sky: #e7eef4;
+  --rb-dusk: #5c4a62;
+  --rb-night: #1a1420;
+  --rb-gold: #c4a574;
+  --rb-font-display: 'Cormorant Garamond', Georgia, serif;
+  --rb-font-script: 'Great Vibes', cursive;
+  --rb-font-sans: 'Nunito', system-ui, sans-serif;
+
   position: relative;
+  min-height: 100vh;
   overflow-x: hidden;
-  line-height: 1.6;
+  background: var(--rb-cream);
+  color: var(--rb-ink);
+  font-family: var(--rb-font-sans);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
 }
 
-.rb-world::before {
-  content: '';
+.rb-world img {
+  max-width: 100%;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.rb-blend {
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.rb-watermark {
   position: fixed;
   inset: 0;
   background-image: url('/themes/kelinci/pattern_bg.jpg');
-  background-size: 280px;
-  background-repeat: repeat;
+  background-size: 260px;
   opacity: 0.045;
   pointer-events: none;
   z-index: 0;
 }
 
-/* ===================================================
-   SCENE 1: ROYAL ENVELOPE (Layar Pembuka Interaktif)
-   =================================================== */
-.rb-scene-envelope {
-  position: fixed;
-  inset: 0;
-  z-index: 150;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.25rem;
-  background: radial-gradient(circle at 50% 40%, #FFFDF9 0%, #F5EBE1 60%, #E8D9C8 100%);
-  overflow: hidden;
-}
-
-.rb-envelope-backdrop-glow {
-  position: absolute;
-  inset: 0;
-  background-image: url('/themes/kelinci/hero_garden.jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.22;
-  filter: blur(8px) saturate(1.1);
-  transform: scale(1.1);
-}
-
-.rb-envelope-parchment {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  max-width: 460px;
-  background: rgba(255, 253, 249, 0.96);
-  border: 2px solid var(--rb-border-gold);
-  border-radius: 28px;
-  padding: 2.75rem 2rem;
-  text-align: center;
-  box-shadow: 0 30px 70px -15px rgba(44, 34, 30, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
-  backdrop-filter: blur(20px);
-}
-
-.rb-seal-medallion {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 1.35rem;
-}
-
-.rb-seal-ring {
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 2px dashed var(--rb-gold-rich);
-  animation: spin-slow 25s linear infinite;
-}
-
-.rb-seal-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 4px solid var(--rb-gold-bright);
-  box-shadow: 0 12px 30px rgba(142, 74, 98, 0.35);
-}
-
-.rb-royal-crest-kicker {
-  font-family: var(--rb-font-display);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--rb-rose-deep);
-  margin-bottom: 0.35rem;
-}
-
-.rb-royal-title-couple {
-  font-family: var(--rb-font-display);
-  font-size: clamp(2rem, 7.5vw, 2.75rem);
-  font-weight: 700;
-  color: var(--rb-ink-royal);
-  line-height: 1.15;
-  margin: 0.35rem 0 0.75rem;
-}
-
-.rb-royal-ampersand {
-  font-family: var(--rb-font-script);
-  font-size: 2.4rem;
-  color: var(--rb-gold-rich);
-  display: inline-block;
-  margin: 0 0.35rem;
-  vertical-align: middle;
-}
-
-.rb-royal-date-label {
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--rb-muted-royal);
-  margin-bottom: 1.5rem;
-}
-
-.rb-royal-guest-card {
-  background: linear-gradient(135deg, var(--rb-rose-soft) 0%, #FFFDF9 100%);
-  border: 1px solid var(--rb-border-rose);
-  border-radius: 16px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.75rem;
-  box-shadow: 0 4px 15px rgba(196, 139, 159, 0.12);
-}
-
-.rb-guest-honor-text {
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--rb-muted-royal);
-  margin-bottom: 0.25rem;
-}
-
-.rb-guest-royal-name {
-  font-family: var(--rb-font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--rb-rose-deep);
-}
-
-.rb-enter-kingdom-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  width: 100%;
-  padding: 1.05rem 1.75rem;
-  background: linear-gradient(135deg, var(--rb-rose-deep) 0%, var(--rb-gold-rich) 100%);
-  color: #FFFFFF;
-  border: none;
-  border-radius: 16px;
-  font-family: var(--rb-font-display);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  cursor: pointer;
-  box-shadow: 0 12px 28px -5px rgba(142, 74, 98, 0.45);
-  transition: all 0.3s ease;
-}
-
-.rb-enter-kingdom-btn:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 16px 35px -5px rgba(142, 74, 98, 0.6);
-}
-
-/* ===================================================
-   SCENE 2: ARRIVAL AT THE KINGDOM (Gerbang Istana)
-   =================================================== */
-.rb-scene-arrival {
-  position: relative;
-  min-height: 92vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 5rem 1.5rem 4rem;
-  overflow: hidden;
-}
-
-.rb-arrival-castle-bg {
-  position: absolute;
-  inset: 0;
-  background-image: url('/themes/kelinci/hero_garden.jpg');
-  background-size: cover;
-  background-position: center bottom;
-  opacity: 0.2;
-  transform: scale(1.03);
-  pointer-events: none;
-}
-
-.rb-arrival-throne-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 380px;
-  margin: 0 auto 2.25rem;
-  z-index: 2;
-}
-
-.rb-throne-frame-asset {
-  position: absolute;
-  inset: -16px;
-  width: calc(100% + 32px);
-  height: calc(100% + 32px);
-  object-fit: contain;
-  pointer-events: none;
-  z-index: 5;
-  filter: drop-shadow(0 15px 30px rgba(142, 74, 98, 0.25));
-}
-
-.rb-throne-couple-portrait {
-  width: 100%;
-  aspect-ratio: 4/5;
-  object-fit: cover;
-  border-radius: 190px 190px 24px 24px;
-  border: 5px solid #FFFFFF;
-  box-shadow: 0 25px 50px rgba(44, 34, 30, 0.18);
+.rb-world > * {
   position: relative;
   z-index: 1;
 }
 
-.rb-arrival-script-greeting {
-  font-family: var(--rb-font-script);
-  font-size: clamp(2.4rem, 9vw, 3.8rem);
-  color: var(--rb-gold-rich);
-  line-height: 1;
-  margin-bottom: -0.5rem;
-  text-shadow: 0 2px 10px rgba(197, 160, 89, 0.2);
+/* Motion primitives */
+@keyframes rb-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+@keyframes rb-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+@keyframes rb-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-5%, 2%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes rb-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.9; }
+}
+@keyframes rb-pulse-seal {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(196, 139, 144, 0.35); }
+  50% { transform: scale(1.04); box-shadow: 0 0 0 10px rgba(196, 139, 144, 0); }
+}
+@keyframes rb-petal {
+  0% { transform: translate3d(0, -8%, 0) rotate(0deg); opacity: 0; }
+  12% { opacity: 0.7; }
+  100% { transform: translate3d(18px, 110vh, 0) rotate(80deg); opacity: 0; }
 }
 
-.rb-arrival-royal-names {
-  font-family: var(--rb-font-display);
-  font-size: clamp(2.2rem, 9vw, 3.8rem);
-  font-weight: 700;
-  color: var(--rb-ink-royal);
-  letter-spacing: 0.04em;
-  margin: 0.4rem 0 0.85rem;
-  line-height: 1.15;
-}
+.rb-breathe { animation: rb-breathe 4.6s ease-in-out infinite; }
+.rb-float { animation: rb-float 6.5s ease-in-out infinite; }
 
-/* ===================================================
-   SCENE 3: THE ROYAL COUPLE (Dua Tokoh Karakter)
-   =================================================== */
-.rb-scene-section {
-  padding: 4.5rem 1.25rem;
-  max-width: 720px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
-}
-
-.rb-scene-header-box {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.rb-scene-proclamation-tag {
-  font-family: var(--rb-font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--rb-rose-deep);
-  margin-bottom: 0.4rem;
-}
-
-.rb-scene-heading {
-  font-family: var(--rb-font-display);
-  font-size: clamp(1.85rem, 5.5vw, 2.5rem);
-  font-weight: 700;
-  color: var(--rb-ink-royal);
-  line-height: 1.2;
-}
-
-.rb-botanical-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.85rem;
-  margin: 0.85rem auto 0;
-}
-
-.rb-botanical-divider::before,
-.rb-botanical-divider::after {
-  content: '';
-  width: 50px;
-  height: 1.5px;
-  background: linear-gradient(90deg, transparent, var(--rb-gold-rich));
-}
-
-.rb-botanical-divider::after {
-  background: linear-gradient(90deg, var(--rb-gold-rich), transparent);
-}
-
-.rb-botanical-divider-icon {
-  width: 32px;
-  height: 32px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 1.5px solid var(--rb-gold-rich);
-  box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2);
-}
-
-/* Character Asymmetrical Stage */
-.rb-characters-stage-grid {
-  display: grid;
-  gap: 2.5rem;
-}
-
-@media (min-width: 640px) {
-  .rb-characters-stage-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 1.75rem;
+@media (prefers-reduced-motion: reduce) {
+  .rb-world *,
+  .rb-world *::before,
+  .rb-world *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-.rb-character-stage-card {
-  position: relative;
-  background: var(--rb-kingdom-cream);
-  border: 2px solid var(--rb-border-gold);
-  border-radius: 28px;
-  padding: 2.5rem 1.75rem;
-  text-align: center;
-  box-shadow: 0 16px 40px rgba(44, 34, 30, 0.08);
+/* ===================================================
+   SCENE 1 — Royal Envelope
+   =================================================== */
+.rb-envelope {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-}
-
-.rb-character-stage-card:hover {
-  transform: translateY(-5px);
-}
-
-.rb-character-arch-frame {
-  width: 170px;
-  height: 220px;
-  border-radius: 95px 95px 16px 16px;
-  border: 4px solid #FFFFFF;
-  box-shadow: 0 14px 35px rgba(142, 74, 98, 0.25);
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  background: var(--rb-rose-soft);
-  position: relative;
-}
-
-.rb-character-arch-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-}
-
-.rb-character-rank {
-  font-family: var(--rb-font-display);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--rb-rose-deep);
-  margin-bottom: 0.35rem;
-}
-
-.rb-character-name {
-  font-family: var(--rb-font-display);
-  font-size: 1.45rem;
-  font-weight: 700;
-  color: var(--rb-ink-royal);
-  margin-bottom: 0.5rem;
-  line-height: 1.25;
-}
-
-.rb-character-lineage {
-  font-size: 0.82rem;
-  color: var(--rb-muted-royal);
-  line-height: 1.6;
-  margin-bottom: 1.35rem;
-}
-
-.rb-character-ig-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--rb-rose-deep);
-  text-decoration: none;
-  padding: 0.5rem 1.15rem;
-  background: var(--rb-rose-soft);
-  border-radius: 50px;
-  border: 1px solid var(--rb-border-rose);
-  transition: all 0.25s ease;
-}
-
-.rb-character-ig-badge:hover {
-  background: var(--rb-rose-deep);
-  color: #FFFFFF;
-}
-
-/* Connective Sacred Vow Card */
-.rb-sacred-vow-card {
-  position: relative;
-  background: linear-gradient(135deg, #FFFFFF 0%, #FDF7F9 100%);
-  border: 2px solid var(--rb-border-rose);
-  border-radius: 28px;
-  padding: 2.75rem 2rem;
-  text-align: center;
-  box-shadow: 0 15px 45px rgba(142, 74, 98, 0.1);
-  margin-top: 3rem;
-  overflow: hidden;
-}
-
-.rb-sacred-paws-art {
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 1.5rem;
-  border-radius: 50%;
-  border: 4px solid var(--rb-gold-pale);
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(196, 139, 159, 0.3);
-}
-
-.rb-sacred-paws-art img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.rb-sacred-vow-text {
-  font-family: var(--rb-font-serif);
-  font-style: italic;
-  font-size: 1.02rem;
-  line-height: 1.85;
-  color: var(--rb-ink-royal);
-  margin-bottom: 1.15rem;
-}
-
-.rb-sacred-vow-cite {
-  font-family: var(--rb-font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--rb-rose-deep);
-}
-
-/* ===================================================
-   SCENE 4: SAVE THE DATE (Papan Maklumat Kerajaan)
-   =================================================== */
-.rb-proclamation-board {
-  position: relative;
-  background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(253,242,245,0.95));
-  border: 2px solid var(--rb-border-gold);
-  border-radius: 28px;
-  padding: 3rem 1.75rem;
-  text-align: center;
-  box-shadow: 0 18px 50px rgba(197, 160, 89, 0.2);
-  overflow: hidden;
-}
-
-.rb-board-carrot-pattern {
-  position: absolute;
-  inset: 0;
-  background-image: url('/themes/kelinci/carrot_pattern.jpg');
-  background-size: 220px;
-  opacity: 0.08;
-  pointer-events: none;
-}
-
-.rb-countdown-parchment-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-  max-width: 440px;
-  margin: 1.75rem auto;
-  position: relative;
-  z-index: 2;
-}
-
-.rb-parchment-box {
-  background: #FFFFFF;
-  border: 1.5px solid var(--rb-border-gold);
-  border-radius: 16px;
-  padding: 1.1rem 0.4rem;
-  box-shadow: 0 6px 20px rgba(44, 34, 30, 0.07);
-}
-
-.rb-parchment-num {
-  font-family: var(--rb-font-display);
-  font-size: 1.95rem;
-  font-weight: 700;
-  color: var(--rb-rose-deep);
-  line-height: 1;
-}
-
-.rb-parchment-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--rb-muted-royal);
-  margin-top: 0.4rem;
-}
-
-.rb-calendar-royal-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.85rem 1.75rem;
-  background: #FFFFFF;
-  color: var(--rb-ink-royal);
-  border: 1.5px solid var(--rb-gold-rich);
-  border-radius: 50px;
-  font-family: var(--rb-font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  text-decoration: none;
-  box-shadow: 0 6px 20px rgba(197, 160, 89, 0.15);
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 2;
-}
-
-.rb-calendar-royal-btn:hover {
-  background: var(--rb-rose-soft);
-  color: var(--rb-rose-deep);
-  border-color: var(--rb-rose-deep);
-  transform: translateY(-2px);
-}
-
-/* ===================================================
-   SCENE 5: ROYAL WEDDING JOURNEY (Buku Dongeng Cinta)
-   =================================================== */
-.rb-fairytale-story-grid {
-  display: grid;
-  gap: 2rem;
-}
-
-.rb-story-page-card {
-  background: var(--rb-kingdom-cream);
-  border: 2px solid var(--rb-border-gold);
-  border-radius: 24px;
-  padding: 1.85rem;
-  box-shadow: 0 12px 35px rgba(44, 34, 30, 0.07);
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-  transition: transform 0.3s ease;
-}
-
-.rb-story-page-card:hover {
-  transform: translateY(-3px);
-}
-
-.rb-story-artwork-frame {
-  width: 88px;
-  height: 88px;
-  border-radius: 20px;
-  border: 3px solid var(--rb-gold-pale);
-  overflow: hidden;
-  flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(142, 74, 98, 0.25);
-}
-
-.rb-story-artwork-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.rb-story-chapter-chip {
-  display: inline-block;
-  font-family: var(--rb-font-display);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--rb-rose-deep);
-  background: var(--rb-rose-soft);
-  padding: 0.25rem 0.75rem;
-  border-radius: 50px;
-  margin-bottom: 0.45rem;
-}
-
-.rb-story-page-card h4 {
-  font-family: var(--rb-font-display);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--rb-ink-royal);
-  margin-bottom: 0.35rem;
-}
-
-.rb-story-page-card p {
-  font-size: 0.85rem;
-  color: var(--rb-muted-royal);
-  line-height: 1.7;
-}
-
-/* ===================================================
-   SCENE 6: THE CELEBRATION (Titah Akad & Resepsi)
-   =================================================== */
-.rb-celebration-grid {
-  display: grid;
-  gap: 2rem;
-}
-
-@media (min-width: 640px) {
-  .rb-celebration-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.rb-decree-card {
-  position: relative;
-  background: var(--rb-kingdom-cream);
-  border: 2px solid var(--rb-border-gold);
-  border-radius: 28px;
-  padding: 2.5rem 1.75rem;
-  text-align: center;
-  box-shadow: 0 15px 40px rgba(44, 34, 30, 0.08);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-}
-
-.rb-decree-icon-medallion {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--rb-rose-soft);
-  border: 2px solid var(--rb-gold-bright);
-  display: flex;
-  align-items: center;
   justify-content: center;
-  margin: 0 auto 1.25rem;
+  padding: 1.25rem 1.1rem 2rem;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(197, 160, 89, 0.3);
+  background:
+    radial-gradient(ellipse at 50% 32%, #fffdf8 0%, #f4eadc 55%, #e7d5c4 100%);
 }
 
-.rb-decree-icon-medallion img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.rb-decree-title {
-  font-family: var(--rb-font-display);
-  font-size: 1.55rem;
-  font-weight: 700;
-  color: var(--rb-ink-royal);
-  margin-bottom: 0.75rem;
-}
-
-.rb-decree-datetime {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--rb-rose-deep);
-  margin-bottom: 0.35rem;
-}
-
-.rb-decree-time {
-  font-size: 0.82rem;
-  color: var(--rb-muted-royal);
-  margin-bottom: 1.35rem;
-}
-
-.rb-decree-venue {
-  font-family: var(--rb-font-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--rb-ink-royal);
-  margin-bottom: 0.35rem;
-}
-
-.rb-decree-addr {
-  font-size: 0.82rem;
-  color: var(--rb-muted-royal);
-  line-height: 1.6;
-  margin-bottom: 1.75rem;
-}
-
-.rb-maps-royal-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.75rem 1.45rem;
-  background: var(--rb-rose-deep);
-  color: #FFFFFF;
-  border-radius: 50px;
-  font-family: var(--rb-font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  text-decoration: none;
-  box-shadow: 0 6px 18px rgba(142, 74, 98, 0.35);
-  transition: all 0.3s ease;
-  margin: 0 auto;
-}
-
-.rb-maps-royal-btn:hover {
-  background: var(--rb-ink-royal);
-  transform: translateY(-2px);
-}
-
-/* ===================================================
-   SCENE 7: MEMORY GARDEN (Galeri & Lightbox)
-   =================================================== */
-.rb-memory-garden-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-@media (min-width: 640px) {
-  .rb-memory-garden-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.35rem;
-  }
-}
-
-.rb-memory-art-thumb {
-  aspect-ratio: 4/5;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 4px solid #FFFFFF;
-  box-shadow: 0 12px 30px rgba(44, 34, 30, 0.12);
-  cursor: pointer;
-  position: relative;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-}
-
-.rb-memory-art-thumb:hover {
-  transform: scale(1.04);
-  box-shadow: 0 18px 40px rgba(142, 74, 98, 0.25);
-}
-
-.rb-memory-art-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ===================================================
-   SCENE 8: ROYAL GIFT (Amplop Digital Kerajaan)
-   =================================================== */
-.rb-treasury-card {
-  position: relative;
-  background: var(--rb-kingdom-cream);
-  border: 2px solid var(--rb-border-gold);
-  border-radius: 24px;
-  padding: 2rem 1.65rem;
-  text-align: center;
-  box-shadow: 0 14px 40px rgba(44, 34, 30, 0.08);
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-}
-
-.rb-treasury-garden-texture {
+.rb-envelope-pattern {
   position: absolute;
   inset: 0;
-  background-image: url('/themes/kelinci/garden_texture.jpg');
-  background-size: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   opacity: 0.07;
   pointer-events: none;
 }
 
-.rb-treasury-bank-logo {
+.rb-scatter {
+  position: absolute;
+  width: min(46vw, 220px);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.rb-scatter-tl { top: -6%; left: -8%; animation: rb-float 8s ease-in-out infinite; }
+.rb-scatter-br { bottom: -8%; right: -10%; animation: rb-float 9s ease-in-out infinite 1s; }
+
+.rb-envelope-stack {
+  position: relative;
+  width: min(88vw, 340px);
+  height: min(72vw, 300px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.rb-letter {
+  position: absolute;
+  z-index: 1;
+  width: 86%;
+  background: #fffaf3 url('/themes/kelinci/garden_texture.jpg') center / cover no-repeat;
+  border-radius: 10px;
+  padding: 1.5rem 1.1rem 1.25rem;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(74, 59, 50, 0.16);
+}
+
+.rb-letter-kicker {
+  font-size: 0.62rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--rb-rose-deep);
+  font-weight: 700;
+}
+.rb-letter-names {
+  font-family: var(--rb-font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0.35rem 0 0.2rem;
+}
+.rb-letter-date {
+  font-size: 0.78rem;
+  color: var(--rb-muted);
+}
+
+.rb-envelope-hero {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+}
+.rb-envelope-art {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 22px 28px rgba(74, 59, 50, 0.22));
+}
+
+.rb-envelope-copy {
+  position: relative;
+  z-index: 4;
+  width: min(88vw, 340px);
+  text-align: center;
+  margin-top: 0.35rem;
+}
+
+.rb-guest-tag {
+  background: rgba(255, 250, 243, 0.92);
+  border: 1px solid rgba(196, 139, 144, 0.28);
+  border-radius: 16px;
+  padding: 0.7rem 1rem 0.8rem;
+  margin: 0.4rem 0 1rem;
+}
+.rb-guest-kicker {
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--rb-muted);
+  font-weight: 700;
+}
+.rb-guest-name {
   font-family: var(--rb-font-display);
   font-size: 1.35rem;
   font-weight: 700;
   color: var(--rb-rose-deep);
-  margin-bottom: 0.75rem;
+  margin-top: 0.1rem;
 }
 
-.rb-treasury-account-num {
-  font-family: var(--rb-font-display);
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--rb-ink-royal);
-  margin-bottom: 0.35rem;
-}
-
-.rb-treasury-holder {
-  font-size: 0.85rem;
-  color: var(--rb-muted-royal);
-  margin-bottom: 1.35rem;
-}
-
-.rb-copy-treasury-btn {
+.rb-open-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.65rem 1.5rem;
-  background: var(--rb-rose-soft);
-  color: var(--rb-rose-deep);
-  border: 1.5px solid var(--rb-border-rose);
-  border-radius: 50px;
-  font-family: var(--rb-font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  position: relative;
-  z-index: 2;
-}
-
-.rb-copy-treasury-btn:hover {
-  background: var(--rb-rose-deep);
-  color: #FFFFFF;
-}
-
-/* ===================================================
-   SCENE 9: GUEST BOOK & LIVE RSVP (Buku Tamu Kerajaan)
-   =================================================== */
-.rb-guestbook-parchment {
-  background: var(--rb-kingdom-cream);
-  border: 2px solid var(--rb-border-gold);
-  border-radius: 28px;
-  padding: 2.5rem 1.85rem;
-  box-shadow: 0 15px 45px rgba(44, 34, 30, 0.08);
-  margin-bottom: 2.5rem;
-}
-
-.rb-input-field-group {
-  margin-bottom: 1.45rem;
-  text-align: left;
-}
-
-.rb-input-field-label {
-  display: block;
-  font-family: var(--rb-font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--rb-muted-royal);
-  margin-bottom: 0.45rem;
-}
-
-.rb-field-text,
-.rb-field-select,
-.rb-field-textarea {
   width: 100%;
-  padding: 0.85rem 1.25rem;
-  border: 1.5px solid rgba(196, 139, 159, 0.4);
-  border-radius: 14px;
-  font-size: 0.9rem;
-  font-family: var(--rb-font-sans);
-  background: #FFFFFF;
-  color: var(--rb-ink-royal);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.rb-field-text:focus,
-.rb-field-select:focus,
-.rb-field-textarea:focus {
-  outline: none;
-  border-color: var(--rb-rose-deep);
-  box-shadow: 0 0 0 3px rgba(142, 74, 98, 0.15);
-}
-
-.rb-submit-proclamation-btn {
-  width: 100%;
-  padding: 1rem 1.75rem;
-  background: var(--rb-rose-deep);
-  color: #FFFFFF;
-  border: none;
-  border-radius: 14px;
+  padding: 0.95rem 1.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #c48b90 0%, #9a5d66 100%);
+  color: #fff;
   font-family: var(--rb-font-display);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  cursor: pointer;
-  box-shadow: 0 10px 25px rgba(142, 74, 98, 0.35);
-  transition: all 0.3s ease;
-}
-
-.rb-submit-proclamation-btn:hover {
-  background: var(--rb-ink-royal);
-  transform: translateY(-2px);
-}
-
-.rb-wishes-stream {
-  display: grid;
-  gap: 1.15rem;
-  max-height: 450px;
-  overflow-y: auto;
-  padding-right: 0.5rem;
-}
-
-.rb-wish-card-item {
-  background: #FFFFFF;
-  border: 1.5px solid var(--rb-border-gold);
-  border-left: 4px solid var(--rb-rose-royal);
-  border-radius: 16px;
-  padding: 1.25rem 1.35rem;
-  text-align: left;
-  box-shadow: 0 4px 15px rgba(44, 34, 30, 0.05);
-}
-
-.rb-wish-author-name {
-  font-family: var(--rb-font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--rb-ink-royal);
-}
-
-.rb-wish-status-badge {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  padding: 0.25rem 0.65rem;
-  border-radius: 50px;
-  margin-left: 0.5rem;
-}
-
-.rb-status-hadir {
-  background: #E8F5E9;
-  color: #2E7D32;
-}
-
-.rb-status-tidak {
-  background: #FFEBEE;
-  color: #C62828;
-}
-
-.rb-wish-message-body {
-  font-size: 0.85rem;
-  color: var(--rb-muted-royal);
-  line-height: 1.7;
-  margin-top: 0.5rem;
-}
-
-.rb-wish-royal-reply {
-  background: var(--rb-rose-soft);
-  border-radius: 12px;
-  padding: 0.85rem 1.15rem;
-  margin-top: 0.85rem;
   font-size: 0.82rem;
-  border-left: 3px solid var(--rb-rose-deep);
-}
-
-.rb-royal-reply-title {
-  font-family: var(--rb-font-display);
   font-weight: 700;
-  color: var(--rb-rose-deep);
-  font-size: 0.7rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 0.25rem;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(154, 93, 102, 0.32);
+  animation: rb-pulse-seal 2.8s ease-in-out infinite;
+}
+.rb-open-btn:active { transform: scale(0.98); }
+
+.rb-envelope-bunny {
+  position: absolute;
+  left: 2%;
+  bottom: 1%;
+  width: min(30vw, 118px);
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: multiply;
 }
 
 /* ===================================================
-   SCENE 10: FAREWELL (Malam Bertabur Bintang)
+   SCENE 2 — Arrival at the Kingdom
    =================================================== */
-.rb-scene-farewell {
+.rb-arrival {
   position: relative;
-  background: linear-gradient(180deg, var(--rb-kingdom-bg) 0%, #2A1F2D 35%, #18121C 100%);
-  color: #FFFFFF;
-  text-align: center;
-  padding: 6rem 1.5rem 8rem;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   overflow: hidden;
+  padding: 4.5rem 1.15rem 7.5rem;
 }
 
-.rb-twilight-stars {
+.rb-arrival-kingdom {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(2px 2px at 20px 30px, #FFF, rgba(0,0,0,0)),
-                    radial-gradient(2px 2px at 40px 70px, #FFE9B3, rgba(0,0,0,0)),
-                    radial-gradient(1.5px 1.5px at 90px 40px, #FFF, rgba(0,0,0,0)),
-                    radial-gradient(2px 2px at 160px 120px, #FFE9B3, rgba(0,0,0,0));
-  background-repeat: repeat;
-  background-size: 200px 200px;
-  opacity: 0.45;
-  animation: stars-twinkle 6s ease-in-out infinite alternate;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 62%;
+  transform: scale(1.06);
+  pointer-events: none;
 }
 
-.rb-farewell-portrait {
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 1.75rem;
-  border-radius: 50%;
-  border: 4px solid var(--rb-gold-bright);
-  overflow: hidden;
-  box-shadow: 0 15px 45px rgba(212, 175, 55, 0.35);
+.rb-arrival-clouds {
+  position: absolute;
+  top: -8%;
+  left: -8%;
+  width: 120%;
+  height: 46%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0.42;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: rb-drift 26s ease-in-out infinite;
+}
+
+.rb-arrival-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(251, 246, 238, 0.55) 0%, rgba(251, 246, 238, 0.12) 28%, rgba(251, 246, 238, 0) 48%),
+    linear-gradient(180deg, transparent 58%, rgba(251, 246, 238, 0.55) 100%);
+  pointer-events: none;
+}
+
+.rb-arrival-title {
   position: relative;
-  z-index: 2;
+  z-index: 4;
+  text-align: center;
+  max-width: 22rem;
 }
 
-.rb-farewell-portrait img {
+.rb-script {
+  font-family: var(--rb-font-script);
+  font-size: clamp(1.85rem, 7vw, 2.7rem);
+  color: var(--rb-rose-deep);
+  line-height: 1;
+  text-shadow: 0 2px 12px rgba(255, 250, 243, 0.8);
+}
+
+.rb-names {
+  font-family: var(--rb-font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.12;
+  color: var(--rb-ink);
+}
+
+.rb-arrival-title .rb-names {
+  font-size: clamp(2.1rem, 8.4vw, 3.3rem);
+  margin: 0.35rem 0 0.55rem;
+}
+
+.rb-date-pill {
+  display: inline-block;
+  padding: 0.38rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(255, 250, 243, 0.82);
+  border: 1px solid rgba(196, 165, 116, 0.4);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rb-sage-deep);
+}
+
+.rb-arrival-cast {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22%;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+  padding: 0 0.15rem;
+}
+
+.rb-cast {
+  width: 42%;
+  max-width: 190px;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 10px 16px rgba(74, 59, 50, 0.12));
+}
+.rb-cast-groom { margin-left: -6%; }
+.rb-cast-bride { margin-right: -6%; }
+
+.rb-wild-band {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -4%;
+  height: 32%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+  mask-image: linear-gradient(to top, #000 18%, transparent 100%);
+}
+.rb-wild-band img {
+  width: 130%;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+}
+
+/* ===================================================
+   Shared scene rhythm
+   =================================================== */
+.rb-scene {
+  position: relative;
+  padding: 4.25rem 1.2rem 3.5rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.rb-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--rb-rose-deep);
+}
+
+.rb-heading {
+  font-family: var(--rb-font-display);
+  font-size: clamp(1.8rem, 6vw, 2.45rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0.25rem 0 0;
+}
+
+.rb-lede {
+  font-size: 0.9rem;
+  color: var(--rb-muted);
+  margin-top: 0.65rem;
+}
+
+.rb-center { text-align: center; }
+
+.rb-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  margin: 0.85rem auto 0;
+}
+.rb-rule::before,
+.rb-rule::after {
+  content: '';
+  width: 42px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rb-gold));
+}
+.rb-rule::after { background: linear-gradient(90deg, var(--rb-gold), transparent); }
+.rb-rule-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--rb-blush);
+  box-shadow: 0 0 0 4px rgba(212, 165, 168, 0.25);
+}
+
+/* ===================================================
+   SCENE 3 — The Royal Couple
+   =================================================== */
+.rb-couple {
+  background:
+    linear-gradient(180deg, rgba(251, 246, 238, 0.2), var(--rb-cream) 8%);
+  overflow: hidden;
+}
+
+.rb-couple-stage {
+  display: grid;
+  gap: 2.75rem;
+  margin-top: 2.4rem;
+}
+
+.rb-character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.rb-character-art-wrap {
+  width: min(78vw, 280px);
+  height: min(64vw, 240px);
+  mix-blend-mode: multiply;
+}
+.rb-character-art {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.rb-portrait-frame {
+  width: 72px;
+  height: 90px;
+  border-radius: 40px 40px 12px 12px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 18px rgba(74, 59, 50, 0.16);
+  margin: -0.4rem 0 0.85rem;
+}
+.rb-portrait-frame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.rb-farewell-kicker {
-  font-family: var(--rb-font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.35em;
+.rb-rank {
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--rb-gold-bright);
-  margin-bottom: 0.4rem;
-  position: relative;
-  z-index: 2;
-}
-
-.rb-farewell-names {
-  font-family: var(--rb-font-display);
-  font-size: clamp(2rem, 7vw, 3rem);
   font-weight: 700;
-  color: #FFFFFF;
-  margin: 0.5rem 0 1.25rem;
-  position: relative;
-  z-index: 2;
+  color: var(--rb-sage-deep);
+  margin-top: 0.35rem;
 }
+.rb-character .rb-names {
+  font-size: 1.45rem;
+  margin: 0.2rem 0 0.35rem;
+}
+.rb-lineage {
+  font-size: 0.84rem;
+  color: var(--rb-muted);
+  max-width: 18rem;
+}
+.rb-ig {
+  margin-top: 0.7rem;
+  font-size: 0.78rem;
+  color: var(--rb-rose-deep);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.rb-ig:hover { text-decoration: underline; }
 
-.rb-farewell-message {
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.85);
-  max-width: 480px;
+.rb-vow {
+  margin-top: 2.8rem;
+  text-align: center;
+}
+.rb-vow-art {
+  width: min(78vw, 280px);
+  height: 180px;
+  object-fit: contain;
+  margin: 0 auto 1rem;
+  mix-blend-mode: multiply;
+  display: block;
+}
+.rb-vow blockquote {
+  font-family: var(--rb-font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 28rem;
   margin: 0 auto;
-  line-height: 1.8;
-  position: relative;
-  z-index: 2;
+}
+.rb-vow cite {
+  display: block;
+  margin-top: 0.7rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--rb-rose-deep);
 }
 
-.rb-brand-watermark {
-  font-family: var(--rb-font-display);
-  font-size: 0.65rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.6);
-  margin-top: 3rem;
-  position: relative;
-  z-index: 2;
+@media (min-width: 640px) {
+  .rb-couple-stage {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: end;
+  }
 }
 
 /* ===================================================
-   FLOATING ROYAL CONTROLLERS (Audio & Nav)
+   SCENE 4 — Save the Date (royal board, not boxes)
    =================================================== */
-.rb-audio-royal-btn {
-  position: fixed;
-  bottom: 5.75rem;
-  right: 1.25rem;
-  z-index: 50;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  border: 2px solid var(--rb-gold-rich);
-  color: var(--rb-rose-deep);
+.rb-date-scene {
+  padding-top: 2.5rem;
+}
+
+.rb-board {
+  position: relative;
+  padding: 3.4rem 1.4rem 2.4rem;
+  min-height: 22rem;
+  text-align: center;
+}
+.rb-board-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+.rb-board-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.rb-clock {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  box-shadow: 0 10px 30px rgba(44, 34, 30, 0.2);
-  cursor: pointer;
-  transition: transform 0.25s ease;
+  gap: 0.28rem;
+  margin: 1.35rem 0 1.1rem;
+  flex-wrap: wrap;
 }
-
-.rb-audio-royal-btn:hover {
-  transform: scale(1.08);
-}
-
-.rb-royal-navbar {
-  position: fixed;
-  bottom: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  background: rgba(255, 253, 249, 0.95);
-  border: 1.5px solid var(--rb-border-gold);
-  border-radius: 50px;
-  padding: 0.45rem 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  box-shadow: 0 12px 40px rgba(44, 34, 30, 0.2);
-  backdrop-filter: blur(16px);
-}
-
-.rb-royal-nav-link {
+.rb-clock-unit {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0.45rem 0.85rem;
-  border-radius: 50px;
-  color: var(--rb-muted-royal);
-  text-decoration: none;
+  min-width: 3.4rem;
+}
+.rb-clock-num {
   font-family: var(--rb-font-display);
-  font-size: 0.6rem;
+  font-size: clamp(1.7rem, 6vw, 2.2rem);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  transition: all 0.25s ease;
-}
-
-.rb-royal-nav-link:hover,
-.rb-royal-nav-link.active {
   color: var(--rb-rose-deep);
-  background: var(--rb-rose-soft);
+  line-height: 1;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, #fff 0%, #f6e6d8 70%);
+  border: 1.5px solid rgba(196, 165, 116, 0.45);
+  box-shadow: 0 6px 14px rgba(74, 59, 50, 0.08);
+}
+.rb-clock-label {
+  margin-top: 0.35rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rb-muted);
+}
+.rb-clock-colon {
+  font-family: var(--rb-font-display);
+  font-size: 1.4rem;
+  color: var(--rb-gold);
+  padding-top: 0.7rem;
 }
 
-/* Animations */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.rb-cal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(255, 250, 243, 0.9);
+  border: 1px solid rgba(125, 143, 106, 0.4);
+  color: var(--rb-sage-deep);
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-@keyframes stars-twinkle {
-  from { opacity: 0.3; }
-  to { opacity: 0.7; }
+.rb-sprite {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  position: relative;
+  vertical-align: middle;
+}
+.rb-sprite img {
+  position: absolute;
+  height: 210%;
+  width: auto;
+  max-width: none;
+  top: 50%;
+  mix-blend-mode: multiply;
+}
+.rb-sprite-gift img { left: -6%; transform: translateY(-50%); }
+.rb-sprite-cal img { left: 50%; transform: translate(-50%, -50%); }
+.rb-sprite-pin img { left: auto; right: -8%; transform: translateY(-50%); }
+
+.rb-icon-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.35rem;
+}
+
+/* ===================================================
+   SCENE 5 — Royal Wedding Journey
+   =================================================== */
+.rb-journey {
+  overflow: hidden;
+}
+.rb-journey-path {
+  position: absolute;
+  left: 50%;
+  top: 7.5rem;
+  bottom: 2rem;
+  width: min(78%, 280px);
+  transform: translateX(-50%);
+  object-fit: cover;
+  opacity: 0.18;
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  pointer-events: none;
+}
+
+.rb-chapters {
+  display: grid;
+  gap: 2.4rem;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.rb-chapter {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.rb-storybook {
+  position: relative;
+  width: min(78vw, 250px);
+}
+.rb-storybook-frame {
+  width: 100%;
+  display: block;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+.rb-storybook-window {
+  position: absolute;
+  z-index: 2;
+  top: 15%;
+  left: 15.5%;
+  right: 15.5%;
+  bottom: 27%;
+  overflow: hidden;
+  border-radius: 22px 22px 18px 18px;
+  background: #f7eee3;
+}
+.rb-storybook-window img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+.rb-chapter-copy { max-width: 22rem; }
+.rb-chip {
+  display: inline-block;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rb-sage-deep);
+  margin-bottom: 0.25rem;
+}
+.rb-chapter-copy h4 {
+  font-family: var(--rb-font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.rb-chapter-copy p {
+  font-size: 0.88rem;
+  color: var(--rb-muted);
+  margin-top: 0.3rem;
+}
+
+.rb-path-nub {
+  width: 72px;
+  height: 72px;
+  margin: -0.4rem auto;
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+@media (min-width: 640px) {
+  .rb-chapter {
+    grid-template-columns: 0.9fr 1.1fr;
+    align-items: center;
+    text-align: left;
+    justify-items: start;
+  }
+  .rb-chapter:nth-child(even) {
+    grid-template-columns: 1.1fr 0.9fr;
+    text-align: right;
+    justify-items: end;
+  }
+  .rb-chapter:nth-child(even) .rb-storybook { order: 2; }
+}
+
+/* ===================================================
+   SCENE 6 — The Celebration
+   =================================================== */
+.rb-celebration {
+  overflow: hidden;
+}
+.rb-celebration-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+.rb-decrees {
+  display: grid;
+  gap: 1.6rem;
+  margin-top: 1.8rem;
+  position: relative;
+  z-index: 2;
+}
+
+.rb-decree {
+  position: relative;
+  padding: 3.1rem 1.5rem 2.1rem;
+  text-align: center;
+  min-height: 22rem;
+}
+.rb-decree-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+.rb-decree-inner { position: relative; z-index: 2; }
+.rb-decree h4 {
+  font-family: var(--rb-font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  margin: 0.15rem 0 0.45rem;
+}
+.rb-decree-when {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--rb-rose-deep);
+}
+.rb-decree-time {
+  font-size: 0.82rem;
+  color: var(--rb-muted);
+  margin-bottom: 0.7rem;
+}
+.rb-decree-venue {
+  font-family: var(--rb-font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+}
+.rb-decree-addr {
+  font-size: 0.8rem;
+  color: var(--rb-muted);
+  margin: 0.25rem auto 1rem;
+  max-width: 16rem;
+}
+
+.rb-maps {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 1.05rem;
+  border-radius: 999px;
+  background: var(--rb-sage-deep);
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 16px rgba(92, 107, 74, 0.28);
+}
+
+.rb-icons-strip {
+  width: min(92%, 340px);
+  height: 96px;
+  margin: 0.35rem auto 0.2rem;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+@media (min-width: 640px) {
+  .rb-decrees { grid-template-columns: 1fr 1fr; }
+}
+
+/* ===================================================
+   SCENE 7 — Memory Garden
+   =================================================== */
+.rb-garden { overflow: hidden; }
+
+.rb-mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  grid-auto-rows: 96px;
+  gap: 0.7rem;
+  margin-top: 1.8rem;
+  position: relative;
+  z-index: 2;
+}
+.rb-mem {
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(74, 59, 50, 0.12);
+  background: #efe3d4;
+}
+.rb-mem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.rb-mem:nth-child(1) { grid-row: span 3; border-radius: 80px 80px 18px 18px; }
+.rb-mem:nth-child(2) { grid-row: span 2; border-radius: 18px; }
+.rb-mem:nth-child(3) { grid-row: span 2; border-radius: 50%; }
+.rb-mem:nth-child(4) { grid-column: span 2; grid-row: span 2; border-radius: 24px; }
+.rb-mem:nth-child(5) { grid-row: span 2; border-radius: 18px 48px 18px 48px; }
+.rb-mem:nth-child(6) { grid-row: span 2; border-radius: 48px 18px 48px 18px; }
+.rb-mem:nth-child(n+7) { grid-row: span 2; border-radius: 18px; }
+
+.rb-garden-fg {
+  position: absolute;
+  right: -12%;
+  bottom: 1rem;
+  width: 46%;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.9;
+}
+
+.rb-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(26, 20, 32, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+}
+.rb-lightbox img {
+  max-width: min(92vw, 720px);
+  max-height: 78vh;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 6px solid rgba(255, 250, 243, 0.88);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+.rb-lightbox-x,
+.rb-lightbox-nav {
+  position: absolute;
+  border: 0;
+  background: rgba(255, 250, 243, 0.12);
+  color: #fff;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.rb-lightbox-x { top: 1rem; right: 1rem; }
+.rb-lightbox-nav { top: 50%; transform: translateY(-50%); }
+.rb-lightbox-prev { left: 0.6rem; }
+.rb-lightbox-next { right: 0.6rem; }
+
+/* ===================================================
+   SCENE 8 — Royal Gift
+   =================================================== */
+.rb-gifts-art {
+  width: min(92%, 360px);
+  margin: 0.4rem auto 1.1rem;
+  display: block;
+  mix-blend-mode: multiply;
+}
+
+.rb-parcel {
+  position: relative;
+  background: var(--rb-paper);
+  border: 1px solid rgba(196, 165, 116, 0.35);
+  border-radius: 22px;
+  padding: 1.5rem 1.2rem 1.35rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(74, 59, 50, 0.07);
+}
+.rb-parcel-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: url('/themes/kelinci/carrot_pattern.jpg');
+  background-size: 180px;
+  opacity: 0.07;
+  pointer-events: none;
+}
+.rb-bank {
+  font-family: var(--rb-font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--rb-sage-deep);
+}
+.rb-account {
+  font-family: var(--rb-font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0.25rem 0 0.15rem;
+}
+.rb-holder {
+  font-size: 0.82rem;
+  color: var(--rb-muted);
+  margin-bottom: 0.9rem;
+}
+.rb-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(196, 139, 144, 0.45);
+  background: #fff;
+  color: var(--rb-rose-deep);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+.rb-copy.is-copied {
+  background: var(--rb-sage-deep);
+  border-color: var(--rb-sage-deep);
+  color: #fff;
+}
+
+.rb-qris {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  margin: 0.4rem auto;
+  background: #fff;
+  padding: 0.4rem;
+  border-radius: 12px;
+}
+
+/* ===================================================
+   SCENE 9 — Guest book
+   =================================================== */
+.rb-book {
+  position: relative;
+  padding: 2.6rem 1.35rem 1.8rem;
+  margin-bottom: 1.4rem;
+}
+.rb-book-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+.rb-book-inner { position: relative; z-index: 2; }
+.rb-book h4 {
+  font-family: var(--rb-font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.rb-field { margin-bottom: 0.85rem; text-align: left; }
+.rb-label {
+  display: block;
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rb-muted);
+  margin-bottom: 0.3rem;
+}
+.rb-input,
+.rb-select,
+.rb-area {
+  width: 100%;
+  padding: 0.72rem 0.9rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(196, 139, 144, 0.35);
+  background: rgba(255, 250, 243, 0.92);
+  color: var(--rb-ink);
+  font-family: var(--rb-font-sans);
+  font-size: 0.9rem;
+}
+.rb-input:focus,
+.rb-select:focus,
+.rb-area:focus {
+  outline: none;
+  border-color: var(--rb-rose);
+  box-shadow: 0 0 0 3px rgba(196, 139, 144, 0.18);
+}
+.rb-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+}
+
+.rb-submit {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-radius: 14px;
+  background: var(--rb-rose-deep);
+  color: #fff;
+  font-family: var(--rb-font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(154, 93, 102, 0.28);
+}
+.rb-submit:disabled { opacity: 0.65; cursor: wait; }
+
+.rb-note {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--rb-sage-deep);
+  background: rgba(125, 143, 106, 0.12);
+  border-radius: 12px;
+  padding: 0.65rem;
+  margin-bottom: 0.9rem;
+}
+
+.rb-wishes {
+  display: grid;
+  gap: 0.75rem;
+  max-height: 22rem;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+.rb-wish {
+  background: rgba(255, 250, 243, 0.92);
+  border: 1px solid rgba(196, 165, 116, 0.28);
+  border-left: 3px solid var(--rb-blush);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  text-align: left;
+}
+.rb-wish:nth-child(even) { transform: rotate(-0.4deg); }
+.rb-wish:nth-child(odd) { transform: rotate(0.35deg); }
+.rb-wish-name {
+  font-family: var(--rb-font-display);
+  font-weight: 700;
+}
+.rb-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+}
+.rb-badge-yes { background: #e7f0dc; color: #3f5a2c; }
+.rb-badge-no { background: #f8e4e4; color: #8a3a3a; }
+.rb-wish p {
+  font-size: 0.84rem;
+  color: var(--rb-muted);
+  margin-top: 0.3rem;
+}
+.rb-reply {
+  margin-top: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  background: rgba(212, 165, 168, 0.16);
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+.rb-reply strong {
+  display: block;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rb-rose-deep);
+  margin-bottom: 0.15rem;
+}
+
+.rb-book-bunny {
+  position: absolute;
+  right: -6%;
+  bottom: -8%;
+  width: 88px;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ===================================================
+   SCENE 10 — Farewell
+   =================================================== */
+.rb-farewell {
+  position: relative;
+  text-align: center;
+  padding: 5rem 1.3rem 8.5rem;
+  color: #fff;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--rb-cream) 0%, #e4cfc8 18%, #8d6e84 42%, var(--rb-dusk) 62%, var(--rb-night) 100%);
+}
+
+.rb-moon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.1rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 32%, #fff8e8, #f0d9a8 55%, #e0c080);
+  box-shadow: 0 0 40px rgba(240, 217, 168, 0.55);
+  position: relative;
+  z-index: 2;
+}
+
+.rb-stars span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #fff;
+  border-radius: 50%;
+  animation: rb-twinkle 3.4s ease-in-out infinite;
+}
+.rb-stars span:nth-child(1) { top: 18%; left: 14%; animation-delay: 0.2s; }
+.rb-stars span:nth-child(2) { top: 12%; left: 72%; width: 2px; height: 2px; animation-delay: 0.8s; }
+.rb-stars span:nth-child(3) { top: 28%; left: 82%; animation-delay: 1.4s; }
+.rb-stars span:nth-child(4) { top: 22%; left: 40%; width: 2px; height: 2px; animation-delay: 0.5s; }
+.rb-stars span:nth-child(5) { top: 36%; left: 22%; animation-delay: 1.1s; }
+.rb-stars span:nth-child(6) { top: 8%; left: 52%; animation-delay: 1.8s; }
+.rb-stars span:nth-child(7) { top: 42%; left: 88%; width: 2px; height: 2px; animation-delay: 0.3s; }
+.rb-stars span:nth-child(8) { top: 14%; left: 8%; animation-delay: 2s; }
+
+.rb-farewell-pair-wrap {
+  width: min(78vw, 300px);
+  margin: 0 auto 0.6rem;
+  padding: 1.1rem 0.6rem 0.2rem;
+  background: radial-gradient(circle at 50% 42%, rgba(255, 250, 243, 0.92) 0%, rgba(255, 250, 243, 0.55) 48%, transparent 72%);
+  position: relative;
+  z-index: 2;
+}
+.rb-farewell-pair {
+  width: 100%;
+  mix-blend-mode: multiply;
+}
+
+.rb-farewell-kicker {
+  position: relative;
+  z-index: 2;
+  font-size: 0.68rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #f0d9a8;
+}
+.rb-farewell .rb-names {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  font-size: clamp(2rem, 8vw, 3rem);
+  margin: 0.3rem 0 0.9rem;
+}
+.rb-farewell-msg {
+  position: relative;
+  z-index: 2;
+  max-width: 26rem;
+  margin: 0 auto;
+  font-size: 0.9rem;
+  color: rgba(255, 250, 243, 0.86);
+  line-height: 1.8;
+}
+.rb-brand {
+  position: relative;
+  z-index: 2;
+  margin-top: 2.4rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(240, 217, 168, 0.55);
+}
+
+/* ===================================================
+   Floating royal nav + audio + toast
+   =================================================== */
+.rb-audio {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.6rem;
+  z-index: 70;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(196, 165, 116, 0.55);
+  background: rgba(255, 250, 243, 0.94);
+  color: var(--rb-rose-deep);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(74, 59, 50, 0.16);
+}
+
+.rb-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 1.05rem;
+  transform: translateX(-50%);
+  z-index: 70;
+  display: flex;
+  gap: 0.15rem;
+  padding: 0.35rem 0.45rem;
+  background: rgba(255, 250, 243, 0.94);
+  border: 1.5px solid rgba(196, 165, 116, 0.45);
+  border-radius: 999px;
+  box-shadow: 0 14px 32px rgba(74, 59, 50, 0.18);
+  backdrop-filter: blur(12px);
+}
+.rb-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12rem;
+  min-width: 3.1rem;
+  padding: 0.38rem 0.45rem;
+  border-radius: 999px;
+  color: var(--rb-muted);
+  text-decoration: none;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.rb-nav a:hover,
+.rb-nav a.is-on {
+  color: var(--rb-rose-deep);
+  background: rgba(212, 165, 168, 0.18);
+}
+
+.rb-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 6.4rem;
+  transform: translateX(-50%);
+  z-index: 90;
+  background: var(--rb-ink);
+  color: #fffaf3;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  box-shadow: 0 12px 28px rgba(26, 20, 32, 0.28);
+  white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  .rb-nav a span { display: none; }
+  .rb-nav a { min-width: 2.4rem; }
+}
+
+@media (min-width: 900px) {
+  .rb-arrival { min-height: 100vh; }
+  .rb-cast { max-width: 260px; }
 }
