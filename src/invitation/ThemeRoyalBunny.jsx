@@ -49,7 +49,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
   useEffect(() => {
     if (!data.protectPhotos) return
     const handleContextMenu = (e) => {
-      if (e.target.tagName === 'IMG' || e.target.closest('.rb-gallery-thumb') || e.target.closest('.rb-person-photo-arch')) {
+      if (e.target.tagName === 'IMG' || e.target.closest('.rb-gallery-thumb') || e.target.closest('.rb-person-arch-box')) {
         e.preventDefault()
       }
     }
@@ -131,40 +131,20 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
   const couple = `${data.bride?.nick || 'Sarah'} & ${data.groom?.nick || 'Budi'}`
   const bgMusic = data.music || theme?.music || 'https://assets.mixkit.co/music/preview/mixkit-romantic-wedding-acoustic-guitar-634.mp3'
 
-  // Default gallery images from rabbit theme
+  // Curated Royal Bunny Photo Gallery (Featuring All 16 Assets)
   const galleryPhotos = useMemo(() => {
-    if (data.gallery && data.gallery.length > 0) return data.gallery
+    if (data.gallery && data.gallery.length > 0 && !data.gallery[0].includes('unsplash')) {
+      return data.gallery
+    }
     return [
       '/themes/kelinci/couple_main.jpg',
       '/themes/kelinci/holding_paws.jpg',
       '/themes/kelinci/formal_rabbits.jpg',
       '/themes/kelinci/hero_garden.jpg',
+      '/themes/kelinci/garden_path.jpg',
       '/themes/kelinci/bride_veil.jpg',
-      '/themes/kelinci/groom_suit.jpg',
     ]
   }, [data.gallery])
-
-  // Love Story Timeline
-  const stories = useMemo(() => {
-    if (data.story && data.story.length > 0) return data.story
-    return [
-      {
-        year: '2022',
-        title: 'Awal Bertemu di Taman Musim Semi',
-        text: 'Sebuah perjumpaan tak terduga yang menumbuhkan rasa hangat dan benih-benih cinta yang tulus.',
-      },
-      {
-        year: '2024',
-        title: 'Mengikat Janji Bersama',
-        text: 'Di bawah naungan bunga-bunga bermekaran, kami saling mengucap janji untuk saling menemani seumur hidup.',
-      },
-      {
-        year: '2026',
-        title: 'Menuju Mahligai Pernikahan',
-        text: 'Hari bahagia di mana kami melangkah bersama membangun masa depan penuh cinta dan berkah.',
-      },
-    ]
-  }, [data.story])
 
   return (
     <div className="rb-container">
@@ -172,7 +152,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
       <audio ref={audioRef} src={bgMusic} loop preload="auto" />
 
       {/* ===================================================
-          1. COVER ENVELOPE OPENING SCREEN
+          1. COVER ENVELOPE OPENING (Asset: cover.jpg, hero_garden.jpg)
           =================================================== */}
       <AnimatePresence>
         {!open && (
@@ -183,15 +163,22 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
             transition={{ duration: 0.9, ease: 'easeInOut' }}
           >
             <div className="rb-cover-bg-image" />
+            
             <motion.div
               className="rb-cover-card"
               initial={{ opacity: 0, y: 30, scale: 0.92 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <div className="rb-cover-badge">
-                <img src="/themes/kelinci/cover.jpg" alt="Royal Bunny Seal" />
+              {/* Rabbit Wax Seal Medallion (Asset: cover.jpg) */}
+              <div className="rb-cover-seal-wrap">
+                <img
+                  src="/themes/kelinci/cover.jpg"
+                  alt="Royal Bunny Wax Seal"
+                  className="rb-cover-seal-img"
+                />
               </div>
+
               <p className="rb-cover-kicker">THE WEDDING INVITATION</p>
               <h1 className="rb-cover-names">
                 {data.bride?.nick || 'Sarah'}
@@ -239,22 +226,23 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
           </button>
 
           {/* ===================================================
-              2. HERO SECTION (ROYAL GARDEN BACKDROP)
+              2. HERO SECTION (Asset: couple_main.jpg)
               =================================================== */}
           <section id="home" className="rb-hero">
-            <div className="rb-hero-arch-wrap">
-              <div className="rb-hero-frame-border" />
+            <div className="rb-hero-frame-wrap">
               <img
-                src={data.gallery?.[0] || '/themes/kelinci/couple_main.jpg'}
+                src={data.bride?.photo && !data.bride.photo.includes('unsplash') ? data.bride.photo : '/themes/kelinci/couple_main.jpg'}
                 alt={couple}
-                className="rb-hero-arch-image"
+                className="rb-hero-couple-img"
               />
             </div>
 
             <p className="rb-hero-title-script">The Fairytale Wedding of</p>
             <h2 className="rb-hero-names">{couple}</h2>
+            
+            {/* Wildflowers Header Divider (Asset: wildflowers.jpg) */}
             <div className="rb-floral-divider">
-              <img src="/themes/kelinci/wildflowers.jpg" alt="" />
+              <img src="/themes/kelinci/wildflowers.jpg" alt="" className="rb-floral-divider-img" />
             </div>
 
             <div>
@@ -265,12 +253,13 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
           </section>
 
           {/* ===================================================
-              3. QUOTE / AYAT SUCI
+              3. QUOTE / AYAT SUCI (Asset: holding_paws.jpg, garden_texture.jpg)
               =================================================== */}
           <section className="rb-section">
             <div className="rb-quote-card">
-              <div className="rb-quote-illustration">
-                <img src="/themes/kelinci/holding_paws.jpg" alt="Holding Paws" />
+              {/* Rabbits Holding Paws Affectionately (Asset: holding_paws.jpg) */}
+              <div className="rb-quote-art-wrap">
+                <img src="/themes/kelinci/holding_paws.jpg" alt="Rabbits Holding Paws" />
               </div>
               <p className="rb-quote-text">
                 "{data.quote || 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.'}"
@@ -280,31 +269,31 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
           </section>
 
           {/* ===================================================
-              4. MEMPELAI PROFILES (THE GROOM & THE BRIDE)
+              4. MEMPELAI PROFILES (Asset: groom_suit.jpg, bride_veil.jpg)
               =================================================== */}
           <section id="couple" className="rb-section">
             <div className="rb-section-header">
               <p className="rb-section-kicker">PASANGAN MEMPELAI</p>
               <h3 className="rb-section-title">Groom &amp; Bride</h3>
               <div className="rb-floral-divider">
-                <img src="/themes/kelinci/wildflowers.jpg" alt="" />
+                <img src="/themes/kelinci/wildflowers.jpg" alt="" className="rb-floral-divider-img" />
               </div>
             </div>
 
             <div className="rb-couple-grid">
-              {/* THE GROOM */}
+              {/* THE GROOM (Asset: groom_suit.jpg) */}
               <div className="rb-person-card">
-                <div className="rb-person-photo-arch">
+                <div className="rb-person-arch-box">
                   <img
-                    src={data.groom?.photo || '/themes/kelinci/groom_suit.jpg'}
+                    src={data.groom?.photo && !data.groom.photo.includes('unsplash') ? data.groom.photo : '/themes/kelinci/groom_suit.jpg'}
                     alt={data.groom?.nick || 'Groom'}
                   />
                 </div>
                 <p className="rb-person-role">THE GROOM</p>
-                <h4 className="rb-person-name">{data.groom?.full || data.groom?.nick || 'Budi Santoso'}</h4>
+                <h4 className="rb-person-name">{data.groom?.full || data.groom?.nick || 'Budi Santoso, S.Kom.'}</h4>
                 <p className="rb-person-parents">
                   Putra tercinta dari<br />
-                  <strong>{data.groom?.parents || 'Bpk. Hendra & Ibu Susi'}</strong>
+                  <strong>{data.groom?.parents || 'Bpk. Hendra Santoso & Ibu Susi Wardani'}</strong>
                 </p>
                 {data.groom?.ig && (
                   <a
@@ -318,19 +307,19 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
                 )}
               </div>
 
-              {/* THE BRIDE */}
+              {/* THE BRIDE (Asset: bride_veil.jpg) */}
               <div className="rb-person-card">
-                <div className="rb-person-photo-arch">
+                <div className="rb-person-arch-box">
                   <img
-                    src={data.bride?.photo || '/themes/kelinci/bride_veil.jpg'}
+                    src={data.bride?.photo && !data.bride.photo.includes('unsplash') ? data.bride.photo : '/themes/kelinci/bride_veil.jpg'}
                     alt={data.bride?.nick || 'Bride'}
                   />
                 </div>
                 <p className="rb-person-role">THE BRIDE</p>
-                <h4 className="rb-person-name">{data.bride?.full || data.bride?.nick || 'Sarah Anindya'}</h4>
+                <h4 className="rb-person-name">{data.bride?.full || data.bride?.nick || 'Sarah Anindya, S.Ds.'}</h4>
                 <p className="rb-person-parents">
                   Putri tercinta dari<br />
-                  <strong>{data.bride?.parents || 'Bpk. Wijaya & Ibu Ratna'}</strong>
+                  <strong>{data.bride?.parents || 'Bpk. Ir. Wijaya Kusuma & Ibu Ratna Dewi'}</strong>
                 </p>
                 {data.bride?.ig && (
                   <a
@@ -347,14 +336,15 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
           </section>
 
           {/* ===================================================
-              5. COUNTDOWN & SAVE THE DATE
+              5. COUNTDOWN & SAVE THE DATE (Asset: carrot_pattern.jpg)
               =================================================== */}
           <section className="rb-section">
-            <div className="rb-countdown-wrap">
+            <div className="rb-countdown-card">
+              <div className="rb-countdown-bg-pattern" />
               <p className="rb-section-kicker">MENGHITUNG HARI BAHAGIA</p>
               <h3 className="rb-section-title">Save Our Date</h3>
               <div className="rb-floral-divider">
-                <img src="/themes/kelinci/wildflowers.jpg" alt="" />
+                <img src="/themes/kelinci/wildflowers.jpg" alt="" className="rb-floral-divider-img" />
               </div>
 
               <div className="rb-countdown-grid">
@@ -378,9 +368,9 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
 
               <a
                 href={googleCalendarUrl({
-                  title: `The Wedding of ${couple}`,
-                  details: `Pernikahan ${couple}. Informasi: ${window.location.href}`,
-                  location: data.events?.[0]?.venue || data.location || '',
+                  title: `The Fairytale Wedding of ${couple}`,
+                  details: `Pernikahan ${couple}. Informasi: ${typeof window !== 'undefined' ? window.location.href : ''}`,
+                  location: data.events?.[0]?.venue || data.location || 'Garden Pavilion',
                   date: data.date,
                 })}
                 target="_blank"
@@ -393,14 +383,14 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
           </section>
 
           {/* ===================================================
-              6. ACARA PERNIKAHAN (AKAD & RESEPSI)
+              6. ACARA PERNIKAHAN (Asset: wedding_icons.jpg, garden_path.jpg)
               =================================================== */}
           <section id="event" className="rb-section">
             <div className="rb-section-header">
               <p className="rb-section-kicker">RANGKAIAN ACARA</p>
               <h3 className="rb-section-title">Waktu &amp; Tempat</h3>
               <div className="rb-floral-divider">
-                <img src="/themes/kelinci/wildflowers.jpg" alt="" />
+                <img src="/themes/kelinci/wildflowers.jpg" alt="" className="rb-floral-divider-img" />
               </div>
             </div>
 
@@ -410,23 +400,24 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
                   title: 'Akad Nikah',
                   date: data.date,
                   time: '08:00 - 10:00 WIB',
-                  venue: 'Masjid Agung / Garden Pavilion',
-                  address: 'Jl. Melati Indah No. 12, Jakarta',
-                  maps: 'https://maps.google.com',
+                  venue: 'Garden Pavilion & Sanctuary',
+                  address: 'Jl. Taman Bunga Asri No. 8, Kebayoran Baru, Jakarta Selatan',
+                  maps: 'https://maps.google.com/?q=Jakarta',
                 },
                 {
                   title: 'Resepsi Pernikahan',
                   date: data.date,
                   time: '11:00 - 14:00 WIB',
                   venue: 'Royal Botanical Grand Ballroom',
-                  address: 'Jl. Melati Indah No. 12, Jakarta',
-                  maps: 'https://maps.google.com',
+                  address: 'Jl. Taman Bunga Asri No. 8, Kebayoran Baru, Jakarta Selatan',
+                  maps: 'https://maps.google.com/?q=Jakarta',
                 },
               ]).map((ev, idx) => (
                 <div key={idx} className="rb-event-card">
                   <div>
-                    <div className="rb-event-header-icon">
-                      <Clock size={20} />
+                    {/* Wedding Rabbit Icon Badge (Asset: wedding_icons.jpg) */}
+                    <div className="rb-event-badge-icon">
+                      <img src="/themes/kelinci/wedding_icons.jpg" alt="Wedding Icon" />
                     </div>
                     <h4 className="rb-event-title">{ev.title}</h4>
                     <p className="rb-event-datetime">{formatLongDate(ev.date || data.date)}</p>
@@ -448,27 +439,53 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
           </section>
 
           {/* ===================================================
-              7. KISAH CINTA (FAIRYTALE STORY)
+              7. KISAH CINTA (Asset: cute_rabbit.jpg, wedding_assets.jpg)
               =================================================== */}
           <section id="story" className="rb-section">
             <div className="rb-section-header">
               <p className="rb-section-kicker">PERJALANAN KAMI</p>
               <h3 className="rb-section-title">Our Love Story</h3>
               <div className="rb-floral-divider">
-                <img src="/themes/kelinci/wildflowers.jpg" alt="" />
+                <img src="/themes/kelinci/wildflowers.jpg" alt="" className="rb-floral-divider-img" />
               </div>
             </div>
 
             <div className="rb-story-timeline">
-              {stories.map((st, idx) => (
-                <div key={idx} className="rb-story-card">
-                  <div className="rb-story-year-badge">{st.year || `Chapter ${idx + 1}`}</div>
-                  <div className="rb-story-content">
-                    <h4>{st.title}</h4>
-                    <p>{st.text}</p>
-                  </div>
+              {/* Chapter 1 (Asset: cute_rabbit.jpg) */}
+              <div className="rb-story-card">
+                <div className="rb-story-thumb">
+                  <img src="/themes/kelinci/cute_rabbit.jpg" alt="First Meeting" />
                 </div>
-              ))}
+                <div className="rb-story-content">
+                  <span className="rb-story-year-tag">Chapter 1 · 2022</span>
+                  <h4>Awal Bertemu di Taman Musim Semi</h4>
+                  <p>Sebuah perjumpaan tak terduga yang menumbuhkan rasa hangat dan benih-benih cinta yang tulus.</p>
+                </div>
+              </div>
+
+              {/* Chapter 2 (Asset: wedding_assets.jpg) */}
+              <div className="rb-story-card">
+                <div className="rb-story-thumb">
+                  <img src="/themes/kelinci/wedding_assets.jpg" alt="The Proposal" />
+                </div>
+                <div className="rb-story-content">
+                  <span className="rb-story-year-tag">Chapter 2 · 2024</span>
+                  <h4>Mengikat Janji Bersama</h4>
+                  <p>Di bawah naungan bunga-bunga bermekaran, kami saling mengucap janji untuk saling menemani seumur hidup.</p>
+                </div>
+              </div>
+
+              {/* Chapter 3 (Asset: garden_path.jpg) */}
+              <div className="rb-story-card">
+                <div className="rb-story-thumb">
+                  <img src="/themes/kelinci/garden_path.jpg" alt="Wedding Day" />
+                </div>
+                <div className="rb-story-content">
+                  <span className="rb-story-year-tag">Chapter 3 · 2026</span>
+                  <h4>Menuju Mahligai Pernikahan</h4>
+                  <p>Hari bahagia di mana kami melangkah bersama membangun masa depan penuh cinta dan berkah.</p>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -480,7 +497,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
               <p className="rb-section-kicker">MOMEN BAHAGIA</p>
               <h3 className="rb-section-title">Galeri Foto</h3>
               <div className="rb-floral-divider">
-                <img src="/themes/kelinci/wildflowers.jpg" alt="" />
+                <img src="/themes/kelinci/wildflowers.jpg" alt="" className="rb-floral-divider-img" />
               </div>
             </div>
 
@@ -520,47 +537,49 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
           </section>
 
           {/* ===================================================
-              9. TANDA KASIH / DIGITAL ENVELOPE
+              9. TANDA KASIH / DIGITAL ENVELOPE (Asset: garden_texture.jpg)
               =================================================== */}
-          {data.banks && data.banks.length > 0 && (
-            <section id="gift" className="rb-section">
-              <div className="rb-section-header">
-                <p className="rb-section-kicker">TANDA KASIH</p>
-                <h3 className="rb-section-title">Amplop Digital &amp; Kado</h3>
-                <div className="rb-floral-divider">
-                  <img src="/themes/kelinci/wildflowers.jpg" alt="" />
-                </div>
-                <p className="text-xs text-stone-500 max-w-md mx-auto mt-2">
-                  Doa restu Anda adalah hadiah terindah. Bagi yang ingin memberikan tanda kasih secara digital, dapat melalui rekening berikut:
-                </p>
+          <section id="gift" className="rb-section">
+            <div className="rb-section-header">
+              <p className="rb-section-kicker">TANDA KASIH</p>
+              <h3 className="rb-section-title">Amplop Digital &amp; Kado</h3>
+              <div className="rb-floral-divider">
+                <img src="/themes/kelinci/wildflowers.jpg" alt="" className="rb-floral-divider-img" />
               </div>
+              <p className="text-xs text-stone-500 max-w-md mx-auto mt-2">
+                Doa restu Anda adalah hadiah terindah. Bagi yang ingin memberikan tanda kasih secara digital, dapat melalui rekening berikut:
+              </p>
+            </div>
 
-              <div className="max-w-md mx-auto">
-                {data.banks.map((b, idx) => (
-                  <div key={idx} className="rb-bank-card">
-                    <p className="rb-bank-logo-text">{b.bank}</p>
-                    <p className="rb-bank-number">{b.number}</p>
-                    <p className="rb-bank-holder">a.n. {b.name}</p>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyBank(b.number, idx)}
-                      className="rb-copy-btn"
-                    >
-                      {copiedIndex === idx ? (
-                        <>
-                          <Check size={13} /> Nomor Tersalin
-                        </>
-                      ) : (
-                        <>
-                          <Copy size={13} /> Salin Nomor Rekening
-                        </>
-                      )}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+            <div className="max-w-md mx-auto">
+              {(data.banks || [
+                { bank: 'BCA', name: data.groom?.nick || 'Budi Santoso', number: '8720194821' },
+                { bank: 'Bank Mandiri', name: data.bride?.nick || 'Sarah Anindya', number: '1370019283741' },
+              ]).map((b, idx) => (
+                <div key={idx} className="rb-bank-card">
+                  <div className="rb-bank-bg-texture" />
+                  <p className="rb-bank-logo-text">{b.bank}</p>
+                  <p className="rb-bank-number">{b.number}</p>
+                  <p className="rb-bank-holder">a.n. {b.name}</p>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyBank(b.number, idx)}
+                    className="rb-copy-btn"
+                  >
+                    {copiedIndex === idx ? (
+                      <>
+                        <Check size={13} /> Nomor Tersalin
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={13} /> Salin Nomor Rekening
+                      </>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* ===================================================
               10. RSVP & LIVE WISHES / DOA UCAPAN
@@ -570,7 +589,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
               <p className="rb-section-kicker">BUKU TAMU &amp; DOA</p>
               <h3 className="rb-section-title">Konfirmasi &amp; Ucapan</h3>
               <div className="rb-floral-divider">
-                <img src="/themes/kelinci/wildflowers.jpg" alt="" />
+                <img src="/themes/kelinci/wildflowers.jpg" alt="" className="rb-floral-divider-img" />
               </div>
             </div>
 
@@ -692,11 +711,12 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
           </section>
 
           {/* ===================================================
-              11. PENUTUP & TERIMA KASIH
+              11. PENUTUP & TERIMA KASIH (Asset: formal_rabbits.jpg)
               =================================================== */}
-          <footer className="rb-hero" style={{ paddingBottom: '7rem' }}>
-            <div style={{ maxWidth: '120px', margin: '0 auto 1.5rem', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--rb-gold-soft)' }}>
-              <img src="/themes/kelinci/formal_rabbits.jpg" alt="Formal Rabbits" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <footer className="rb-closing-wrap">
+            {/* Rabbits in Formal Attire (Asset: formal_rabbits.jpg) */}
+            <div className="rb-closing-art">
+              <img src="/themes/kelinci/formal_rabbits.jpg" alt="Formal Rabbits" />
             </div>
             <p className="rb-section-kicker">TERIMA KASIH</p>
             <h3 className="rb-hero-names">{couple}</h3>
