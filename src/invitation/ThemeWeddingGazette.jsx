@@ -259,7 +259,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
 
           {/* Toast Notification */}
           {toast && (
-            <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#110D0A] text-[#FFFDF9] px-5 py-2.5 rounded font-mono text-xs shadow-2xl border border-white/20">
+            <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#18120C] text-[#E6D8C3] px-5 py-2.5 rounded font-mono text-xs shadow-2xl border border-[#DECDB3]">
               ✓ {toast}
             </div>
           )}
@@ -360,7 +360,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 <h4 className="gz-profile-name">{data.groom?.full || data.groom?.nick || 'Dimas Pratama, S.T.'}</h4>
                 <p className="gz-profile-parents">
                   Putra tercinta dari<br />
-                  <strong className="text-[#110D0A]">{data.groom?.parents || 'Bpk. Ir. Bambang Haryo & Ibu Sri Wahyuni'}</strong>
+                  <strong className="text-[#18120C]">{data.groom?.parents || 'Bpk. Ir. Bambang Haryo & Ibu Sri Wahyuni'}</strong>
                 </p>
                 {data.groom?.ig && (
                   <a
@@ -386,7 +386,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 <h4 className="gz-profile-name">{data.bride?.full || data.bride?.nick || 'Andini Putri, S.Ds.'}</h4>
                 <p className="gz-profile-parents">
                   Putri tercinta dari<br />
-                  <strong className="text-[#110D0A]">{data.bride?.parents || 'Bpk. Dr. Suryo Broto & Ibu Ratna Kemala'}</strong>
+                  <strong className="text-[#18120C]">{data.bride?.parents || 'Bpk. Dr. Suryo Broto & Ibu Ratna Kemala'}</strong>
                 </p>
                 {data.bride?.ig && (
                   <a
@@ -405,7 +405,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             <motion.div className="gz-sketch-card" {...fadeUp}>
               <p className="gz-role-badge">SKETSA POTRET RESMI REDAKSI</p>
               <img src={A.sketch} alt="Sketsa Pengantin" />
-              <p className="text-xs font-mono text-stone-600 mt-2">
+              <p className="text-xs font-mono text-stone-700 mt-2">
                 "Dua hati yang dipersatukan dalam ikatan cinta abadi."
               </p>
             </motion.div>
@@ -521,7 +521,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 alt="Peta Petunjuk Arah"
                 className="gz-map-feature-img"
               />
-              <p className="text-xs font-mono text-stone-600 mt-2">
+              <p className="text-xs font-mono text-stone-700 mt-2">
                 Peta Ilustrasi Lokasi: Ikuti petunjuk rute menuju tempat perhelatan resepsi pernikahan.
               </p>
             </motion.div>
@@ -565,7 +565,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 })}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 border-2 border-black bg-[#FFFDF9] px-5 py-2.5 font-mono text-xs font-bold uppercase hover:bg-black hover:text-[#FFFDF9] transition-colors"
+                className="inline-flex items-center gap-2 border-2 border-black bg-[#E6D8C3] px-5 py-2.5 font-mono text-xs font-bold uppercase hover:bg-black hover:text-[#E6D8C3] transition-colors"
               >
                 <Calendar size={14} /> SIMPAN KE GOOGLE CALENDAR
               </a>
@@ -579,7 +579,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 alt="Wedding Crossword"
                 className="gz-crossword-img"
               />
-              <p className="text-xs font-mono text-stone-600 max-w-sm text-center">
+              <p className="text-xs font-mono text-stone-700 max-w-sm text-center">
                 Teka-teki silang edisi cinta: Temukan kata kunci kebahagiaan dan saksikan ikrar suci kedua mempelai!
               </p>
             </div>
@@ -626,7 +626,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 <img
                   src={galleryPhotos[lightbox]}
                   alt="Enlarged"
-                  className="max-w-full max-h-[85vh] object-contain border-4 border-[#FFFDF9] shadow-2xl"
+                  className="max-w-full max-h-[85vh] object-contain border-4 border-[#E6D8C3] shadow-2xl"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -642,7 +642,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             <div className="gz-section-header">
               <p className="gz-section-kicker">CLASSIFIED ADVERTISEMENTS · WEDDING GIFT</p>
               <h3 className="gz-section-heading">Amplop Digital &amp; Kado</h3>
-              <p className="text-xs text-stone-600 max-w-md mx-auto mt-1 font-mono">
+              <p className="text-xs text-stone-700 max-w-md mx-auto mt-1 font-mono">
                 Doa restu Anda adalah hadiah terindah. Bagi yang ingin memberikan tanda kasih secara digital dapat melalui kolom warta perbendaharaan:
               </p>
             </div>
@@ -691,11 +691,11 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             {/* RSVP Form */}
             <div className="gz-form-card">
               <div className="flex items-center gap-2 mb-3">
-                <Ticket size={18} className="text-[#8B1515]" />
-                <h4 className="font-serif font-bold text-lg uppercase text-[#110D0A]">Konfirmasi Kehadiran (RSVP Ticket)</h4>
+                <Ticket size={18} className="text-[#7C1818]" />
+                <h4 className="font-serif font-bold text-lg uppercase text-[#18120C]">Konfirmasi Kehadiran (RSVP Ticket)</h4>
               </div>
               {rsvpSuccess && (
-                <div className="p-3 mb-4 bg-[#D8ECC8] text-[#1F4E12] text-xs border border-[#1F4E12]/30 font-mono">
+                <div className="p-3 mb-4 bg-[#C8DCB8] text-[#1F4E12] text-xs border border-[#1F4E12]/30 font-mono">
                   ✓ Berhasil! Konfirmasi kehadiran Anda telah tercatat dalam warta warta.
                 </div>
               )}
@@ -749,9 +749,9 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
 
             {/* Telegram Wishes Form & Feed */}
             <div className="gz-form-card">
-              <h4 className="font-serif font-bold text-lg mb-3 uppercase text-[#110D0A]">Kirim Kawat Doa &amp; Harapan</h4>
+              <h4 className="font-serif font-bold text-lg mb-3 uppercase text-[#18120C]">Kirim Kawat Doa &amp; Harapan</h4>
               {wishSuccess && (
-                <div className="p-3 mb-4 bg-[#D8ECC8] text-[#1F4E12] text-xs border border-[#1F4E12]/30 font-mono">
+                <div className="p-3 mb-4 bg-[#C8DCB8] text-[#1F4E12] text-xs border border-[#1F4E12]/30 font-mono">
                   ✓ Kawat doa restu Anda telah dipublikasikan!
                 </div>
               )}
@@ -798,7 +798,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                     <p className="gz-feed-text">{w.message || w.text}</p>
                     {w.reply && (
                       <div className="gz-reply-box">
-                        <p className="font-bold text-[10px] uppercase text-[#8B1515]">Balasan Redaksi / Mempelai:</p>
+                        <p className="font-bold text-[10px] uppercase text-[#7C1818]">Balasan Redaksi / Mempelai:</p>
                         <p>{w.reply}</p>
                       </div>
                     )}
@@ -811,13 +811,13 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
           {/* ===================================================
               SECTION 10: EVENING EDITION CLOSING
               =================================================== */}
-          <footer className="text-center pt-8 pb-16 border-t-2 border-[#1C1510]">
+          <footer className="text-center pt-8 pb-16 border-t-2 border-[#231911]">
             <p className="gz-role-badge">★ EDITION CLOSED · THANK YOU ★</p>
-            <h3 className="font-serif font-black text-3xl uppercase mt-1 mb-2 text-[#110D0A]">{couple}</h3>
+            <h3 className="font-serif font-black text-3xl uppercase mt-1 mb-2 text-[#18120C]">{couple}</h3>
             <p className="text-xs text-stone-700 max-w-md mx-auto leading-relaxed">
               Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu bagi lembaran baru kehidupan kami.
             </p>
-            <p className="font-mono text-[10px] text-stone-500 mt-5 uppercase tracking-widest">
+            <p className="font-mono text-[10px] text-stone-600 mt-5 uppercase tracking-widest">
               Published &amp; Printed with Love by Aruna Digital Wedding
             </p>
           </footer>

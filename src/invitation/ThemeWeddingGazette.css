@@ -1,23 +1,23 @@
 /* ===================================================
    THE WEDDING GAZETTE · RETRO EDITORIAL BROADSHEET
-   10-Scene Unique Visual Layouts & High-Contrast Typography
+   100% Authentic Aged Sepia Newsprint (Zero Pure White)
    Aruna Digital Wedding Engine
    =================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700;1,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --gz-bg: #EAE2D2;
-  --gz-paper: #FFFDF9;
-  --gz-paper-tint: #F7EFE1;
-  --gz-paper-aged: #EFE4D2;
-  --gz-ink: #110D0A;          /* Deepest Charcoal Ink for 100% High Contrast */
-  --gz-ink-body: #261F1A;     /* Crisp Dark Body Ink */
-  --gz-muted: #5C4F44;        /* Readable Secondary Text */
-  --gz-border: #1C1510;
-  --gz-border-light: rgba(28, 21, 16, 0.2);
-  --gz-red: #8B1515;          /* Vintage Red Press Stamp */
-  --gz-gold: #966614;
+  --gz-bg: #D8C7AF;           /* Authentic Aged Newsprint Table Base */
+  --gz-paper: #E6D8C3;        /* Warm Yellowed Pulp Paper (Zero White) */
+  --gz-paper-tint: #DECDB3;   /* Aged Cream Inset Paper */
+  --gz-paper-dark: #CCAFA0;   /* Shadow / Crease Paper Tone */
+  --gz-ink: #18120C;          /* Dense Carbon Black Newsprint Ink */
+  --gz-ink-body: #2B2117;     /* Readable Rich Newsprint Ink */
+  --gz-muted: #5C4A3A;        /* Aged Caption Muted Ink */
+  --gz-border: #231911;       /* Vintage Woodblock Print Border */
+  --gz-border-light: rgba(35, 25, 17, 0.28);
+  --gz-red: #7C1818;          /* Antique Red Stamp / Wax Seal */
+  --gz-gold: #8E5E14;         /* Aged Vintage Gold Ingot */
   --gz-font-headline: 'Playfair Display', 'Cinzel', Georgia, serif;
   --gz-font-serif: 'Newsreader', Georgia, serif;
   --gz-font-mono: 'Courier Prime', monospace;
@@ -43,7 +43,7 @@
   background-image: url('/themes/koran/pattern_bg.jpg');
   background-size: 300px;
   background-repeat: repeat;
-  opacity: 0.12;
+  opacity: 0.22;
   pointer-events: none;
   z-index: 0;
 }
@@ -59,7 +59,7 @@
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: radial-gradient(circle at center, #F8F1E5 0%, #D4C3AB 100%);
+  background: radial-gradient(circle at center, #EBDDC6 0%, #BAA287 100%);
   overflow: hidden;
 }
 
@@ -69,8 +69,8 @@
   background-image: url('/themes/koran/newspaper_layout.jpg');
   background-size: cover;
   background-position: center;
-  opacity: 0.25;
-  filter: contrast(1.15) sepia(0.35);
+  opacity: 0.35;
+  filter: contrast(1.15) sepia(0.5);
   transform: scale(1.05);
 }
 
@@ -80,17 +80,19 @@
   width: 100%;
   max-width: 480px;
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
+  background-size: 280px;
   border: 3px double var(--gz-border);
   border-radius: 4px;
   padding: 2.25rem 1.75rem 2rem;
   text-align: center;
-  box-shadow: 0 30px 70px -15px rgba(17, 13, 10, 0.55), 0 0 0 1px rgba(28, 21, 16, 0.2);
+  box-shadow: 0 30px 70px -15px rgba(24, 18, 12, 0.6), 0 0 0 1px rgba(35, 25, 17, 0.3);
 }
 
 .gz-stamp-ribbon {
   display: inline-block;
   background: var(--gz-red);
-  color: #FFFFFF;
+  color: #E6D8C3;
   font-family: var(--gz-font-headline);
   font-size: 0.72rem;
   font-weight: 900;
@@ -98,7 +100,7 @@
   text-transform: uppercase;
   padding: 0.35rem 1.15rem;
   margin-bottom: 1rem;
-  box-shadow: 0 4px 12px rgba(139, 21, 21, 0.4);
+  box-shadow: 0 4px 12px rgba(124, 24, 24, 0.4);
 }
 
 .gz-masthead-hero-img {
@@ -106,7 +108,7 @@
   max-height: 80px;
   object-fit: contain;
   margin: 0.25rem 0 0.5rem;
-  filter: contrast(1.15) sepia(0.15);
+  filter: contrast(1.15) sepia(0.3);
 }
 
 .gz-cover-subbar {
@@ -175,7 +177,7 @@
   width: 100%;
   padding: 0.95rem 1.5rem;
   background: var(--gz-ink);
-  color: #FFFFFF;
+  color: var(--gz-paper);
   border: 2px solid var(--gz-border);
   font-family: var(--gz-font-headline);
   font-size: 0.82rem;
@@ -183,7 +185,7 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   cursor: pointer;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.4);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.45);
   transition: all 0.25s ease;
 }
 
@@ -206,7 +208,7 @@
 /* Live Marquee Ticker */
 .gz-ticker-wrapper {
   background: var(--gz-ink);
-  color: #FFFFFF;
+  color: var(--gz-paper);
   padding: 0.45rem 1rem;
   font-family: var(--gz-font-mono);
   font-size: 0.72rem;
@@ -217,12 +219,12 @@
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 15px rgba(17, 13, 10, 0.2);
+  box-shadow: 0 4px 15px rgba(24, 18, 12, 0.25);
 }
 
 .gz-ticker-badge {
   background: var(--gz-red);
-  color: #FFFFFF;
+  color: var(--gz-paper);
   padding: 0.15rem 0.5rem;
   font-size: 0.62rem;
   font-weight: 900;
@@ -232,11 +234,12 @@
 /* Header Masthead Box */
 .gz-masthead-box {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 3px double var(--gz-border);
   padding: 1.75rem 1.25rem 1.25rem;
   text-align: center;
   margin-bottom: 2.25rem;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.08);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.1);
 }
 
 .gz-masthead-title {
@@ -291,7 +294,7 @@
   object-fit: contain;
   margin: 2rem auto;
   opacity: 0.9;
-  filter: contrast(1.15) sepia(0.2);
+  filter: contrast(1.15) sepia(0.35);
   display: block;
 }
 
@@ -332,9 +335,10 @@
    =================================================== */
 .gz-lead-section {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 2rem 1.65rem;
-  box-shadow: 0 10px 30px rgba(17, 13, 10, 0.08);
+  box-shadow: 0 10px 30px rgba(24, 18, 12, 0.1);
 }
 
 .gz-lead-headline {
@@ -360,7 +364,7 @@
   width: 100%;
   aspect-ratio: 16/10;
   object-fit: cover;
-  filter: contrast(1.08) sepia(0.15);
+  filter: contrast(1.08) sepia(0.25);
 }
 
 .gz-caption {
@@ -423,7 +427,7 @@
 }
 
 /* ===================================================
-   SECTION 2: PROFILES & INTERVIEW (Distinct 2-Column)
+   SECTION 2: PROFILES & INTERVIEW
    =================================================== */
 .gz-profiles-container {
   margin-top: 1rem;
@@ -443,6 +447,7 @@
 
 .gz-profile-card {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
   text-align: center;
@@ -450,7 +455,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-profile-photo-vignette {
@@ -466,7 +471,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: contrast(1.1) sepia(0.18);
+  filter: contrast(1.1) sepia(0.25);
 }
 
 .gz-role-badge {
@@ -511,16 +516,17 @@
 
 .gz-profile-ig:hover {
   background: var(--gz-ink);
-  color: #FFFFFF;
+  color: var(--gz-paper);
 }
 
 /* Center Sketch Caricature Box */
 .gz-sketch-card {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-sketch-card img {
@@ -528,7 +534,7 @@
   max-height: 260px;
   object-fit: cover;
   border: 1px solid var(--gz-border);
-  filter: contrast(1.12) sepia(0.2);
+  filter: contrast(1.12) sepia(0.28);
 }
 
 /* ===================================================
@@ -536,10 +542,11 @@
    =================================================== */
 .gz-opinion-section {
   background: var(--gz-paper-tint);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 2.25rem 1.75rem;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-horoscope-circle {
@@ -549,7 +556,7 @@
   border-radius: 50%;
   border: 2px solid var(--gz-border);
   margin: 0 auto 1.25rem;
-  filter: contrast(1.15) sepia(0.18);
+  filter: contrast(1.15) sepia(0.28);
 }
 
 .gz-opinion-quote {
@@ -578,9 +585,10 @@
    =================================================== */
 .gz-comic-section {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-comic-banner {
@@ -601,7 +609,7 @@
   object-fit: cover;
   border: 2px solid var(--gz-border);
   margin-bottom: 1.25rem;
-  filter: contrast(1.1) sepia(0.18);
+  filter: contrast(1.1) sepia(0.25);
 }
 
 .gz-comic-grid {
@@ -663,13 +671,14 @@
 
 .gz-event-card {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-event-stamp-badge {
@@ -731,7 +740,7 @@
   gap: 0.4rem;
   padding: 0.65rem 1.25rem;
   background: var(--gz-ink);
-  color: #FFFFFF;
+  color: var(--gz-paper);
   font-family: var(--gz-font-mono);
   font-size: 0.75rem;
   font-weight: 700;
@@ -747,11 +756,12 @@
 
 .gz-map-feature-card {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.5rem;
   margin-top: 1rem;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-map-feature-img {
@@ -759,7 +769,7 @@
   max-height: 340px;
   object-fit: cover;
   border: 1px solid var(--gz-border);
-  filter: contrast(1.08) sepia(0.18);
+  filter: contrast(1.08) sepia(0.25);
 }
 
 /* ===================================================
@@ -767,10 +777,11 @@
    ================================================== */
 .gz-countdown-section {
   background: var(--gz-paper-tint);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 2.25rem 1.5rem;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-countdown-grid {
@@ -820,7 +831,7 @@
   max-width: 320px;
   border: 1px solid var(--gz-border);
   margin: 0.75rem 0;
-  filter: contrast(1.1) sepia(0.18);
+  filter: contrast(1.1) sepia(0.25);
 }
 
 /* ===================================================
@@ -828,9 +839,10 @@
    =================================================== */
 .gz-gallery-section {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 2rem 1.5rem;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-gallery-grid {
@@ -863,7 +875,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: sepia(0.22) contrast(1.08);
+  filter: sepia(0.3) contrast(1.08);
 }
 
 /* ===================================================
@@ -871,13 +883,15 @@
    =================================================== */
 .gz-gift-section {
   background: var(--gz-paper-tint);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 2rem 1.5rem;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-bank-card {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
   text-align: center;
@@ -940,7 +954,7 @@
 
 .gz-copy-btn:hover {
   background: var(--gz-ink);
-  color: #FFFFFF;
+  color: var(--gz-paper);
 }
 
 /* ===================================================
@@ -948,9 +962,10 @@
    =================================================== */
 .gz-rsvp-section {
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   padding: 2rem 1.5rem;
-  box-shadow: 0 8px 25px rgba(17, 13, 10, 0.06);
+  box-shadow: 0 8px 25px rgba(24, 18, 12, 0.08);
 }
 
 .gz-form-card {
@@ -992,7 +1007,7 @@
 .gz-select-input:focus,
 .gz-textarea-input:focus {
   outline: none;
-  background: #FFFDF4;
+  background: #EFE4D2;
   border-color: var(--gz-red);
 }
 
@@ -1000,7 +1015,7 @@
   width: 100%;
   padding: 0.95rem 1.5rem;
   background: var(--gz-ink);
-  color: #FFFFFF;
+  color: var(--gz-paper);
   border: 1px solid var(--gz-border);
   font-family: var(--gz-font-headline);
   font-size: 0.85rem;
@@ -1024,7 +1039,7 @@
 }
 
 .gz-feed-item {
-  background: var(--gz-paper);
+  background: var(--gz-paper-tint);
   border: 1px solid var(--gz-border);
   padding: 1.15rem 1.25rem;
   text-align: left;
@@ -1049,12 +1064,12 @@
 }
 
 .gz-status-hadir {
-  background: #D8ECC8;
+  background: #C8DCB8;
   color: #1F4E12;
 }
 
 .gz-status-tidak {
-  background: #F8D0D4;
+  background: #EAC4C8;
   color: #78151D;
 }
 
@@ -1066,7 +1081,7 @@
 }
 
 .gz-reply-box {
-  background: var(--gz-paper-tint);
+  background: var(--gz-paper);
   border: 1px dashed var(--gz-border);
   padding: 0.65rem 0.95rem;
   margin-top: 0.65rem;
@@ -1074,7 +1089,7 @@
 }
 
 /* ===================================================
-   FLOATING AUDIO & BOTTOM NAV
+   FLOATING AUDIO & BOTTOM NAV (PANEL BAR KORAN ANTIK)
    =================================================== */
 .gz-audio-btn {
   position: fixed;
@@ -1090,7 +1105,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(17, 13, 10, 0.35);
+  box-shadow: 0 6px 20px rgba(24, 18, 12, 0.4);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -1106,13 +1121,14 @@
   transform: translateX(-50%);
   z-index: 50;
   background: var(--gz-paper);
+  background-image: url('/themes/koran/pattern_bg.jpg');
   border: 2px solid var(--gz-border);
   border-radius: 50px;
   padding: 0.35rem 0.65rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  box-shadow: 0 10px 35px rgba(17, 13, 10, 0.35);
+  box-shadow: 0 10px 35px rgba(24, 18, 12, 0.4);
 }
 
 .gz-nav-item {
