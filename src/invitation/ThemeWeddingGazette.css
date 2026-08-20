@@ -1,57 +1,56 @@
 /* ===================================================
-   THE WEDDING GAZETTE (VINTAGE NEWSPAPER THEME)
-   Aruna Digital Wedding · Authentic Newsprint Edition
+   THE WEDDING GAZETTE · RETRO EDITORIAL BROADSHEET
+   10-Scene Theatrical Fairytale of Newsprint
+   Aruna Digital Wedding Engine
    =================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700;1,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Special+Elite&display=swap');
 
 :root {
-  --news-bg: #EDE5D5;
-  --news-paper: #FAF4E8;
-  --news-paper-aged: #EADBCA;
-  --news-paper-dark: #D8C6B0;
-  --news-ink: #1C1612;
-  --news-ink-soft: #3D332A;
-  --news-muted: #6E5F52;
-  --news-border: #2C221A;
-  --news-border-light: rgba(44, 34, 26, 0.25);
-  --news-red: #9B2226;
-  --news-gold: #B8860B;
-  --news-stamp: #9B2226;
-  --news-font-headline: 'Playfair Display', 'Cinzel', Georgia, serif;
-  --news-font-body: 'Newsreader', Georgia, serif;
-  --news-font-mono: 'Courier Prime', 'Special Elite', monospace;
-  --news-font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --gz-bg: #EAE1D0;
+  --gz-paper: #F8F2E6;
+  --gz-paper-crease: #EDE2CD;
+  --gz-paper-dark: #DCCBB3;
+  --gz-ink: #18130F;
+  --gz-ink-soft: #382F26;
+  --gz-muted: #6B5B4E;
+  --gz-border: #241A13;
+  --gz-red: #8F1D1D;
+  --gz-gold: #A37016;
+  --gz-font-headline: 'Playfair Display', 'Cinzel', Georgia, serif;
+  --gz-font-serif: 'Newsreader', Georgia, serif;
+  --gz-font-mono: 'Courier Prime', 'Special Elite', monospace;
+  --gz-font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
-/* Base Newspaper Page */
-.news-world {
-  background-color: var(--news-bg);
-  color: var(--news-ink);
-  font-family: var(--news-font-body);
+/* Base World */
+.gz-world {
+  background-color: var(--gz-bg);
+  color: var(--gz-ink);
+  font-family: var(--gz-font-serif);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
-/* Halftone Newsprint Paper Texture */
-.news-world::before {
+/* Authentic Seamless Newsprint Background */
+.gz-world::before {
   content: '';
   position: fixed;
   inset: 0;
   background-image: url('/themes/koran/pattern_bg.jpg');
-  background-size: 360px;
+  background-size: 320px;
   background-repeat: repeat;
-  opacity: 0.12;
+  opacity: 0.16;
   pointer-events: none;
   z-index: 0;
 }
 
 /* ===================================================
-   SCENE 1: THE EXTRA! EXTRA! FRONT PAGE COVER
+   SCENE 1: THE FOLDED NEWSPAPER & MORNING DELIVERY
    =================================================== */
-.news-cover-screen {
+.gz-cover-screen {
   position: fixed;
   inset: 0;
   z-index: 150;
@@ -59,530 +58,537 @@
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: radial-gradient(circle at center, #F5EDE0 0%, #D8C7B0 100%);
+  background: radial-gradient(circle at center, #F6EDE0 0%, #D4C1A8 100%);
   overflow: hidden;
 }
 
-.news-cover-bg-halftone {
+.gz-cover-backdrop-art {
   position: absolute;
   inset: 0;
   background-image: url('/themes/koran/newspaper_layout.jpg');
   background-size: cover;
   background-position: center;
-  opacity: 0.22;
-  filter: contrast(1.2) sepia(0.4);
-  transform: scale(1.05);
+  opacity: 0.28;
+  filter: contrast(1.15) sepia(0.35);
+  transform: scale(1.08);
 }
 
-.news-folded-broadsheet {
+.gz-folded-paper {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 480px;
-  background: var(--news-paper);
-  border: 3px double var(--news-border);
-  border-radius: 3px;
-  padding: 2.25rem 1.75rem;
+  max-width: 490px;
+  background: var(--gz-paper);
+  border: 3px double var(--gz-border);
+  border-radius: 4px;
+  padding: 2.25rem 1.75rem 2rem;
   text-align: center;
-  box-shadow: 0 25px 60px -15px rgba(28, 22, 18, 0.45), 0 0 0 1px rgba(44, 34, 26, 0.15);
+  box-shadow: 0 30px 70px -15px rgba(24, 19, 15, 0.5), 0 0 0 1px rgba(36, 26, 19, 0.2);
 }
 
-.news-breaking-banner {
+.gz-stamp-ribbon {
   display: inline-block;
-  background: var(--news-red);
-  color: #FAF4E8;
-  font-family: var(--news-font-headline);
+  background: var(--gz-red);
+  color: #F8F2E6;
+  font-family: var(--gz-font-headline);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  padding: 0.35rem 1rem;
-  margin-bottom: 1.25rem;
-  box-shadow: 0 3px 10px rgba(155, 34, 38, 0.35);
+  padding: 0.35rem 1.15rem;
+  margin-bottom: 1.15rem;
+  box-shadow: 0 4px 12px rgba(143, 29, 29, 0.4);
 }
 
-.news-masthead-title {
-  font-family: var(--news-font-headline);
-  font-size: clamp(2rem, 7.5vw, 2.75rem);
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--news-ink);
-  line-height: 1.05;
+.gz-masthead-hero-img {
+  width: 100%;
+  max-height: 85px;
+  object-fit: contain;
   margin: 0.25rem 0 0.5rem;
-  border-bottom: 2px solid var(--news-border);
-  padding-bottom: 0.5rem;
+  filter: contrast(1.15) sepia(0.2);
 }
 
-.news-masthead-subbar {
+.gz-cover-subbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: var(--news-font-mono);
+  border-top: 1px solid var(--gz-border);
+  border-bottom: 1px solid var(--gz-border);
+  padding: 0.35rem 0.25rem;
+  margin: 0.65rem 0 1.25rem;
+  font-family: var(--gz-font-mono);
   font-size: 0.65rem;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--news-border);
-  padding: 0.35rem 0;
-  margin-bottom: 1.25rem;
-  color: var(--news-muted);
-}
-
-.news-cover-headline {
-  font-family: var(--news-font-headline);
-  font-size: clamp(1.6rem, 5.5vw, 2.2rem);
   font-weight: 700;
-  line-height: 1.15;
-  color: var(--news-ink);
-  margin-bottom: 0.75rem;
+  color: var(--gz-muted);
+  text-transform: uppercase;
 }
 
-.news-lead-summary {
+.gz-cover-headline {
+  font-family: var(--gz-font-headline);
+  font-size: clamp(1.65rem, 5.8vw, 2.25rem);
+  font-weight: 900;
+  line-height: 1.12;
+  color: var(--gz-ink);
+  margin-bottom: 0.65rem;
+  text-transform: uppercase;
+}
+
+.gz-cover-blurb {
   font-size: 0.88rem;
   line-height: 1.6;
-  color: var(--news-ink-soft);
-  margin-bottom: 1.5rem;
+  color: var(--gz-ink-soft);
+  margin-bottom: 1.4rem;
   font-style: italic;
 }
 
-.news-press-pass-box {
-  background: var(--news-paper-aged);
-  border: 1px dashed var(--news-border);
+.gz-press-pass {
+  background: var(--gz-paper-crease);
+  border: 1px dashed var(--gz-border);
   padding: 0.85rem 1.25rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.4rem;
   text-align: left;
 }
 
-.news-press-pass-label {
-  font-family: var(--news-font-mono);
+.gz-press-pass-kicker {
+  font-family: var(--gz-font-mono);
   font-size: 0.62rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--news-muted);
+  color: var(--gz-red);
 }
 
-.news-press-pass-guest {
-  font-family: var(--news-font-headline);
+.gz-press-pass-name {
+  font-family: var(--gz-font-headline);
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   margin-top: 0.15rem;
 }
 
-.news-read-gazette-btn {
+.gz-open-broadsheet-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
   padding: 0.95rem 1.5rem;
-  background: var(--news-ink);
-  color: var(--news-paper);
-  border: 1px solid var(--news-border);
-  font-family: var(--news-font-headline);
+  background: var(--gz-ink);
+  color: var(--gz-paper);
+  border: 2px solid var(--gz-border);
+  font-family: var(--gz-font-headline);
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(28, 22, 18, 0.35);
+  box-shadow: 0 8px 25px rgba(24, 19, 15, 0.4);
   transition: all 0.25s ease;
 }
 
-.news-read-gazette-btn:hover {
-  background: var(--news-red);
+.gz-open-broadsheet-btn:hover {
+  background: var(--gz-red);
   transform: translateY(-2px);
 }
 
 /* ===================================================
-   MAIN EDITORIAL CONTAINER
+   MAIN EDITORIAL BROADSHEET (AFTER UNROLL)
    =================================================== */
-.news-broadsheet-container {
-  max-width: 760px;
+.gz-stage {
+  max-width: 780px;
   margin: 0 auto;
-  padding: 2rem 1.25rem 7rem;
+  padding: 2.25rem 1.25rem 7.5rem;
   position: relative;
   z-index: 2;
 }
 
-/* Broadsheet Top Header (Masthead) */
-.news-editorial-masthead {
-  border-bottom: 3px double var(--news-border);
-  padding-bottom: 1rem;
-  margin-bottom: 2rem;
+/* Live Marquee Breaking News Ticker */
+.gz-ticker-wrapper {
+  background: var(--gz-ink);
+  color: var(--gz-paper);
+  padding: 0.45rem 1rem;
+  font-family: var(--gz-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px rgba(24, 19, 15, 0.2);
+}
+
+.gz-ticker-badge {
+  background: var(--gz-red);
+  color: #FFFFFF;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+/* Header Masthead */
+.gz-masthead-box {
+  background: var(--gz-paper);
+  border: 3px double var(--gz-border);
+  padding: 1.5rem 1.25rem 1.15rem;
   text-align: center;
-  background: var(--news-paper);
-  padding: 1.5rem 1.25rem 1rem;
-  border: 2px solid var(--news-border);
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 25px rgba(24, 19, 15, 0.08);
 }
 
-.news-masthead-art-banner {
-  width: 100%;
-  max-height: 90px;
-  object-fit: contain;
-  margin-bottom: 0.5rem;
-  filter: contrast(1.1) sepia(0.2);
-}
-
-.news-gazette-big-logo {
-  font-family: var(--news-font-headline);
-  font-size: clamp(2.4rem, 9.5vw, 3.8rem);
+.gz-masthead-title {
+  font-family: var(--gz-font-headline);
+  font-size: clamp(2.4rem, 9.5vw, 3.9rem);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   margin: 0.25rem 0;
 }
 
-.news-dateline-bar {
+.gz-dateline {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--news-border);
-  border-bottom: 1px solid var(--news-border);
+  border-top: 1px solid var(--gz-border);
+  border-bottom: 1px solid var(--gz-border);
   padding: 0.4rem 0.25rem;
-  font-family: var(--news-font-mono);
+  font-family: var(--gz-font-mono);
   font-size: 0.68rem;
-  color: var(--news-ink-soft);
+  font-weight: 700;
+  color: var(--gz-ink-soft);
   text-transform: uppercase;
   margin-top: 0.75rem;
 }
 
-/* Frontpage Index Bar (Daftar Isi Koran) */
-.news-frontpage-index {
+.gz-toc-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 0.85rem;
-  background: var(--news-paper-aged);
-  border: 1px solid var(--news-border);
+  background: var(--gz-paper-crease);
+  border: 1px solid var(--gz-border);
   padding: 0.45rem 0.75rem;
-  margin-top: 0.5rem;
-  font-family: var(--news-font-mono);
+  margin-top: 0.65rem;
+  font-family: var(--gz-font-mono);
   font-size: 0.65rem;
   font-weight: 700;
-  color: var(--news-ink-soft);
+  color: var(--gz-ink-soft);
   text-transform: uppercase;
 }
 
-/* Section Header Typography */
-.news-section-kicker {
-  font-family: var(--news-font-mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--news-red);
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.news-section-title {
-  font-family: var(--news-font-headline);
-  font-size: clamp(1.85rem, 6vw, 2.5rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  line-height: 1.15;
-  color: var(--news-ink);
-  margin-bottom: 0.5rem;
-}
-
-.news-section-flourish {
+/* Dividers & Flourishes */
+.gz-flourish-divider {
   width: 100%;
-  max-width: 220px;
-  height: 18px;
+  max-width: 240px;
+  height: 20px;
   object-fit: contain;
-  margin: 0.35rem auto 0.85rem;
+  margin: 0.5rem auto 1rem;
   opacity: 0.85;
+  filter: contrast(1.1) sepia(0.25);
 }
 
-.news-double-divider {
-  border-top: 3px double var(--news-border);
-  margin: 1.75rem 0;
+.gz-double-rule {
+  border-top: 3px double var(--gz-border);
+  margin: 2rem 0;
 }
 
 /* ===================================================
-   SCENE 2: FRONT PAGE LEAD STORY (Hero Section)
+   SCENE 2: LEAD ARTICLE (Headline & Hero)
    =================================================== */
-.news-lead-hero-box {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-lead-card {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 1.75rem 1.5rem;
   margin-bottom: 2.5rem;
-  box-shadow: 0 8px 25px rgba(28, 22, 18, 0.08);
+  box-shadow: 0 10px 30px rgba(24, 19, 15, 0.08);
 }
 
-.news-lead-headline-main {
-  font-family: var(--news-font-headline);
+.gz-lead-headline {
+  font-family: var(--gz-font-headline);
   font-size: clamp(2rem, 7.5vw, 3.2rem);
   font-weight: 900;
   text-transform: uppercase;
   line-height: 1.08;
   text-align: center;
   margin-bottom: 1.25rem;
-  color: var(--news-ink);
+  color: var(--gz-ink);
 }
 
-.news-lead-photo-frame {
+.gz-lead-photo-frame {
   position: relative;
-  border: 2px solid var(--news-border);
+  border: 2px solid var(--gz-border);
   padding: 6px;
-  background: var(--news-paper-aged);
+  background: var(--gz-paper-crease);
   margin-bottom: 1.25rem;
 }
 
-.news-lead-photo-frame img {
+.gz-lead-photo-frame img {
   width: 100%;
   aspect-ratio: 16/10;
   object-fit: cover;
-  filter: contrast(1.08) sepia(0.15);
+  filter: contrast(1.08) sepia(0.18);
 }
 
-.news-photo-caption {
-  font-family: var(--news-font-mono);
+.gz-caption {
+  font-family: var(--gz-font-mono);
   font-size: 0.72rem;
-  color: var(--news-muted);
+  color: var(--gz-muted);
   font-style: italic;
-  margin-top: 0.4rem;
+  margin-top: 0.45rem;
   text-align: center;
 }
 
-/* Weather & Stock Bulletin Widget */
-.news-weather-widget {
-  background: var(--news-paper-aged);
-  border: 1px solid var(--news-border);
+.gz-drop-cap {
+  float: left;
+  font-family: var(--gz-font-headline);
+  font-size: 3.8rem;
+  line-height: 0.8;
+  font-weight: 900;
+  margin: 0.15rem 0.5rem 0 0;
+  color: var(--gz-ink);
+}
+
+/* Weather Widget */
+.gz-weather-card {
+  background: var(--gz-paper-crease);
+  border: 1px solid var(--gz-border);
   padding: 0.85rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-top: 1.25rem;
+  gap: 1.15rem;
+  margin-top: 1.35rem;
 }
 
-.news-weather-icon {
-  width: 48px;
-  height: 48px;
+.gz-weather-art {
+  width: 52px;
+  height: 52px;
   object-fit: cover;
   border-radius: 4px;
-  border: 1px solid var(--news-border);
+  border: 1px solid var(--gz-border);
 }
 
-.news-weather-text h5 {
-  font-family: var(--news-font-headline);
+.gz-weather-text h5 {
+  font-family: var(--gz-font-headline);
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 900;
   text-transform: uppercase;
 }
 
-.news-weather-text p {
-  font-family: var(--news-font-mono);
+.gz-weather-text p {
+  font-family: var(--gz-font-mono);
   font-size: 0.72rem;
-  color: var(--news-ink-soft);
+  color: var(--gz-ink-soft);
 }
 
 /* ===================================================
-   SCENE 3: EXCLUSIVE INTERVIEW (The Bride & The Groom)
+   SCENE 3: EXCLUSIVE INTERVIEW (The Couple Profiles)
    =================================================== */
-.news-couple-columns-grid {
+.gz-profiles-grid {
   display: grid;
   gap: 1.5rem;
   margin-bottom: 2.5rem;
 }
 
 @media (min-width: 640px) {
-  .news-couple-columns-grid {
+  .gz-profiles-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.news-profile-column-card {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-profile-card {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
 }
 
-.news-profile-photo-engraved {
+.gz-profile-photo-vignette {
   width: 140px;
   height: 180px;
-  border: 2px solid var(--news-border);
+  border: 2px solid var(--gz-border);
   padding: 4px;
-  background: var(--news-paper-aged);
+  background: var(--gz-paper-crease);
   margin-bottom: 1rem;
 }
 
-.news-profile-photo-engraved img {
+.gz-profile-photo-vignette img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   filter: contrast(1.1) sepia(0.2);
 }
 
-.news-profile-role-tag {
-  font-family: var(--news-font-mono);
+.gz-role-badge {
+  font-family: var(--gz-font-mono);
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--news-red);
+  color: var(--gz-red);
   margin-bottom: 0.25rem;
 }
 
-.news-profile-fullname {
-  font-family: var(--news-font-headline);
+.gz-profile-name {
+  font-family: var(--gz-font-headline);
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   margin-bottom: 0.4rem;
 }
 
-.news-profile-parents {
+.gz-profile-parents {
   font-size: 0.82rem;
-  color: var(--news-ink-soft);
+  color: var(--gz-ink-soft);
   line-height: 1.5;
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
 }
 
-.news-profile-ig-press {
+.gz-profile-ig {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-family: var(--news-font-mono);
+  font-family: var(--gz-font-mono);
   font-size: 0.72rem;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   text-decoration: none;
-  border: 1px solid var(--news-border);
+  border: 1px solid var(--gz-border);
   padding: 0.35rem 0.85rem;
-  background: var(--news-paper-aged);
+  background: var(--gz-paper-crease);
   transition: all 0.2s ease;
 }
 
-.news-profile-ig-press:hover {
-  background: var(--news-ink);
-  color: var(--news-paper);
+.gz-profile-ig:hover {
+  background: var(--gz-ink);
+  color: var(--gz-paper);
 }
 
 /* ===================================================
    SCENE 4: EDITORIAL OPINION & HOROSCOPE (Quote)
    =================================================== */
-.news-editorial-opinion-box {
-  background: var(--news-paper-aged);
-  border: 2px solid var(--news-border);
+.gz-opinion-card {
+  background: var(--gz-paper-crease);
+  border: 2px solid var(--gz-border);
   padding: 2.25rem 1.75rem;
   text-align: center;
   margin-bottom: 2.5rem;
 }
 
-.news-opinion-horoscope-img {
-  width: 72px;
-  height: 72px;
+.gz-horoscope-circle {
+  width: 74px;
+  height: 74px;
   object-fit: cover;
   border-radius: 50%;
-  border: 2px solid var(--news-border);
+  border: 2px solid var(--gz-border);
   margin: 0 auto 1.25rem;
 }
 
-.news-opinion-quote-text {
-  font-family: var(--news-font-body);
-  font-size: 1.1rem;
+.gz-opinion-quote {
+  font-family: var(--gz-font-serif);
+  font-size: 1.12rem;
   font-style: italic;
   line-height: 1.8;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   margin-bottom: 1rem;
 }
 
-.news-opinion-author-cite {
-  font-family: var(--news-font-headline);
+.gz-opinion-cite {
+  font-family: var(--gz-font-headline);
   font-size: 0.82rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--news-red);
+  color: var(--gz-red);
 }
 
 /* ===================================================
-   SCENE 5: COMIC STRIP LOVE STORY (Linimasa Komik)
+   SCENE 5: COMIC STRIP (Cerita Cinta Bergambar)
    =================================================== */
-.news-comic-strip-container {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-comic-card {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
   margin-bottom: 2.5rem;
 }
 
-.news-comic-strip-banner {
-  font-family: var(--news-font-headline);
+.gz-comic-banner {
+  font-family: var(--gz-font-headline);
   font-size: 1.15rem;
   font-weight: 900;
   text-transform: uppercase;
   text-align: center;
-  border-bottom: 2px solid var(--news-border);
+  border-bottom: 2px solid var(--gz-border);
   padding-bottom: 0.5rem;
   margin-bottom: 1.25rem;
 }
 
-.news-comic-panels-grid {
+.gz-comic-grid {
   display: grid;
   gap: 1.25rem;
 }
 
 @media (min-width: 640px) {
-  .news-comic-panels-grid {
+  .gz-comic-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-.news-comic-panel-card {
-  border: 2px solid var(--news-border);
+.gz-comic-cell {
+  border: 2px solid var(--gz-border);
   padding: 0.85rem;
-  background: var(--news-paper-aged);
+  background: var(--gz-paper-crease);
   display: flex;
   flex-direction: column;
 }
 
-.news-comic-panel-num {
-  font-family: var(--news-font-mono);
+.gz-comic-step {
+  font-family: var(--gz-font-mono);
   font-size: 0.65rem;
   font-weight: 700;
-  color: var(--news-red);
+  color: var(--gz-red);
   text-transform: uppercase;
   margin-bottom: 0.35rem;
 }
 
-.news-comic-panel-card h4 {
-  font-family: var(--news-font-headline);
+.gz-comic-cell h4 {
+  font-family: var(--gz-font-headline);
   font-size: 0.95rem;
   font-weight: 700;
   margin-bottom: 0.35rem;
 }
 
-.news-comic-panel-card p {
+.gz-comic-cell p {
   font-size: 0.78rem;
-  color: var(--news-ink-soft);
+  color: var(--gz-ink-soft);
   line-height: 1.55;
 }
 
 /* ===================================================
-   SCENE 6: SPECIAL BULLETIN & VINTAGE MAP (Acara & Peta)
+   SCENE 6: SPECIAL BULLETIN & VINTAGE ROUTE MAP
    =================================================== */
-.news-events-bulletin-grid {
+.gz-events-grid {
   display: grid;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
 @media (min-width: 640px) {
-  .news-events-bulletin-grid {
+  .gz-events-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.news-bulletin-card {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-event-card {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 1.75rem 1.35rem;
   text-align: center;
   display: flex;
@@ -590,52 +596,52 @@
   justify-content: space-between;
 }
 
-.news-bulletin-title {
-  font-family: var(--news-font-headline);
+.gz-event-title {
+  font-family: var(--gz-font-headline);
   font-size: 1.45rem;
   font-weight: 900;
   text-transform: uppercase;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   margin-bottom: 0.75rem;
 }
 
-.news-bulletin-datetime {
-  font-family: var(--news-font-mono);
+.gz-event-date {
+  font-family: var(--gz-font-mono);
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--news-red);
+  color: var(--gz-red);
   margin-bottom: 0.25rem;
 }
 
-.news-bulletin-time {
-  font-family: var(--news-font-mono);
+.gz-event-time {
+  font-family: var(--gz-font-mono);
   font-size: 0.78rem;
-  color: var(--news-muted);
+  color: var(--gz-muted);
   margin-bottom: 1rem;
 }
 
-.news-bulletin-venue {
-  font-family: var(--news-font-headline);
+.gz-event-venue {
+  font-family: var(--gz-font-headline);
   font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
 
-.news-bulletin-addr {
+.gz-event-addr {
   font-size: 0.8rem;
-  color: var(--news-ink-soft);
+  color: var(--gz-ink-soft);
   line-height: 1.5;
   margin-bottom: 1.25rem;
 }
 
-.news-map-dispatch-btn {
+.gz-maps-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.65rem 1.25rem;
-  background: var(--news-ink);
-  color: var(--news-paper);
-  font-family: var(--news-font-mono);
+  background: var(--gz-ink);
+  color: var(--gz-paper);
+  font-family: var(--gz-font-mono);
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -644,39 +650,38 @@
   transition: all 0.2s ease;
 }
 
-.news-map-dispatch-btn:hover {
-  background: var(--news-red);
+.gz-maps-btn:hover {
+  background: var(--gz-red);
 }
 
-/* Hand-Drawn Map Feature Box */
-.news-handdrawn-map-box {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-map-feature-card {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 1.25rem;
   margin-bottom: 2.5rem;
   text-align: center;
 }
 
-.news-handdrawn-map-art {
+.gz-map-feature-img {
   width: 100%;
   max-height: 320px;
   object-fit: cover;
-  border: 1px solid var(--news-border);
+  border: 1px solid var(--gz-border);
   filter: contrast(1.08) sepia(0.2);
 }
 
 /* ===================================================
-   SCENE 7: COUNTDOWN & CROSSWORD (Hitung Mundur & Teka-Teki)
+   SCENE 7: COUNTDOWN & CROSSWORD (Hitung Mundur & TTS)
    =================================================== */
-.news-countdown-dispatch-box {
-  background: var(--news-paper-aged);
-  border: 2px solid var(--news-border);
+.gz-countdown-card {
+  background: var(--gz-paper-crease);
+  border: 2px solid var(--gz-border);
   padding: 2.25rem 1.5rem;
   text-align: center;
   margin-bottom: 2.5rem;
 }
 
-.news-countdown-digit-grid {
+.gz-countdown-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
@@ -684,33 +689,32 @@
   margin: 1.5rem auto;
 }
 
-.news-digit-cell {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-digit-box {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 0.85rem 0.25rem;
 }
 
-.news-digit-number {
-  font-family: var(--news-font-mono);
+.gz-digit-val {
+  font-family: var(--gz-font-mono);
   font-size: 1.85rem;
   font-weight: 700;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   line-height: 1;
 }
 
-.news-digit-label {
-  font-family: var(--news-font-mono);
+.gz-digit-lbl {
+  font-family: var(--gz-font-mono);
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--news-muted);
+  color: var(--gz-muted);
   margin-top: 0.35rem;
 }
 
-/* Crossword Puzzle Feature Box */
-.news-crossword-box {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-crossword-card {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 1.5rem;
   margin-top: 1.5rem;
   display: flex;
@@ -718,10 +722,10 @@
   align-items: center;
 }
 
-.news-crossword-art {
+.gz-crossword-img {
   width: 100%;
   max-width: 320px;
-  border: 1px solid var(--news-border);
+  border: 1px solid var(--gz-border);
   margin: 0.75rem 0;
   filter: contrast(1.1) sepia(0.2);
 }
@@ -729,7 +733,7 @@
 /* ===================================================
    SCENE 8: PHOTO ROTOGRAVURE (Galeri Foto)
    =================================================== */
-.news-gallery-rotogravure-grid {
+.gz-gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.85rem;
@@ -737,26 +741,26 @@
 }
 
 @media (min-width: 640px) {
-  .news-gallery-rotogravure-grid {
+  .gz-gallery-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.15rem;
   }
 }
 
-.news-gallery-art-cell {
+.gz-gallery-cell {
   aspect-ratio: 4/5;
-  border: 2px solid var(--news-border);
+  border: 2px solid var(--gz-border);
   padding: 4px;
-  background: var(--news-paper-aged);
+  background: var(--gz-paper-crease);
   cursor: pointer;
   transition: transform 0.25s ease;
 }
 
-.news-gallery-art-cell:hover {
+.gz-gallery-cell:hover {
   transform: scale(1.03);
 }
 
-.news-gallery-art-cell img {
+.gz-gallery-cell img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -764,47 +768,47 @@
 }
 
 /* ===================================================
-   SCENE 9: CLASSIFIED ADS & WEDDING GIFT (Amplop Digital)
+   SCENE 9: CLASSIFIED ADS & DIGITAL GIFTS (Amplop)
    =================================================== */
-.news-classified-card {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-bank-card {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 1.65rem 1.35rem;
   text-align: center;
   margin-bottom: 1.25rem;
 }
 
-.news-classified-bank-title {
-  font-family: var(--news-font-headline);
+.gz-bank-name {
+  font-family: var(--gz-font-headline);
   font-size: 1.25rem;
   font-weight: 900;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   margin-bottom: 0.5rem;
 }
 
-.news-classified-acc-num {
-  font-family: var(--news-font-mono);
+.gz-acc-num {
+  font-family: var(--gz-font-mono);
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--news-ink);
+  color: var(--gz-ink);
   margin-bottom: 0.25rem;
 }
 
-.news-classified-holder {
+.gz-acc-holder {
   font-size: 0.85rem;
-  color: var(--news-muted);
+  color: var(--gz-muted);
   margin-bottom: 1rem;
 }
 
-.news-copy-wire-btn {
+.gz-copy-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   padding: 0.55rem 1.25rem;
-  background: var(--news-paper-aged);
-  border: 1px solid var(--news-border);
-  font-family: var(--news-font-mono);
+  background: var(--gz-paper-crease);
+  border: 1px solid var(--gz-border);
+  font-family: var(--gz-font-mono);
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -812,64 +816,64 @@
   transition: all 0.2s ease;
 }
 
-.news-copy-wire-btn:hover {
-  background: var(--news-ink);
-  color: var(--news-paper);
+.gz-copy-btn:hover {
+  background: var(--gz-ink);
+  color: var(--gz-paper);
 }
 
 /* ===================================================
-   SCENE 10: TELEGRAM & RSVP GUESTBOOK (Buku Tamu)
+   SCENE 10: TELEGRAM & RSVP GUESTBOOK
    =================================================== */
-.news-telegram-form-card {
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+.gz-form-card {
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   padding: 2.25rem 1.65rem;
   margin-bottom: 2rem;
 }
 
-.news-input-row {
+.gz-input-group {
   margin-bottom: 1.25rem;
   text-align: left;
 }
 
-.news-input-label {
+.gz-input-lbl {
   display: block;
-  font-family: var(--news-font-mono);
+  font-family: var(--gz-font-mono);
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--news-muted);
+  color: var(--gz-muted);
   margin-bottom: 0.35rem;
 }
 
-.news-text-input,
-.news-select-input,
-.news-textarea-input {
+.gz-text-input,
+.gz-select-input,
+.gz-textarea-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--news-border);
-  font-family: var(--news-font-mono);
+  border: 1px solid var(--gz-border);
+  font-family: var(--gz-font-mono);
   font-size: 0.85rem;
-  background: var(--news-paper-aged);
-  color: var(--news-ink);
+  background: var(--gz-paper-crease);
+  color: var(--gz-ink);
 }
 
-.news-text-input:focus,
-.news-select-input:focus,
-.news-textarea-input:focus {
+.gz-text-input:focus,
+.gz-select-input:focus,
+.gz-textarea-input:focus {
   outline: none;
   background: #FFFDF4;
-  border-color: var(--news-red);
+  border-color: var(--gz-red);
 }
 
-.news-telegram-submit-btn {
+.gz-submit-btn {
   width: 100%;
   padding: 0.95rem 1.5rem;
-  background: var(--news-ink);
-  color: var(--news-paper);
-  border: 1px solid var(--news-border);
-  font-family: var(--news-font-headline);
+  background: var(--gz-ink);
+  color: var(--gz-paper);
+  border: 1px solid var(--gz-border);
+  font-family: var(--gz-font-headline);
   font-size: 0.82rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -878,12 +882,11 @@
   transition: all 0.2s ease;
 }
 
-.news-telegram-submit-btn:hover {
-  background: var(--news-red);
+.gz-submit-btn:hover {
+  background: var(--gz-red);
 }
 
-/* Telegram Stream List */
-.news-telegram-feed {
+.gz-feed-stream {
   display: grid;
   gap: 1rem;
   max-height: 440px;
@@ -891,51 +894,51 @@
   padding-right: 0.35rem;
 }
 
-.news-telegram-item {
-  background: var(--news-paper-aged);
-  border: 1px solid var(--news-border);
+.gz-feed-item {
+  background: var(--gz-paper-crease);
+  border: 1px solid var(--gz-border);
   padding: 1.15rem 1.25rem;
   text-align: left;
 }
 
-.news-telegram-sender {
-  font-family: var(--news-font-headline);
+.gz-feed-sender {
+  font-family: var(--gz-font-headline);
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--news-ink);
+  color: var(--gz-ink);
 }
 
-.news-status-pill {
+.gz-status-tag {
   display: inline-block;
-  font-family: var(--news-font-mono);
+  font-family: var(--gz-font-mono);
   font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
   padding: 0.2rem 0.5rem;
-  border: 1px solid var(--news-border);
+  border: 1px solid var(--gz-border);
   margin-left: 0.5rem;
 }
 
-.news-status-pill-hadir {
+.gz-status-hadir {
   background: #E0EED4;
   color: #2D5A1E;
 }
 
-.news-status-pill-tidak {
+.gz-status-tidak {
   background: #F8D7DA;
   color: #842029;
 }
 
-.news-telegram-body {
+.gz-feed-text {
   font-size: 0.85rem;
-  color: var(--news-ink-soft);
+  color: var(--gz-ink-soft);
   line-height: 1.6;
   margin-top: 0.4rem;
 }
 
-.news-reply-bubble {
-  background: var(--news-paper);
-  border: 1px dashed var(--news-border);
+.gz-reply-box {
+  background: var(--gz-paper);
+  border: 1px dashed var(--gz-border);
   padding: 0.65rem 0.95rem;
   margin-top: 0.65rem;
   font-size: 0.8rem;
@@ -944,7 +947,7 @@
 /* ===================================================
    FLOATING AUDIO & BOTTOM NAV (PANEL BAR KORAN ANTIK)
    =================================================== */
-.news-audio-toggle {
+.gz-audio-btn {
   position: fixed;
   bottom: 5.5rem;
   right: 1.25rem;
@@ -952,55 +955,55 @@
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
-  color: var(--news-ink);
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
+  color: var(--gz-ink);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(28, 22, 18, 0.35);
+  box-shadow: 0 6px 20px rgba(24, 19, 15, 0.35);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 
-.news-audio-toggle:hover {
+.gz-audio-btn:hover {
   transform: scale(1.08);
 }
 
-.news-floating-navbar {
+.gz-navbar {
   position: fixed;
   bottom: 1.25rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
-  background: var(--news-paper);
-  border: 2px solid var(--news-border);
+  background: var(--gz-paper);
+  border: 2px solid var(--gz-border);
   border-radius: 50px;
   padding: 0.35rem 0.65rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  box-shadow: 0 10px 35px rgba(28, 22, 18, 0.35);
+  box-shadow: 0 10px 35px rgba(24, 19, 15, 0.35);
 }
 
-.news-nav-link {
+.gz-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0.35rem 0.65rem;
   border-radius: 50px;
-  color: var(--news-muted);
+  color: var(--gz-muted);
   text-decoration: none;
-  font-family: var(--news-font-mono);
+  font-family: var(--gz-font-mono);
   font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
   transition: all 0.2s ease;
 }
 
-.news-nav-link:hover,
-.news-nav-link.active {
-  color: var(--news-ink);
-  background: var(--news-paper-aged);
+.gz-nav-item:hover,
+.gz-nav-item.active {
+  color: var(--gz-ink);
+  background: var(--gz-paper-crease);
 }
