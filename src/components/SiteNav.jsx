@@ -4,10 +4,11 @@ import { Menu, X } from 'lucide-react'
 import { site, waLink } from '../data/site'
 
 const links = [
-  { to: '/tema', label: 'Tema' },
-  { to: '/#cara-kerja', label: 'Cara kerja' },
+  { to: '/tema', label: 'Katalog Tema' },
+  { to: '/#fitur', label: 'Fitur' },
+  { to: '/#cara-kerja', label: 'Cara Kerja' },
   { to: '/#harga', label: 'Harga' },
-  { to: '/admin', label: 'Admin' },
+  { to: '/studio', label: 'Theme Studio' },
 ]
 
 export default function SiteNav() {

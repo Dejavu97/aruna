@@ -135,13 +135,18 @@ function Themes() {
 
 function FeatureGrid() {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-20">
-      <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Isi undangan</p>
-      <h2 className="mt-2 max-w-2xl font-display text-4xl md:text-5xl">Semua yang tamu butuhkan, tanpa yang tidak perlu.</h2>
-      <div className="mt-10 grid gap-px bg-ink/10 sm:grid-cols-2 lg:grid-cols-3">
+    <section id="fitur" className="mx-auto max-w-6xl px-5 py-20">
+      <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Fitur Lengkap</p>
+      <h2 className="mt-2 max-w-2xl font-display text-4xl md:text-5xl">Semua fitur cerdas untuk hari bahagia kalian.</h2>
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((f) => (
-          <article key={f.title} className="bg-transparent border border-ink/10 p-6">
-            <h3 className="font-display text-2xl">{f.title}</h3>
+          <article key={f.title} className="border border-ink/15 bg-paper/60 p-6 backdrop-blur-sm shadow-xs transition-transform hover:-translate-y-1">
+            {f.tag && (
+              <span className="inline-block text-[10px] uppercase font-semibold tracking-[0.2em] text-gold-deep mb-2">
+                {f.tag}
+              </span>
+            )}
+            <h3 className="font-display text-2xl font-semibold">{f.title}</h3>
             <p className="mt-2 text-sm leading-relaxed text-stone">{f.body}</p>
           </article>
         ))}

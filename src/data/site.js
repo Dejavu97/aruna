@@ -76,28 +76,49 @@ export const steps = [
 
 export const features = [
   {
-    title: 'Siap dibuka di HP',
-    body: 'Tamu hampir selalu buka dari WhatsApp. Semua tema kami rancang mobile-first.',
+    tag: 'Personalisasi',
+    title: 'Nama Tamu di Sampul',
+    body: 'Tambah ?to=Nama+Tamu di tautan undangan. Sampul otomatis menyapa tamu secara personal.',
   },
   {
-    title: 'Nama tamu di sampul',
-    body: 'Tambah ?to=Keluarga+Wijaya di tautan, sampul menyapa mereka secara personal.',
+    tag: 'Buku Tamu',
+    title: 'RSVP & Rekap Kehadiran',
+    body: 'Konfirmasi hadir, tidak hadir, dan jumlah tamu tercatat rapi di dashboard kelola.',
   },
   {
-    title: 'RSVP terkumpul rapi',
-    body: 'Hadir, tidak hadir, jumlah tamu. Kamu lihat semuanya di halaman admin.',
+    tag: 'Tanda Kasih',
+    title: 'Amplop Digital & QRIS',
+    body: 'Nomor rekening bank dan QRIS dengan tombol 1-klik salin nomor rekening untuk kemudahan tamu.',
   },
   {
-    title: 'Amplop digital',
-    body: 'Nomor rekening dan QRIS. Tamu salin dengan satu ketukan, tanpa malu-malu.',
+    tag: 'Doa Restu',
+    title: 'Ucapan Doa & Balasan',
+    body: 'Aliran doa restu dari para tamu secara langsung, dan pengantin dapat membalasnya di halaman undangan.',
   },
   {
-    title: 'Peta & countdown',
-    body: 'Lokasi terbuka di Google Maps. Hitungan mundur membuat tanggal terasa dekat.',
+    tag: 'Navigasi',
+    title: 'Google Maps & Hitung Mundur',
+    body: 'Petunjuk rute langsung ke Google Maps/Waze, disertai timer hitung mundur dan simpan ke Google Calendar.',
   },
   {
-    title: 'Tanpa aplikasi',
-    body: 'Tidak perlu unduh apa-apa. Satu tautan, langsung dibuka di browser HP.',
+    tag: 'Media',
+    title: 'Galeri Foto & Cerita Cinta',
+    body: 'Galeri foto prewedding dengan penampil layar penuh (lightbox) dan linimasa perjalanan cinta.',
+  },
+  {
+    tag: 'Cetak Fisik',
+    title: 'Generator Cetak Kartu A4',
+    body: 'Cetak tag souvenir (8 per A4), kartu nomor meja, dan kartu mini otomatis pas di kertas A4 tanpa tumpang tindih.',
+  },
+  {
+    tag: 'Desain Kustom',
+    title: 'Theme Studio & Upload Font',
+    body: 'Bebas meracik tema sendiri, menyesuaikan warna, dan mengunggah file font kaligrafi pilihan (.TTF/.OTF).',
+  },
+  {
+    tag: 'Privasi',
+    title: 'Proteksi Foto Anti-Download',
+    body: 'Fitur pengaman untuk memblokir klik kanan dan unduhan pada foto galeri prewedding demi privasi pengantin.',
   },
 ]
 
