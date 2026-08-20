@@ -65,3 +65,21 @@ Dokumen ini menjelaskan bagaimana siklus hidup sebuah undangan terbentuk, mulai 
 - Sistem memuat data undangan, memutar musik latar romantis, dan menyajikan animasi buka undangan.
 - Tamu dapat mengisi RSVP, menulis doa restu, melihat galeri foto, rute navigasi Google Maps, dan membuat frame Instagram Story.
 - Jika fitur Proteksi Foto aktif, sistem melindungi hak cipta foto dengan memblokir klik kanan (*context menu*) dan *drag-and-drop*.
+
+---
+
+## 7. Standar Desain Kreatif & Arsitektur Tema (*Creative Theme Standard*)
+Setiap tema baru yang dibuat di Aruna harus mengikuti standar desain teatrikal (*World Building*) dan tidak boleh sekadar berupa kumpulan kotak putih polos vertikal:
+
+1. **Konseptual Sesuai Jiwa Tema (*Context-Aware Art Direction*):**
+   - **Tema Fairytale / Karakter:** Segel lilin pembuka, tekstur buku dongeng, kartu melengkung, ilustrasi bab cinta, dan musik instrumen hangat.
+   - **Tema Adat Nusantara:** Ornamen ukiran kayu, frame gebyok, watermark batik keraton, aksara/filosofi, dan audio gamelan gending.
+   - **Tema Futuristik / Superhero:** Grid HUD neon, aksen laser, tekstur komik/halftone, dan soundscape sinematik.
+   - **Tema Modern / Editorial:** Tipografi besar asimetris, garis tipis presisi, marmer halus, dan split view layout.
+
+2. **Dilarang Menampilkan Panel Polos (*No Plain Boxes*):**
+   - Seluruh panel (Countdown, Rangkaian Acara, RSVP, Doa Restu, dan Amplop Digital) wajib memiliki tekstur latar (*textured paper/backdrop*), watermark motif tema, pembatas visual, dan lencana ikon tematik.
+
+3. **Proaktif dalam Meracik & Menemukan Aset:**
+   - Tidak pasif hanya menunggu file mentah. Proaktif mencari atau menghubungkan audio musik latar yang pas, efek partikel, dan ornamen pendukung agar dunia temanya terbentuk 100% utuh sejak pertama kali dibuka.
+
