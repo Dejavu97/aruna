@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Calendar, Clock, MapPin, Heart, Copy, Check, Send,
   Home, User, MessageSquare, Pause, Play, Sparkles, X,
-  Radio, Compass, Newspaper, Camera, BookOpen
+  Radio, Compass, Newspaper, Camera, BookOpen, HelpCircle,
+  Award, Ticket
 } from 'lucide-react'
 import { copyText, googleCalendarUrl, wazeUrl, formatLongDate } from '../lib/utils'
 import { addRsvp, addWish } from '../lib/api'
@@ -234,7 +235,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
 
           {/* Toast Notification */}
           {toast && (
-            <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-black text-white px-5 py-2 rounded font-mono text-xs shadow-xl border border-white/20">
+            <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#1C1612] text-[#FAF4E8] px-5 py-2 rounded font-mono text-xs shadow-xl border border-white/20">
               ✓ {toast}
             </div>
           )}
@@ -243,13 +244,26 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
               TOP EDITORIAL MASTHEAD
               =================================================== */}
           <header id="home" className="news-editorial-masthead">
-            <p className="news-section-kicker">★ OFFICIAL WEDDING CHRONICLE · INDEPENDENT DAILY ★</p>
+            <p className="news-section-kicker">★ OFFICIAL WEDDING CHRONICLE · SPECIAL EDITION ★</p>
             <h2 className="news-gazette-big-logo">The Wedding Gazette</h2>
             
             <div className="news-dateline-bar">
               <span>SPECIAL EDITION · NO. 01</span>
               <span>{formatLongDate(data.date)}</span>
-              <span>WEATHER: 100% CHANCE OF LOVE</span>
+              <span>PRICE: ONE HAPPY SMILE</span>
+            </div>
+
+            {/* Frontpage Newspaper Table of Contents / Index */}
+            <div className="news-frontpage-index">
+              <span>HAL 1: BERITA UTAMA</span>
+              <span>•</span>
+              <span>HAL 2: WAWANCARA</span>
+              <span>•</span>
+              <span>HAL 3: KOMIK CINTA</span>
+              <span>•</span>
+              <span>HAL 4: PETA &amp; JADWAL</span>
+              <span>•</span>
+              <span>HAL 5: TELEGRAM RSVP</span>
             </div>
           </header>
 
@@ -268,20 +282,20 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 alt={couple}
               />
               <p className="news-photo-caption">
-                Foto Utama: Kedua mempelai berbahagia saat mengumumkan hari ikrar suci pernikahan.
+                Dokumentasi Utama: Kedua mempelai berbahagia saat mengumumkan hari ikrar suci pernikahan.
               </p>
             </div>
 
-            <p className="text-justify text-sm leading-relaxed text-stone-800">
-              <span className="float-left text-4xl font-bold font-serif leading-none mr-2">D</span>engan rasa syukur yang mendalam, kami mengabarkan kepada seluruh keluarga besar, sahabat, dan kerabat tercinta bahwa hari penyatuan janji suci kami akan segera dilangsungkan dengan penuh kegembiraan dan berkah.
+            <p className="text-justify text-sm leading-relaxed text-[#3D332A]">
+              <span className="float-left text-4xl font-bold font-serif leading-none mr-2">D</span>engan rasa syukur yang mendalam, kami mengabarkan kepada seluruh keluarga besar, sahabat, dan kerabat tercinta bahwa hari penyatuan janji suci kami akan segera dilangsungkan dengan penuh kegembiraan dan limpahan berkah.
             </p>
 
             {/* Weather & Horoscope Mini Widget (Asset: weather.jpg) */}
             <div className="news-weather-widget">
               <img src="/themes/koran/weather.jpg" alt="Weather" className="news-weather-icon" />
               <div className="news-weather-text">
-                <h5>RAMALAN CUACA HARI-H: CERAH &amp; BAHAGIA</h5>
-                <p>Suhu 28°C · Kelembaban: 100% Hangat Penuh Cinta · Angin Segar Doa Restu Para Tamu.</p>
+                <h5>RAMALAN CUACA HARI-H: CERAH &amp; BERKAH</h5>
+                <p>Suhu 28°C · Kelembaban: 100% Hangat Penuh Kasih · Angin Segar Doa Restu Para Tamu.</p>
               </div>
             </div>
           </section>
@@ -295,7 +309,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             <div className="text-center mb-6">
               <p className="news-section-kicker">FEATURED PROFILES · EXCLUSIVE INTERVIEW</p>
               <h3 className="news-section-title">Mempelai Berbahagia</h3>
-              <p className="text-xs text-stone-500 font-mono">Dua Tokoh Utama dalam Berita Hari Ini</p>
+              <p className="text-xs text-stone-600 font-mono">Dua Tokoh Utama dalam Berita Hari Ini</p>
             </div>
 
             <div className="news-couple-columns-grid">
@@ -311,7 +325,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 <h4 className="news-profile-fullname">{data.groom?.full || data.groom?.nick || 'Dimas Pratama, S.T.'}</h4>
                 <p className="news-profile-parents">
                   Putra tercinta dari<br />
-                  <strong>{data.groom?.parents || 'Bpk. Bambang & Ibu Sri'}</strong>
+                  <strong>{data.groom?.parents || 'Bpk. Ir. Bambang Haryo & Ibu Sri Wahyuni'}</strong>
                 </p>
                 {data.groom?.ig && (
                   <a
@@ -337,7 +351,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 <h4 className="news-profile-fullname">{data.bride?.full || data.bride?.nick || 'Andini Putri, S.Ds.'}</h4>
                 <p className="news-profile-parents">
                   Putri tercinta dari<br />
-                  <strong>{data.bride?.parents || 'Bpk. Suryo & Ibu Ratna'}</strong>
+                  <strong>{data.bride?.parents || 'Bpk. Dr. Suryo Broto & Ibu Ratna Kemala'}</strong>
                 </p>
                 {data.bride?.ig && (
                   <a
@@ -399,13 +413,13 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
           </section>
 
           {/* ===================================================
-              SCENE 6: SPECIAL BULLETIN (Jadwal Acara & Peta)
+              SCENE 6: SPECIAL BULLETIN & HAND-DRAWN MAP (Acara & Peta)
               =================================================== */}
           <section id="event">
             <div className="text-center mb-6">
               <p className="news-section-kicker">OFFICIAL DISPATCH · ITINERARY</p>
               <h3 className="news-section-title">Waktu &amp; Tempat Acara</h3>
-              <p className="text-xs text-stone-500 font-mono">Maklumat Resmi Agenda Pernikahan</p>
+              <p className="text-xs text-stone-600 font-mono">Maklumat Resmi Agenda Pernikahan</p>
             </div>
 
             <div className="news-events-bulletin-grid">
@@ -444,10 +458,23 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 </div>
               ))}
             </div>
+
+            {/* Hand-Drawn Vintage Wedding Map Feature (Asset: vintage_map.jpg) */}
+            <div className="news-handdrawn-map-box">
+              <p className="news-section-kicker">VINTAGE ROUTE MAP &amp; GUIDE</p>
+              <img
+                src="/themes/koran/vintage_map.jpg"
+                alt="Peta Petunjuk Arah"
+                className="news-handdrawn-map-art"
+              />
+              <p className="text-xs font-mono text-stone-600 mt-2">
+                Peta Ilustrasi Lokasi: Ikuti petunjuk rute menuju tempat perhelatan resepsi pernikahan.
+              </p>
+            </div>
           </section>
 
           {/* ===================================================
-              SCENE 7: COUNTDOWN & CROSSWORD (Hitung Mundur)
+              SCENE 7: COUNTDOWN & CROSSWORD (Hitung Mundur & TTS)
               =================================================== */}
           <section className="news-countdown-dispatch-box">
             <p className="news-section-kicker">COUNTDOWN TO SHOWTIME</p>
@@ -481,10 +508,23 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
               })}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 border border-black bg-white px-5 py-2 font-mono text-xs font-bold uppercase hover:bg-black hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 border border-black bg-[#FAF4E8] px-5 py-2 font-mono text-xs font-bold uppercase hover:bg-black hover:text-[#FAF4E8] transition-colors"
             >
               <Calendar size={13} /> SIMPAN KE GOOGLE CALENDAR
             </a>
+
+            {/* Wedding Crossword Feature (Asset: crossword.jpg) */}
+            <div className="news-crossword-box">
+              <p className="news-section-kicker">DAILY WEDDING CROSSWORD &amp; TRIVIA</p>
+              <img
+                src="/themes/koran/crossword.jpg"
+                alt="Wedding Crossword"
+                className="news-crossword-art"
+              />
+              <p className="text-xs font-mono text-stone-600 max-w-sm text-center">
+                Teka-teki silang edisi cinta: Temukan kata kunci kebahagiaan dan saksikan ikrar suci kedua mempelai!
+              </p>
+            </div>
           </section>
 
           {/* ===================================================
@@ -494,7 +534,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             <div className="text-center mb-6">
               <p className="news-section-kicker">PHOTO ROTOGRAVURE SECTION</p>
               <h3 className="news-section-title">Galeri Momen</h3>
-              <p className="text-xs text-stone-500 font-mono">Dokumentasi Potret Prewedding</p>
+              <p className="text-xs text-stone-600 font-mono">Dokumentasi Potret Prewedding</p>
             </div>
 
             <div className="news-gallery-rotogravure-grid">
@@ -525,7 +565,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 <img
                   src={galleryPhotos[lightbox]}
                   alt="Enlarged"
-                  className="max-w-full max-h-[85vh] object-contain border-4 border-white shadow-2xl"
+                  className="max-w-full max-h-[85vh] object-contain border-4 border-[#FAF4E8] shadow-2xl"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -539,8 +579,8 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             <div className="text-center mb-6">
               <p className="news-section-kicker">CLASSIFIED ADVERTISEMENTS · WEDDING GIFT</p>
               <h3 className="news-section-title">Amplop Digital &amp; Kado</h3>
-              <p className="text-xs text-stone-500 max-w-md mx-auto mt-1 font-mono">
-                Doa restu Anda adalah hadiah terindah. Bagi yang ingin memberikan tanda kasih secara digital dapat melalui kolom berikut:
+              <p className="text-xs text-stone-600 max-w-md mx-auto mt-1 font-mono">
+                Doa restu Anda adalah hadiah terindah. Bagi yang ingin memberikan tanda kasih secara digital dapat melalui kolom warta perbendaharaan:
               </p>
             </div>
 
@@ -580,14 +620,17 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             <div className="text-center mb-6">
               <p className="news-section-kicker">TELEGRAM DISPATCH · PRESS GUESTBOOK</p>
               <h3 className="news-section-title">Konfirmasi &amp; Doa Restu</h3>
-              <p className="text-xs text-stone-500 font-mono">Kirimkan Telegram Ucapan Selamat</p>
+              <p className="text-xs text-stone-600 font-mono">Kirimkan Telegram Ucapan Selamat</p>
             </div>
 
             {/* RSVP Form */}
             <div className="news-telegram-form-card">
-              <h4 className="font-serif font-bold text-lg mb-3 uppercase">Konfirmasi Kehadiran (RSVP)</h4>
+              <div className="flex items-center gap-2 mb-3">
+                <Ticket size={18} className="text-[#9B2226]" />
+                <h4 className="font-serif font-bold text-lg uppercase">Konfirmasi Kehadiran (RSVP Ticket)</h4>
+              </div>
               {rsvpSuccess && (
-                <div className="p-3 mb-4 bg-green-50 text-green-800 text-xs border border-green-300 font-mono">
+                <div className="p-3 mb-4 bg-[#E0EED4] text-[#2D5A1E] text-xs border border-[#2D5A1E]/30 font-mono">
                   ✓ Berhasil! Konfirmasi kehadiran Anda telah tercatat dalam warta.
                 </div>
               )}
@@ -643,7 +686,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             <div className="news-telegram-form-card">
               <h4 className="font-serif font-bold text-lg mb-3 uppercase">Kirim Kawat Doa &amp; Harapan</h4>
               {wishSuccess && (
-                <div className="p-3 mb-4 bg-green-50 text-green-800 text-xs border border-green-300 font-mono">
+                <div className="p-3 mb-4 bg-[#E0EED4] text-[#2D5A1E] text-xs border border-[#2D5A1E]/30 font-mono">
                   ✓ Kawat doa restu Anda telah dipublikasikan!
                 </div>
               )}
@@ -690,7 +733,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                     <p className="news-telegram-body">{w.message || w.text}</p>
                     {w.reply && (
                       <div className="news-reply-bubble">
-                        <p className="font-bold text-[10px] uppercase text-red-800">Balasan Redaksi / Mempelai:</p>
+                        <p className="font-bold text-[10px] uppercase text-[#9B2226]">Balasan Redaksi / Mempelai:</p>
                         <p>{w.reply}</p>
                       </div>
                     )}
@@ -703,43 +746,43 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
           {/* ===================================================
               SCENE 11: EVENING EDITION CLOSING (Penutup)
               =================================================== */}
-          <footer className="text-center pt-8 pb-16 border-t-2 border-black">
+          <footer className="text-center pt-8 pb-16 border-t-2 border-[#2C221A]">
             <p className="news-section-kicker">★ EDITION CLOSED · THANK YOU ★</p>
             <h3 className="font-serif font-black text-3xl uppercase mt-1 mb-2">{couple}</h3>
             <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
               Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu bagi lembaran baru kehidupan kami.
             </p>
-            <p className="font-mono text-[10px] text-stone-400 mt-5 uppercase tracking-widest">
+            <p className="font-mono text-[10px] text-stone-500 mt-5 uppercase tracking-widest">
               Published &amp; Printed with Love by Aruna Digital Wedding
             </p>
           </footer>
 
           {/* ===================================================
-              FLOATING BOTTOM NEWSPAPER NAVIGATION
+              FLOATING BOTTOM NEWSPAPER NAVIGATION (PANEL BAR)
               =================================================== */}
           <nav className="news-floating-navbar">
             <a href="#home" className="news-nav-link">
-              <Home size={15} />
+              <Home size={14} />
               <span>HEADLINE</span>
             </a>
             <a href="#couple" className="news-nav-link">
-              <User size={15} />
+              <User size={14} />
               <span>PROFIL</span>
             </a>
             <a href="#event" className="news-nav-link">
-              <Calendar size={15} />
+              <Calendar size={14} />
               <span>ACARA</span>
             </a>
             <a href="#story" className="news-nav-link">
-              <BookOpen size={15} />
+              <BookOpen size={14} />
               <span>KOMIK</span>
             </a>
             <a href="#gallery" className="news-nav-link">
-              <Camera size={15} />
+              <Camera size={14} />
               <span>FOTO</span>
             </a>
             <a href="#rsvp" className="news-nav-link">
-              <MessageSquare size={15} />
+              <MessageSquare size={14} />
               <span>RSVP</span>
             </a>
           </nav>
