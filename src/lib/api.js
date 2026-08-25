@@ -149,36 +149,46 @@ export async function recordInvitationView(slug) {
 
 
 export async function loginAdmin(password) {
+  let customPassword = null
+
   // 1. Check custom admin password in Firestore
   try {
     const docRef = doc(db, 'settings', 'admin_auth')
     const snap = await getDoc(docRef)
-    if (snap.exists()) {
-      const stored = snap.data()
-      if (stored.password && password === stored.password) {
-        setAdminKey('custom-admin-key')
-        return { key: 'custom-admin-key' }
-      }
+    if (snap.exists() && snap.data()?.password) {
+      customPassword = snap.data().password
     }
-  } catch {}
+  } catch (err) {
+    console.warn('Firestore admin_auth fetch error:', err)
+  }
 
-  // 2. Check custom password in localStorage
-  try {
-    const localCustomPass = localStorage.getItem('aruna_admin_custom_password')
-    if (localCustomPass && password === localCustomPass) {
+  // 2. Check custom password in localStorage as backup
+  if (!customPassword) {
+    try {
+      const localCustomPass = localStorage.getItem('aruna_admin_custom_password')
+      if (localCustomPass) {
+        customPassword = localCustomPass
+      }
+    } catch {}
+  }
+
+  // 3. JIKA SUDAH PERNAH GANTI PASSWORD: Wajib menggunakan password baru (admin123 otomatis dinonaktifkan)
+  if (customPassword) {
+    if (password === customPassword) {
       setAdminKey('custom-admin-key')
       return { key: 'custom-admin-key' }
     }
-  } catch {}
+    throw new Error('Kata sandi admin salah. Silakan periksa kembali kata sandi kustom Anda.')
+  }
 
-  // 3. Master password fallback
-  if (password === 'admin123' || password === 'aruna2026' || password === 'admin') {
+  // 4. Default password HANYA berlaku jika Anda BELUM PERNAH mengganti kata sandi
+  if (password === 'admin123' || password === 'aruna2026' || password === 'byaruna2026') {
     setAdminKey('firebase-admin')
     return { key: 'local-admin-key' }
   }
 
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, 'admin@aruna.com', password)
+    const userCredential = await signInWithEmailAndPassword(auth, 'admin@byaruna.my.id', password)
     setAdminKey('firebase-admin')
     return { key: userCredential.user.uid }
   } catch (err) {
