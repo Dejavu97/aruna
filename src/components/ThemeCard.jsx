@@ -4,11 +4,12 @@ export default function ThemeCard({ theme }) {
   return (
     <article className="group flex flex-col">
       <Link to={`/tema/${theme.id}`} className="block relative overflow-hidden">
-        <div className="aspect-[3/4] overflow-hidden">
+        <div className="aspect-[3/4] overflow-hidden bg-ink/5 relative">
           <img
             src={theme.cover}
             alt={theme.name}
-            className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
+            loading="lazy"
+            className={`h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${theme.coverPosition || 'object-center'}`}
           />
         </div>
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-5 text-ivory translate-y-2 opacity-90 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">

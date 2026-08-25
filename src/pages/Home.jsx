@@ -75,7 +75,7 @@ function Hero() {
       tagline: 'Undangan pesta ulang tahun interaktif dengan galeri foto, countdown pesta, rundown acara, dan dresscode.',
       themeTitle: 'Sweet 17 Glamour',
       personName: 'Sarah Bella (17th)',
-      cover: '/assets/local/birthday_party_cover.jpg',
+      cover: '/assets/local/teenager_party_dress.jpg',
       categoryParam: 'ulang-tahun',
     },
     graduation: {
@@ -86,7 +86,7 @@ function Hero() {
       tagline: 'Bagikan rasa syukur atas peraihan gelar sarjana dan spesialis bersama keluarga dan sahabat tercinta.',
       themeTitle: 'Academic Honors',
       personName: 'dr. Siti Sarah, Sp.A',
-      cover: '/assets/local/graduation_campus_cover.jpg',
+      cover: '/assets/local/graduate_toga.jpg',
       categoryParam: 'wisuda',
     },
     aqiqah: {
@@ -97,7 +97,7 @@ function Hero() {
       tagline: 'Undangan syukuran kelahiran dan aqiqah lembut dengan arti nama indah, doa keberkahan, dan lokasi acara.',
       themeTitle: 'Aqiqah Al-Fatih',
       personName: 'Aruna Muhammad Al-Fatih',
-      cover: '/assets/local/aqiqah_cradle_cover.jpg',
+      cover: '/assets/local/baby_sleeping.jpg',
       categoryParam: 'aqiqah',
     },
     corporate: {
@@ -108,7 +108,7 @@ function Hero() {
       tagline: 'Seminar tahunan, annual gala dinner, dan peluncuran produk dengan kartu tiket akses QR check-in digital.',
       themeTitle: 'Corporate Summit',
       personName: 'Aruna Tech Summit 2026',
-      cover: '/assets/local/corporate_stage_cover.jpg',
+      cover: '/assets/local/corporate_executive.jpg',
       categoryParam: 'perusahaan',
     },
   }
@@ -172,7 +172,7 @@ function Hero() {
             <img
               src={currentHero.cover}
               alt={currentHero.themeTitle}
-              className="h-[400px] w-full object-cover transition-opacity duration-300"
+              className="h-[400px] w-full object-cover object-center transition-opacity duration-300"
             />
             <div className="bg-ivory/90 p-5 text-center text-ink backdrop-blur-md">
               <p className="text-[10px] uppercase tracking-[0.22em] text-gold-deep font-semibold">{currentHero.badge}</p>
