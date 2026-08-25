@@ -8,11 +8,55 @@ import { filterChips, themes } from '../data/themes'
 import { fetchCustomThemes } from '../lib/api'
 import { motion, AnimatePresence } from 'framer-motion'
 
+const subFiltersByEvent = {
+  pernikahan: [
+    { id: 'semua', label: 'Semua Pernikahan' },
+    { id: 'adat', label: 'Adat Nusantara' },
+    { id: 'elegan', label: 'Elegan' },
+    { id: 'modern', label: 'Modern & Minimalis' },
+    { id: 'islami', label: 'Islami' },
+    { id: 'floral', label: 'Floral & Garden' },
+    { id: 'mewah', label: 'Mewah' },
+    { id: 'unik', label: 'Unik & Fairytale' },
+    { id: 'klasik', label: 'Klasik' },
+    { id: 'premium', label: 'Koleksi Premium' },
+    { id: 'komunitas', label: 'Koleksi Komunitas' },
+  ],
+  'ulang-tahun': [
+    { id: 'semua', label: 'Semua Ulang Tahun' },
+    { id: 'surat-cinta', label: 'Surat Romantis Pasangan' },
+    { id: 'sahabat', label: 'Kapsul Sahabat & Bestie' },
+    { id: 'sweet17', label: 'Sweet 17 Glamour' },
+    { id: 'pesta', label: 'Party & Music' },
+    { id: 'elegan', label: 'Elegan' },
+    { id: 'modern', label: 'Modern' },
+  ],
+  wisuda: [
+    { id: 'semua', label: 'Semua Wisuda' },
+    { id: 'prestisius', label: 'Prestisius Emas' },
+    { id: 'sarjana', label: 'Sarjana & Profesi' },
+    { id: 'elegan', label: 'Elegan' },
+  ],
+  aqiqah: [
+    { id: 'semua', label: 'Semua Aqiqah' },
+    { id: 'islami', label: 'Islami Doa' },
+    { id: 'lembut', label: 'Pastel Lembut' },
+    { id: 'syukuran', label: 'Tasyakuran' },
+  ],
+  perusahaan: [
+    { id: 'semua', label: 'Semua Korporat' },
+    { id: 'gala', label: 'Gala Dinner & Awarding' },
+    { id: 'seminar', label: 'Seminar & Summit' },
+    { id: 'modern', label: 'VIP Modern' },
+  ],
+}
+
 export default function Themes() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
-  const initialCategory = params.get('kategori') || 'semua'
-  const [chip, setChip] = useState(initialCategory)
+  const initialCategory = params.get('kategori') || 'pernikahan'
+  const [eventTab, setEventTab] = useState(initialCategory === 'semua' ? 'pernikahan' : initialCategory)
+  const [subFilter, setSubFilter] = useState('semua')
   const [customThemes, setCustomThemes] = useState([])
 
   // Wedding Vibe Matcher Quiz State
@@ -30,7 +74,10 @@ export default function Themes() {
 
   useEffect(() => {
     const cat = params.get('kategori')
-    if (cat) setChip(cat)
+    if (cat && subFiltersByEvent[cat]) {
+      setEventTab(cat)
+      setSubFilter('semua')
+    }
   }, [params])
 
   useEffect(() => {
@@ -45,38 +92,43 @@ export default function Themes() {
     return [...themes, ...customThemes]
   }, [customThemes])
 
-  const list = useMemo(() => {
-    if (chip === 'semua') return allThemes
-    if (chip === 'komunitas') return allThemes.filter((t) => t.collection === 'community')
-    if (chip === 'pernikahan') {
+  // 1. Filter themes by Active Event Tab
+  const eventThemes = useMemo(() => {
+    if (eventTab === 'pernikahan') {
       return allThemes.filter((t) => !t.eventType || t.eventType === 'wedding' || (t.tags || []).includes('pernikahan'))
     }
-    if (chip === 'ulang-tahun') {
+    if (eventTab === 'ulang-tahun') {
       return allThemes.filter((t) => t.eventType === 'birthday' || (t.tags || []).includes('ulang-tahun') || (t.tags || []).includes('birthday'))
     }
-    if (chip === 'wisuda') {
+    if (eventTab === 'wisuda') {
       return allThemes.filter((t) => t.eventType === 'graduation' || (t.tags || []).includes('wisuda') || (t.tags || []).includes('graduation'))
     }
-    if (chip === 'aqiqah') {
+    if (eventTab === 'aqiqah') {
       return allThemes.filter((t) => t.eventType === 'aqiqah' || (t.tags || []).includes('aqiqah') || (t.tags || []).includes('bayi'))
     }
-    if (chip === 'perusahaan') {
+    if (eventTab === 'perusahaan') {
       return allThemes.filter((t) => t.eventType === 'corporate' || (t.tags || []).includes('perusahaan') || (t.tags || []).includes('corporate'))
     }
-    if (chip === 'reuni') {
-      return allThemes.filter((t) => t.eventType === 'reunion' || (t.tags || []).includes('reuni') || (t.tags || []).includes('gathering'))
-    }
-    return allThemes.filter((t) => 
-      (t.tags || []).includes(chip) || 
-      t.tag?.toLowerCase() === chip || 
-      t.collection === chip ||
-      t.eventType === chip
+    return allThemes
+  }, [eventTab, allThemes])
+
+  // 2. Filter by Active Sub-Category Style
+  const list = useMemo(() => {
+    if (subFilter === 'semua') return eventThemes
+    if (subFilter === 'komunitas') return eventThemes.filter((t) => t.collection === 'community')
+    if (subFilter === 'premium') return eventThemes.filter((t) => t.collection === 'premium')
+    return eventThemes.filter((t) => 
+      (t.tags || []).includes(subFilter) || 
+      t.tag?.toLowerCase() === subFilter || 
+      t.collection === subFilter
     )
-  }, [chip, allThemes])
+  }, [subFilter, eventThemes])
 
   const communityList = useMemo(() => list.filter((t) => t.collection === 'community'), [list])
   const premiumList = useMemo(() => list.filter((t) => t.collection === 'premium'), [list])
   const classicList = useMemo(() => list.filter((t) => t.collection !== 'premium' && t.collection !== 'community'), [list])
+
+  const currentSubFilters = subFiltersByEvent[eventTab] || subFiltersByEvent.pernikahan
 
   // Process Quiz Step Selection
   function handleSelectAnswer(field, val) {
@@ -195,32 +247,34 @@ export default function Themes() {
           Setiap tema bisa di-preview persis seperti tamu akan membukanya. Atau gunakan asisten cerdas untuk menemukan dan meracik tema yang sesuai dengan imajinasi Anda.
         </p>
 
-        {/* Action Banners Grid: Wedding Vibe Matcher Quiz & Theme Studio */}
-        <div className="mt-8 grid md:grid-cols-2 gap-4">
-          {/* 1. Wedding Vibe Matcher Quiz Banner */}
-          <div className="bg-paper border border-gold/40 p-6 flex flex-col justify-between rounded-sm shadow-xs relative overflow-hidden">
-            <div className="relative z-10">
-              <div className="flex items-center gap-1.5 text-gold-deep text-xs uppercase tracking-widest font-bold mb-1">
-                <HelpCircle size={15} /> Wedding Vibe Matcher
+        {/* Action Banners Grid */}
+        <div className={`mt-8 grid gap-4 ${eventTab === 'pernikahan' ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
+          {/* 1. Wedding Vibe Matcher Quiz Banner (Khusus Acara Pernikahan) */}
+          {eventTab === 'pernikahan' && (
+            <div className="bg-paper border border-gold/40 p-6 flex flex-col justify-between rounded-sm shadow-xs relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="flex items-center gap-1.5 text-gold-deep text-xs uppercase tracking-widest font-bold mb-1">
+                  <HelpCircle size={15} /> Wedding Vibe Matcher
+                </div>
+                <h2 className="font-display text-2xl font-bold text-ink">Bingung Memilih Tema Pernikahan?</h2>
+                <p className="text-stone text-xs mt-1.5 leading-relaxed">
+                  Jawab kuis 30 detik atau <strong>tulis bebas konsep impian Anda</strong> (misal: adat Minang/Sunda/Batak, pantai rustic, atau tema custom). Sistem akan mencocokkan tema terbaik.
+                </p>
               </div>
-              <h2 className="font-display text-2xl font-bold text-ink">Bingung Memilih Tema?</h2>
-              <p className="text-stone text-xs mt-1.5 leading-relaxed">
-                Jawab kuis 30 detik atau <strong>tulis bebas konsep impian Anda</strong> (misal: adat Minang/Sunda/Batak, pantai rustic, atau tema custom). Sistem akan mencocokkan tema terbaik.
-              </p>
+              <div className="mt-5 relative z-10">
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetQuiz()
+                    setQuizOpen(true)
+                  }}
+                  className="inline-flex items-center gap-2 bg-gold-deep text-ivory px-5 py-2.5 text-xs uppercase tracking-widest hover:bg-gold transition-colors font-semibold shadow-xs"
+                >
+                  <Sparkles size={14} /> Temukan / Tulis Konsep Saya
+                </button>
+              </div>
             </div>
-            <div className="mt-5 relative z-10">
-              <button
-                type="button"
-                onClick={() => {
-                  resetQuiz()
-                  setQuizOpen(true)
-                }}
-                className="inline-flex items-center gap-2 bg-gold-deep text-ivory px-5 py-2.5 text-xs uppercase tracking-widest hover:bg-gold transition-colors font-semibold shadow-xs"
-              >
-                <Sparkles size={14} /> Temukan / Tulis Konsep Saya
-              </button>
-            </div>
-          </div>
+          )}
 
           {/* 2. Theme Studio Banner */}
           <div className="bg-paper border border-ink/10 p-6 flex flex-col justify-between rounded-sm shadow-xs relative overflow-hidden">
@@ -228,14 +282,16 @@ export default function Themes() {
               <div className="flex items-center gap-1.5 text-stone text-xs uppercase tracking-widest font-bold mb-1">
                 <Sparkles size={15} className="text-gold-deep" /> Aruna Theme Studio 2.0
               </div>
-              <h2 className="font-display text-2xl font-bold text-ink">Punya Konsep Sendiri?</h2>
+              <h2 className="font-display text-2xl font-bold text-ink">
+                {eventTab === 'pernikahan' ? 'Punya Konsep Pernikahan Sendiri?' : `Racik Tema ${currentSubFilters[0]?.label.replace('Semua ', '')} Sendiri`}
+              </h2>
               <p className="text-stone text-xs mt-1.5 leading-relaxed">
-                Rancang tema impian tanpa batas: ubah urutan bagian, generator inisial monogram, color grading foto, dan upload audio voice note.
+                Rancang tema impian tanpa batas: ubah urutan bagian, generator inisial monogram, ekstraktor palet warna dari foto, dan upload audio voice note.
               </p>
             </div>
             <div className="mt-5 relative z-10">
               <Link
-                to="/studio"
+                to={`/studio?concept=${eventTab}`}
                 className="inline-flex items-center gap-2 bg-ink text-ivory px-5 py-2.5 text-xs uppercase tracking-widest hover:bg-gold-deep transition-colors font-semibold shadow-xs"
               >
                 <Palette size={14} /> Buka Theme Studio
@@ -244,82 +300,160 @@ export default function Themes() {
           </div>
         </div>
 
-        {/* Filter Chips */}
-        <div className="mt-10 flex flex-wrap gap-2">
-          {filterChips.map((c) => (
+        {/* TIER 1: PRIMARY EVENT CATEGORY TABS */}
+        <div className="mt-10 border-b border-ink/10">
+          <div className="flex flex-wrap items-center gap-2 pb-3">
+            {[
+              { id: 'pernikahan', label: 'Undangan Pernikahan' },
+              { id: 'ulang-tahun', label: 'Ulang Tahun & Sweet 17' },
+              { id: 'wisuda', label: 'Wisuda & Kelulusan' },
+              { id: 'aqiqah', label: 'Aqiqah & Bayi' },
+              { id: 'perusahaan', label: 'Acara Perusahaan' },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  setEventTab(cat.id)
+                  setSubFilter('semua')
+                }}
+                className={`px-4 py-2.5 text-xs uppercase tracking-wider font-semibold rounded-sm whitespace-nowrap transition-colors ${
+                  eventTab === cat.id
+                    ? 'bg-ink text-ivory shadow-xs font-bold'
+                    : 'bg-paper/80 border border-ink/15 text-stone hover:text-ink hover:border-ink/30'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* TIER 2: SUB-CATEGORY CHIPS (Membungkus ke Bawah dengan Rapi) */}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] uppercase tracking-widest text-stone font-semibold mr-1">
+            Kategori:
+          </span>
+          {currentSubFilters.map((sub) => (
             <button
-              key={c.id}
+              key={sub.id}
               type="button"
-              onClick={() => setChip(c.id)}
-              className={`px-3 py-1.5 text-xs uppercase tracking-[0.16em] transition-colors ${
-                chip === c.id ? 'bg-ink text-ivory font-semibold' : 'border border-ink/15 text-stone hover:border-ink/40 bg-white'
+              onClick={() => setSubFilter(sub.id)}
+              className={`px-3 py-1.5 text-xs uppercase tracking-[0.14em] rounded-xs transition-colors ${
+                subFilter === sub.id
+                  ? 'bg-gold-deep text-ivory font-bold shadow-2xs'
+                  : 'bg-white border border-ink/15 text-stone hover:border-ink/40 hover:text-ink'
               }`}
             >
-              {c.label}
+              {sub.label}
             </button>
           ))}
         </div>
 
-        {/* Koleksi Komunitas */}
-        {communityList.length > 0 && (
-          <div className="mt-12">
-            <div className="flex items-center gap-2 mb-2">
-              <h2 className="text-2xl font-display font-semibold">Koleksi Komunitas</h2>
-              <span className="bg-teal-900/10 text-teal-800 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-bold">Karya Pengguna</span>
-            </div>
-            <p className="text-xs uppercase tracking-widest text-stone mb-6">
-              Tema hasil rancangan calon pengantin &amp; desainer di Aruna Theme Studio.
+        {/* ACTIVE CATEGORY HEADER & RESULT COUNT */}
+        <div className="mt-8 flex justify-between items-center border-b border-ink/10 pb-4">
+          <div>
+            <h2 className="text-2xl font-display font-semibold text-ink capitalize">
+              {eventTab === 'pernikahan' && 'Katalog Undangan Pernikahan'}
+              {eventTab === 'ulang-tahun' && 'Katalog Pesta Ulang Tahun & Sweet 17'}
+              {eventTab === 'wisuda' && 'Katalog Wisuda & Sumpah Profesi'}
+              {eventTab === 'aqiqah' && 'Katalog Tasyakuran Aqiqah & Kelahiran'}
+              {eventTab === 'perusahaan' && 'Katalog Acara Korporat & Gala Dinner'}
+            </h2>
+            <p className="text-xs text-stone mt-0.5">
+              Menampilkan {list.length} desain tema pilihan {subFilter !== 'semua' ? `(Kategori: ${currentSubFilters.find(s => s.id === subFilter)?.label})` : ''}.
             </p>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {communityList.map((t) => (
-                <ThemeCard key={t.id} theme={t} />
-              ))}
-            </div>
           </div>
-        )}
 
-        {/* Koleksi Premium */}
-        {premiumList.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-display font-semibold mb-2">Koleksi Premium</h2>
-            <p className="text-xs uppercase tracking-widest text-stone mb-6">
-              Desain eksklusif dengan animasi khusus &amp; layout unik.
-            </p>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {premiumList.map((t) => (
-                <ThemeCard key={t.id} theme={t} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Koleksi Klasik (V1) */}
-        {classicList.length > 0 && (
-          <div className="mt-16 border-t border-ink/10 pt-10">
-            <div className="flex items-center gap-2 mb-2">
-              <h2 className="text-xl font-display font-semibold text-stone">Koleksi Klasik (V1)</h2>
-            </div>
-            <p className="text-xs uppercase tracking-widest text-stone/70 mb-6">
-              Tema warisan standar Aruna.
-            </p>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {classicList.map((t) => (
-                <ThemeCard key={t.id} theme={t} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {communityList.length === 0 && premiumList.length === 0 && classicList.length === 0 && (
-          <div className="mt-12 text-center py-16 border border-dashed border-ink/15 p-8 rounded-xl">
-            <p className="text-stone text-base">Tidak ada tema yang cocok dengan filter yang dipilih.</p>
+          {eventTab === 'pernikahan' ? (
             <button
               type="button"
-              onClick={() => setChip('semua')}
-              className="mt-4 inline-block bg-ink px-4 py-2 text-xs uppercase tracking-widest text-ivory font-semibold"
+              onClick={() => {
+                resetQuiz()
+                setQuizOpen(true)
+              }}
+              className="text-xs uppercase tracking-wider text-gold-deep hover:underline font-semibold inline-flex items-center gap-1"
             >
-              Tampilkan Semua Tema
+              <Sparkles size={13} /> Kuis Rekomendasi
+            </button>
+          ) : (
+            <Link
+              to={`/studio?concept=${eventTab}`}
+              className="text-xs uppercase tracking-wider text-gold-deep hover:underline font-semibold inline-flex items-center gap-1"
+            >
+              <Palette size={13} /> Racik Desain di Studio
+            </Link>
+          )}
+        </div>
+
+        {/* THEMES GRID & COLLECTION SECTIONS */}
+        {subFilter === 'semua' ? (
+          <div className="space-y-12">
+            {/* Koleksi Komunitas */}
+            {communityList.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-2xl font-display font-semibold text-ink">Koleksi Komunitas &amp; Studio</h3>
+                  <span className="bg-teal-900/10 text-teal-800 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-bold">Karya Pengguna</span>
+                </div>
+                <p className="text-xs uppercase tracking-widest text-stone mb-6">
+                  Tema hasil rancangan desainer di Aruna Theme Studio.
+                </p>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {communityList.map((t) => (
+                    <ThemeCard key={t.id} theme={t} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Koleksi Premium */}
+            {premiumList.length > 0 && (
+              <div>
+                <h3 className="text-2xl font-display font-semibold text-ink mb-2">Koleksi Premium</h3>
+                <p className="text-xs uppercase tracking-widest text-stone mb-6">
+                  Desain eksklusif dengan animasi khusus &amp; layout unik.
+                </p>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {premiumList.map((t) => (
+                    <ThemeCard key={t.id} theme={t} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Koleksi Klasik (V1) */}
+            {classicList.length > 0 && (
+              <div className="border-t border-ink/10 pt-10">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-xl font-display font-semibold text-stone">Koleksi Klasik (V1)</h3>
+                </div>
+                <p className="text-xs uppercase tracking-widest text-stone/70 mb-6">
+                  Tema warisan standar Aruna.
+                </p>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {classicList.map((t) => (
+                    <ThemeCard key={t.id} theme={t} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : list.length > 0 ? (
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {list.map((t) => (
+              <ThemeCard key={t.id} theme={t} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-12 text-center py-16 border border-dashed border-ink/15 p-8 rounded-sm bg-white/50">
+            <p className="text-stone text-base">Belum ada tema di sub-kategori ini.</p>
+            <button
+              type="button"
+              onClick={() => setSubFilter('semua')}
+              className="mt-4 inline-block bg-ink px-5 py-2.5 text-xs uppercase tracking-widest text-ivory font-semibold hover:bg-gold-deep transition-colors"
+            >
+              Tampilkan Semua Tema {eventTab}
             </button>
           </div>
         )}

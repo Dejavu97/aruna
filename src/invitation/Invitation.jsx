@@ -105,7 +105,9 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
     }
   }, [data.protectPhotos])
 
-  const couple = `${data.bride?.nick || ''} & ${data.groom?.nick || ''}`
+  const couple = data.groom?.nick && data.groom?.nick !== data.bride?.nick
+    ? `${data.bride?.nick} & ${data.groom?.nick}`
+    : data.bride?.nick || data.customerName || 'Acara Spesial'
   const coverImg = data.gallery?.[0] || data.backdrop || theme.cover
 
   useEffect(() => {
@@ -323,9 +325,13 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
           {theme.opener}
         </motion.p>
         <motion.h1 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } }} className={`cover-names${theme.layout === 'attari' ? ' attari-cover-names' : ''}`}>
-          {data.bride?.nick || ''}
-          <em className="attari-amp">&</em>
-          {data.groom?.nick || ''}
+          {data.bride?.nick || data.customerName || 'Nama Acara'}
+          {data.groom?.nick && data.groom?.nick !== data.bride?.nick && (
+            <>
+              <em className="attari-amp">&</em>
+              {data.groom?.nick}
+            </>
+          )}
         </motion.h1>
         <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}>
           {theme.layout === 'attari' ? <div className="attari-cover-divider" /> : <Divider />}
@@ -393,10 +399,20 @@ function Greeting({ theme, text, scene }) {
 }
 
 function Couple({ theme, data, scene }) {
+  const isSingle = !data.groom?.nick || data.groom?.nick === data.bride?.nick
+  const getSingleRole = () => {
+    if (theme.eventType === 'birthday') return 'Bintang Ulang Tahun'
+    if (theme.eventType === 'graduation') return 'Wisudawan / Wisudawati'
+    if (theme.eventType === 'aqiqah') return 'Buah Hati / Bayi'
+    if (theme.eventType === 'corporate') return 'Host / Penyelenggara'
+    return 'Tokoh Utama'
+  }
+
   const order = [
-    { who: data.bride, role: 'The Bride' },
-    { who: data.groom, role: 'The Groom' },
+    { who: data.bride, role: isSingle ? getSingleRole() : 'The Bride' },
+    ...(!isSingle && data.groom?.nick ? [{ who: data.groom, role: 'The Groom' }] : []),
   ]
+
   return (
     <section className="pad couple" id="couple" data-scene={scene}>
       {order.map((item, index) =>
@@ -421,7 +437,7 @@ function Couple({ theme, data, scene }) {
               </div>
             </article>
             
-            {index === 0 && (
+            {index === 0 && !isSingle && (
               <div className="and-separator">
                 {theme.layout === 'islamic' ? (
                   <StarGeom className="and-mark" color="var(--accent)" />

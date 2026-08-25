@@ -374,6 +374,33 @@ export const themes = [
       cover: '#020617',
     },
   },
+  {
+    id: 'birthday-memory-capsule',
+    name: 'Birthday Memory Capsule',
+    tag: 'Surat & Kenangan',
+    tags: ['ulang-tahun', 'birthday', 'surat-cinta', 'sahabat', 'romantis', 'kenangan', 'premium'],
+    collection: 'premium',
+    eventType: 'birthday',
+    description: 'Kapsul ucapan ulang tahun interaktif untuk pasangan atau sahabat: surat rahasia, kilas balik foto, voice note, dan kupon kado virtual.',
+    cover: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+    layout: 'classic',
+    greeting: 'Merayakan hari kelahiranmu dengan penuh cinta, terima kasih telah menjadi bagian paling berharga dalam hidupku.',
+    opener: 'A Special Birthday Love Letter',
+    fonts: {
+      display: '"Playfair Display", serif',
+      script: '"Alex Brush", cursive',
+      body: '"Plus Jakarta Sans", sans-serif',
+    },
+    colors: {
+      bg: '#FFFBF5',
+      paper: '#FFFFFF',
+      fg: '#2D2424',
+      muted: '#8C7A7A',
+      accent: '#E07A5F',
+      accentSoft: '#F4DFD8',
+      cover: '#3D2C2E',
+    },
+  },
 ]
 
 export function getTheme(id, customThemes = []) {

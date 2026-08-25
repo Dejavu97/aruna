@@ -339,13 +339,44 @@ app.get('/api/custom-themes/:id', async (req, res) => {
 })
 
 function injectOg(html, item, origin, guestName = '') {
-  const couple = `${item.bride?.nick || ''} & ${item.groom?.nick || ''}`
-  const image = item.gallery?.[0] || item.bride?.photo || `${origin}/themes/${item.themeId}.jpg`
-  const abs = image.startsWith('http') ? image : `${origin}${image}`
-  const title = `The Wedding of ${couple}`
-  const desc = guestName 
+  const isBirthday = item.eventType === 'birthday' || (item.themeId && (item.themeId.includes('birthday') || item.themeId.includes('sweet')))
+  const isGraduation = item.eventType === 'graduation' || (item.themeId && (item.themeId.includes('graduation') || item.themeId.includes('wisuda')))
+  const isAqiqah = item.eventType === 'aqiqah' || (item.themeId && (item.themeId.includes('aqiqah') || item.themeId.includes('bayi')))
+  const isCorporate = item.eventType === 'corporate' || (item.themeId && (item.themeId.includes('corporate') || item.themeId.includes('gala')))
+
+  const couple = item.groom?.nick && item.groom?.nick !== item.bride?.nick
+    ? `${item.bride?.nick || ''} & ${item.groom?.nick || ''}`
+    : item.bride?.nick || item.customerName || 'Acara Spesial'
+
+  let title = `The Wedding of ${couple}`
+  let desc = guestName 
     ? `Kepada Yth. ${guestName}, kami mengundang Anda untuk hadir di hari bahagia pernikahan kami.`
     : `Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di hari bahagia pernikahan kami.`
+
+  if (isBirthday) {
+    title = `Birthday Celebration & Memory Capsule · ${couple}`
+    desc = guestName
+      ? `Hai ${guestName}! Buka undangan dan kapsul kenangan perayaan ulang tahun spesial ${couple}.`
+      : `Buka undangan pesta ulang tahun dan kapsul kenangan interaktif ${couple}.`
+  } else if (isGraduation) {
+    title = `Graduation Honors & Celebration · ${item.bride?.full || couple}`
+    desc = guestName
+      ? `Kepada Yth. ${guestName}, kami mengundang Anda dalam Tasyakuran Kelulusan ${item.bride?.full || couple}.`
+      : `Tasyakuran & Syukuran Kelulusan ${item.bride?.full || couple}.`
+  } else if (isAqiqah) {
+    title = `Tasyakuran Aqiqah & Kelahiran · ${item.bride?.full || couple}`
+    desc = guestName
+      ? `Kepada Yth. ${guestName}, kami mengundang Anda dalam Tasyakuran Aqiqah ananda ${item.bride?.full || couple}.`
+      : `Sambut kehadiran buah hati kami dalam Tasyakuran Aqiqah ${item.bride?.full || couple}.`
+  } else if (isCorporate) {
+    title = `${item.bride?.full || couple} · Official Event Invitation`
+    desc = guestName
+      ? `Kepada Yth. ${guestName}, berikut adalah undangan resmi & tiket akses ${item.bride?.full || couple}.`
+      : `Undangan resmi & jadwal acara ${item.bride?.full || couple}.`
+  }
+
+  const image = item.gallery?.[0] || item.bride?.photo || `${origin}/themes/${item.themeId}.jpg`
+  const abs = image.startsWith('http') ? image : `${origin}${image}`
 
   const tags = [
     `<title>${escapeHtml(title)}</title>`,
@@ -354,7 +385,9 @@ function injectOg(html, item, origin, guestName = '') {
     `<meta property="og:title" content="${escapeHtml(title)}" />`,
     `<meta property="og:description" content="${escapeHtml(desc)}" />`,
     `<meta property="og:image" content="${escapeHtml(abs)}" />`,
-    `<meta property="og:site_name" content="Aruna Undangan" />`,
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta property="og:site_name" content="Aruna Studio" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(desc)}" />`,

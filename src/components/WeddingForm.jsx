@@ -6,7 +6,8 @@ import { getDummyWeddingData } from '../data/dummyData'
 import MediaUpload from './MediaUpload'
 import Invitation from '../invitation/Invitation'
 import { slugify } from '../lib/utils'
-import { Sparkles, RotateCcw, Wand2, Globe, ShieldCheck } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { Sparkles, RotateCcw, Wand2, Globe, ShieldCheck, CheckCircle2, User } from 'lucide-react'
 
 const emptyEvent = () => ({
   title: '',
@@ -68,6 +69,107 @@ export function blankWedding(themeId) {
   }
 }
 
+function getEventTypeConfig(eventType) {
+  if (eventType === 'birthday') {
+    return {
+      type: 'birthday',
+      step1Label: 'Tokoh Ultah',
+      person1Title: 'Data Bintang Ulang Tahun',
+      person1NickLabel: 'Nama Panggilan & Usia',
+      person1NickHint: 'Contoh: Sarah (17th)',
+      person1FullLabel: 'Nama Lengkap',
+      person1PhotoLabel: 'Foto Tokoh Ulang Tahun',
+      person2Title: 'Pasangan / Sahabat Terdekat (Opsional)',
+      person2Optional: true,
+      parentsLabel: 'Orang Tua / Penyelenggara',
+      dateLabel: 'Tanggal Pesta Ulang Tahun',
+      defaultEvent1: 'Pesta Ulang Tahun & Games',
+      defaultEvent2: 'Celebration Dinner & Music',
+      quoteLabel: 'Pesan / Harapan Ulang Tahun',
+      quoteHint: 'Harapan dan doa di usia yang baru',
+      storyTitle: 'Kilas Balik Kenangan',
+    }
+  }
+  if (eventType === 'graduation') {
+    return {
+      type: 'graduation',
+      step1Label: 'Wisudawan',
+      person1Title: 'Data Wisudawan / Wisudawati',
+      person1NickLabel: 'Nama Panggilan',
+      person1NickHint: 'Contoh: Sarah',
+      person1FullLabel: 'Nama Lengkap & Gelar',
+      person1PhotoLabel: 'Foto Wisudawan',
+      person2Title: 'Rekan Wisuda / Pasangan (Opsional)',
+      person2Optional: true,
+      parentsLabel: 'Orang Tua',
+      dateLabel: 'Tanggal Wisuda / Kelulusan',
+      defaultEvent1: 'Upacara Wisuda & Sumpah',
+      defaultEvent2: 'Syukuran & Ramah Tamah',
+      quoteLabel: 'Kutipan / Motto Kelulusan',
+      quoteHint: 'Kata mutiara atau rasa syukur atas kelulusan',
+      storyTitle: 'Perjalanan Meraih Gelar',
+    }
+  }
+  if (eventType === 'aqiqah') {
+    return {
+      type: 'aqiqah',
+      step1Label: 'Buah Hati',
+      person1Title: 'Data Buah Hati / Bayi',
+      person1NickLabel: 'Nama Panggilan Anak',
+      person1NickHint: 'Contoh: Al-Fatih',
+      person1FullLabel: 'Nama Lengkap Anak',
+      person1PhotoLabel: 'Foto Si Kecil',
+      person2Title: 'Data Tambahan (Opsional)',
+      person2Optional: true,
+      parentsLabel: 'Ayah & Ibu Kandung',
+      dateLabel: 'Tanggal Tasyakuran Aqiqah',
+      defaultEvent1: 'Cukur Rambut & Tausiyah',
+      defaultEvent2: 'Santap Siang & Doa Bersama',
+      quoteLabel: 'Doa Syukuran Aqiqah',
+      quoteHint: 'Doa untuk keselamatan dan keberkahan si kecil',
+      storyTitle: 'Arti Nama & Harapan',
+    }
+  }
+  if (eventType === 'corporate') {
+    return {
+      type: 'corporate',
+      step1Label: 'Host & Acara',
+      person1Title: 'Penyelenggara / Host Acara',
+      person1NickLabel: 'Nama Singkat Acara',
+      person1NickHint: 'Contoh: Aruna Summit',
+      person1FullLabel: 'Nama Lengkap Acara / Organisasi',
+      person1PhotoLabel: 'Logo / Foto Keynote Speaker',
+      person2Title: 'Keynote Speaker / VIP (Opsional)',
+      person2Optional: true,
+      parentsLabel: 'Board / Komite Penyelenggara',
+      dateLabel: 'Tanggal Acara',
+      defaultEvent1: 'Keynote Presentation & Launching',
+      defaultEvent2: 'Gala Dinner & Awarding Night',
+      quoteLabel: 'Visi / Tema Utama Acara',
+      quoteHint: 'Tema besar konferensi atau gala',
+      storyTitle: 'Agenda & Latar Belakang',
+    }
+  }
+  return {
+    type: 'wedding',
+    step1Label: 'Pengantin',
+    person1Title: 'Mempelai Wanita',
+    person1NickLabel: 'Nama Panggilan',
+    person1NickHint: '',
+    person1FullLabel: 'Nama Lengkap',
+    person1PhotoLabel: 'Foto Mempelai Wanita',
+    person2Title: 'Mempelai Pria',
+    person2Optional: false,
+    parentsLabel: 'Orang Tua',
+    dateLabel: 'Tanggal Pernikahan',
+    defaultEvent1: 'Akad Nikah',
+    defaultEvent2: 'Resepsi Pernikahan',
+    quoteLabel: 'Kutipan / Ayat Suci',
+    quoteHint: 'Kutipan atau ayat suci yang akan muncul di undangan.',
+    storyTitle: 'Cerita / Kisah Cinta',
+  }
+}
+
 export default function WeddingForm({
   themeId,
   initial,
@@ -77,7 +179,9 @@ export default function WeddingForm({
   onSubmit,
   customThemes = [],
 }) {
+  const { user, loginWithGoogle } = useAuth()
   const theme = getTheme(themeId, customThemes)
+  const eventConfig = getEventTypeConfig(theme?.eventType)
   const features = getThemeFeatures(theme)
   const [step, setStep] = useState(0)
   const [showPreview, setShowPreview] = useState(false)
@@ -101,7 +205,7 @@ export default function WeddingForm({
   )
 
   const steps = [
-    { id: 'pengantin', label: 'Pengantin' },
+    { id: 'pengantin', label: eventConfig.step1Label },
     { id: 'acara', label: 'Acara' },
     ...(hasPelengkap ? [{ id: 'pelengkap', label: 'Pelengkap' }] : []),
     { id: 'pemesan', label: mode === 'create' ? 'Bayar' : 'Pemesan' },
@@ -129,7 +233,10 @@ export default function WeddingForm({
 
   const slug = useMemo(() => {
     if (form.slug) return slugify(form.slug)
-    return slugify(`${form.bride.nick}-${form.groom.nick}`)
+    if (form.groom.nick && form.groom.nick !== form.bride.nick) {
+      return slugify(`${form.bride.nick}-${form.groom.nick}`)
+    }
+    return slugify(form.bride.nick || 'acara')
   }, [form.slug, form.bride.nick, form.groom.nick])
 
   function update(path, value) {
@@ -145,8 +252,9 @@ export default function WeddingForm({
 
   function submit(e) {
     e.preventDefault()
-    if (!form.bride.nick || !form.groom.nick || !form.date) {
-      onSubmit(null, 'Nama panggilan kedua mempelai dan tanggal wajib diisi.')
+    const isSinglePerson = eventConfig.type !== 'wedding'
+    if (!form.bride.nick || (!isSinglePerson && !form.groom.nick) || !form.date) {
+      onSubmit(null, isSinglePerson ? 'Nama dan tanggal acara wajib diisi.' : 'Nama panggilan kedua mempelai dan tanggal wajib diisi.')
       setStep(0)
       return
     }
@@ -158,6 +266,9 @@ export default function WeddingForm({
     }
     const payload = {
       ...form,
+      ownerUid: user?.uid || form.ownerUid || '',
+      customerEmail: user?.email || form.customerEmail || '',
+      customerName: form.customerName || user?.displayName || '',
       themeId,
       slug,
       packageId: form.packageId || 'lengkap',
@@ -281,35 +392,40 @@ export default function WeddingForm({
           ))}
         </ol>
 
-        {/* STEP: PENGANTIN */}
+        {/* STEP: PENGANTIN / DATA TOKOH */}
         {steps[step]?.id === 'pengantin' && (
           <div className="grid gap-6">
-            <Pair title="Mempelai wanita">
-              <Field label="Nama panggilan" value={form.bride.nick} onChange={(v) => update('bride.nick', v)} />
+            <Pair title={eventConfig.person1Title}>
+              <Field
+                label={eventConfig.person1NickLabel}
+                value={form.bride.nick}
+                onChange={(v) => update('bride.nick', v)}
+                hint={eventConfig.person1NickHint}
+              />
               <div className="grid gap-4 sm:grid-cols-4">
                 <div className="sm:col-span-3">
-                  <Field label="Nama lengkap" value={form.bride.full} onChange={(v) => update('bride.full', v)} />
+                  <Field label={eventConfig.person1FullLabel} value={form.bride.full} onChange={(v) => update('bride.full', v)} />
                 </div>
                 <div className="sm:col-span-1">
-                  <Field label="Gelar" value={form.bride.degree} onChange={(v) => update('bride.degree', v)} hint="S.E., M.B.A." />
+                  <Field label="Gelar / Tambahan" value={form.bride.degree} onChange={(v) => update('bride.degree', v)} hint="S.E., M.B.A." />
                 </div>
               </div>
               <div className="mt-2 border-l-2 border-ink/10 pl-4">
-                <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">Orang Tua</p>
+                <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">{eventConfig.parentsLabel}</p>
                 <div className="grid gap-4 sm:grid-cols-4">
                   <div className="sm:col-span-3">
-                    <Field label="Nama Bapak" value={form.bride.fatherName} onChange={(v) => update('bride.fatherName', v)} />
+                    <Field label="Nama Bapak / Penyelenggara 1" value={form.bride.fatherName} onChange={(v) => update('bride.fatherName', v)} />
                   </div>
                   <div className="sm:col-span-1">
-                    <Field label="Gelar Bapak" value={form.bride.fatherDegree} onChange={(v) => update('bride.fatherDegree', v)} />
+                    <Field label="Gelar" value={form.bride.fatherDegree} onChange={(v) => update('bride.fatherDegree', v)} />
                   </div>
                 </div>
                 <div className="mt-3 grid gap-4 sm:grid-cols-4">
                   <div className="sm:col-span-3">
-                    <Field label="Nama Ibu" value={form.bride.motherName} onChange={(v) => update('bride.motherName', v)} />
+                    <Field label="Nama Ibu / Penyelenggara 2" value={form.bride.motherName} onChange={(v) => update('bride.motherName', v)} />
                   </div>
                   <div className="sm:col-span-1">
-                    <Field label="Gelar Ibu" value={form.bride.motherDegree} onChange={(v) => update('bride.motherDegree', v)} />
+                    <Field label="Gelar" value={form.bride.motherDegree} onChange={(v) => update('bride.motherDegree', v)} />
                   </div>
                 </div>
                 <div className="mt-3">
@@ -317,7 +433,7 @@ export default function WeddingForm({
                 </div>
               </div>
               <MediaUpload
-                label="Foto mempelai wanita"
+                label={eventConfig.person1PhotoLabel}
                 value={form.bride.photo}
                 onChange={(v) => update('bride.photo', v)}
               />
@@ -328,57 +444,59 @@ export default function WeddingForm({
                 hint="Contoh: @andini (tanpa spasi)"
               />
             </Pair>
-            <Pair title="Mempelai pria">
-              <Field label="Nama panggilan" value={form.groom.nick} onChange={(v) => update('groom.nick', v)} />
-              <div className="grid gap-4 sm:grid-cols-4">
-                <div className="sm:col-span-3">
-                  <Field label="Nama lengkap" value={form.groom.full} onChange={(v) => update('groom.full', v)} />
-                </div>
-                <div className="sm:col-span-1">
-                  <Field label="Gelar" value={form.groom.degree} onChange={(v) => update('groom.degree', v)} hint="S.T., M.Sc." />
-                </div>
-              </div>
-              <div className="mt-2 border-l-2 border-ink/10 pl-4">
-                <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">Orang Tua</p>
+
+            {/* PERSON 2 (Hanya wajib untuk wedding, opsional untuk kategori lain) */}
+            {(!eventConfig.person2Optional || form.groom.nick || eventConfig.type === 'wedding') && (
+              <Pair title={eventConfig.person2Title}>
+                <Field label={eventConfig.type === 'wedding' ? 'Nama panggilan' : 'Nama Panggilan / Rekan'} value={form.groom.nick} onChange={(v) => update('groom.nick', v)} />
                 <div className="grid gap-4 sm:grid-cols-4">
                   <div className="sm:col-span-3">
-                    <Field label="Nama Bapak" value={form.groom.fatherName} onChange={(v) => update('groom.fatherName', v)} />
+                    <Field label={eventConfig.type === 'wedding' ? 'Nama lengkap' : 'Nama Lengkap'} value={form.groom.full} onChange={(v) => update('groom.full', v)} />
                   </div>
                   <div className="sm:col-span-1">
-                    <Field label="Gelar Bapak" value={form.groom.fatherDegree} onChange={(v) => update('groom.fatherDegree', v)} />
+                    <Field label="Gelar" value={form.groom.degree} onChange={(v) => update('groom.degree', v)} hint="S.T., M.Sc." />
                   </div>
                 </div>
-                <div className="mt-3 grid gap-4 sm:grid-cols-4">
-                  <div className="sm:col-span-3">
-                    <Field label="Nama Ibu" value={form.groom.motherName} onChange={(v) => update('groom.motherName', v)} />
+                <div className="mt-2 border-l-2 border-ink/10 pl-4">
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">Orang Tua / Penyelenggara</p>
+                  <div className="grid gap-4 sm:grid-cols-4">
+                    <div className="sm:col-span-3">
+                      <Field label="Nama Bapak" value={form.groom.fatherName} onChange={(v) => update('groom.fatherName', v)} />
+                    </div>
+                    <div className="sm:col-span-1">
+                      <Field label="Gelar Bapak" value={form.groom.fatherDegree} onChange={(v) => update('groom.fatherDegree', v)} />
+                    </div>
                   </div>
-                  <div className="sm:col-span-1">
-                    <Field label="Gelar Ibu" value={form.groom.motherDegree} onChange={(v) => update('groom.motherDegree', v)} />
+                  <div className="mt-3 grid gap-4 sm:grid-cols-4">
+                    <div className="sm:col-span-3">
+                      <Field label="Nama Ibu" value={form.groom.motherName} onChange={(v) => update('groom.motherName', v)} />
+                    </div>
+                    <div className="sm:col-span-1">
+                      <Field label="Gelar Ibu" value={form.groom.motherDegree} onChange={(v) => update('groom.motherDegree', v)} />
+                    </div>
                   </div>
                 </div>
-                <div className="mt-3">
-                  <Field label="Teks Lengkap (Opsional)" value={form.groom.parents} onChange={(v) => update('groom.parents', v)} hint="Kosongkan jika ingin nama orang tua di atas dirangkai otomatis." />
-                </div>
-              </div>
-              <MediaUpload
-                label="Foto mempelai pria"
-                value={form.groom.photo}
-                onChange={(v) => update('groom.photo', v)}
-              />
-              <Field
-                label="Akun Instagram (opsional)"
-                value={form.groom.ig}
-                onChange={(v) => update('groom.ig', v)}
-                hint="Contoh: @raka (tanpa spasi)"
-              />
-            </Pair>
-            <Field label="Tanggal pernikahan" type="date" value={form.date} onChange={(v) => update('date', v)} />
+                <MediaUpload
+                  label={eventConfig.type === 'wedding' ? 'Foto mempelai pria' : 'Foto Tambahan'}
+                  value={form.groom.photo}
+                  onChange={(v) => update('groom.photo', v)}
+                />
+                <Field
+                  label="Akun Instagram (opsional)"
+                  value={form.groom.ig}
+                  onChange={(v) => update('groom.ig', v)}
+                  hint="Contoh: @raka (tanpa spasi)"
+                />
+              </Pair>
+            )}
+
+            <Field label={eventConfig.dateLabel} type="date" value={form.date} onChange={(v) => update('date', v)} />
             {mode === 'create' && (
               <Field
                 label="Tautan kustom (opsional)"
                 value={form.slug}
                 onChange={(v) => update('slug', v)}
-                hint={`Akan jadi /u/${slug || 'nama-pasangan'}`}
+                hint={`Akan jadi /u/${slug || 'nama-acara'}`}
               />
             )}
           </div>
@@ -417,16 +535,16 @@ export default function WeddingForm({
             {features.quote && (
               <>
                 <Field 
-                  label="Kutipan" 
+                  label={eventConfig.quoteLabel} 
                   value={form.quote} 
                   onChange={(v) => update('quote', v)} 
-                  hint="Kutipan atau ayat suci yang akan muncul di undangan."
+                  hint={eventConfig.quoteHint}
                 />
                 <Field 
-                  label="Sumber kutipan" 
+                  label="Sumber kutipan / Keterangan" 
                   value={form.quoteSource} 
                   onChange={(v) => update('quoteSource', v)} 
-                  hint="Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa."
+                  hint={eventConfig.type === 'wedding' ? 'Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa.' : 'Contoh: Sweet 17th, Doctor of Medicine, Doa Aqiqah, atau Annual Summit.'}
                 />
               </>
             )}
@@ -434,10 +552,10 @@ export default function WeddingForm({
             {features.story?.enabled && (
               <>
                 {form.story.map((s, i) => (
-                  <Pair key={i} title={`Cerita / Kisah ${i + 1}`}>
+                  <Pair key={i} title={`${eventConfig.storyTitle} ${i + 1}`}>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <Field label="Tahun" value={s.year} onChange={(v) => update(`story.${i}.year`, v)} hint="Contoh: 2019" />
-                      <Field label="Judul" value={s.title} onChange={(v) => update(`story.${i}.title`, v)} hint="Contoh: Awal Bertemu" />
+                      <Field label="Tahun / Momen" value={s.year} onChange={(v) => update(`story.${i}.year`, v)} hint="Contoh: 2024" />
+                      <Field label="Judul" value={s.title} onChange={(v) => update(`story.${i}.title`, v)} hint="Contoh: Kilas Balik / Awal Bertemu" />
                     </div>
                     <Field label="Isi cerita" value={s.body} onChange={(v) => update(`story.${i}.body`, v)} />
                     {features.story?.withPhoto && (
@@ -653,6 +771,34 @@ export default function WeddingForm({
                 </div>
               </div>
             )}
+
+            {user ? (
+              <div className="flex items-center justify-between p-3.5 bg-green-50 border border-green-200 rounded-xs text-xs text-green-900">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-green-600 shrink-0" />
+                  <div>
+                    <p className="font-bold">Tersambung dengan Akun Google</p>
+                    <p className="text-[11px] text-green-700">{user.email}</p>
+                  </div>
+                </div>
+                <span className="text-[10px] uppercase font-bold bg-green-200 text-green-800 px-2 py-0.5 rounded-xs">Tersinkron</span>
+              </div>
+            ) : (
+              <div className="p-3.5 bg-gold/10 border border-gold-deep/25 rounded-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div>
+                  <p className="font-bold text-ink">Simpan ke Akun Google? (Opsional)</p>
+                  <p className="text-[11px] text-stone">Anda tetap bisa memesan langsung tanpa login. Hubungkan jika ingin sinkron ke laptop.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={loginWithGoogle}
+                  className="bg-white border border-ink/20 hover:border-ink px-3 py-1.5 font-bold text-ink text-[11px] uppercase tracking-wider rounded-xs transition-colors shrink-0 shadow-2xs"
+                >
+                  Hubungkan Google
+                </button>
+              </div>
+            )}
+
             <Pair title="Data pemesan">
               <Field
                 label="Nama pemesan"

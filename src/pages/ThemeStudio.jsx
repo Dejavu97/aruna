@@ -5,7 +5,8 @@ import {
   Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet,
   Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3, Wand2, RotateCcw, Disc, Layers,
   ArrowUp, ArrowDown, EyeOff, GripVertical, Activity, Flame, Wind, Shuffle, Maximize2, FileCode, CheckCircle2, SlidersHorizontal, Camera, Bookmark, Plus,
-  Mic, Volume2, Share2, MessageCircle, Crown, Shirt, HelpCircle, FolderUp, Sun, Moon, Download, CornerDownRight, Sparkle
+  Mic, Volume2, Share2, MessageCircle, Crown, Shirt, HelpCircle, FolderUp, Sun, Moon, Download, CornerDownRight, Sparkle,
+  Cake, GraduationCap, Baby, Briefcase, UserCheck
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -14,6 +15,95 @@ import ImageAdjustModal from '../components/ImageAdjustModal'
 import { createCustomTheme, fetchCustomTheme, uploadFile } from '../lib/api'
 import { themes } from '../data/themes'
 import { motion, AnimatePresence } from 'framer-motion'
+
+// Universal Event Types Configuration
+const eventTypeConfigs = {
+  wedding: {
+    id: 'wedding',
+    name: 'Pernikahan & Walimatul Urs',
+    icon: Crown,
+    headerBadge: 'WALIMATUL \'URS',
+    coverTitle: 'The Wedding Invitation of',
+    heroNames: 'Sarah & Budi',
+    personTitle: 'Pasangan Mempelai',
+    storyTitle: 'Cerita Kisah Cinta',
+    quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan dari jenismu sendiri...',
+    quoteSource: 'QS. Ar-Rum: 21',
+    eventTitle1: 'Akad Nikah',
+    eventTitle2: 'Resepsi Pernikahan',
+    wishesTitle: 'Buku Tamu & Doa Restu',
+    giftTitle: 'Wedding Gift / Amplop Digital',
+    dresscodeTitle: 'Panduan Busana Resepsi',
+  },
+  birthday: {
+    id: 'birthday',
+    name: 'Ulang Tahun & Sweet 17',
+    icon: Cake,
+    headerBadge: 'BIRTHDAY CELEBRATION',
+    coverTitle: 'You are Invited to the Birthday of',
+    heroNames: 'Sarah Bella (17th)',
+    personTitle: 'Bintang Ulang Tahun',
+    storyTitle: '17 Tahun Penuh Kenangan Indah',
+    quote: 'Merayakan 17 tahun penuh tawa, cinta keluarga, dan harapan cerah untuk masa depan.',
+    quoteSource: 'Sweet Seventeen Celebration',
+    eventTitle1: 'Birthday Party & Fun Games',
+    eventTitle2: 'Celebration Dinner & Music',
+    wishesTitle: 'Ucapan Selamat & Harapan',
+    giftTitle: 'Birthday Gift / Kado Spesial',
+    dresscodeTitle: 'Dresscode Pesta Ulang Tahun',
+  },
+  graduation: {
+    id: 'graduation',
+    name: 'Wisuda & Kelulusan',
+    icon: GraduationCap,
+    headerBadge: 'GRADUATION CEREMONY',
+    coverTitle: 'Graduation Celebration of',
+    heroNames: 'dr. Siti Sarah, Sp.A',
+    personTitle: 'Profil Wisudawati',
+    storyTitle: 'Perjalanan Meraih Gelar Dokter',
+    quote: 'Perjalanan panjang penuh dedikasi dan ketekunan. Terima kasih atas doa orang tua, guru, dan sahabat.',
+    quoteSource: 'Doctor of Medicine',
+    eventTitle1: 'Upacara Wisuda & Sumpah',
+    eventTitle2: 'Tasyakuran & Ramah Tamah',
+    wishesTitle: 'Ucapan Selamat & Doa Sukses',
+    giftTitle: 'Graduation Gift / Apresiasi',
+    dresscodeTitle: 'Dresscode Syukuran Kelulusan',
+  },
+  aqiqah: {
+    id: 'aqiqah',
+    name: 'Aqiqah & Syukuran Bayi',
+    icon: Baby,
+    headerBadge: 'TASYAKURAN AQIQAH',
+    coverTitle: 'Tasyakuran Kelahiran & Aqiqah',
+    heroNames: 'Aruna Muhammad Al-Fatih',
+    personTitle: 'Putra Tercinta',
+    storyTitle: 'Arti Nama & Harapan Orang Tua',
+    quote: 'Ya Allah, jadikanlah putra kami anak yang sholeh, berbakti kepada orang tua, dan bermanfaat bagi sesama.',
+    quoteSource: 'Doa Syukuran Aqiqah',
+    eventTitle1: 'Cukur Rambut & Tausiyah',
+    eventTitle2: 'Santap Siang & Doa Bersama',
+    wishesTitle: 'Doa & Ucapan untuk Si Kecil',
+    giftTitle: 'Tanda Kasih Aqiqah',
+    dresscodeTitle: 'Dresscode Syukuran Keluarga',
+  },
+  corporate: {
+    id: 'corporate',
+    name: 'Acara Perusahaan & Gala Dinner',
+    icon: Briefcase,
+    headerBadge: 'ANNUAL GALA DINNER',
+    coverTitle: 'Official Invitation to',
+    heroNames: 'Aruna Tech Summit 2026',
+    personTitle: 'Keynote Speaker & Host',
+    storyTitle: 'Tema & Visi Acara',
+    quote: 'Transformasi digital menuju masa depan berkelanjutan. Bergabunglah bersama para inovator dan pemimpin industri.',
+    quoteSource: 'Annual Corporate Summit',
+    eventTitle1: 'Keynote Speech & Launching',
+    eventTitle2: 'Gala Dinner & Awarding Night',
+    wishesTitle: 'Konfirmasi Kehadiran VIP',
+    giftTitle: 'Registrasi & Akses Masuk VIP',
+    dresscodeTitle: 'Dresscode Bisnis Formal / Black Tie',
+  },
+}
 
 // Curated Starter Presets (Zero emojis)
 const themePresets = [
@@ -227,8 +317,12 @@ export default function ThemeStudio() {
   const audioRef = useRef(null)
   const voiceAudioRef = useRef(null)
 
+  // 1. Universal Event Type State
+  const [eventType, setEventType] = useState('wedding') // 'wedding' | 'birthday' | 'graduation' | 'aqiqah' | 'corporate'
+  const activeEventConfig = eventTypeConfigs[eventType] || eventTypeConfigs.wedding
+
   // Custom Theme Meta
-  const [themeName, setThemeName] = useState('Tema Eksklusif Saya')
+  const [themeName, setThemeName] = useState('Tema Eksklusif Universal')
   const [creatorName, setCreatorName] = useState('')
   const [themeDesc, setThemeDesc] = useState('Tema custom rancangan sendiri dengan sentuhan estetis.')
   const [isPublic, setIsPublic] = useState(true)
@@ -516,7 +610,19 @@ export default function ThemeStudio() {
       setMoodPrompt(customConcept)
       const lower = customConcept.toLowerCase()
       let matched = { ...themePresets[0] }
-      if (lower.includes('jawa') || lower.includes('adat') || lower.includes('batik') || lower.includes('kraton')) {
+      if (lower.includes('ulang') || lower.includes('birthday') || lower.includes('sweet 17') || lower.includes('sweet17')) {
+        setEventType('birthday')
+        matched = themePresets[4]
+      } else if (lower.includes('wisuda') || lower.includes('graduation') || lower.includes('sarjana')) {
+        setEventType('graduation')
+        matched = themePresets[1]
+      } else if (lower.includes('aqiqah') || lower.includes('bayi') || lower.includes('baby')) {
+        setEventType('aqiqah')
+        matched = themePresets[2]
+      } else if (lower.includes('perusahaan') || lower.includes('corporate') || lower.includes('gala')) {
+        setEventType('corporate')
+        matched = themePresets[3]
+      } else if (lower.includes('jawa') || lower.includes('adat') || lower.includes('batik') || lower.includes('kraton')) {
         matched = themePresets[5]
       } else if (lower.includes('pantai') || lower.includes('bali') || lower.includes('sunset') || lower.includes('boho') || lower.includes('terracotta') || lower.includes('rustic')) {
         matched = themePresets[0]
@@ -798,18 +904,18 @@ export default function ThemeStudio() {
     ctx.fillStyle = colors.accent
     ctx.font = 'bold 24px serif'
     ctx.textAlign = 'center'
-    ctx.fillText('THE WEDDING CELEBRATION', 540, 180)
+    ctx.fillText(activeEventConfig.headerBadge || 'OFFICIAL INVITATION', 540, 180)
 
     // 3. Monogram Initials
     ctx.font = 'italic bold 64px serif'
-    ctx.fillText(monogramInitials || 'S & B', 540, 280)
+    ctx.fillText(monogramInitials || (eventType === 'wedding' ? 'S & B' : 'ARUNA'), 540, 280)
 
-    // 4. Couple Names
+    // 4. Hero / Couple Names
     ctx.fillStyle = previewThemeMode === 'twilight' ? twilightColors.fg : colors.fg
     ctx.font = 'bold 72px serif'
-    ctx.fillText(`${previewData.bride.nick} & ${previewData.groom.nick}`, 540, 420)
+    ctx.fillText(eventType === 'wedding' ? `${previewData.bride.nick} & ${previewData.groom.nick}` : activeEventConfig.heroNames, 540, 420)
 
-    // 5. Wedding Date
+    // 5. Event Date
     ctx.fillStyle = colors.accent
     ctx.font = 'bold 32px sans-serif'
     ctx.fillText('20 NOVEMBER 2026', 540, 500)
@@ -1242,6 +1348,44 @@ export default function ThemeStudio() {
             {/* TAB 1: PRESET & AGENCY TEMPLATES */}
             {activeTab === 'preset' && (
               <div className="space-y-6 animate-in fade-in">
+                {/* 1. Universal Event Type Selector */}
+                <div className="border border-gold/40 p-4 rounded-sm bg-gold/5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
+                      <Sparkles size={14} className="text-gold-deep" /> Pilih Kategori Jenis Acara:
+                    </label>
+                    <span className="text-[10px] font-semibold text-gold-deep font-mono">
+                      {activeEventConfig.name}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {Object.values(eventTypeConfigs).map((ev) => {
+                      const IconComponent = ev.icon
+                      return (
+                        <button
+                          key={ev.id}
+                          type="button"
+                          onClick={() => {
+                            setEventType(ev.id)
+                            setAnimKey((k) => k + 1)
+                          }}
+                          className={`p-2.5 border text-left rounded-xs transition-colors space-y-1 ${
+                            eventType === ev.id
+                              ? 'border-gold-deep bg-paper font-bold text-ink shadow-xs ring-1 ring-gold-deep'
+                              : 'border-ink/15 bg-white text-stone hover:border-ink/30'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <IconComponent size={13} className={eventType === ev.id ? 'text-gold-deep' : 'text-stone'} />
+                            <p className="text-[11px] font-semibold leading-tight">{ev.name.split(' & ')[0]}</p>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
                 <div className="flex border-b border-ink/10 gap-2 text-xs font-semibold uppercase tracking-wider">
                   <button
                     type="button"
@@ -2216,18 +2360,18 @@ export default function ThemeStudio() {
                     <div className="relative z-10 pt-10">
                       {monogramStyle !== 'none' && (
                         <div className="mb-2 flex justify-center">
-                          {renderMonogram(monogramStyle, monogramInitials || 'S & B', '#F2EDE4')}
+                          {renderMonogram(monogramStyle, monogramInitials || (eventType === 'wedding' ? 'S & B' : 'ARUNA'), '#F2EDE4')}
                         </div>
                       )}
 
                       <p className="text-[10px] uppercase tracking-[0.3em] font-semibold text-gold-deep">
-                        The Wedding Invitation of
+                        {activeEventConfig.coverTitle}
                       </p>
                       <h2
                         className="text-4xl italic my-3"
                         style={{ fontFamily: activeScriptFont }}
                       >
-                        {previewData.bride.nick} &amp; {previewData.groom.nick}
+                        {eventType === 'wedding' ? `${previewData.bride.nick} & ${previewData.groom.nick}` : activeEventConfig.heroNames}
                       </h2>
                     </div>
 
@@ -2258,7 +2402,7 @@ export default function ThemeStudio() {
               <div className="p-5 space-y-8 pt-10 pb-20">
                 <div className="flex justify-between items-center pb-2 border-b border-black/10">
                   <span className="text-[10px] uppercase tracking-wider" style={{ color: activeColorPalette.muted }}>
-                    Tema: {themeName} ({previewThemeMode.toUpperCase()})
+                    Kategori: {activeEventConfig.name.split(' & ')[0]} ({previewThemeMode.toUpperCase()})
                   </span>
                   <button
                     type="button"
@@ -2297,21 +2441,24 @@ export default function ThemeStudio() {
                           <motion.section {...floatingAnimation} className="relative z-10 block text-center pt-2">
                             {monogramStyle !== 'none' && (
                               <div className="mb-3 flex justify-center">
-                                {renderMonogram(monogramStyle, monogramInitials || 'S & B', activeColorPalette.accent)}
+                                {renderMonogram(monogramStyle, monogramInitials || (eventType === 'wedding' ? 'S & B' : 'ARUNA'), activeColorPalette.accent)}
                               </div>
                             )}
 
                             <p className="text-[10px] uppercase tracking-[0.28em]" style={{ color: activeColorPalette.muted }}>
-                              WALIMATUL 'URS
+                              {activeEventConfig.headerBadge}
                             </p>
                             <h2
                               className="text-4xl italic my-2"
                               style={{ fontFamily: activeScriptFont, color: activeColorPalette.fg }}
                             >
-                              {previewData.bride.nick} &amp; {previewData.groom.nick}
+                              {eventType === 'wedding' ? `${previewData.bride.nick} & ${previewData.groom.nick}` : activeEventConfig.heroNames}
                             </h2>
                             <p className="text-xs leading-relaxed max-w-xs mx-auto italic mt-2" style={{ color: activeColorPalette.muted }}>
-                              "{previewData.quote}"
+                              "{activeEventConfig.quote}"
+                            </p>
+                            <p className="text-[10px] font-mono font-semibold mt-1" style={{ color: activeColorPalette.accent }}>
+                              — {activeEventConfig.quoteSource}
                             </p>
                           </motion.section>
                           {renderSectionDivider(dividerShape)}
@@ -2319,50 +2466,67 @@ export default function ThemeStudio() {
                       )
                     }
 
-                    // 2. COUPLE SECTION
+                    // 2. COUPLE / PROFIL SECTION
                     if (sec.id === 'couple') {
                       return (
                         <div key={`sec-${sec.id}-${animKey}`}>
                           <section className="relative z-10 space-y-4">
                             <div className="text-center">
                               <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: activeColorPalette.muted }}>
-                                PASANGAN MEMPELAI
+                                {activeEventConfig.personTitle.toUpperCase()}
                               </p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
-                              {/* Bride */}
-                              <motion.div {...floatingAnimation} className="p-3 text-center border" style={cardCustomStyle}>
-                                <div className="aspect-[3/4] relative mb-2.5 overflow-hidden rounded-full border-2 border-gold">
+                            {eventType === 'wedding' ? (
+                              <div className="grid grid-cols-2 gap-3">
+                                {/* Bride */}
+                                <motion.div {...floatingAnimation} className="p-3 text-center border" style={cardCustomStyle}>
+                                  <div className="aspect-[3/4] relative mb-2.5 overflow-hidden rounded-full border-2 border-gold">
+                                    <img
+                                      src={customAssets.bridePhotoUrl}
+                                      alt="Bride"
+                                      className="w-full h-full object-cover"
+                                      style={{ filter: activePhotoFilterCss }}
+                                    />
+                                  </div>
+                                  <h3 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
+                                    {previewData.bride.nick}
+                                  </h3>
+                                  <p className="text-[9px] text-stone mt-1">{previewData.bride.parents}</p>
+                                </motion.div>
+
+                                {/* Groom */}
+                                <motion.div {...floatingAnimation} className="p-3 text-center border" style={cardCustomStyle}>
+                                  <div className="aspect-[3/4] relative mb-2.5 overflow-hidden rounded-full border-2 border-gold">
+                                    <img
+                                      src={customAssets.groomPhotoUrl}
+                                      alt="Groom"
+                                      className="w-full h-full object-cover"
+                                      style={{ filter: activePhotoFilterCss }}
+                                    />
+                                  </div>
+                                  <h3 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
+                                    {previewData.groom.nick}
+                                  </h3>
+                                  <p className="text-[9px] text-stone mt-1">{previewData.groom.parents}</p>
+                                </motion.div>
+                              </div>
+                            ) : (
+                              <motion.div {...floatingAnimation} className="p-4 text-center border max-w-xs mx-auto" style={cardCustomStyle}>
+                                <div className="w-24 h-24 mx-auto relative mb-3 overflow-hidden rounded-full border-2 border-gold">
                                   <img
                                     src={customAssets.bridePhotoUrl}
-                                    alt="Bride"
+                                    alt="Tokoh Utama"
                                     className="w-full h-full object-cover"
                                     style={{ filter: activePhotoFilterCss }}
                                   />
                                 </div>
-                                <h3 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
-                                  {previewData.bride.nick}
+                                <h3 className="text-lg font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
+                                  {activeEventConfig.heroNames}
                                 </h3>
-                                <p className="text-[9px] text-stone mt-1">{previewData.bride.parents}</p>
+                                <p className="text-[10px] text-stone mt-1">{activeEventConfig.personTitle}</p>
                               </motion.div>
-
-                              {/* Groom */}
-                              <motion.div {...floatingAnimation} className="p-3 text-center border" style={cardCustomStyle}>
-                                <div className="aspect-[3/4] relative mb-2.5 overflow-hidden rounded-full border-2 border-gold">
-                                  <img
-                                    src={customAssets.groomPhotoUrl}
-                                    alt="Groom"
-                                    className="w-full h-full object-cover"
-                                    style={{ filter: activePhotoFilterCss }}
-                                  />
-                                </div>
-                                <h3 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
-                                  {previewData.groom.nick}
-                                </h3>
-                                <p className="text-[9px] text-stone mt-1">{previewData.groom.parents}</p>
-                              </motion.div>
-                            </div>
+                            )}
                           </section>
                           {renderSectionDivider(dividerShape)}
                         </div>
@@ -2376,13 +2540,13 @@ export default function ThemeStudio() {
                           <section className="relative z-10 space-y-3">
                             <div className="text-center">
                               <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: activeColorPalette.muted }}>
-                                RANGKAIAN ACARA
+                                JADWAL &amp; LOKASI ACARA
                               </p>
                             </div>
                             {previewData.events.map((ev, i) => (
                               <div key={i} className="p-4 border text-center space-y-2" style={cardCustomStyle}>
                                 <h4 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
-                                  {ev.title}
+                                  {i === 0 ? activeEventConfig.eventTitle1 : activeEventConfig.eventTitle2}
                                 </h4>
                                 <p className="text-xs font-semibold" style={{ color: activeColorPalette.accent }}>{ev.time}</p>
                                 <p className="text-xs font-bold" style={{ color: activeColorPalette.fg }}>{ev.venue}</p>
@@ -2402,7 +2566,7 @@ export default function ThemeStudio() {
                           <section className="relative z-10 space-y-4">
                             <div className="text-center">
                               <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: activeColorPalette.muted }}>
-                                CERITA KAMI
+                                {activeEventConfig.storyTitle.toUpperCase()}
                               </p>
                             </div>
 
@@ -2447,7 +2611,7 @@ export default function ThemeStudio() {
                           <section className="relative z-10 space-y-3">
                             <div className="text-center">
                               <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: activeColorPalette.muted }}>
-                                GALERI FOTO PREWEDDING
+                                {eventType === 'wedding' ? 'GALERI FOTO PREWEDDING' : 'GALERI DOKUMENTASI & MOMEN'}
                               </p>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
@@ -2468,7 +2632,7 @@ export default function ThemeStudio() {
                       return (
                         <footer key={`sec-${sec.id}-${animKey}`} className="relative z-10 text-center pt-4 space-y-2">
                           <h3 className="text-2xl italic" style={{ fontFamily: activeScriptFont, color: activeColorPalette.fg }}>
-                            {previewData.bride.nick} &amp; {previewData.groom.nick}
+                            {eventType === 'wedding' ? `${previewData.bride.nick} & ${previewData.groom.nick}` : activeEventConfig.heroNames}
                           </h3>
                           <p className="text-[9px] opacity-75 uppercase tracking-widest">
                             Dibuat dengan Aruna · {themeName}

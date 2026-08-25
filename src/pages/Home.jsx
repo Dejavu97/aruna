@@ -1,13 +1,14 @@
-import { Link } from 'react-router-dom'
-import { ArrowRight, Megaphone } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ArrowRight, Megaphone, Sparkles, Wand2, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import ThemeCard from '../components/ThemeCard'
-import { faqs, features, formatRupiah, packages, site, steps, testimonials, waLink } from '../data/site'
+import { faqs, features, formatRupiah, packages, site, steps, waLink } from '../data/site'
 import { themes } from '../data/themes'
 import { getAnnouncement } from '../lib/api'
 import AdSlot from '../components/AdSlot'
+import InteractiveVideoTeaser from '../components/InteractiveVideoTeaser'
+import ClientTestimonials from '../components/ClientTestimonials'
 
 export default function Home() {
   const [globalAnnouncement, setGlobalAnnouncement] = useState('')
@@ -37,11 +38,12 @@ export default function Home() {
         <SiteNav />
         <Hero />
         <How />
-        <Themes />
+        <InteractiveVideoTeaser />
+        <VibeAndStudioSection />
         <FeatureGrid />
+        <ClientTestimonials />
         <Pricing />
         <AdSlot slot="home" className="max-w-4xl" />
-        <Words />
         <Faq />
         <Close />
         <SiteFooter />
@@ -60,9 +62,9 @@ function Hero() {
       badge: 'Undangan Pernikahan & Walimatul Urs',
       headline: 'Tamu memilih tautan. Kamu memilih kesan.',
       tagline: 'Pilih tema mewah, isi data mempelai, sebar lewat WhatsApp. Tanpa aplikasi, tanpa ribet.',
-      themeTitle: 'Emas Senja',
-      personName: 'Andini & Raka',
-      cover: '/themes/emas-senja.jpg',
+      themeTitle: 'Royal Bunny Fairytale',
+      personName: 'Sarah & Budi',
+      cover: '/themes/kelinci/cover.jpg',
       categoryParam: 'pernikahan',
     },
     birthday: {
@@ -202,44 +204,220 @@ function How() {
   )
 }
 
-function Themes() {
+function VibeAndStudioSection() {
+  const [conceptPrompt, setConceptPrompt] = useState('')
+  const navigate = useNavigate()
+
+  function handleSearchConcept(e) {
+    e.preventDefault()
+    if (!conceptPrompt.trim()) {
+      navigate('/tema')
+      return
+    }
+    navigate(`/tema?concept=${encodeURIComponent(conceptPrompt.trim())}`)
+  }
+
   return (
-    <section className="bg-transparent py-20">
-      <div className="mx-auto max-w-6xl px-5">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Katalog</p>
-            <h2 className="mt-2 font-display text-4xl md:text-5xl">Customer pilih desainnya sendiri.</h2>
+    <section className="py-20 relative overflow-hidden">
+      <div className="mx-auto max-w-6xl px-5 space-y-16">
+        
+        {/* 1. Vibe Matcher Box (Pencari Konsep Pintar) */}
+        <div className="border border-gold-deep/30 bg-paper/80 backdrop-blur-md p-8 sm:p-12 shadow-sm rounded-sm text-center max-w-4xl mx-auto space-y-6">
+          <div className="inline-flex items-center gap-2 border border-gold-deep/30 bg-gold/10 px-3.5 py-1 text-xs uppercase tracking-widest text-gold-deep font-semibold">
+            <Sparkles size={13} />
+            <span>Event Vibe Matcher</span>
           </div>
-          <Link to="/tema" className="text-sm uppercase tracking-[0.16em] underline-offset-4 hover:underline">
-            Lihat semua tema
-          </Link>
+
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink leading-tight">
+            Bingung Menentukan Konsep Undangan?
+          </h2>
+          <p className="text-stone text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+            Ketik gaya atau nuansa acara impian Anda dengan bebas, sistem cerdas kami akan langsung mencocokkan desain yang paling selaras.
+          </p>
+
+          <form onSubmit={handleSearchConcept} className="max-w-xl mx-auto flex flex-col sm:flex-row gap-2.5 pt-2">
+            <input
+              type="text"
+              value={conceptPrompt}
+              onChange={(e) => setConceptPrompt(e.target.value)}
+              placeholder="Contoh: Adat Sunda modern emas putih, Pesta Sweet 17 pastel..."
+              className="flex-1 border border-ink/20 bg-white p-3.5 text-xs text-ink placeholder:text-stone/60 focus:outline-none focus:border-ink font-medium shadow-2xs"
+            />
+            <button
+              type="submit"
+              className="bg-ink text-ivory px-6 py-3.5 text-xs uppercase tracking-[0.16em] font-semibold hover:bg-gold-deep transition-colors inline-flex items-center justify-center gap-2 shrink-0 shadow-xs"
+            >
+              <Search size={14} /> Temukan Desain
+            </button>
+          </form>
+
+          {/* Quick Prompt Chips */}
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-[11px]">
+            <span className="text-stone font-semibold">Inspirasi Cepat:</span>
+            {[
+              'Adat Jawa Keraton Emas',
+              'Sweet 17 Party Glam',
+              'Wisuda Kedokteran Navy',
+              'Aqiqah Sage Pastel',
+              'Gala Dinner Korporat',
+            ].map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                onClick={() => navigate(`/tema?concept=${encodeURIComponent(chip)}`)}
+                className="border border-ink/15 bg-white/70 px-2.5 py-1 text-stone hover:text-ink hover:border-gold-deep transition-colors font-medium"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {themes.map((t) => (
-            <ThemeCard key={t.id} theme={t} />
-          ))}
+
+        {/* 2. Theme Studio Showcase (Racik Bebas Sendiri) */}
+        <div className="border border-ink/15 bg-paper/60 backdrop-blur-md p-8 sm:p-12 shadow-sm rounded-sm grid md:grid-cols-12 gap-8 items-center">
+          <div className="md:col-span-7 space-y-5">
+            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-gold-deep font-semibold">
+              <Wand2 size={14} />
+              <span>Aruna Theme Studio</span>
+            </div>
+            <h3 className="font-display text-3xl sm:text-4xl text-ink leading-tight">
+              Atau Racik Desain Sendiri Tanpa Batas.
+            </h3>
+            <p className="text-stone text-sm sm:text-base leading-relaxed">
+              Bebaskan kreativitas Anda. Di Aruna Theme Studio, Anda bisa mengubah seluruh palet warna dari foto moodboard, mengunggah font kustom, menambahkan pesan suara, hingga mengatur urutan bagian acara sesuka hati.
+            </p>
+
+            <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
+              <div className="border border-ink/10 bg-white/60 p-3 rounded-xs space-y-1">
+                <p className="font-bold text-ink">AI Palette Extractor</p>
+                <p className="text-[11px] text-stone">Ekstrak 5 warna harmonis dari foto kebaya atau dekorasi.</p>
+              </div>
+              <div className="border border-ink/10 bg-white/60 p-3 rounded-xs space-y-1">
+                <p className="font-bold text-ink">Living Motion & Partikel</p>
+                <p className="text-[11px] text-stone">Efek mengambang hidup dan jejak sentuhan debu emas.</p>
+              </div>
+              <div className="border border-ink/10 bg-white/60 p-3 rounded-xs space-y-1">
+                <p className="font-bold text-ink">Poster Story 9:16</p>
+                <p className="text-[11px] text-stone">Ekspor 1-klik gambar vertikal siap unggah ke Instagram.</p>
+              </div>
+              <div className="border border-ink/10 bg-white/60 p-3 rounded-xs space-y-1">
+                <p className="font-bold text-ink">Universal Multi-Event</p>
+                <p className="text-[11px] text-stone">Mendukung pernikahan, ulang tahun, wisuda, dan korporat.</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3 pt-4">
+              <Link
+                to="/studio"
+                className="bg-gold-deep text-ivory px-6 py-3.5 text-xs uppercase tracking-[0.16em] font-semibold hover:bg-gold transition-colors inline-flex items-center gap-2 shadow-xs"
+              >
+                Buka Theme Studio <ArrowRight size={14} />
+              </Link>
+              <Link
+                to="/tema"
+                className="border border-ink/25 bg-white px-6 py-3.5 text-xs uppercase tracking-[0.16em] text-ink font-semibold hover:bg-ink hover:text-ivory transition-colors"
+              >
+                Lihat Semua Koleksi di Katalog
+              </Link>
+            </div>
+          </div>
+
+          <div className="md:col-span-5 flex justify-center">
+            <div className="w-full max-w-xs border border-ink/20 p-4 rounded-sm bg-white shadow-xl space-y-3">
+              <div className="flex justify-between items-center border-b border-ink/10 pb-2">
+                <span className="text-[10px] uppercase font-bold text-gold-deep">Live Theme Studio</span>
+                <span className="text-[10px] text-stone font-mono">Custom Preset</span>
+              </div>
+              <div className="aspect-[4/3] rounded-xs overflow-hidden border border-ink/10 relative">
+                <img
+                  src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80"
+                  alt="Studio Preview"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-3 text-white">
+                  <p className="text-[9px] uppercase tracking-widest text-gold font-semibold">Terracotta Boho</p>
+                  <p className="font-display text-sm italic">Sarah & Budi</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-[11px] pt-1">
+                <span className="text-stone">Palet Warna:</span>
+                <div className="flex items-center gap-1">
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#FDFBF7] border border-black/15" />
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#C86D51] border border-black/15" />
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#2C221E] border border-black/15" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
       </div>
     </section>
   )
 }
 
 function FeatureGrid() {
+  const [selectedCategory, setSelectedCategory] = useState('Semua')
+
+  const categories = [
+    'Semua',
+    'Tamu & Sapaan',
+    'Hari H & Tamu',
+    'Kado & Keuangan',
+    'Theme Studio',
+    'Audio & Media',
+    'Akses & Akun',
+  ]
+
+  const filteredFeatures =
+    selectedCategory === 'Semua'
+      ? features
+      : features.filter((f) => f.category === selectedCategory || (selectedCategory === 'Tamu & Sapaan' && f.category === 'Multi-Acara') || (selectedCategory === 'Audio & Media' && f.category === 'Media Sosial') || (selectedCategory === 'Akses & Akun' && (f.category === 'Keamanan' || f.category === 'Bisnis & Agensi' || f.category === 'Domain & Teknis')))
+
   return (
-    <section id="fitur" className="mx-auto max-w-6xl px-5 py-20">
-      <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Fitur Lengkap</p>
-      <h2 className="mt-2 max-w-2xl font-display text-4xl md:text-5xl">Semua fitur cerdas untuk hari bahagia kalian.</h2>
-      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {features.map((f) => (
-          <article key={f.title} className="border border-ink/15 bg-paper/60 p-6 backdrop-blur-sm shadow-xs transition-transform hover:-translate-y-1">
-            {f.tag && (
-              <span className="inline-block text-[10px] uppercase font-semibold tracking-[0.2em] text-gold-deep mb-2">
-                {f.tag}
-              </span>
-            )}
-            <h3 className="font-display text-2xl font-semibold">{f.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-stone">{f.body}</p>
+    <section id="fitur" className="mx-auto max-w-6xl px-5 py-20 relative">
+      <div className="text-center max-w-2xl mx-auto space-y-3">
+        <p className="text-xs uppercase tracking-[0.28em] text-gold-deep font-semibold">Fitur Lengkap Platform</p>
+        <h2 className="font-display text-4xl md:text-5xl text-ink">Semua Fitur Cerdas untuk Hari Bahagia.</h2>
+        <p className="text-sm text-stone">
+          Mulai dari kartu kado fisik, buku tamu digital dengan kamera scanner, hingga studio kustomisasi bebas.
+        </p>
+
+        {/* Category Filter Pills */}
+        <div className="pt-4 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3.5 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-xs transition-all ${
+                selectedCategory === cat
+                  ? 'bg-gold-deep text-ivory shadow-xs font-bold'
+                  : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+              }`}
+            >
+              {cat === 'Semua' ? `Semua (${features.length})` : cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredFeatures.map((f, idx) => (
+          <article
+            key={f.title}
+            className="border border-ink/15 bg-paper/70 p-6 rounded-sm backdrop-blur-sm shadow-xs transition-all hover:-translate-y-1 hover:border-gold-deep/60 hover:shadow-md flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <span className="inline-block text-[10px] uppercase font-bold tracking-[0.18em] text-gold-deep bg-gold/10 px-2 py-0.5 rounded-xs border border-gold-deep/20">
+                  {f.tag}
+                </span>
+                <span className="text-[10px] text-stone font-mono opacity-60">#{String(idx + 1).padStart(2, '0')}</span>
+              </div>
+              <h3 className="font-display text-xl font-bold text-ink leading-snug">{f.title}</h3>
+              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-stone">{f.body}</p>
+            </div>
           </article>
         ))}
       </div>

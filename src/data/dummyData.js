@@ -4,6 +4,229 @@ export function getDummyWeddingData(themeId = 'adat-jawa') {
   targetDate.setDate(targetDate.getDate() + 30)
   const dateStr = targetDate.toISOString().slice(0, 10)
 
+  const isBirthday = themeId.includes('birthday') || themeId.includes('sweet')
+  const isGraduation = themeId.includes('graduation') || themeId.includes('wisuda')
+  const isAqiqah = themeId.includes('aqiqah') || themeId.includes('bayi')
+  const isCorporate = themeId.includes('corporate') || themeId.includes('gala')
+
+  if (isBirthday) {
+    return {
+      themeId,
+      bride: {
+        nick: 'Sarah Bella (17th)',
+        full: 'Sarah Bella Anindya',
+        degree: '',
+        fatherName: 'Ir. Hendra Wijaya',
+        fatherDegree: 'M.M.',
+        motherName: 'Dewi Lestari',
+        motherDegree: 'S.Pd.',
+        parents: 'Putri tercinta dari Bpk. Ir. Hendra Wijaya & Ibu Dewi Lestari',
+        photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+        ig: 'sarahbella17',
+      },
+      groom: {
+        nick: '',
+        full: '',
+        degree: '',
+        fatherName: '',
+        fatherDegree: '',
+        motherName: '',
+        motherDegree: '',
+        parents: '',
+        photo: '',
+        ig: '',
+      },
+      date: dateStr,
+      slug: `sweet-17-sarah-bella`,
+      quote: 'Merayakan 17 tahun penuh tawa, cinta keluarga, dan harapan cerah untuk masa depan.',
+      quoteSource: 'Sweet Seventeen Celebration',
+      story: [
+        {
+          year: '2009',
+          title: 'Awal Perjalanan',
+          body: 'Lahir ke dunia membawa kebahagiaan dan keceriaan bagi seluruh keluarga tercinta.',
+          image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          year: '2026',
+          title: 'Langkah Menuju Kedewasaan',
+          body: 'Memasuki usia 17 tahun dengan rasa syukur, mimpi yang tinggi, dan sahabat-sahabat terbaik.',
+          image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+        },
+      ],
+      events: [
+        {
+          title: 'Birthday Party & Games',
+          date: dateStr,
+          time: '16:00',
+          venue: 'Sky Garden Lounge & Bistro',
+          address: 'Jl. Senopati No. 88, Kebayoran Baru, Jakarta Selatan',
+          maps: 'https://maps.google.com',
+        },
+        {
+          title: 'Celebration Dinner & Music',
+          date: dateStr,
+          time: '19:00',
+          venue: 'The Grand Terrace Ballroom',
+          address: 'Jl. Senopati No. 88, Kebayoran Baru, Jakarta Selatan',
+          maps: 'https://maps.google.com',
+        },
+      ],
+      banks: [
+        { bank: 'BCA', name: 'Sarah Bella Anindya', number: '5420198821' },
+      ],
+      gallery: [
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      ],
+      music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+      customerName: 'Sarah Bella (Birthday Test)',
+      customerWhatsapp: '081234567890',
+      packageId: 'lengkap',
+    }
+  }
+
+  if (isGraduation) {
+    return {
+      themeId,
+      bride: {
+        nick: 'dr. Sarah',
+        full: 'dr. Siti Sarah Azzahra, Sp.A',
+        degree: 'Sp.A',
+        fatherName: 'Prof. Dr. H. Rahmat Hidayat',
+        fatherDegree: 'Sp.PD',
+        motherName: 'Hj. Siti Aminah',
+        motherDegree: 'M.Kes.',
+        parents: 'Putri pertama dari Prof. Dr. H. Rahmat Hidayat & Hj. Siti Aminah',
+        photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+        ig: 'drsiti_sarah',
+      },
+      groom: { nick: '', full: '', degree: '', fatherName: '', fatherDegree: '', motherName: '', motherDegree: '', parents: '', photo: '', ig: '' },
+      date: dateStr,
+      slug: `wisuda-dr-sarah-azzahra`,
+      quote: 'Perjalanan panjang penuh dedikasi dan ketekunan. Terima kasih atas doa orang tua, guru, dan sahabat.',
+      quoteSource: 'Doctor of Medicine',
+      events: [
+        {
+          title: 'Upacara Wisuda & Sumpah Dokter',
+          date: dateStr,
+          time: '08:00',
+          venue: 'Auditorium Utama Universitas Indonesia',
+          address: 'Kampus UI Depok, Jawa Barat',
+          maps: 'https://maps.google.com',
+        },
+        {
+          title: 'Tasyakuran & Ramah Tamah',
+          date: dateStr,
+          time: '13:00',
+          venue: 'Hotel Santika Premiere',
+          address: 'Jl. Margonda Raya No. 88, Depok',
+          maps: 'https://maps.google.com',
+        },
+      ],
+      banks: [{ bank: 'BCA', name: 'Siti Sarah Azzahra', number: '5420198821' }],
+      gallery: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80'],
+      music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+      customerName: 'dr. Siti Sarah (Graduation Test)',
+      customerWhatsapp: '081234567890',
+      packageId: 'lengkap',
+    }
+  }
+
+  if (isAqiqah) {
+    return {
+      themeId,
+      bride: {
+        nick: 'Al-Fatih',
+        full: 'Aruna Muhammad Al-Fatih',
+        degree: '',
+        fatherName: 'H. Budi Santoso',
+        fatherDegree: 'S.T.',
+        motherName: 'Hj. Sarah Azzahra',
+        motherDegree: 'S.Farm.',
+        parents: 'Putra pertama dari Bpk. H. Budi Santoso & Ibu Hj. Sarah Azzahra',
+        photo: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80',
+        ig: '',
+      },
+      groom: { nick: '', full: '', degree: '', fatherName: '', fatherDegree: '', motherName: '', motherDegree: '', parents: '', photo: '', ig: '' },
+      date: dateStr,
+      slug: `aqiqah-aruna-al-fatih`,
+      quote: 'Ya Allah, jadikanlah putra kami anak yang sholeh, berbakti kepada orang tua, dan bermanfaat bagi sesama.',
+      quoteSource: 'Doa Syukuran Aqiqah',
+      events: [
+        {
+          title: 'Cukur Rambut & Tausiyah',
+          date: dateStr,
+          time: '09:00',
+          venue: 'Kediaman Keluarga Besar',
+          address: 'Jl. Taman Asri No. 12, Kebayoran Baru, Jakarta Selatan',
+          maps: 'https://maps.google.com',
+        },
+        {
+          title: 'Santap Siang & Doa Bersama',
+          date: dateStr,
+          time: '12:00',
+          venue: 'Kediaman Keluarga Besar',
+          address: 'Jl. Taman Asri No. 12, Kebayoran Baru, Jakarta Selatan',
+          maps: 'https://maps.google.com',
+        },
+      ],
+      banks: [{ bank: 'BSI', name: 'Budi Santoso (Aqiqah)', number: '7190823412' }],
+      gallery: ['https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80'],
+      music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+      customerName: 'Keluarga Budi & Sarah (Aqiqah Test)',
+      customerWhatsapp: '081234567890',
+      packageId: 'lengkap',
+    }
+  }
+
+  if (isCorporate) {
+    return {
+      themeId,
+      bride: {
+        nick: 'Tech Summit 2026',
+        full: 'Aruna Tech Summit & Gala Dinner',
+        degree: '',
+        fatherName: 'Aruna Studio Corporation',
+        fatherDegree: '',
+        motherName: 'Executive Committee',
+        motherDegree: '',
+        parents: 'Penyelenggara: Aruna Studio Corporation & Partners',
+        photo: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+        ig: 'arunastudio',
+      },
+      groom: { nick: '', full: '', degree: '', fatherName: '', fatherDegree: '', motherName: '', motherDegree: '', parents: '', photo: '', ig: '' },
+      date: dateStr,
+      slug: `aruna-tech-summit-2026`,
+      quote: 'Transformasi digital menuju masa depan berkelanjutan. Bersama para inovator dan pemimpin industri.',
+      quoteSource: 'Annual Corporate Summit',
+      events: [
+        {
+          title: 'Keynote Speech & Product Launching',
+          date: dateStr,
+          time: '13:00',
+          venue: 'Grand Ballroom Ritz Carlton Pacific Place',
+          address: 'SCBD, Jl. Jendral Sudirman Kav. 52-53, Jakarta Selatan',
+          maps: 'https://maps.google.com',
+        },
+        {
+          title: 'Gala Dinner & Awarding Night',
+          date: dateStr,
+          time: '19:00',
+          venue: 'Grand Ballroom Ritz Carlton Pacific Place',
+          address: 'SCBD, Jl. Jendral Sudirman Kav. 52-53, Jakarta Selatan',
+          maps: 'https://maps.google.com',
+        },
+      ],
+      banks: [{ bank: 'BCA Bisnis', name: 'PT ARUNA KREASI DIGITAL', number: '5420999988' }],
+      gallery: ['https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80'],
+      music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+      customerName: 'Aruna Corporate (Corporate Test)',
+      customerWhatsapp: '081234567890',
+      packageId: 'lengkap',
+    }
+  }
+
   return {
     themeId,
     bride: {

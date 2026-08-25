@@ -6,6 +6,7 @@ import { fetchInvitation, fetchSettings, getEditKey, rememberEditKey } from '../
 import { copyText, invitationUrl } from '../lib/utils'
 import { formatRupiah, packages, waLink } from '../data/site'
 import AdSlot from '../components/AdSlot'
+import LoveQRCardGenerator from '../components/LoveQRCardGenerator'
 import { CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react'
 
 export default function Success() {
@@ -46,6 +47,10 @@ Paket: ${pack.name} ${formatRupiah(pack.price)}
 Link: ${url}
 Mohon dicek pembayarannya.`
 
+  const heroNames = data?.groom?.nick && data?.groom?.nick !== data?.bride?.nick
+    ? `${data?.bride?.nick} & ${data?.groom?.nick}`
+    : data?.bride?.nick || data?.customerName || 'Acara Spesial'
+
   return (
     <div className="bg-ivory">
       <SiteNav />
@@ -57,7 +62,7 @@ Mohon dicek pembayarannya.`
         <h1 className="mt-3 font-display text-5xl">Undangan sudah hidup.</h1>
         <p className="mt-4 text-stone">
           {data
-            ? `${data.bride?.nick} & ${data.groom?.nick} · ${data.orderCode}`
+            ? `${heroNames} · ${data.orderCode}`
             : 'Salin tautan, lalu selesaikan pembayaran.'}
         </p>
 
@@ -86,6 +91,18 @@ Mohon dicek pembayarannya.`
               Dashboard & statistik
             </Link>
           </div>
+        </div>
+
+        {/* Aesthetic Love QR Card & Physical Gift Card Generator */}
+        <div className="mt-8">
+          <LoveQRCardGenerator
+            invitationUrl={url}
+            names={heroNames}
+            eventType={data?.eventType || 'birthday'}
+            orderCode={data?.orderCode}
+            photo={data?.bride?.photo}
+            date={data?.date}
+          />
         </div>
 
         {pack.price > 0 ? (

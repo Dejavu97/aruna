@@ -95,9 +95,13 @@ function Cover({ data, guest, coverImg, onOpen }) {
           className="at-cover-names"
           variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 1.1 } } }}
         >
-          <span>{bride}</span>
-          <em>&amp;</em>
-          <span>{groom}</span>
+          <span>{bride || data.customerName || 'Acara'}</span>
+          {groom && groom !== bride && (
+            <>
+              <em>&amp;</em>
+              <span>{groom}</span>
+            </>
+          )}
         </motion.h1>
         <motion.div
           className="at-cover-divider"
@@ -120,17 +124,16 @@ function Cover({ data, guest, coverImg, onOpen }) {
           </motion.div>
         )}
         <motion.div
-          className="at-cover-actions"
-          variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { delay: 1.6 } } }}
+          variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { delay: 1.2 } } }}
         >
           <motion.button
             type="button"
-            className="at-btn-primary"
+            className="at-open-btn"
             onClick={onOpen}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
           >
-            <MailOpen size={15} /> BUKA UNDANGAN
+            <MailOpen size={16} /> BUKA UNDANGAN
           </motion.button>
         </motion.div>
       </motion.div>
@@ -138,17 +141,30 @@ function Cover({ data, guest, coverImg, onOpen }) {
   )
 }
 
-function Hero({ data, bride, groom }) {
+function Hero({ data, bride, groom, coverImg }) {
+  const isSingle = !groom || groom === bride
   return (
-    <section className="at-hero" id="home">
-      <Kicker>THE WEDDING OF</Kicker>
-      <h2 className="at-hero-names">
-        <span>{bride}</span>
-        <em className="at-hero-amp">&amp;</em>
-        <span>{groom}</span>
-      </h2>
+    <section className="at-hero" style={{ backgroundImage: `url(${coverImg})` }}>
+      <div className="at-hero-shade" />
+      <div className="at-hero-content">
+        <Kicker>THE CELEBRATION OF</Kicker>
+        <h2>{isSingle ? (bride || data.customerName) : `${bride} & ${groom}`}</h2>
+        <GoldLine width="4rem" />
+        <p className="at-hero-date">{formatLongDate(data.date)}</p>
+      </div>
+    </section>
+  )
+}
+
+function Greeting({ text }) {
+  return (
+    <section className="at-pad at-center">
+      <div className="at-bismillah">
+        <p className="at-bismillah-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+        <p className="at-bismillah-trans">Bismillahirrahmanirrahim</p>
+      </div>
       <GoldLine />
-      <p className="at-hero-date">{formatLongDate(data.date).toUpperCase()}</p>
+      <p className="at-lead">{text || 'Assalamu’alaikum Warahmatullahi Wabarakatuh'}</p>
     </section>
   )
 }
@@ -166,9 +182,10 @@ function Quote({ data }) {
 }
 
 function Couple({ data }) {
+  const isSingle = !data.groom?.nick || data.groom?.nick === data.bride?.nick
   const people = [
-    { who: data.groom, role: 'THE GROOM' },
-    { who: data.bride, role: 'THE BRIDE' },
+    { who: data.bride, role: isSingle ? 'DATA TOKOH' : 'THE BRIDE' },
+    ...(!isSingle && data.groom?.nick ? [{ who: data.groom, role: 'THE GROOM' }] : []),
   ]
   return (
     <section className="at-pad" id="couple">

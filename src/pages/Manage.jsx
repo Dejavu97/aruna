@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX, Shield, Megaphone, Tag } from 'lucide-react'
+import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX, Shield, Megaphone, Tag, Heart } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import QrCameraScanner from '../components/QrCameraScanner'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import PrintCardModal from '../components/PrintCardModal'
+import LoveQRCardGenerator from '../components/LoveQRCardGenerator'
 import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../lib/api'
 import { copyText, formatLongDate, invitationUrl, uid } from '../lib/utils'
 import { shareWaLink, waLink } from '../data/site'
@@ -604,9 +605,10 @@ export default function Manage() {
         </div>
 
         {/* Tabs */}
-        <div className="mt-10 flex flex-wrap gap-2 border-b border-ink/10 pb-0 text-xs uppercase tracking-[0.14em]">
+        <div className="mt-10 flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-none border-b border-ink/10 pb-0 text-xs uppercase tracking-[0.14em]">
           {[
             ['ringkas', 'Ringkas'],
+            ['love_qr', 'Kartu QR Cinta & Kado'],
             ['rsvp', 'RSVP'],
             ['checkin', `Buku Tamu (${checkedInCount})`],
             ['ucapan', 'Ucapan'],
@@ -617,8 +619,8 @@ export default function Manage() {
               key={id}
               type="button"
               onClick={() => setTab(id)}
-              className={`border-b-2 px-3 py-2 ${
-                tab === id ? 'border-gold text-ink' : 'border-transparent text-stone'
+              className={`shrink-0 border-b-2 px-3 py-2 transition-colors ${
+                tab === id ? 'border-gold text-ink font-bold bg-gold/5' : 'border-transparent text-stone hover:text-ink'
               }`}
             >
               {label}
@@ -627,6 +629,23 @@ export default function Manage() {
         </div>
 
         <div className="mt-6">
+          {tab === 'love_qr' && (
+            <div className="space-y-6">
+              <LoveQRCardGenerator
+                invitationUrl={invitationUrl(slug)}
+                names={
+                  item?.groom?.nick && item?.groom?.nick !== item?.bride?.nick
+                    ? `${item?.bride?.nick} & ${item?.groom?.nick}`
+                    : item?.bride?.nick || item?.customerName || 'Acara Spesial'
+                }
+                eventType={item?.eventType || 'birthday'}
+                orderCode={item?.orderCode}
+                photo={item?.bride?.photo}
+                date={item?.date}
+              />
+            </div>
+          )}
+
           {tab === 'ringkas' && (
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="border border-ink/10 bg-paper p-5 lg:col-span-2">

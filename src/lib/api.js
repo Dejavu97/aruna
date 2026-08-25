@@ -819,6 +819,74 @@ export async function saveMaintenanceSettings(settings) {
   return { success: true }
 }
 
+export async function fetchUserInvitations(uid, email) {
+  if (!uid && !email) return []
+  try {
+    const q1 = query(collection(db, 'invitations'), where('ownerUid', '==', uid))
+    const snap1 = await getDocs(q1)
+    const list = snap1.docs.map((d) => ({ ...d.data(), slug: d.id }))
+
+    if (email) {
+      const q2 = query(collection(db, 'invitations'), where('customerEmail', '==', email))
+      const snap2 = await getDocs(q2)
+      const list2 = snap2.docs.map((d) => ({ ...d.data(), slug: d.id }))
+
+      const merged = [...list]
+      for (const item of list2) {
+        if (!merged.some((m) => m.slug === item.slug)) {
+          merged.push(item)
+        }
+      }
+      return merged.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+    }
+
+    return list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+  } catch (err) {
+    console.warn('fetchUserInvitations error:', err)
+    return []
+  }
+}
+
+export async function fetchPublicTestimonials() {
+  try {
+    const q = query(collection(db, 'testimonials'), orderBy('createdAt', 'desc'), limit(15))
+    const snap = await getDocs(q)
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+  } catch (err) {
+    console.warn('fetchPublicTestimonials error:', err)
+    try {
+      const local = localStorage.getItem('aruna_public_testimonials')
+      if (local) return JSON.parse(local)
+    } catch {}
+    return []
+  }
+}
+
+export async function submitPublicTestimonial(data) {
+  const item = {
+    ...data,
+    stars: Number(data.stars) || 5,
+    createdAt: Date.now(),
+  }
+
+  try {
+    const docRef = doc(collection(db, 'testimonials'))
+    await setDoc(docRef, item)
+    item.id = docRef.id
+  } catch (err) {
+    console.warn('submitPublicTestimonial error:', err)
+    item.id = 'local_' + Date.now()
+  }
+
+  try {
+    const local = JSON.parse(localStorage.getItem('aruna_public_testimonials') || '[]')
+    localStorage.setItem('aruna_public_testimonials', JSON.stringify([item, ...local]))
+  } catch {}
+
+  return item
+}
+
+
 
 
 

@@ -11,7 +11,10 @@ import Edit from './pages/Edit'
 import Manage from './pages/Manage'
 import ThemeStudio from './pages/ThemeStudio'
 import CustomDomainPage from './pages/CustomDomainPage'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
 import MaintenanceScreen from './components/MaintenanceScreen'
+import { AuthProvider } from './context/AuthContext'
 import { defaultMaintenanceSettings, fetchMaintenanceSettings } from './lib/api'
 
 export default function App() {
@@ -39,28 +42,34 @@ export default function App() {
     location.pathname.startsWith('/kelola') ||
     location.pathname.startsWith('/edit') ||
     location.pathname.startsWith('/u/') ||
-    location.pathname.startsWith('/berhasil')
+    location.pathname.startsWith('/berhasil') ||
+    location.pathname.startsWith('/masuk') ||
+    location.pathname.startsWith('/dashboard')
 
   if (maintenance?.enabled && !isExempt) {
     return <MaintenanceScreen settings={maintenance} />
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/tema" element={<Themes />} />
-      <Route path="/tema/:themeId" element={<ThemePreview />} />
-      <Route path="/studio" element={<ThemeStudio />} />
-      <Route path="/studio/:themeId" element={<ThemeStudio />} />
-      <Route path="/pesan" element={<Order />} />
-      <Route path="/pesan/:themeId" element={<Order />} />
-      <Route path="/berhasil/:slug" element={<Success />} />
-      <Route path="/edit/:slug" element={<Edit />} />
-      <Route path="/kelola/:slug" element={<Manage />} />
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/u/:slug" element={<InvitationPage />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/tema" element={<Themes />} />
+        <Route path="/tema/:themeId" element={<ThemePreview />} />
+        <Route path="/studio" element={<ThemeStudio />} />
+        <Route path="/studio/:themeId" element={<ThemeStudio />} />
+        <Route path="/pesan" element={<Order />} />
+        <Route path="/pesan/:themeId" element={<Order />} />
+        <Route path="/berhasil/:slug" element={<Success />} />
+        <Route path="/edit/:slug" element={<Edit />} />
+        <Route path="/kelola/:slug" element={<Manage />} />
+        <Route path="/masuk" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/u/:slug" element={<InvitationPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AuthProvider>
   )
 }
 

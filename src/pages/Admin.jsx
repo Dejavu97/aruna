@@ -71,9 +71,12 @@ export default function Admin() {
   const [open, setOpen] = useState(null)
   const [loading, setLoading] = useState(true)
   
-  // Navigation Tabs
-  const [mainTab, setMainTab] = useState('orders') // 'orders' | 'themes' | 'vouchers' | 'payment' | 'pricing' | 'announcement'
+  // Navigation Tabs (Consolidated 4-Hub Layout)
+  const [mainTab, setMainTab] = useState('orders') // 'orders' | 'themes_announcement' | 'monetization' | 'system'
   const [orderTab, setOrderTab] = useState('all') // 'all' | 'unpaid' | 'paid' | 'past'
+  const [themeSubTab, setThemeSubTab] = useState('themes') // 'themes' | 'announcement'
+  const [monetizationSubTab, setMonetizationSubTab] = useState('pricing') // 'pricing' | 'vouchers' | 'payment' | 'ads'
+  const [systemSubTab, setSystemSubTab] = useState('wa_templates') // 'wa_templates' | 'platform'
   
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('')
@@ -1084,18 +1087,13 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* 3. MAIN NAVIGATION TABS */}
+        {/* 3. CONSOLIDATED MAIN NAVIGATION TABS */}
         <div className="flex border-b border-ink/15 gap-4 overflow-x-auto text-xs uppercase tracking-widest font-semibold">
           {[
             ['orders', `Daftar Pesanan (${items.length})`],
-            ['themes', `Tema Kustom Studio (${customThemesList.length})`],
-            ['vouchers', `Voucher Diskon (${vouchersList.length})`],
-            ['payment', 'Rekening & QRIS'],
-            ['pricing', 'Paket & Harga'],
-            ['announcement', 'Spanduk Pengumuman'],
-            ['ads', 'Iklan & Monetisasi'],
-            ['wa_templates', 'Template WhatsApp'],
-            ['platform_settings', 'Pengaturan & Keamanan'],
+            ['themes_announcement', `Tema & Pengumuman (${customThemesList.length})`],
+            ['monetization', `Harga, Voucher & Keuangan`],
+            ['system', `Sistem & WhatsApp`],
           ].map(([tKey, tLabel]) => (
             <button
               key={tKey}
@@ -1109,6 +1107,8 @@ export default function Admin() {
             </button>
           ))}
         </div>
+
+        {/* TAB 1: DAFTAR PESANAN & UNDANGAN */}
 
         {/* TAB 1: DAFTAR PESANAN & UNDANGAN */}
         {mainTab === 'orders' && (
@@ -1484,8 +1484,36 @@ export default function Admin() {
           </div>
         )}
 
-        {/* TAB 2: MANAJEMEN TEMA KUSTOM STUDIO */}
-        {mainTab === 'themes' && (
+        {/* TAB 2: TEMA & PENGUMUMAN */}
+        {mainTab === 'themes_announcement' && (
+          <div className="space-y-6">
+            {/* Sub Tabs Bar */}
+            <div className="flex gap-2 border-b border-ink/10 pb-2 text-xs uppercase tracking-wider font-semibold">
+              <button
+                type="button"
+                onClick={() => setThemeSubTab('themes')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  themeSubTab === 'themes'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Tema Kustom Studio ({customThemesList.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setThemeSubTab('announcement')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  themeSubTab === 'announcement'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Spanduk Pengumuman Global
+              </button>
+            </div>
+
+            {themeSubTab === 'themes' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
@@ -1559,10 +1587,216 @@ export default function Admin() {
               </div>
             )}
           </div>
+            )}
+
+            {themeSubTab === 'announcement' && (
+          <div className="bg-paper border border-ink/15 p-6 rounded-sm shadow-xs space-y-4 max-w-3xl">
+            <div className="flex items-center gap-2 text-gold-deep">
+              <Megaphone size={20} />
+              <h2 className="font-display text-xl font-bold">Spanduk Pengumuman Global</h2>
+            </div>
+            <p className="text-xs text-stone leading-relaxed">
+              Teks ini akan muncul sebagai spanduk kuning mengambang di atas dashboard kelola semua klien. Kosongkan teks jika tidak ada pengumuman.
+            </p>
+
+            <div className="space-y-3 pt-2">
+              <textarea
+                rows={3}
+                value={announcement}
+                onChange={(e) => setAnnouncement(e.target.value)}
+                placeholder="Contoh: Fitur buku tamu QR Code & pemutar musik MP3 kini sudah aktif! Silakan cek di menu pengaturan."
+                className="w-full border border-ink/20 p-3 text-sm focus:border-ink focus:outline-none"
+              />
+
+              {announcement && (
+                <div className="bg-gold/10 border border-gold-deep/30 p-3 text-xs text-ink rounded-xs">
+                  <p className="font-semibold text-[10px] uppercase tracking-wider text-gold-deep mb-1">Preview Spanduk:</p>
+                  <p>{announcement}</p>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={async () => {
+                  setSavingAnnouncement(true)
+                  try {
+                    await saveAnnouncement(announcement)
+                    alert('Spanduk pengumuman berhasil disimpan!')
+                  } catch (err) {
+                    alert('Gagal menyimpan: ' + err.message)
+                  } finally {
+                    setSavingAnnouncement(false)
+                  }
+                }}
+                disabled={savingAnnouncement}
+                className="bg-ink text-ivory px-6 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50"
+              >
+                {savingAnnouncement ? 'Menyimpan...' : 'Simpan & Publikasikan'}
+              </button>
+            </div>
+          </div>
+            )}
+          </div>
         )}
 
-        {/* TAB 3: MANAJEMEN VOUCHER DISKON */}
-        {mainTab === 'vouchers' && (
+        {/* TAB 3: HARGA, VOUCHER, REKENING & MONETISASI */}
+        {mainTab === 'monetization' && (
+          <div className="space-y-6">
+            {/* Sub Tabs Bar */}
+            <div className="flex flex-wrap gap-2 border-b border-ink/10 pb-2 text-xs uppercase tracking-wider font-semibold">
+              <button
+                type="button"
+                onClick={() => setMonetizationSubTab('pricing')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  monetizationSubTab === 'pricing'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Paket &amp; Harga ({adminPackages.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setMonetizationSubTab('vouchers')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  monetizationSubTab === 'vouchers'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Voucher Diskon ({vouchersList.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setMonetizationSubTab('payment')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  monetizationSubTab === 'payment'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Rekening Bank &amp; QRIS
+              </button>
+              <button
+                type="button"
+                onClick={() => setMonetizationSubTab('ads')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  monetizationSubTab === 'ads'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Iklan &amp; Sponsor
+              </button>
+            </div>
+
+            {monetizationSubTab === 'pricing' && (
+          <div className="space-y-6 max-w-4xl">
+            <div>
+              <h2 className="font-display text-2xl font-bold">Pengaturan Harga &amp; Paket Layanan</h2>
+              <p className="text-xs text-stone mt-0.5">
+                Ubah nominal harga setiap paket. Perubahan akan langsung aktif di halaman depan dan form pemesanan.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              {adminPackages.map((pkg, idx) => (
+                <div key={pkg.id} className="bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-3 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs uppercase font-bold text-stone">ID: {pkg.id}</span>
+                      {pkg.popular && (
+                        <span className="bg-gold-deep text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-bold">
+                          Populer
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Nama Paket</label>
+                      <input
+                        type="text"
+                        value={pkg.name}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setAdminPackages((prev) => {
+                            const n = [...prev]
+                            n[idx].name = val
+                            return n
+                          })
+                        }}
+                        className="w-full border border-ink/20 p-2 text-sm font-bold bg-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Harga Paket (Rp)</label>
+                      <input
+                        type="number"
+                        value={pkg.price}
+                        onChange={(e) => {
+                          const val = Number(e.target.value) || 0
+                          setAdminPackages((prev) => {
+                            const n = [...prev]
+                            n[idx].price = val
+                            return n
+                          })
+                        }}
+                        className="w-full border border-ink/20 p-2 text-base font-mono font-bold text-green-800 bg-white"
+                      />
+                      <p className="text-[10px] text-stone mt-0.5">{formatRupiah(pkg.price)}</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Keterangan Singkat</label>
+                      <textarea
+                        rows={2}
+                        value={pkg.blurb || ''}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setAdminPackages((prev) => {
+                            const n = [...prev]
+                            n[idx].blurb = val
+                            return n
+                          })
+                        }}
+                        className="w-full border border-ink/20 p-2 text-xs bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-ink/10 flex items-center justify-between text-xs">
+                    <span className="text-stone">Tandai Populer:</span>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(pkg.popular)}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        setAdminPackages((prev) => {
+                          const n = [...prev]
+                          n[idx].popular = checked
+                          return n
+                        })
+                      }}
+                      className="w-4 h-4 accent-gold-deep cursor-pointer"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSavePackages}
+              disabled={savingPackages}
+              className="bg-ink text-ivory px-6 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50"
+            >
+              {savingPackages ? 'Menyimpan...' : 'Simpan Harga Paket'}
+            </button>
+          </div>
+            )}
+
+            {monetizationSubTab === 'vouchers' && (
           <div className="space-y-6">
             <div className="grid md:grid-cols-12 gap-6">
               {/* Form Tambah Voucher (5 Cols) */}
@@ -1668,10 +1902,9 @@ export default function Admin() {
               </div>
             </div>
           </div>
-        )}
+            )}
 
-        {/* TAB 4: REKENING & QRIS PEMBAYARAN */}
-        {mainTab === 'payment' && (
+            {monetizationSubTab === 'payment' && (
           <div className="space-y-6 max-w-4xl">
             <div>
               <h2 className="font-display text-2xl font-bold">Pengaturan Rekening &amp; QRIS Pembayaran</h2>
@@ -1827,166 +2060,9 @@ export default function Admin() {
               {savingPayment ? 'Menyimpan...' : 'Simpan Pengaturan Pembayaran'}
             </button>
           </div>
-        )}
+            )}
 
-        {/* TAB 5: PENGATURAN PAKET & HARGA */}
-        {mainTab === 'pricing' && (
-          <div className="space-y-6 max-w-4xl">
-            <div>
-              <h2 className="font-display text-2xl font-bold">Pengaturan Harga &amp; Paket Layanan</h2>
-              <p className="text-xs text-stone mt-0.5">
-                Ubah nominal harga setiap paket. Perubahan akan langsung aktif di halaman depan dan form pemesanan.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              {adminPackages.map((pkg, idx) => (
-                <div key={pkg.id} className="bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-3 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs uppercase font-bold text-stone">ID: {pkg.id}</span>
-                      {pkg.popular && (
-                        <span className="bg-gold-deep text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-bold">
-                          Populer
-                        </span>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Nama Paket</label>
-                      <input
-                        type="text"
-                        value={pkg.name}
-                        onChange={(e) => {
-                          const val = e.target.value
-                          setAdminPackages((prev) => {
-                            const n = [...prev]
-                            n[idx].name = val
-                            return n
-                          })
-                        }}
-                        className="w-full border border-ink/20 p-2 text-sm font-bold bg-white"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Harga Paket (Rp)</label>
-                      <input
-                        type="number"
-                        value={pkg.price}
-                        onChange={(e) => {
-                          const val = Number(e.target.value) || 0
-                          setAdminPackages((prev) => {
-                            const n = [...prev]
-                            n[idx].price = val
-                            return n
-                          })
-                        }}
-                        className="w-full border border-ink/20 p-2 text-base font-mono font-bold text-green-800 bg-white"
-                      />
-                      <p className="text-[10px] text-stone mt-0.5">{formatRupiah(pkg.price)}</p>
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Keterangan Singkat</label>
-                      <textarea
-                        rows={2}
-                        value={pkg.blurb || ''}
-                        onChange={(e) => {
-                          const val = e.target.value
-                          setAdminPackages((prev) => {
-                            const n = [...prev]
-                            n[idx].blurb = val
-                            return n
-                          })
-                        }}
-                        className="w-full border border-ink/20 p-2 text-xs bg-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-ink/10 flex items-center justify-between text-xs">
-                    <span className="text-stone">Tandai Populer:</span>
-                    <input
-                      type="checkbox"
-                      checked={Boolean(pkg.popular)}
-                      onChange={(e) => {
-                        const checked = e.target.checked
-                        setAdminPackages((prev) => {
-                          const n = [...prev]
-                          n[idx].popular = checked
-                          return n
-                        })
-                      }}
-                      className="w-4 h-4 accent-gold-deep cursor-pointer"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button
-              type="button"
-              onClick={handleSavePackages}
-              disabled={savingPackages}
-              className="bg-ink text-ivory px-6 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50"
-            >
-              {savingPackages ? 'Menyimpan...' : 'Simpan Harga Paket'}
-            </button>
-          </div>
-        )}
-
-        {/* TAB 6: SPANDUK PENGUMUMAN GLOBAL */}
-        {mainTab === 'announcement' && (
-          <div className="bg-paper border border-ink/15 p-6 rounded-sm shadow-xs space-y-4 max-w-3xl">
-            <div className="flex items-center gap-2 text-gold-deep">
-              <Megaphone size={20} />
-              <h2 className="font-display text-xl font-bold">Spanduk Pengumuman Global</h2>
-            </div>
-            <p className="text-xs text-stone leading-relaxed">
-              Teks ini akan muncul sebagai spanduk kuning mengambang di atas dashboard kelola semua klien. Kosongkan teks jika tidak ada pengumuman.
-            </p>
-
-            <div className="space-y-3 pt-2">
-              <textarea
-                rows={3}
-                value={announcement}
-                onChange={(e) => setAnnouncement(e.target.value)}
-                placeholder="Contoh: Fitur buku tamu QR Code & pemutar musik MP3 kini sudah aktif! Silakan cek di menu pengaturan."
-                className="w-full border border-ink/20 p-3 text-sm focus:border-ink focus:outline-none"
-              />
-
-              {announcement && (
-                <div className="bg-gold/10 border border-gold-deep/30 p-3 text-xs text-ink rounded-xs">
-                  <p className="font-semibold text-[10px] uppercase tracking-wider text-gold-deep mb-1">Preview Spanduk:</p>
-                  <p>{announcement}</p>
-                </div>
-              )}
-
-              <button
-                type="button"
-                onClick={async () => {
-                  setSavingAnnouncement(true)
-                  try {
-                    await saveAnnouncement(announcement)
-                    alert('Spanduk pengumuman berhasil disimpan!')
-                  } catch (err) {
-                    alert('Gagal menyimpan: ' + err.message)
-                  } finally {
-                    setSavingAnnouncement(false)
-                  }
-                }}
-                disabled={savingAnnouncement}
-                className="bg-ink text-ivory px-6 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50"
-              >
-                {savingAnnouncement ? 'Menyimpan...' : 'Simpan & Publikasikan'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 7: PENGATURAN IKLAN & MONETISASI */}
-        {mainTab === 'ads' && (
+            {monetizationSubTab === 'ads' && (
           <div className="space-y-6 max-w-4xl">
             {/* Master Switch Banner */}
             <div className={`p-6 rounded-sm border transition-all ${
@@ -2356,10 +2432,40 @@ export default function Admin() {
               </div>
             </div>
           </div>
+            )}
+          </div>
         )}
 
-        {/* TAB 8: PENGATURAN TEMPLATE WHATSAPP */}
-        {mainTab === 'wa_templates' && (
+        {/* TAB 4: SISTEM, WHATSAPP & KEAMANAN */}
+        {mainTab === 'system' && (
+          <div className="space-y-6">
+            {/* Sub Tabs Bar */}
+            <div className="flex gap-2 border-b border-ink/10 pb-2 text-xs uppercase tracking-wider font-semibold">
+              <button
+                type="button"
+                onClick={() => setSystemSubTab('wa_templates')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  systemSubTab === 'wa_templates'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Template WhatsApp
+              </button>
+              <button
+                type="button"
+                onClick={() => setSystemSubTab('platform')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  systemSubTab === 'platform'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Pengaturan Platform &amp; Keamanan
+              </button>
+            </div>
+
+            {systemSubTab === 'wa_templates' && (
           <div className="space-y-6 max-w-4xl">
             <div className="bg-paper border border-ink/15 p-6 rounded-sm shadow-xs space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-4">
@@ -2494,10 +2600,9 @@ export default function Admin() {
               </div>
             </div>
           </div>
-        )}
+            )}
 
-        {/* TAB 9: PENGATURAN PLATFORM, SEO, KEAMANAN & BACKUP */}
-        {mainTab === 'platform_settings' && (
+            {systemSubTab === 'platform' && (
           <div className="space-y-6 max-w-4xl">
             <div className="bg-paper border border-ink/15 p-6 rounded-sm shadow-xs space-y-6">
               {/* Header */}
@@ -3052,8 +3157,11 @@ export default function Admin() {
 
             </div>
           </div>
+            )}
+          </div>
         )}
-      </main>
+
+            </main>
 
       {/* WHATSAPP TEMPLATE SELECTOR MODAL */}
       {waModalItem && (
