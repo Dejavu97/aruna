@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Sparkles, Palette, HelpCircle, Check, ArrowRight, RotateCcw, X, Eye, CheckCircle2, Edit3, Wand2, Search } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -10,7 +10,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Themes() {
   const navigate = useNavigate()
-  const [chip, setChip] = useState('semua')
+  const [params] = useSearchParams()
+  const initialCategory = params.get('kategori') || 'semua'
+  const [chip, setChip] = useState(initialCategory)
   const [customThemes, setCustomThemes] = useState([])
 
   // Wedding Vibe Matcher Quiz State
@@ -27,6 +29,11 @@ export default function Themes() {
   const [quizResult, setQuizResult] = useState(null)
 
   useEffect(() => {
+    const cat = params.get('kategori')
+    if (cat) setChip(cat)
+  }, [params])
+
+  useEffect(() => {
     fetchCustomThemes().then((list) => {
       if (Array.isArray(list)) {
         setCustomThemes(list.filter((t) => t.isPublic !== false))
@@ -41,10 +48,29 @@ export default function Themes() {
   const list = useMemo(() => {
     if (chip === 'semua') return allThemes
     if (chip === 'komunitas') return allThemes.filter((t) => t.collection === 'community')
+    if (chip === 'pernikahan') {
+      return allThemes.filter((t) => !t.eventType || t.eventType === 'wedding' || (t.tags || []).includes('pernikahan'))
+    }
+    if (chip === 'ulang-tahun') {
+      return allThemes.filter((t) => t.eventType === 'birthday' || (t.tags || []).includes('ulang-tahun') || (t.tags || []).includes('birthday'))
+    }
+    if (chip === 'wisuda') {
+      return allThemes.filter((t) => t.eventType === 'graduation' || (t.tags || []).includes('wisuda') || (t.tags || []).includes('graduation'))
+    }
+    if (chip === 'aqiqah') {
+      return allThemes.filter((t) => t.eventType === 'aqiqah' || (t.tags || []).includes('aqiqah') || (t.tags || []).includes('bayi'))
+    }
+    if (chip === 'perusahaan') {
+      return allThemes.filter((t) => t.eventType === 'corporate' || (t.tags || []).includes('perusahaan') || (t.tags || []).includes('corporate'))
+    }
+    if (chip === 'reuni') {
+      return allThemes.filter((t) => t.eventType === 'reunion' || (t.tags || []).includes('reuni') || (t.tags || []).includes('gathering'))
+    }
     return allThemes.filter((t) => 
       (t.tags || []).includes(chip) || 
       t.tag?.toLowerCase() === chip || 
-      t.collection === chip
+      t.collection === chip ||
+      t.eventType === chip
     )
   }, [chip, allThemes])
 

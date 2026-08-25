@@ -51,41 +51,131 @@ export default function Home() {
 }
 
 function Hero() {
+  const [activeCat, setActiveCat] = useState('wedding')
+
+  const heroConfigs = {
+    wedding: {
+      id: 'wedding',
+      label: 'Pernikahan',
+      badge: 'Undangan Pernikahan & Walimatul Urs',
+      headline: 'Tamu memilih tautan. Kamu memilih kesan.',
+      tagline: 'Pilih tema mewah, isi data mempelai, sebar lewat WhatsApp. Tanpa aplikasi, tanpa ribet.',
+      themeTitle: 'Emas Senja',
+      personName: 'Andini & Raka',
+      cover: '/themes/emas-senja.jpg',
+      categoryParam: 'pernikahan',
+    },
+    birthday: {
+      id: 'birthday',
+      label: 'Ulang Tahun & Sweet 17',
+      badge: 'Perayaan Ulang Tahun & Sweet 17',
+      headline: 'Rayakan usia baru penuh gaya, musik & kenangan.',
+      tagline: 'Undangan pesta ulang tahun interaktif dengan galeri foto, countdown pesta, rundown acara, dan dresscode.',
+      themeTitle: 'Sweet 17 Glamour',
+      personName: 'Sarah Bella (17th)',
+      cover: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      categoryParam: 'ulang-tahun',
+    },
+    graduation: {
+      id: 'graduation',
+      label: 'Wisuda & Kelulusan',
+      badge: 'Wisuda & Sumpah Profesi',
+      headline: 'Momen puncak dedikasi, gelar & kebanggaan.',
+      tagline: 'Bagikan rasa syukur atas peraihan gelar sarjana dan spesialis bersama keluarga dan sahabat tercinta.',
+      themeTitle: 'Academic Honors',
+      personName: 'dr. Siti Sarah, Sp.A',
+      cover: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80',
+      categoryParam: 'wisuda',
+    },
+    aqiqah: {
+      id: 'aqiqah',
+      label: 'Aqiqah & Syukuran',
+      badge: 'Tasyakuran Aqiqah & Bayi',
+      headline: 'Sambut kehadiran buah hati penuh keberkahan.',
+      tagline: 'Undangan syukuran kelahiran dan aqiqah lembut dengan arti nama indah, doa keberkahan, dan lokasi acara.',
+      themeTitle: 'Aqiqah Al-Fatih',
+      personName: 'Aruna Muhammad Al-Fatih',
+      cover: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80',
+      categoryParam: 'aqiqah',
+    },
+    corporate: {
+      id: 'corporate',
+      label: 'Acara Perusahaan',
+      badge: 'Gala Dinner & Summit',
+      headline: 'Undangan profesional untuk acara prestisius.',
+      tagline: 'Seminar tahunan, annual gala dinner, dan peluncuran produk dengan kartu tiket akses QR check-in digital.',
+      themeTitle: 'Corporate Summit',
+      personName: 'Aruna Tech Summit 2026',
+      cover: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+      categoryParam: 'perusahaan',
+    },
+  }
+
+  const currentHero = heroConfigs[activeCat] || heroConfigs.wedding
+
   return (
     <section className="relative overflow-hidden">
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 py-24 text-ink md:grid-cols-[1.2fr_0.8fr] md:py-32">
-        <div>
-          <p className="text-xs uppercase tracking-[0.32em] text-gold-deep">Undangan pernikahan digital</p>
-          <h1 className="mt-4 font-display text-5xl leading-[0.95] md:text-7xl">
-            Tamu memilih tautan.
-            <br />
-            Kamu memilih kesan.
+      <div className="relative mx-auto max-w-6xl px-5 pt-16 pb-10">
+        {/* Clean Interactive Category Capsule Bar */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
+          <span className="text-[10px] uppercase tracking-widest text-stone/80 font-semibold mr-2 shrink-0">
+            Kategori Acara:
+          </span>
+          {Object.values(heroConfigs).map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setActiveCat(cat.id)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition-all ${
+                activeCat === cat.id
+                  ? 'bg-ink text-ivory shadow-xs font-bold'
+                  : 'bg-paper/80 border border-ink/15 text-stone hover:text-ink hover:border-ink/40'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-24 md:pb-32 text-ink md:grid-cols-[1.2fr_0.8fr]">
+        <div className="animate-in fade-in transition-all duration-300">
+          <p className="text-xs uppercase tracking-[0.32em] text-gold-deep font-semibold">
+            {currentHero.badge}
+          </p>
+          <h1 className="mt-4 font-display text-4xl leading-[1.05] sm:text-5xl md:text-6xl min-h-[120px] md:min-h-[160px]">
+            {currentHero.headline}
           </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-stone md:text-lg">
-            {site.tagline} Pilih tema, isi data pengantin, sebar lewat WhatsApp. Tanpa aplikasi, tanpa ribet.
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-stone md:text-lg">
+            {currentHero.tagline}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              to="/tema"
-              className="inline-flex items-center gap-2 bg-ink px-6 py-3 text-sm uppercase tracking-[0.16em] text-ivory transition-colors hover:bg-gold-deep"
+              to={`/tema?kategori=${currentHero.categoryParam}`}
+              className="inline-flex items-center gap-2 bg-ink px-6 py-3 text-sm uppercase tracking-[0.16em] text-ivory transition-colors hover:bg-gold-deep font-medium"
             >
-              Pilih desain <ArrowRight size={16} />
+              Pilih Desain {currentHero.label.split(' ')[0]} <ArrowRight size={16} />
             </Link>
-            <a
-              href={waLink('Halo Aruna, saya mau tanya dulu sebelum pilih tema.')}
-              className="inline-flex items-center border border-ink/30 px-6 py-3 text-sm uppercase tracking-[0.16em] transition-colors hover:bg-ink hover:text-ivory"
+            <Link
+              to="/studio"
+              className="inline-flex items-center border border-gold-deep/40 bg-gold/10 px-6 py-3 text-sm uppercase tracking-[0.16em] text-ink transition-colors hover:bg-gold/20 font-semibold"
             >
-              Tanya dulu
-            </a>
+              Buka Studio Desain
+            </Link>
           </div>
         </div>
+
         <aside className="hidden justify-self-end md:block">
-          <div className="w-72 overflow-hidden rounded-t-[10rem] rounded-b-xl border-[6px] border-ivory/60 bg-transparent shadow-2xl backdrop-blur-sm">
-            <img src="/themes/emas-senja.jpg" alt="Contoh undangan" className="h-[400px] w-full object-cover" />
+          <div className="w-72 overflow-hidden rounded-t-[10rem] rounded-b-xl border-[6px] border-ivory/60 bg-transparent shadow-2xl backdrop-blur-sm transition-all duration-300">
+            <img
+              src={currentHero.cover}
+              alt={currentHero.themeTitle}
+              className="h-[400px] w-full object-cover transition-opacity duration-300"
+            />
             <div className="bg-ivory/90 p-5 text-center text-ink backdrop-blur-md">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-gold-deep">Contoh tema</p>
-              <p className="font-display text-2xl mt-1">Emas Senja</p>
-              <p className="text-xs text-stone mt-1">Andini & Raka</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-gold-deep font-semibold">{currentHero.badge}</p>
+              <p className="font-display text-2xl mt-1 font-bold">{currentHero.themeTitle}</p>
+              <p className="text-xs text-stone mt-1">{currentHero.personName}</p>
             </div>
           </div>
         </aside>

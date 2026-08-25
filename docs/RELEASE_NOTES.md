@@ -87,3 +87,18 @@ Dokumen ini mencatat seluruh rincian pembaruan, evolusi fitur, dan penguatan sis
 * **Mode Pemeliharaan Sistem (Maintenance Mode Toggle):**
   - Saklar darurat pemeliharaan sistem dengan layar tunggu elegan saat pembaruan besar berlangsung.
 
+---
+
+### 6. Aruna Universal Multi-Event Suite & Beranda Bersih (Clean Capsule Navigation)
+* **Kapsul Kategori Interaktif di Hero Beranda (`/`):**
+  - Saklar kategori minimalis di bagian atas layar: Pernikahan, Ulang Tahun & Sweet 17, Wisuda & Kelulusan, Aqiqah & Bayi, dan Acara Perusahaan.
+  - Transisi teks headline, deskripsi, dan mockup ponsel 3D secara instan dan elegan tanpa membebani tampilan.
+* **Segmentasi Katalog Terisolasi (`/tema?kategori=...`):**
+  - Filter chip kategori untuk memisahkan tema pernikahan, ulang tahun, wisuda, aqiqah, dan korporat sehingga pengguna tidak terganggu oleh kategori yang tidak mereka butuhkan.
+* **Koleksi Tema Bawaan Multi-Event (`themes.js`):**
+  - *Sweet 17 Glamour Party:* Tema pesta ulang tahun mawar emas dan kilau pesta.
+  - *Academic Honors & Wisuda:* Tema kelulusan royal navy dan emas berwibawa.
+  - *Tasyakuran Aqiqah Al-Fatih:* Tema kelahiran bayi bernuansa sage pastel dan kaligrafi doa keberkahan.
+  - *Annual Corporate Gala & Summit:* Undangan korporat modern onyx black dengan kartu akses VIP.
+
+
