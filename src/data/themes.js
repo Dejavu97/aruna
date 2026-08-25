@@ -1,10 +1,10 @@
 const galleryClassic = [
-  'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=80',
+  '/assets/local/couple_laughing_1.jpg',
+  '/assets/local/attari_cover.jpg',
+  '/assets/local/couple_garden.jpg',
+  '/assets/local/couple_classical.jpg',
+  '/assets/local/wedding_rings_2.jpg',
+  '/assets/local/couple_laughing_2.jpg',
 ]
 
 export const themes = [
@@ -67,7 +67,7 @@ export const themes = [
     popular: true,
     collection: 'premium',
     description: 'Kloning dari desain premium Byattari. Minimalis, tipografi besar, dan estetis modern.',
-    cover: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
+    cover: '/assets/local/attari_cover.jpg',
     layout: 'attari',
     opener: 'THE WEDDING OF',
     fonts: {
@@ -278,7 +278,7 @@ export const themes = [
     collection: 'premium',
     eventType: 'birthday',
     description: 'Tema pesta perayaan ulang tahun ke-17 yang ceria, modis, dan mewah dengan aksen mawar emas dan kilau lampu pesta.',
-    cover: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+    cover: '/assets/local/birthday_party_cover.jpg',
     layout: 'attari',
     opener: 'The Sweet 17th Celebration of',
     fonts: {
@@ -304,7 +304,7 @@ export const themes = [
     collection: 'premium',
     eventType: 'graduation',
     description: 'Tema perayaan kelulusan dan wisuda bernuansa royal navy dan emas berwibawa, menghormati perjuangan meraih gelar.',
-    cover: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80',
+    cover: '/assets/local/graduation_campus_cover.jpg',
     layout: 'wedding-gazette',
     opener: 'Graduation Ceremony & Celebration of',
     fonts: {
@@ -330,7 +330,7 @@ export const themes = [
     collection: 'premium',
     eventType: 'aqiqah',
     description: 'Tema tasyakuran kelahiran dan aqiqah buah hati dengan warna sage pastel dan kaligrafi doa keberkahan yang tenang.',
-    cover: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80',
+    cover: '/assets/local/aqiqah_cradle_cover.jpg',
     layout: 'garden',
     opener: 'Tasyakuran Kelahiran & Aqiqah',
     fonts: {
@@ -356,7 +356,7 @@ export const themes = [
     collection: 'premium',
     eventType: 'corporate',
     description: 'Undangan resmi korporat untuk perayaan tahunan, seminar teknologi, dan peluncuran produk dengan kartu akses VIP.',
-    cover: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+    cover: '/assets/local/corporate_stage_cover.jpg',
     layout: 'wedding-gazette',
     opener: 'Official Invitation to Annual Gala Dinner',
     fonts: {
@@ -382,7 +382,7 @@ export const themes = [
     collection: 'premium',
     eventType: 'birthday',
     description: 'Kapsul ucapan ulang tahun interaktif untuk pasangan atau sahabat: surat rahasia, kilas balik foto, voice note, dan kupon kado virtual.',
-    cover: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+    cover: '/assets/local/birthday_party_cover.jpg',
     layout: 'classic',
     greeting: 'Merayakan hari kelahiranmu dengan penuh cinta, terima kasih telah menjadi bagian paling berharga dalam hidupku.',
     opener: 'A Special Birthday Love Letter',
@@ -610,14 +610,14 @@ export const demos = {
       nick: 'Dimas',
       full: 'R. Dimas Suryo Diningrat, S.T., M.Sc.',
       parents: 'Putra dari Bpk. R.H. Suryo Joyodiningrat & Ibu R.Ay. Kusuma Wardhani',
-      photo: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=600&q=80',
+      photo: '/assets/local/groom_suit.jpg',
       ig: '@dimassuryo'
     },
     bride: {
       nick: 'Ayu',
       full: 'R.A. Ayu Sekar Wangi, S.E.',
       parents: 'Putri dari Bpk. R.T. Mangun Kusumo & Ibu R.Ny. Sri Widowati',
-      photo: 'https://images.unsplash.com/photo-1541250848049-b4f7141dca3f?auto=format&fit=crop&w=600&q=80',
+      photo: '/assets/local/bride_bouquet.jpg',
       ig: '@ayusekar'
     },
     date: '2026-12-12',
@@ -652,9 +652,9 @@ export const demos = {
     ],
     gallery: [
       '/themes/adat-jawa.jpg',
-      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
-      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1000&q=80',
-      'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1000&q=80',
+      '/assets/local/couple_laughing_1.jpg',
+      '/assets/local/couple_traditional.jpg',
+      '/assets/local/wedding_rings_2.jpg',
     ],
   }),
   'emas-senja': demo({
@@ -665,14 +665,14 @@ export const demos = {
       full: 'Raka Pradana Wijaya',
       parents: 'Putra dari Bapak Hendra Wijaya & Ibu Sinta Dewi',
       photo:
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/groom_beskap.jpg',
     },
     bride: {
       nick: 'Andini',
       full: 'Andini Maharani Kusuma',
       parents: 'Putri dari Bapak Agus Kusuma & Ibu Ratna Sari',
       photo:
-        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/bride_jasmine.jpg',
     },
     date: '2026-10-17',
     quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan.',
@@ -713,14 +713,14 @@ export const demos = {
       full: 'Damien Hartono',
       parents: 'Putra dari Bapak Lukas Hartono & Ibu Maria Hartono',
       photo:
-        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/couple_temple.jpg',
     },
     bride: {
       nick: 'Clara',
       full: 'Clara Anindita',
       parents: 'Putri dari Bapak Yosef Anindita & Ibu Helena Anindita',
       photo:
-        'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/couple_traditional_wedding.jpg',
     },
     date: '2026-11-21',
     quote: 'I have found the one whom my soul loves.',
@@ -758,14 +758,14 @@ export const demos = {
       full: 'Yusuf Al-Farisi, S.T.',
       parents: 'Putra dari Bapak H. Ahmad Farisi & Ibu Hj. Maryam Farisi',
       photo:
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/groom_suit.jpg',
     },
     bride: {
       nick: 'Aisyah',
       full: 'Aisyah Rahman, S.Ked.',
       parents: 'Putri dari Bapak H. Hasan Rahman & Ibu Hj. Fatimah Rahman',
       photo:
-        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/bride_bouquet.jpg',
     },
     date: '2026-12-05',
     quote: 'Dan segala sesuatu Kami ciptakan berpasang-pasangan supaya kamu mengingat akan kebesaran Allah.',
@@ -806,14 +806,14 @@ export const demos = {
       full: 'Bimo Aryasatya',
       parents: 'Putra dari Bapak Eko Satya & Ibu Wulan Aryani',
       photo:
-        'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/groom_beskap.jpg',
     },
     bride: {
       nick: 'Salsa',
       full: 'Salsabila Putri',
       parents: 'Putri dari Bapak Dedi Putra & Ibu Rina Lestari',
       photo:
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/bride_jasmine.jpg',
     },
     date: '2026-09-12',
     quote: 'Aku ingin mencintaimu dengan sederhana.',
@@ -851,14 +851,14 @@ export const demos = {
       full: 'Kenzo Adiwijaya',
       parents: 'Putra dari Bapak Anton Adiwijaya & Ibu Lina Adiwijaya',
       photo:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/groom_suit.jpg',
     },
     bride: {
       nick: 'Maya',
       full: 'Maya Prameswari',
       parents: 'Putri dari Bapak Budi Prameswari & Ibu Sari Prameswari',
       photo:
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/teenager_birthday.jpg',
     },
     date: '2027-01-16',
     quote: 'Whatever our souls are made of, his and mine are the same.',
@@ -896,14 +896,14 @@ export const demos = {
       full: 'Raden Satria Wibowo',
       parents: 'Putra dari Kanjeng Raden Wibowo & Ibu Rara Wibowo',
       photo:
-        'https://images.unsplash.com/photo-1504257432389-52343af06ae3?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/groom_beskap.jpg',
     },
     bride: {
       nick: 'Dewi',
       full: 'Rara Dewi Laksmi',
       parents: 'Putri dari Bapak Laksmana & Ibu Sri Laksmi',
       photo:
-        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/bride_jasmine.jpg',
     },
     date: '2026-08-30',
     quote: 'Tresna kang tulus iku ora mbutuhake akeh tembung.',
@@ -944,7 +944,7 @@ export const demos = {
       full: 'Bagas Aditya, S.T',
       parents: 'Putra Pertama Dari Bapak Hermawan & Ibu Sri Kusuma',
       photo:
-        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/couple_temple.jpg',
       ig: 'bagasaditya',
     },
     bride: {
@@ -952,7 +952,7 @@ export const demos = {
       full: 'Kirana Larasati, S.Ds',
       parents: 'Putri Ketiga Dari Bapak Wahyudi & Ibu Retno',
       photo:
-        'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80',
+        '/assets/local/couple_traditional_wedding.jpg',
       ig: 'kirana.larasati',
     },
     date: '2026-04-09',
@@ -992,13 +992,13 @@ export const demos = {
       nick: 'Gilang',
       full: 'Gilang Saputra',
       parents: 'Putra dari Bapak Herman & Ibu Wati',
-      photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80',
+      photo: '/assets/local/couple_temple.jpg',
     },
     bride: {
       nick: 'Tara',
       full: 'Tara Anindita',
       parents: 'Putri dari Bapak Budi & Ibu Rini',
-      photo: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80',
+      photo: '/assets/local/couple_traditional_wedding.jpg',
     },
     date: '2026-11-20',
     quote: 'Love is the greatest adventure.',

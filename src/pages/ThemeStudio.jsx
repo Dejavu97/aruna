@@ -563,7 +563,7 @@ export default function ThemeStudio() {
 
   // Full Uploaded Custom Assets
   const [customAssets, setCustomAssets] = useState({
-    coverImgUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
+    coverImgUrl: '/assets/local/couple_laughing_1.jpg',
     coverImgSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     bgTextureUrl: '',
     bgTextureSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
@@ -575,9 +575,9 @@ export default function ThemeStudio() {
     customLottieUrl: '',
     coupleFrameUrl: '',
     coupleFrameSettings: { scale: 1.15, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
-    bridePhotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+    bridePhotoUrl: '/assets/local/teenager_birthday.jpg',
     bridePhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
-    groomPhotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    groomPhotoUrl: '/assets/local/groom_suit.jpg',
     groomPhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     customMusicUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=piano-moment-9835.mp3',
     customMusicTitle: 'A Thousand Years (Piano Instrumental)',
@@ -1074,10 +1074,10 @@ export default function ThemeStudio() {
       },
     ],
     gallery: [
-      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
-      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
-      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=600&q=80',
-      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80',
+      '/assets/local/couple_laughing_1.jpg',
+      '/assets/local/attari_cover.jpg',
+      '/assets/local/couple_garden.jpg',
+      '/assets/local/couple_classical.jpg',
     ],
     wishes: [
       { name: 'dr. Hendra Pratama', msg: 'Selamat Sarah dan Budi! Semoga menjadi keluarga yang sakinah mawaddah warahmah.' },

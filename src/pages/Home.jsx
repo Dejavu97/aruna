@@ -22,7 +22,7 @@ export default function Home() {
       {/* Aesthetic Fixed Background */}
       <div 
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1920&q=80)' }}
+        style={{ backgroundImage: 'url(/assets/local/floral_watercolor_bg.jpg)' }}
       />
       {/* Soft overlay to ensure text readability against the floral background */}
       <div className="fixed inset-0 z-0 bg-ivory/85" />
@@ -75,7 +75,7 @@ function Hero() {
       tagline: 'Undangan pesta ulang tahun interaktif dengan galeri foto, countdown pesta, rundown acara, dan dresscode.',
       themeTitle: 'Sweet 17 Glamour',
       personName: 'Sarah Bella (17th)',
-      cover: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      cover: '/assets/local/birthday_party_cover.jpg',
       categoryParam: 'ulang-tahun',
     },
     graduation: {
@@ -86,7 +86,7 @@ function Hero() {
       tagline: 'Bagikan rasa syukur atas peraihan gelar sarjana dan spesialis bersama keluarga dan sahabat tercinta.',
       themeTitle: 'Academic Honors',
       personName: 'dr. Siti Sarah, Sp.A',
-      cover: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80',
+      cover: '/assets/local/graduation_campus_cover.jpg',
       categoryParam: 'wisuda',
     },
     aqiqah: {
@@ -97,7 +97,7 @@ function Hero() {
       tagline: 'Undangan syukuran kelahiran dan aqiqah lembut dengan arti nama indah, doa keberkahan, dan lokasi acara.',
       themeTitle: 'Aqiqah Al-Fatih',
       personName: 'Aruna Muhammad Al-Fatih',
-      cover: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80',
+      cover: '/assets/local/aqiqah_cradle_cover.jpg',
       categoryParam: 'aqiqah',
     },
     corporate: {
@@ -108,7 +108,7 @@ function Hero() {
       tagline: 'Seminar tahunan, annual gala dinner, dan peluncuran produk dengan kartu tiket akses QR check-in digital.',
       themeTitle: 'Corporate Summit',
       personName: 'Aruna Tech Summit 2026',
-      cover: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+      cover: '/assets/local/corporate_stage_cover.jpg',
       categoryParam: 'perusahaan',
     },
   }
@@ -330,7 +330,7 @@ function VibeAndStudioSection() {
               </div>
               <div className="aspect-[4/3] rounded-xs overflow-hidden border border-ink/10 relative">
                 <img
-                  src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80"
+                  src="/assets/local/couple_laughing_1.jpg"
                   alt="Studio Preview"
                   className="w-full h-full object-cover"
                 />
