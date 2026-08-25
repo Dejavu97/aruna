@@ -42,7 +42,7 @@ export default function Invitation({ data, guest = '', preview = false }) {
     return <ThemeAdatJawa data={data} guest={guest} preview={preview} />
   }
 
-  if (theme.layout === 'art-jawa-biru') {
+  if (theme.layout === 'art-jawa-biru' || theme.id === 'art-jawa-biru' || theme.id === 'jawa-biru' || data?.themeId === 'art-jawa-biru' || data?.themeId === 'jawa-biru') {
     return <ThemeArtJawaBiru theme={theme} data={data} guest={guest} preview={preview} />
   }
 

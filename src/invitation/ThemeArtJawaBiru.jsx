@@ -26,7 +26,7 @@ function countdownParts(targetDate) {
 /* ===================================================
    COVER COMPONENT (Buka Undangan)
    =================================================== */
-function Cover({ data, guest, onOpen }) {
+function Cover({ data = {}, guest = '', onOpen }) {
   return (
     <motion.div 
       className="jb-cover-wrap"
@@ -99,12 +99,12 @@ function Cover({ data, guest, onOpen }) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.7 }}
         >
-          {data.groom?.nick || 'Yogi'} <span className="jb-cover-amp">&amp;</span> {data.bride?.nick || 'Ratna'}
+          {data?.groom?.nick || 'Yogi'} <span className="jb-cover-amp">&amp;</span> {data?.bride?.nick || 'Ratna'}
         </motion.h1>
 
         <img src="/themes/jawa-biru/gold_ribbon.png" alt="Ribbon" className="jb-gold-ribbon" />
 
-        <p className="jb-cover-date">{formatLongDate(data.date)}</p>
+        <p className="jb-cover-date">{formatLongDate(data?.date)}</p>
 
         {/* Guest Name Box */}
         <motion.div 
@@ -179,13 +179,14 @@ function FloatingAudio({ src }) {
 /* ===================================================
    MAIN THEME COMPONENT
    =================================================== */
-export default function ThemeArtJawaBiru({ data, guest = '', preview = false }) {
+export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = false }) {
   const [opened, setOpened] = useState(false)
+  const [copied, setCopied] = useState('')
   const [copiedIndex, setCopiedIndex] = useState(null)
-  const [wishes, setWishes] = useState([
-    { name: 'Bpk. H. Bambang Setyo', status: 'Hadir', text: 'Selamat menempuh hidup baru untuk Mas Yogi & Mbak Ratna. Semoga sakinah mawaddah warahmah, langgeng sampai kaken ninen.' },
-    { name: 'Keluarga Besar Sasana Krida', status: 'Hadir', text: 'Ndherek mangayubagya Mas Yogi & Mbak Ratna. Mugi tansah pinaringan berkah lan karaharjan wonten ing bebrayan agung.' },
-    { name: 'Dian & Prasetyo', status: 'Hadir', text: 'Happy wedding Yogi & Ratna! Bahagia selalu selamanya, dilancarkan seluruh prosesi acaranya.' },
+  const [wishes, setWishes] = useState(() => (Array.isArray(data?.wishes) && data.wishes.length > 0) ? data.wishes : [
+    { name: 'Bpk. H. Bambang Setyo', status: 'Hadir', text: 'Selamat menempuh hidup baru untuk kedua mempelai. Semoga sakinah mawaddah warahmah, langgeng sampai kaken ninen.' },
+    { name: 'Keluarga Besar Sasana Krida', status: 'Hadir', text: 'Ndherek mangayubagya temanten sarimbit. Mugi tansah pinaringan berkah lan karaharjan wonten ing bebrayan agung.' },
+    { name: 'Dian & Prasetyo', status: 'Hadir', text: 'Happy wedding! Bahagia selalu selamanya, dilancarkan seluruh prosesi acaranya.' },
   ])
   const [wishName, setWishName] = useState('')
   const [wishStatus, setWishStatus] = useState('Hadir')
@@ -414,14 +415,15 @@ export default function ThemeArtJawaBiru({ data, guest = '', preview = false }) 
                 </div>
 
                 <div className="jb-events-list">
-                  {data.events.map((ev, idx) => {
-                    const isAkad = idx === 0 || ev.title.toLowerCase().includes('akad')
+                  {(data?.events || []).map((ev, idx) => {
+                    const eventTitle = ev?.title || (idx === 0 ? 'Akad Nikah' : 'Resepsi Pernikahan')
+                    const isAkad = idx === 0 || eventTitle.toLowerCase().includes('akad')
                     const bannerImg = isAkad ? '/themes/jawa-biru/akad_banner.jpg' : '/themes/jawa-biru/resepsi_banner.jpg'
                     const iconImg = isAkad ? '/themes/jawa-biru/icon_akad.png' : '/themes/jawa-biru/icon_reception.png'
 
                     return (
                       <motion.article 
-                        key={ev.title}
+                        key={eventTitle + idx}
                         className="jb-event-card-oval"
                         initial={{ opacity: 0, y: 50, scale: 0.95 }}
                         whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -429,50 +431,52 @@ export default function ThemeArtJawaBiru({ data, guest = '', preview = false }) 
                         transition={{ duration: 0.8, delay: idx * 0.2 }}
                       >
                         {/* Card Header Banner Image */}
-                        <img src={bannerImg} alt={ev.title} className="jb-event-banner-img" />
+                        <img src={bannerImg} alt={eventTitle} className="jb-event-banner-img" />
 
                         {/* Gold Circular Badge */}
                         <img src={iconImg} alt="Badge" className="jb-event-badge-icon" />
 
                         <div className="jb-event-inner">
-                          <h3 className="jb-event-title">{ev.title}</h3>
+                          <h3 className="jb-event-title">{eventTitle}</h3>
 
                           <div className="jb-event-info-row">
                             <Calendar size={18} style={{ color: 'var(--jb-gold-main)' }} />
-                            <span>{formatLongDate(ev.date || data.date)}</span>
+                            <span>{formatLongDate(ev?.date || data?.date)}</span>
                           </div>
 
                           <div className="jb-event-info-row">
                             <Clock size={18} style={{ color: 'var(--jb-gold-main)' }} />
-                            <span>{ev.time}</span>
+                            <span>{ev?.time || '09:00 WIB'}</span>
                           </div>
 
-                          <p className="jb-event-venue">{ev.venue}</p>
-                          <p className="jb-event-addr">{ev.address}</p>
+                          <p className="jb-event-venue">{ev?.venue || 'Lokasi Acara'}</p>
+                          <p className="jb-event-addr">{ev?.address || ''}</p>
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.2rem', alignItems: 'center' }}>
-                            {ev.maps && (
+                            {ev?.maps && (
                               <a href={ev.maps} target="_blank" rel="noreferrer" className="jb-maps-btn" style={{ width: '100%' }}>
                                 <MapPin size={15} /> GOOGLE MAPS
                               </a>
                             )}
                             <div style={{ display: 'flex', gap: '0.4rem', width: '100%', flexWrap: 'wrap' }}>
-                              <a 
-                                href={wazeUrl(ev.address, ev.venue)} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                className="jb-maps-btn"
-                                style={{ flex: '1 1 auto', fontSize: '0.68rem', padding: '0.6rem 0.8rem' }}
-                              >
-                                WAZE
-                              </a>
+                              {ev?.address && (
+                                <a 
+                                  href={wazeUrl(ev.address, ev.venue)} 
+                                  target="_blank" 
+                                  rel="noreferrer" 
+                                  className="jb-maps-btn"
+                                  style={{ flex: '1 1 auto', fontSize: '0.68rem', padding: '0.6rem 0.8rem' }}
+                                >
+                                  WAZE
+                                </a>
+                              )}
                               <a 
                                 href={googleCalendarUrl({
-                                  title: `${ev.title} — ${data.bride?.nick || ''} & ${data.groom?.nick || ''}`,
-                                  date: ev.date || data.date,
-                                  time: ev.time,
-                                  venue: `${ev.venue}, ${ev.address}`,
-                                  details: `Undangan ${ev.title} pernikahan ${data.bride?.nick || ''} & ${data.groom?.nick || ''}. Lokasi: ${ev.venue}`,
+                                  title: `${eventTitle} — ${data?.bride?.nick || ''} & ${data?.groom?.nick || ''}`,
+                                  date: ev?.date || data?.date,
+                                  time: ev?.time || '09:00',
+                                  venue: `${ev?.venue || ''}, ${ev?.address || ''}`,
+                                  details: `Undangan ${eventTitle} pernikahan ${data?.bride?.nick || ''} & ${data?.groom?.nick || ''}. Lokasi: ${ev?.venue || ''}`,
                                 })}
                                 target="_blank" 
                                 rel="noreferrer" 
@@ -481,19 +485,19 @@ export default function ThemeArtJawaBiru({ data, guest = '', preview = false }) 
                               >
                                 <Calendar size={13} /> KALENDER
                               </a>
-                              {ev.address && (
+                              {ev?.address && (
                                 <button
                                   type="button"
                                   onClick={async () => {
-                                    if (await copyText(`${ev.venue}, ${ev.address}`)) {
-                                      setCopied(ev.title)
+                                    if (await copyText(`${ev.venue || ''}, ${ev.address || ''}`)) {
+                                      setCopied(eventTitle)
                                       setTimeout(() => setCopied(''), 1500)
                                     }
                                   }}
                                   className="jb-maps-btn"
                                   style={{ flex: '1 1 auto', fontSize: '0.68rem', padding: '0.6rem 0.8rem' }}
                                 >
-                                  <Copy size={13} /> {copied === ev.title ? 'TERSALIN' : 'SALIN ALAMAT'}
+                                  <Copy size={13} /> {copied === eventTitle ? 'TERSALIN' : 'SALIN ALAMAT'}
                                 </button>
                               )}
                             </div>
