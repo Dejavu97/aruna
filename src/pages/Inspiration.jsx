@@ -22,8 +22,9 @@ import { copyText } from '../lib/utils'
 
 export const inspirationCategories = [
   { id: 'semua', label: 'Semua Kategori', icon: Sparkles },
-  { id: 'pernikahan', label: 'Pernikahan', icon: Heart, param: 'pernikahan' },
-  { id: 'ulang-tahun', label: 'Ulang Tahun & Sweet 17', icon: Calendar, param: 'ulang-tahun' },
+  { id: 'pernikahan', label: 'Undangan Pernikahan', icon: Heart, param: 'pernikahan' },
+  { id: 'ucapan-ultah', label: 'Surat & Ucapan Ultah Romantis', icon: Heart, param: 'ulang-tahun' },
+  { id: 'ulang-tahun', label: 'Pesta Ulang Tahun & Sweet 17', icon: Calendar, param: 'ulang-tahun' },
   { id: 'wisuda', label: 'Wisuda & Kelulusan', icon: Award, param: 'wisuda' },
   { id: 'aqiqah', label: 'Aqiqah & Kelahiran', icon: Baby, param: 'aqiqah' },
   { id: 'perusahaan', label: 'Perusahaan & Gathering', icon: Briefcase, param: 'perusahaan' },
@@ -94,16 +95,69 @@ export const templateArticles = [
     tags: ['Anak', 'Kids', 'Ceria', 'Ulang Tahun'],
     text: `Hore! Sang Buah Hati Kami Bertambah Usia!\n\nKami mengundang teman-teman dan keluarga terkasih untuk ikut merayakan pesta ulang tahun ke-[Usia] anak kami tercinta:\n\n[Nama Lengkap Anak] ([Nama Panggilan])\n\nAkan ada banyak permainan seru, kue lezat, balon warna-warni, dan tawa bersama!\n\nDatang ya teman-teman, kehadiran dan doa restu kalian akan membuat hari ulang tahun ini semakin ceria dan membahagiakan.`
   },
+  // 2. SURAT & UCAPAN ULANG TAHUN ROMANTIS (KARTU DIGITAL & KAPSUL WAKTU)
   {
-    id: 'surat-cinta-ulang-tahun',
-    category: 'ulang-tahun',
-    categoryLabel: 'Surat Romantis Pasangan',
-    title: 'Teks Undangan Perayaan Ulang Tahun Pasangan & Private Dinner',
-    desc: 'Format undangan makan malam romantis dan perayaan intim bersama pasangan terkasih.',
+    id: 'surat-cinta-ultah-pacar',
+    category: 'ucapan-ultah',
+    categoryLabel: 'Surat Cinta Pasangan',
+    title: 'Surat Cinta Ulang Tahun untuk Pacar / Pasangan (Romantis & Estetik - Long Text)',
+    desc: 'Rangkaian kata menyentuh hati dan ungkapan rasa syukur mendalam untuk hari kelahiran orang terkasih.',
     targetThemeCat: 'ulang-tahun',
-    tags: ['Romantis', 'Private Dinner', 'Pasangan', 'Anniversary'],
-    text: `Untuk seseorang yang senantiasa membuat duniaku lebih bercahaya.\n\nDalam rangka merayakan hari lahir dan bertambahnya usiamu yang istimewa, aku mengundangmu ke momen makan malam intim dan perayaan penuh cinta:\n\n"A Special Night for [Nama Pasangan]"\n\nTerima kasih telah hadir dan menjadi bagian terindah dalam hidupku. Mari kita rayakan hari ini dengan syukur dan kebahagiaan bersama.`
+    tags: ['Surat Cinta', 'Romantis', 'Pacar', 'Long Text', 'Aesthetic'],
+    text: `Happy Birthday to the one who makes my heart feel so safe and loved...\n\nSelamat bertambah usia, sayangku. Di hari yang begitu indah ini, aku ingin mengucapkan terima kasih atas setiap tawa, genggaman tangan, dan kehadiranmu yang selalu menenangkan duniaku.\n\nSemoga di usia yang baru ini, setiap impian dan harapan yang kamu bisikkan dalam doa satu per satu terwujud. Semoga kamu selalu dilimpahi kesehatan yang prima, kebahagiaan yang melimpah, dan ketenangan hati yang tak pernah putus. Aku berjanji akan selalu ada di sampingmu, merayakan setiap langkah kecil dan besarmu.\n\nTerima kasih telah lahir ke dunia dan memilih untuk melangkah bersamaku. Happy Birthday, my favorite person in the whole world!`
   },
+  {
+    id: 'ucapan-ultah-islami-suami-istri',
+    category: 'ucapan-ultah',
+    categoryLabel: 'Ucapan Islami Suami / Istri',
+    title: 'Ucapan Ulang Tahun Islami untuk Suami / Istri (Barakallah Fii Umrik Penuh Doa)',
+    desc: 'Doa keberkahan umur, rezeki barakah, dan keharmonisan rumah tangga sakinah mawaddah warahmah.',
+    targetThemeCat: 'ulang-tahun',
+    tags: ['Barakallah', 'Suami', 'Istri', 'Islami', 'Doa'],
+    text: `Bismillahirrohmanirrohim\n\nBarakallah Fii Umrik, pendamping hidupku tercinta [Nama Pasangan].\n\nAlhamdulillah, puji syukur kepada Allah SWT yang telah menganugerahkan umur panjang dan mempertemukan kita dalam ikatan suci yang penuh berkah.\n\nDi hari kelahiranmu ini, doaku selalu menyertai setiap hembusan nafasmu: Semoga Allah senantiasa melindungimu, melimpahkan rezeki yang halal dan barakah, memanjangkan umurmu dalam ketaatan, serta membimbing keluarga kecil kita menuju surga-Nya.\n\nTerima kasih atas segala ketulusan, kesabaran, nafkah, dan cintamu yang tak pernah pudar. Selamat ulang tahun, belahan jiwaku dunia dan akhirat.`
+  },
+  {
+    id: 'surat-kenangan-kapsul-waktu-pasangan',
+    category: 'ucapan-ultah',
+    categoryLabel: 'Kilas Balik Memori',
+    title: 'Surat Kilas Balik Memori & Perjalanan Cinta (Time Capsule Anniversary / Birthday)',
+    desc: 'Format refleksi perjalanan cinta, kenangan masa lalu, dan harapan indah di masa depan.',
+    targetThemeCat: 'ulang-tahun',
+    tags: ['Time Capsule', 'Kilas Balik', 'Kenangan', 'Anniversary'],
+    text: `Melihat kembali hari-hari yang telah kita lalui bersama adalah hal paling membahagiakan dalam hidupku.\n\nDari awal kita saling mengenal, melewati hari-hari sederhana penuh tawa, hingga kini kita berdiri di titik ini bersama-sama. Kamu bukan hanya pasanganku, kamu adalah tempat pulang ternyaman, sahabat terbaik, dan rumah bagi hatiku.\n\nSelamat ulang tahun, cintaku. Semoga lembaran usiamu yang baru ini dipenuhi lebih banyak petualangan seru, cerita manis, dan memori indah yang akan kita ukir berdua.\n\nI love you more than words could ever say.`
+  },
+  {
+    id: 'ucapan-ultah-sahabat-bestie',
+    category: 'ucapan-ultah',
+    categoryLabel: 'Sahabat Sejati / Bestie',
+    title: 'Surat Ucapan Ulang Tahun untuk Sahabat Sejati / Bestie (Hangat & Menyentuh)',
+    desc: 'Ungkapan terima kasih atas persahabatan tulus dan doa terbaik untuk sahabat tercinta.',
+    targetThemeCat: 'ulang-tahun',
+    tags: ['Sahabat', 'Bestie', 'Persahabatan', 'Hangat'],
+    text: `Happy Birthday to my dearest bestie!\n\nSelamat ulang tahun untuk orang yang selalu tahu cara membuatku tertawa bahkan di hari-hari terberatku. Terima kasih sudah selalu ada, mendengarkan segala ceritaku tanpa menghakimi, dan selalu jadi teman seperjuangan terbaik.\n\nDi usia yang baru ini, aku berdoa agar kamu selalu dikelilingi orang-orang baik, diberi kemudahan dalam mengejar setiap impianmu, dan selalu bahagia. Tetaplah menjadi pribadi yang hangat dan luar biasa seperti yang kukenal.\n\nCheers to another year of great memories, crazy adventures, and lifelong friendship!`
+  },
+  {
+    id: 'ucapan-ultah-puitis-singkat',
+    category: 'ucapan-ultah',
+    categoryLabel: 'Puitis & Aesthetic',
+    title: 'Ucapan Ulang Tahun Puitis, Singkat & Aesthetic (Cocok untuk Kartu Digital)',
+    desc: 'Rangkaian kalimat singkat yang indah, estetik, dan berkelas untuk kartu ucapan digital.',
+    targetThemeCat: 'ulang-tahun',
+    tags: ['Puitis', 'Singkat', 'Aesthetic', 'Quote'],
+    text: `Untukmu yang kelahirannya adalah hadiah terindah bagi semesta dan duniaku.\n\nSelamat ulang tahun. Semoga bahagia senantiasa menemukan jalannya menuju hatimu, seperti bagaimana kamu selalu berhasil menghadirkan senyuman di hariku.\n\nSemoga langkahmu selalu diberkahi, harimu senantiasa hangat, dan setiap doamu dijawab dengan cara yang paling indah oleh Tuhan.\n\nHappy Birthday, with all my love.`
+  },
+  {
+    id: 'ucapan-ultah-orang-tua',
+    category: 'ucapan-ultah',
+    categoryLabel: 'Untuk Orang Tua (Ibu/Ayah)',
+    title: 'Surat Ungkapan Terima Kasih & Doa Ulang Tahun untuk Ibu / Ayah',
+    desc: 'Rangkaian kata bakti yang mendalam, haru, dan penuh doa untuk orang tua tercinta.',
+    targetThemeCat: 'ulang-tahun',
+    tags: ['Orang Tua', 'Ibu', 'Ayah', 'Bakti', 'Doa'],
+    text: `Selamat Ulang Tahun untuk Pahlawan Hidupku, [Ibu/Ayah] tercinta.\n\nTiada kata yang cukup untuk membalas setiap tetes keringat, doa tulus di sepertiga malam, dan kasih sayang tanpa batas yang telah [Ibu/Ayah] curahkan untukku sejak hari pertama aku bernafas di dunia.\n\nDi hari yang istimewa ini, anandamu bersujud memohon kepada Tuhan agar senantiasa memberikan kesehatan yang sempurna, umur yang panjang dan penuh berkah, serta ketenangan hati yang melimpah untuk [Ibu/Ayah].\n\nTerima kasih telah menjadi pelindung, teladan, dan cinta pertama dalam hidupku. Selamat ulang tahun, [Ibu/Ayah].`
+  },
+
+  // 3. PESTA ULANG TAHUN & SWEET 17 (UNDANGAN ACARA)
 
   // 3. WISUDA & KELULUSAN
   {
