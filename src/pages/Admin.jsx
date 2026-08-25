@@ -96,9 +96,9 @@ export default function Admin() {
   // Payment Settings State
   const [paymentSettings, setPaymentSettings] = useState({
     banks: [
-      { bank: 'BCA', number: '5420198821', name: 'PT Aruna Digital Nusantara' },
-      { bank: 'Mandiri', number: '1370019283741', name: 'PT Aruna Digital Nusantara' },
-      { bank: 'BSI', number: '7190823412', name: 'PT Aruna Digital Nusantara' },
+      { bank: 'BCA', number: '5420198821', name: 'PT ByAruna Digital Nusantara' },
+      { bank: 'Mandiri', number: '1370019283741', name: 'PT ByAruna Digital Nusantara' },
+      { bank: 'BSI', number: '7190823412', name: 'PT ByAruna Digital Nusantara' },
     ],
     qrisUrl: '',
   })
@@ -900,7 +900,7 @@ export default function Admin() {
         <section className="mx-auto max-w-md w-full px-5 py-20 flex-1">
           <div className="bg-paper border border-ink/15 p-6 sm:p-8 shadow-sm">
             <p className="text-xs uppercase tracking-[0.28em] text-gold-deep font-semibold">Admin Panel</p>
-            <h1 className="mt-2 font-display text-3xl font-bold">Masuk Admin Aruna</h1>
+            <h1 className="mt-2 font-display text-3xl font-bold">Masuk Admin ByAruna</h1>
             <p className="mt-2 text-xs text-stone leading-relaxed">
               Gunakan kata sandi akun admin untuk mengelola pesanan, tema studio, dan voucher.
             </p>
@@ -1562,7 +1562,7 @@ export default function Admin() {
                       </div>
 
                       <h3 className="font-display text-lg font-bold text-ink">{ct.name}</h3>
-                      <p className="text-xs text-stone">Karya: {ct.creator || 'Komunitas Aruna'}</p>
+                      <p className="text-xs text-stone">Karya: {ct.creator || 'Komunitas ByAruna'}</p>
                       <p className="text-[11px] text-stone mt-1 line-clamp-2 leading-relaxed">{ct.description}</p>
                     </div>
 
@@ -2477,7 +2477,7 @@ export default function Admin() {
                 {/* DNS Server Info Guide Box */}
                 <div className="bg-ivory/70 border border-gold-deep/30 p-4 rounded-sm grid sm:grid-cols-2 gap-4 text-xs">
                   <div>
-                    <p className="font-bold text-ink uppercase tracking-wider mb-1">Target DNS Server Aruna:</p>
+                    <p className="font-bold text-ink uppercase tracking-wider mb-1">Target DNS Server ByAruna:</p>
                     <p className="text-stone">Setiap domain pelanggan harus diarahkan ke DNS Vercel:</p>
                     <div className="mt-2 font-mono text-[11px] bg-paper p-2.5 border border-ink/10 rounded-xs space-y-1">
                       <div><span className="text-stone">Type A (@):</span> <strong className="text-ink">76.76.21.21</strong></div>

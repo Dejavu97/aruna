@@ -549,7 +549,7 @@ function Footer({ bride, groom }) {
       <p className="jw-footer-sub">Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i berkenan hadir di hari bahagia kami.</p>
       <h3 className="jw-footer-names">{bride} &amp; {groom}</h3>
       <GoldLine width="2rem" />
-      <p className="jw-brand">Dibuat dengan Aruna</p>
+      <p className="jw-brand">Dibuat dengan ByAruna</p>
     </footer>
   )
 }

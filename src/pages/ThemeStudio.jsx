@@ -976,7 +976,7 @@ export default function ThemeStudio() {
     try {
       const themePayload = {
         name: themeName,
-        creator: creatorName.trim() ? creatorName : 'Komunitas Aruna',
+        creator: creatorName.trim() ? creatorName : 'Komunitas ByAruna',
         description: themeDesc,
         collection: 'community',
         isPublic,

@@ -514,7 +514,7 @@ function Close() {
           Lihat desain
         </Link>
         <a
-          href={waLink('Halo Aruna, saya sudah lihat landing-nya. Mau pesan.')}
+          href={waLink('Halo ByAruna, saya sudah lihat landing-nya. Mau pesan.')}
           className="border border-ink px-6 py-3 text-xs uppercase tracking-[0.18em]"
         >
           Pesan via WhatsApp

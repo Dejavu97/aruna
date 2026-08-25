@@ -59,12 +59,12 @@ export async function fetchSettings() {
     bank: {
       bank: 'BCA',
       number: '5420198821',
-      name: 'PT Aruna Digital Nusantara',
+      name: 'PT ByAruna Digital Nusantara',
     },
     banks: [
-      { bank: 'BCA', number: '5420198821', name: 'PT Aruna Digital Nusantara' },
-      { bank: 'Mandiri', number: '1370019283741', name: 'PT Aruna Digital Nusantara' },
-      { bank: 'BSI', number: '7190823412', name: 'PT Aruna Digital Nusantara' },
+      { bank: 'BCA', number: '5420198821', name: 'PT ByAruna Digital Nusantara' },
+      { bank: 'Mandiri', number: '1370019283741', name: 'PT ByAruna Digital Nusantara' },
+      { bank: 'BSI', number: '7190823412', name: 'PT ByAruna Digital Nusantara' },
     ],
     qrisUrl: '',
   }
@@ -575,10 +575,10 @@ export async function deleteVoucher(code) {
 }
 
 export const defaultWaTemplates = {
-  tagihan: `Halo Kak {nama},\n\nTerima kasih telah memesan undangan digital di Aruna untuk pernikahan {mempelai}.\n\nBerikut rincian pesanan Kakak:\n- Kode Order: {kode_order}\n- Paket: {paket}\n- Total Tagihan: {total}\n\nSilakan lakukan pembayaran ke rekening resmi Aruna dan konfirmasi kembali bukti transfernya ke nomor ini ya Kak. Terima kasih.`,
+  tagihan: `Halo Kak {nama},\n\nTerima kasih telah memesan undangan digital di ByAruna untuk pernikahan {mempelai}.\n\nBerikut rincian pesanan Kakak:\n- Kode Order: {kode_order}\n- Paket: {paket}\n- Total Tagihan: {total}\n\nSilakan lakukan pembayaran ke rekening resmi ByAruna dan konfirmasi kembali bukti transfernya ke nomor ini ya Kak. Terima kasih.`,
   lunas: `Halo Kak {nama},\n\nPembayaran untuk pesanan {kode_order} ({mempelai}) telah kami konfirmasi LUNAS.\n\nUndangan digital Kakak sudah aktif dan dapat dikelola secara penuh melalui dashboard:\n{link_klien}\n\nSelamat mempersiapkan hari bahagia! Jika butuh bantuan kami siap membantu.`,
   undangan: `Halo Kak {nama}, Undangan digital pernikahan {mempelai} sudah siap dibagikan ke seluruh tamu undangan:\n\nLink Undangan: {link_undangan}\n\nKakak juga bisa membuat tautan khusus per nama tamu di menu dashboard:\n{link_klien}`,
-  kwitansi: `Halo Kak {nama}, Berikut tanda terima resmi pembayaran undangan digital Aruna:\n\nNomor Kwitansi: {nomor_kwitansi}\nMempelai: {mempelai}\nPaket: {paket}\nTotal: {total}\nStatus: {status}\n\nTerima kasih telah mempercayakan momen bahagia Anda bersama Aruna.`
+  kwitansi: `Halo Kak {nama}, Berikut tanda terima resmi pembayaran undangan digital ByAruna:\n\nNomor Kwitansi: {nomor_kwitansi}\nMempelai: {mempelai}\nPaket: {paket}\nTotal: {total}\nStatus: {status}\n\nTerima kasih telah mempercayakan momen bahagia Anda bersama ByAruna.`
 }
 
 export async function fetchWaTemplates() {
@@ -613,13 +613,13 @@ export async function saveWaTemplates(templates) {
 }
 
 export const defaultSiteProfile = {
-  name: 'Aruna',
+  name: 'ByAruna',
   tagline: 'Undangan digital yang terasa seperti kertas mahal.',
-  description: 'Aruna membuat undangan pernikahan digital yang siap disebar lewat WhatsApp. Pilih tema, isi data, dapatkan tautan dalam hitungan menit.',
+  description: 'ByAruna membuat undangan pernikahan digital yang siap disebar lewat WhatsApp. Pilih tema, isi data, dapatkan tautan dalam hitungan menit.',
   whatsapp: '0851-5744-0439',
-  instagram: 'aruna.undangan',
-  tiktok: 'aruna.undangan',
-  email: 'halo@aruna.undangan',
+  instagram: 'byaruna.my.id',
+  tiktok: 'byaruna.my.id',
+  email: 'halo@byaruna.my.id',
   copyright: 'Undangan digital untuk hari yang tidak diulang.'
 }
 
@@ -655,10 +655,10 @@ export async function saveSiteProfile(profile) {
 }
 
 export const defaultSeoSettings = {
-  metaTitle: 'Aruna — Undangan Pernikahan Digital Eksklusif & Modern',
+  metaTitle: 'ByAruna — Undangan Pernikahan Digital Eksklusif & Modern',
   metaDescription: 'Buat undangan pernikahan digital elegan, mewah, responsif, dan siap sebar via WhatsApp dalam hitungan menit.',
   ogImageUrl: '/themes/emas-senja.jpg',
-  keywords: 'undangan digital, wedding invitation, undangan pernikahan online, undangan website, aruna'
+  keywords: 'undangan digital, wedding invitation, undangan pernikahan online, undangan website, byaruna, aruna'
 }
 
 export async function fetchSeoSettings() {

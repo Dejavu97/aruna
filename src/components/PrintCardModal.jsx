@@ -95,7 +95,7 @@ export default function PrintCardModal({ item, onClose }) {
       resepsiAddress: resepsi.address || '',
       quote: item.quote || 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu...',
       subtitle: cardType === 'souvenir' ? 'Terima kasih atas kehadiran & doa restu Anda' : cardType === 'table' ? 'Selamat Menikmati Jamuan' : 'Pindai QR Code untuk melihat undangan digital & konfirmasi kehadiran',
-      footerNote: 'Mohon doa restu dan kehadiran Anda · Aruna Digital Invitation',
+      footerNote: 'Mohon doa restu dan kehadiran Anda · ByAruna Digital Invitation',
     })
 
     if (item.gallery?.[0] || item.bride?.photo) {

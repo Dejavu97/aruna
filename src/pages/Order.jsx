@@ -150,7 +150,7 @@ export default function Order() {
                   activeTab === 'official' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
                 }`}
               >
-                Katalog Resmi Aruna ({themes.length})
+                Katalog Resmi ByAruna ({themes.length})
               </button>
             </div>
 

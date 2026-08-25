@@ -88,7 +88,7 @@ export default function Dashboard() {
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <h1 className="font-display text-2xl sm:text-3xl font-bold text-ink">
-                  Halo, {user?.displayName || 'Pelanggan Aruna'}
+                  Halo, {user?.displayName || 'Pelanggan ByAruna'}
                 </h1>
                 <span className="bg-gold/10 text-gold-deep border border-gold-deep/20 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-xs">
                   Akun Terverifikasi

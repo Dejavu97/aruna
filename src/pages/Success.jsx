@@ -40,7 +40,7 @@ export default function Success() {
     }
   }
 
-  const payText = `Halo Aruna, saya sudah pesan undangan.
+  const payText = `Halo ByAruna, saya sudah pesan undangan.
 Kode: ${data?.orderCode || '-'}
 Pasangan: ${data?.bride?.nick || ''} & ${data?.groom?.nick || ''}
 Paket: ${pack.name} ${formatRupiah(pack.price)}

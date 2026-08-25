@@ -1,11 +1,11 @@
 export const site = {
-  name: 'Aruna',
+  name: 'ByAruna',
   tagline: 'Undangan digital yang terasa seperti kertas mahal.',
   description:
-    'Aruna membuat undangan pernikahan digital yang siap disebar lewat WhatsApp. Pilih tema, isi data, dapatkan tautan dalam hitungan menit.',
+    'ByAruna membuat undangan pernikahan digital yang siap disebar lewat WhatsApp. Pilih tema, isi data, dapatkan tautan dalam hitungan menit.',
   whatsapp: '6285157440439',
-  instagram: 'aruna.undangan',
-  email: 'halo@aruna.undangan',
+  instagram: 'byaruna.my.id',
+  email: 'halo@byaruna.my.id',
   city: 'Indonesia',
 }
 

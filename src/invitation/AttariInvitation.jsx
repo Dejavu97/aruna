@@ -475,7 +475,7 @@ function Footer({ bride, groom }) {
       <p className="at-footer-sub">Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i berkenan hadir di hari bahagia kami.</p>
       <h3 className="at-footer-names">{bride} &amp; {groom}</h3>
       <GoldLine width="2rem" />
-      <p className="at-brand">Dibuat dengan Aruna</p>
+      <p className="at-brand">Dibuat dengan ByAruna</p>
     </footer>
   )
 }

@@ -111,7 +111,7 @@ export default function ClientTestimonials() {
               Dipercaya untuk Momen Bersejarah.
             </h2>
             <p className="text-stone text-xs sm:text-sm">
-              Pengalaman nyata dari pasangan pengantin, wisudawan, dan pemesan yang telah merayakan momen bahagia bersama Aruna.
+              Pengalaman nyata dari pasangan pengantin, wisudawan, dan pemesan yang telah merayakan momen bahagia bersama ByAruna.
             </p>
           </div>
 

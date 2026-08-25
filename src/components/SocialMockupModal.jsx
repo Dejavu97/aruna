@@ -228,7 +228,7 @@ export default function SocialMockupModal({ item, onClose }) {
       ctx.textAlign = 'center'
       ctx.fillStyle = goldColor
       ctx.font = 'bold 28px "Playfair Display", Georgia, serif'
-      ctx.fillText('ARUNA DIGITAL INVITATION', width / 2, footerY - 30)
+      ctx.fillText('BYARUNA DIGITAL INVITATION', width / 2, footerY - 30)
 
       ctx.fillStyle = stoneColor
       ctx.font = '500 22px sans-serif'

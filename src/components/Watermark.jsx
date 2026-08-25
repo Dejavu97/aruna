@@ -21,7 +21,7 @@ export default function Watermark({ data, theme, className = '' }) {
 
   return (
     <span className={className}>
-      Dibuat dengan Aruna · Tema {theme?.name || 'Elegan'}
+      Dibuat dengan ByAruna · Tema {theme?.name || 'Elegan'}
     </span>
   )
 }
