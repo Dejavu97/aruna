@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Sparkles, DollarSign, Users, CheckCircle, Clock, Search, Filter,
+  Sparkles, DollarSign, Users, CheckCircle, CheckCircle2, Clock, Search, Filter,
   Download, MessageCircle, Copy, Check, Trash2, Edit, ExternalLink,
   Eye, Tag, Megaphone, Plus, AlertCircle, RefreshCw, Smartphone, Layers,
   CreditCard, QrCode, Upload, TrendingUp, Settings, ShieldCheck,
-  Printer, Receipt, FileText, CopyPlus, Send, Share2, ListChecks
+  Printer, Receipt, FileText, CopyPlus, Send, Share2, ListChecks,
+  BarChart2, PieChart, MessageSquareQuote, Lock, Globe, Database, Key,
+  FileDown, FileUp, ShieldAlert
 } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import PrintCardModal from '../components/PrintCardModal'
+import SocialMockupModal from '../components/SocialMockupModal'
 import { getTheme, themes } from '../data/themes'
 import { auth } from '../lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -18,6 +21,7 @@ import {
   fetchAdminInvitations,
   getAdminKey,
   loginAdmin,
+  changeAdminPassword,
   rememberEditKey,
   setAdminKey,
   setInvitationStatus,
@@ -32,9 +36,27 @@ import {
   savePaymentSettings,
   fetchDynamicPackages,
   saveDynamicPackages,
+  fetchAdSettings,
+  saveAdSettings,
   uploadFile,
-  cloneInvitation
+  cloneInvitation,
+  createInvitation,
+  fetchWaTemplates,
+  saveWaTemplates,
+  defaultWaTemplates,
+  defaultSiteProfile,
+  fetchSiteProfile,
+  saveSiteProfile,
+  defaultSeoSettings,
+  fetchSeoSettings,
+  saveSeoSettings,
+  defaultMaintenanceSettings,
+  fetchMaintenanceSettings,
+  saveMaintenanceSettings,
+  createFullBackupData,
+  restoreFullBackupData
 } from '../lib/api'
+import { getDummyWeddingData } from '../data/dummyData'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
 import { formatRupiah, packages as defaultPackages } from '../data/site'
 import { invitePath } from '../lib/nav'
@@ -84,18 +106,79 @@ export default function Admin() {
   const [adminPackages, setAdminPackages] = useState(defaultPackages)
   const [savingPackages, setSavingPackages] = useState(false)
 
+  // Ad Settings State (Default OFF / Inactive)
+  const [adSettings, setAdSettings] = useState({
+    enabled: false,
+    provider: 'custom',
+    adsenseClient: '',
+    adsenseSlotFooter: '',
+    adsenseSlotRsvp: '',
+    adsenseSlotSticky: '',
+    adsenseSlotHome: '',
+    adsenseSlotSuccess: '',
+    customBanner: {
+      imageUrl: '',
+      targetUrl: 'https://aruna.id',
+      title: 'Aruna Undangan — Undangan Pernikahan Digital Gratis & Mewah',
+      subtitle: 'Mau punya undangan pernikahan mewah seperti ini tanpa biaya? Buat sekarang dalam 5 menit!',
+      badgeText: 'Sponsor & Rekomendasi'
+    },
+    showStickyBottom: true,
+    showFooterAd: true,
+    showRsvpAd: true,
+    showHomeAd: true,
+    showSuccessAd: true
+  })
+  const [savingAds, setSavingAds] = useState(false)
+  const [uploadingBanner, setUploadingBanner] = useState(false)
+
+  // WhatsApp Templates Customizer State
+  const [waTemplates, setWaTemplates] = useState(defaultWaTemplates)
+  const [savingWaTemplates, setSavingWaTemplates] = useState(false)
+  const [activeWaTab, setActiveWaTab] = useState('tagihan') // 'tagihan' | 'lunas' | 'undangan' | 'kwitansi'
+
+  // Platform & Security Settings State
+  const [platformSubTab, setPlatformSubTab] = useState('profil_kontak') // 'profil_kontak' | 'seo_og' | 'maintenance' | 'keamanan' | 'backup_restore'
+  const [siteProfile, setSiteProfile] = useState(defaultSiteProfile)
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [seoSettings, setSeoSettings] = useState(defaultSeoSettings)
+  const [savingSeo, setSavingSeo] = useState(false)
+  const [maintenanceSettings, setMaintenanceSettings] = useState(defaultMaintenanceSettings)
+  const [savingMaintenance, setSavingMaintenance] = useState(false)
+  const [newAdminPassword, setNewAdminPassword] = useState('')
+  const [confirmAdminPassword, setConfirmAdminPassword] = useState('')
+  const [savingPassword, setSavingPassword] = useState(false)
+  const [passwordMsg, setPasswordMsg] = useState('')
+  const [exportingBackup, setExportingBackup] = useState(false)
+  const [importingBackup, setImportingBackup] = useState(false)
+  const [backupRestoreSummary, setBackupRestoreSummary] = useState(null)
+
   // Modals State
   const [waModalItem, setWaModalItem] = useState(null)
   const [invoiceModalItem, setInvoiceModalItem] = useState(null)
   const [cloneModalItem, setCloneModalItem] = useState(null)
   const [printCardModalItem, setPrintCardModalItem] = useState(null)
+  const [socialMockupItem, setSocialMockupItem] = useState(null)
+  const [whiteLabelModalItem, setWhiteLabelModalItem] = useState(null)
+  const [wlMode, setWlMode] = useState('default')
+  const [wlText, setWlText] = useState('')
+  const [wlUrl, setWlUrl] = useState('')
+  const [savingWl, setSavingWl] = useState(false)
   const [newCloneSlug, setNewCloneSlug] = useState('')
   const [cloning, setCloning] = useState(false)
+  const [deletingDemos, setDeletingDemos] = useState(false)
   
+  // Instant Demo Generator Modal State
+  const [demoModalOpen, setDemoModalOpen] = useState(false)
+  const [demoThemeId, setDemoThemeId] = useState('adat-jawa')
+  const [demoSlug, setDemoSlug] = useState('')
+  const [demoGenerating, setDemoGenerating] = useState(false)
+  const [demoSuccessSlug, setDemoSuccessSlug] = useState('')
+
   // WA Blast Dispatcher State
   const [blastModalItem, setBlastModalItem] = useState(null)
   const [blastTemplate, setBlastTemplate] = useState(
-    `Kepada Yth.\nBapak/Ibu/Saudara/i {nama}\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir dan memberikan doa restu pada acara pernikahan kami:\n\n💍 {mempelai}\n📅 {tanggal}\n\nBerikut tautan undangan digital Anda:\n👉 {link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan untuk hadir. Terima kasih! 🙏✨`
+    `Kepada Yth.\nBapak/Ibu/Saudara/i {nama}\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk hadir dan memberikan doa restu pada acara pernikahan kami:\n\nPernikahan: {mempelai}\nTanggal: {tanggal}\n\nBerikut tautan undangan digital Anda:\n{link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan untuk hadir. Terima kasih.`
   )
   const [blastInputText, setBlastInputText] = useState('')
   const [blastQueue, setBlastQueue] = useState([])
@@ -122,7 +205,12 @@ export default function Admin() {
         fetchedThemes,
         fetchedVouchers,
         fetchedPayment,
-        fetchedPkgs
+        fetchedPkgs,
+        fetchedAds,
+        fetchedWaTemplates,
+        fetchedProfile,
+        fetchedSeo,
+        fetchedMaintenance
       ] = await Promise.all([
         fetchAdminInvitations().catch(() => []),
         getAnnouncement().catch(() => ''),
@@ -130,6 +218,11 @@ export default function Admin() {
         fetchVouchers().catch(() => []),
         fetchSettings().catch(() => null),
         fetchDynamicPackages().catch(() => null),
+        fetchAdSettings().catch(() => null),
+        fetchWaTemplates().catch(() => defaultWaTemplates),
+        fetchSiteProfile().catch(() => defaultSiteProfile),
+        fetchSeoSettings().catch(() => defaultSeoSettings),
+        fetchMaintenanceSettings().catch(() => defaultMaintenanceSettings),
       ])
 
       // Merge local custom themes
@@ -159,6 +252,21 @@ export default function Admin() {
       }
       if (fetchedPkgs && Array.isArray(fetchedPkgs)) {
         setAdminPackages(fetchedPkgs)
+      }
+      if (fetchedAds) {
+        setAdSettings(fetchedAds)
+      }
+      if (fetchedWaTemplates) {
+        setWaTemplates(fetchedWaTemplates)
+      }
+      if (fetchedProfile) {
+        setSiteProfile(fetchedProfile)
+      }
+      if (fetchedSeo) {
+        setSeoSettings(fetchedSeo)
+      }
+      if (fetchedMaintenance) {
+        setMaintenanceSettings(fetchedMaintenance)
       }
 
       setError('')
@@ -229,6 +337,43 @@ export default function Admin() {
       })
     })
 
+    // Theme rankings & package breakdown
+    const themeCounts = {}
+    const packageCounts = { gratis: 0, hemat: 0, lengkap: 0, premium: 0 }
+    const demoItems = []
+
+    items.forEach((it) => {
+      // Theme count
+      const tId = it.themeId || 'adat-jawa'
+      themeCounts[tId] = (themeCounts[tId] || 0) + 1
+
+      // Package count
+      const pId = it.packageId || 'lengkap'
+      if (packageCounts[pId] !== undefined) {
+        packageCounts[pId]++
+      } else {
+        packageCounts.lengkap++
+      }
+
+      // Demo detection
+      const slug = (it.slug || '').toLowerCase()
+      if (slug.startsWith('demo-') || slug.startsWith('test-') || slug.includes('sarah-budi')) {
+        demoItems.push(it)
+      }
+    })
+
+    const themeRankings = Object.entries(themeCounts)
+      .map(([id, count]) => {
+        const tObj = themes.find((t) => t.id === id) || customThemesList.find((t) => t.id === id)
+        return {
+          id,
+          name: tObj?.name || id,
+          count,
+          percent: items.length ? Math.round((count / items.length) * 100) : 0,
+        }
+      })
+      .sort((a, b) => b.count - a.count)
+
     return {
       totalRevenue,
       totalOrders: items.length,
@@ -239,6 +384,9 @@ export default function Admin() {
       totalAttending,
       totalViews,
       customThemesCount: customThemesList.length,
+      themeRankings,
+      packageCounts,
+      demoItems,
     }
   }, [items, customThemesList, adminPackages])
 
@@ -512,23 +660,212 @@ export default function Admin() {
     }
   }
 
+  // Format Dynamic WhatsApp Message with Variables
+  function formatWaMessage(type, item, customVars = {}) {
+    const rawTemplate = waTemplates[type] || defaultWaTemplates[type] || ''
+    const pack = adminPackages.find((p) => p.id === item?.packageId) || defaultPackages.find((p) => p.id === item?.packageId)
+    const clientUrl = `${window.location.origin}/kelola/${item?.slug}?key=${item?.editKey || ''}`
+    const invUrl = invitationUrl(item?.slug || '')
+    const price = pack ? pack.price : 0
+    const priceText = pack ? formatRupiah(pack.price) : ''
+    const mempelai = `${item?.bride?.nick || ''} & ${item?.groom?.nick || ''}`
+
+    return rawTemplate
+      .replaceAll('{nama}', item?.customerName || 'Calon Pengantin')
+      .replaceAll('{mempelai}', mempelai)
+      .replaceAll('{kode_order}', item?.orderCode || 'NO-CODE')
+      .replaceAll('{paket}', pack?.name || item?.packageId || '')
+      .replaceAll('{total}', priceText)
+      .replaceAll('{link_klien}', clientUrl)
+      .replaceAll('{link_undangan}', invUrl)
+      .replaceAll('{nomor_kwitansi}', customVars.invNumber || '')
+      .replaceAll('{status}', customVars.status || (item?.status === 'paid' ? 'LUNAS' : 'MENUNGGU PEMBAYARAN'))
+  }
+
+  // Save WhatsApp Templates
+  async function handleSaveWaTemplates() {
+    setSavingWaTemplates(true)
+    try {
+      await saveWaTemplates(waTemplates)
+      alert('Template WhatsApp berhasil disimpan!')
+    } catch (err) {
+      alert('Gagal menyimpan template WhatsApp: ' + err.message)
+    } finally {
+      setSavingWaTemplates(false)
+    }
+  }
+
+  // Bulk Clean Demo / Test Invitations
+  async function handleCleanupDemoData() {
+    const demoItems = analytics.demoItems || []
+    if (demoItems.length === 0) {
+      alert('Tidak ada data undangan demo/uji coba untuk dibersihkan.')
+      return
+    }
+    if (!confirm(`Hapus ${demoItems.length} undangan demo/uji coba sekaligus dari database? Tindakan ini tidak dapat dibatalkan.`)) {
+      return
+    }
+    setDeletingDemos(true)
+    try {
+      await Promise.all(demoItems.map((it) => deleteInvitation(it.slug).catch(() => {})))
+      alert(`Berhasil membersihkan ${demoItems.length} undangan demo!`)
+      load()
+    } catch (err) {
+      alert('Gagal membersihkan data demo: ' + err.message)
+    } finally {
+      setDeletingDemos(false)
+    }
+  }
+
+  // Save Site Profile & Socials
+  async function handleSaveProfile() {
+    setSavingProfile(true)
+    try {
+      await saveSiteProfile(siteProfile)
+      alert('Informasi kontak & media sosial berhasil diperbarui!')
+    } catch (err) {
+      alert('Gagal menyimpan profil: ' + err.message)
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
+  // Save SEO & OpenGraph Settings
+  async function handleSaveSeo() {
+    setSavingSeo(true)
+    try {
+      await saveSeoSettings(seoSettings)
+      alert('Pengaturan SEO & OpenGraph berhasil disimpan!')
+    } catch (err) {
+      alert('Gagal menyimpan SEO: ' + err.message)
+    } finally {
+      setSavingSeo(false)
+    }
+  }
+
+  // Save Maintenance Mode Settings
+  async function handleSaveMaintenance() {
+    setSavingMaintenance(true)
+    try {
+      await saveMaintenanceSettings(maintenanceSettings)
+      alert(
+        maintenanceSettings.enabled
+          ? 'Mode Pemeliharaan DIAKTIFKAN. Halaman publik sekarang menampilkan layar pemeliharaan, sementara dashboard pelanggan & undangan tamu tetap aktif normal.'
+          : 'Mode Pemeliharaan DINONAKTIFKAN. Seluruh website publik kini kembali normal.'
+      )
+    } catch (err) {
+      alert('Gagal menyimpan pengaturan pemeliharaan: ' + err.message)
+    } finally {
+      setSavingMaintenance(false)
+    }
+  }
+
+  // Open White-Label Modal for Super Admin
+  function openWhiteLabelModal(inv) {
+    setWhiteLabelModalItem(inv)
+    setWlMode(inv.watermarkMode || 'default')
+    setWlText(inv.customWatermarkText || '')
+    setWlUrl(inv.customWatermarkUrl || '')
+  }
+
+  // Save White-Label from Super Admin
+  async function handleSaveWhiteLabelAdmin() {
+    if (!whiteLabelModalItem) return
+    setSavingWl(true)
+    try {
+      await updateInvitation(whiteLabelModalItem.slug, {
+        watermarkMode: wlMode,
+        customWatermarkText: wlText,
+        customWatermarkUrl: wlUrl,
+      })
+      setItems((prev) =>
+        prev.map((i) =>
+          i.slug === whiteLabelModalItem.slug
+            ? { ...i, watermarkMode: wlMode, customWatermarkText: wlText, customWatermarkUrl: wlUrl }
+            : i
+        )
+      )
+      alert('Pengaturan White-Label berhasil disimpan!')
+      setWhiteLabelModalItem(null)
+    } catch (err) {
+      alert('Gagal menyimpan White-Label: ' + err.message)
+    } finally {
+      setSavingWl(false)
+    }
+  }
+
+  // Change Admin Password
+  async function handleChangePassword(e) {
+    e.preventDefault()
+    if (newAdminPassword !== confirmAdminPassword) {
+      alert('Konfirmasi kata sandi baru tidak cocok.')
+      return
+    }
+    setSavingPassword(true)
+    setPasswordMsg('')
+    try {
+      await changeAdminPassword(newAdminPassword)
+      setPasswordMsg('Kata sandi admin berhasil diubah! Gunakan kata sandi baru untuk login berikutnya.')
+      setNewAdminPassword('')
+      setConfirmAdminPassword('')
+    } catch (err) {
+      alert('Gagal mengubah kata sandi: ' + err.message)
+    } finally {
+      setSavingPassword(false)
+    }
+  }
+
+  // Download Full Database Backup JSON
+  async function handleDownloadBackup() {
+    setExportingBackup(true)
+    try {
+      const backupData = await createFullBackupData()
+      const jsonStr = JSON.stringify(backupData, null, 2)
+      const blob = new Blob([jsonStr], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      const dateStr = new Date().toISOString().slice(0, 10)
+      a.download = `aruna-database-backup-${dateStr}.json`
+      a.href = url
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      alert('Gagal mengunduh cadangan database: ' + err.message)
+    } finally {
+      setExportingBackup(false)
+    }
+  }
+
+  // Restore Database from JSON File
+  async function handleRestoreBackupFile(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!confirm('PERINGATAN: Memulihkan cadangan akan menimpa/memperbarui data pesanan dan pengaturan yang ada. Lanjutkan pemulihan database?')) {
+      e.target.value = ''
+      return
+    }
+    setImportingBackup(true)
+    setBackupRestoreSummary(null)
+    try {
+      const text = await file.text()
+      const parsed = JSON.parse(text)
+      const res = await restoreFullBackupData(parsed)
+      setBackupRestoreSummary(res.results)
+      alert(`Pemulihan database selesai!\n- ${res.results.invitationsCount} Undangan dipulihkan\n- ${res.results.themesCount} Tema Kustom dipulihkan\n- ${res.results.vouchersCount} Voucher dipulihkan`)
+      load()
+    } catch (err) {
+      alert('Gagal memulihkan cadangan database: ' + err.message)
+    } finally {
+      setImportingBackup(false)
+      e.target.value = ''
+    }
+  }
+
   // Generate WhatsApp Message Templates
   function openWhatsApp(item, type) {
     const phone = (item.customerWhatsapp || '').replace(/[^0-9]/g, '')
     const cleanPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone
-    const clientUrl = `${window.location.origin}/kelola/${item.slug}?key=${item.editKey || ''}`
-    const invUrl = invitationUrl(item.slug)
-    const pack = adminPackages.find((p) => p.id === item.packageId) || defaultPackages.find((p) => p.id === item.packageId)
-    const priceText = pack ? formatRupiah(pack.price) : ''
-
-    let message = ''
-    if (type === 'tagihan') {
-      message = `Halo Kak ${item.customerName || 'Calon Pengantin'},\n\nTerima kasih telah memesan undangan digital di *Aruna* untuk pernikahan *${item.bride?.nick} & ${item.groom?.nick}*.\n\nBerikut rincian pesanan Kakak:\n- Kode Order: *${item.orderCode}*\n- Paket: *${pack?.name || item.packageId}*\n- Total Tagihan: *${priceText}*\n\nSilakan lakukan pembayaran ke rekening resmi Aruna dan konfirmasi kembali bukti transfernya ke nomor ini ya Kak. Terima kasih! 🙏✨`
-    } else if (type === 'lunas') {
-      message = `Halo Kak ${item.customerName || 'Calon Pengantin'}! 🎉\n\nPembayaran untuk pesanan *${item.orderCode}* (*${item.bride?.nick} & ${item.groom?.nick}*) telah kami konfirmasi *LUNAS*.\n\nUndangan digital Kakak sudah aktif dan dapat dikelola secara penuh melalui dashboard:\n👉 ${clientUrl}\n\nSelamat mempersiapkan hari bahagia! Jika butuh bantuan kami siap membantu. 😊`
-    } else if (type === 'undangan') {
-      message = `Halo Kak ${item.customerName}! Undangan digital pernikahan *${item.bride?.nick} & ${item.groom?.nick}* sudah siap dibagikan ke seluruh tamu undangan:\n\n🔗 Link Undangan: ${invUrl}\n\nKakak juga bisa membuat tautan khusus per nama tamu di menu dashboard:\n👉 ${clientUrl}`
-    }
+    const message = formatWaMessage(type, item)
 
     const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`
     window.open(waLink, '_blank')
@@ -678,7 +1015,76 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* 2. MAIN NAVIGATION TABS */}
+        {/* 2. VISUAL CHARTS: POPULAR THEMES & PACKAGE BREAKDOWN */}
+        <div className="grid md:grid-cols-2 gap-4">
+          {/* Top Themes Leaderboard */}
+          <div className="bg-paper border border-ink/15 p-4 sm:p-5 rounded-sm shadow-xs space-y-3.5">
+            <div className="flex items-center justify-between border-b border-ink/10 pb-2.5">
+              <div className="flex items-center gap-2">
+                <BarChart2 size={16} className="text-gold-deep" />
+                <h3 className="font-display text-xs font-bold uppercase tracking-wider text-ink">Tema Paling Populer &amp; Diminati</h3>
+              </div>
+              <span className="text-[10px] text-stone uppercase tracking-wider font-semibold">Total Order</span>
+            </div>
+
+            {(!analytics.themeRankings || analytics.themeRankings.length === 0) ? (
+              <p className="text-xs text-stone italic py-2">Belum ada data pesanan tema.</p>
+            ) : (
+              <div className="space-y-2.5">
+                {analytics.themeRankings.slice(0, 4).map((tr, idx) => (
+                  <div key={tr.id} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5 font-medium text-ink">
+                        <span className="text-[10px] font-mono text-stone w-4">#{idx + 1}</span>
+                        <span>{tr.name}</span>
+                      </span>
+                      <span className="font-mono text-stone text-[11px] font-semibold">
+                        {tr.count} pesanan ({tr.percent}%)
+                      </span>
+                    </div>
+                    <div className="w-full bg-ivory h-2 rounded-full overflow-hidden border border-ink/10">
+                      <div
+                        className="bg-gold-deep h-full rounded-full transition-all duration-500"
+                        style={{ width: `${Math.max(6, tr.percent)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Package Revenue Share */}
+          <div className="bg-paper border border-ink/15 p-4 sm:p-5 rounded-sm shadow-xs space-y-3.5">
+            <div className="flex items-center justify-between border-b border-ink/10 pb-2.5">
+              <div className="flex items-center gap-2">
+                <PieChart size={16} className="text-gold-deep" />
+                <h3 className="font-display text-xs font-bold uppercase tracking-wider text-ink">Distribusi Pilihan Paket</h3>
+              </div>
+              <span className="text-[10px] text-stone uppercase tracking-wider font-semibold">Kategori</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 pt-0.5">
+              {[
+                { id: 'gratis', label: 'Paket Gratis', count: analytics.packageCounts?.gratis || 0, color: 'border-amber-300 bg-amber-50/70', text: 'text-amber-900' },
+                { id: 'hemat', label: 'Paket Hemat', count: analytics.packageCounts?.hemat || 0, color: 'border-blue-300 bg-blue-50/70', text: 'text-blue-900' },
+                { id: 'lengkap', label: 'Paket Lengkap', count: analytics.packageCounts?.lengkap || 0, color: 'border-gold-deep/40 bg-gold/10', text: 'text-ink font-bold' },
+                { id: 'premium', label: 'Paket Premium', count: analytics.packageCounts?.premium || 0, color: 'border-purple-300 bg-purple-50/70', text: 'text-purple-900' },
+              ].map((p) => {
+                const pct = items.length ? Math.round((p.count / items.length) * 100) : 0
+                return (
+                  <div key={p.id} className={`p-2.5 border rounded-xs ${p.color} space-y-0.5`}>
+                    <p className="text-[10px] uppercase tracking-wider text-stone font-semibold">{p.label}</p>
+                    <p className={`text-lg font-display font-bold ${p.text}`}>{p.count}</p>
+                    <p className="text-[10px] text-stone">{pct}% dari total pesanan</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* 3. MAIN NAVIGATION TABS */}
         <div className="flex border-b border-ink/15 gap-4 overflow-x-auto text-xs uppercase tracking-widest font-semibold">
           {[
             ['orders', `Daftar Pesanan (${items.length})`],
@@ -687,6 +1093,9 @@ export default function Admin() {
             ['payment', 'Rekening & QRIS'],
             ['pricing', 'Paket & Harga'],
             ['announcement', 'Spanduk Pengumuman'],
+            ['ads', 'Iklan & Monetisasi'],
+            ['wa_templates', 'Template WhatsApp'],
+            ['platform_settings', 'Pengaturan & Keamanan'],
           ].map(([tKey, tLabel]) => (
             <button
               key={tKey}
@@ -718,19 +1127,48 @@ export default function Admin() {
                 />
               </div>
 
-              {/* Package Filter */}
-              <div className="flex items-center gap-2">
-                <Filter size={14} className="text-stone" />
-                <select
-                  value={filterPackage}
-                  onChange={(e) => setFilterPackage(e.target.value)}
-                  className="border border-ink/15 bg-transparent py-2 px-3 text-xs focus:border-ink focus:outline-none"
+              {/* Package Filter & Generate Demo */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <Filter size={14} className="text-stone" />
+                  <select
+                    value={filterPackage}
+                    onChange={(e) => setFilterPackage(e.target.value)}
+                    className="border border-ink/15 bg-transparent py-2 px-3 text-xs focus:border-ink focus:outline-none"
+                  >
+                    <option value="all">Semua Paket</option>
+                    <option value="gratis">Paket Gratis</option>
+                    <option value="hemat">Paket Hemat</option>
+                    <option value="lengkap">Paket Lengkap</option>
+                    <option value="premium">Paket Premium</option>
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const defaultTheme = themes[0]?.id || 'adat-jawa'
+                    setDemoThemeId(defaultTheme)
+                    setDemoSlug(`demo-${defaultTheme}-${Math.floor(100 + Math.random() * 900)}`)
+                    setDemoSuccessSlug('')
+                    setDemoModalOpen(true)
+                  }}
+                  className="bg-gold-deep text-ivory px-3.5 py-2 text-xs font-semibold uppercase tracking-wider rounded-xs hover:bg-gold transition-colors inline-flex items-center gap-1.5 shadow-xs"
                 >
-                  <option value="all">Semua Paket</option>
-                  <option value="hemat">Paket Hemat</option>
-                  <option value="lengkap">Paket Lengkap</option>
-                  <option value="premium">Paket Premium</option>
-                </select>
+                  <Sparkles size={13} /> Generate Undangan Demo
+                </button>
+
+                {analytics.demoItems?.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleCleanupDemoData}
+                    disabled={deletingDemos}
+                    className="border border-red-300 bg-red-50 text-red-800 px-3 py-2 text-xs font-semibold uppercase tracking-wider rounded-xs hover:bg-red-100 transition-colors inline-flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+                    title="Hapus massal seluruh data undangan demo / uji coba"
+                  >
+                    <Trash2 size={13} /> {deletingDemos ? 'Menghapus...' : `Bersihkan Demo (${analytics.demoItems.length})`}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -790,7 +1228,7 @@ export default function Admin() {
                                   : 'bg-amber-100 text-amber-900 border border-amber-300'
                               }`}
                             >
-                              {item.status === 'paid' ? '✓ Lunas' : '⏳ Menunggu Bayar'}
+                              {item.status === 'paid' ? 'Lunas' : 'Menunggu Bayar'}
                             </span>
                             <span className="text-xs font-mono font-semibold text-stone">
                               {item.orderCode || 'NO-CODE'} · {theme.name}
@@ -901,13 +1339,13 @@ export default function Admin() {
                                 }
                               }}
                             >
-                              {copied === item.slug ? '✓ Tersalin!' : 'Copy Link Klien'}
+                              {copied === item.slug ? 'Tersalin' : 'Copy Link Klien'}
                             </button>
                           )}
 
                           <button
                             type="button"
-                            className={`border px-3 py-1.5 ${
+                            className={`border px-3 py-1.5 font-semibold ${
                               item.status === 'paid' ? 'border-amber-400 text-amber-900 bg-amber-50' : 'border-green-600 text-green-800 bg-green-50'
                             }`}
                             onClick={async () => {
@@ -915,7 +1353,7 @@ export default function Admin() {
                               load()
                             }}
                           >
-                            {item.status === 'paid' ? 'Tandai Belum' : '✓ Tandai Lunas'}
+                            {item.status === 'paid' ? 'Tandai Belum' : 'Tandai Lunas'}
                           </button>
 
                           <button
@@ -951,6 +1389,30 @@ export default function Admin() {
                             title="Cetak kartu souvenir, mini invitation, atau nomor meja siap potong"
                           >
                             <QrCode size={12} /> Kartu Cetak
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setSocialMockupItem(item)}
+                            className="border border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100 px-3 py-1.5 inline-flex items-center gap-1 font-semibold shadow-xs"
+                            title="Buka generator mockup promosi Instagram Story & Feed HD"
+                          >
+                            <Sparkles size={12} /> Mockup Promo
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => openWhiteLabelModal(item)}
+                            className={`border px-3 py-1.5 inline-flex items-center gap-1 font-semibold shadow-xs transition-colors ${
+                              item.watermarkMode === 'custom'
+                                ? 'border-amber-400 bg-amber-50 text-amber-950 hover:bg-amber-100'
+                                : item.watermarkMode === 'hidden'
+                                ? 'border-blue-400 bg-blue-50 text-blue-950 hover:bg-blue-100'
+                                : 'border-ink/20 bg-paper text-stone hover:text-ink hover:border-gold-deep'
+                            }`}
+                            title="Kelola branding footer & watermark mandiri (White-Label)"
+                          >
+                            <Tag size={12} /> {item.watermarkMode === 'custom' ? 'White-Label (Aktif)' : item.watermarkMode === 'hidden' ? 'Tanpa Watermark' : 'White-Label'}
                           </button>
 
                           <button
@@ -1522,6 +1984,1075 @@ export default function Admin() {
             </div>
           </div>
         )}
+
+        {/* TAB 7: PENGATURAN IKLAN & MONETISASI */}
+        {mainTab === 'ads' && (
+          <div className="space-y-6 max-w-4xl">
+            {/* Master Switch Banner */}
+            <div className={`p-6 rounded-sm border transition-all ${
+              adSettings.enabled
+                ? 'bg-green-50/70 border-green-300'
+                : 'bg-paper border-ink/15'
+            }`}>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Megaphone size={18} className="text-gold-deep" />
+                    <h2 className="font-display text-xl font-bold text-ink">Status Iklan Global Platform</h2>
+                  </div>
+                  <p className="text-xs text-stone mt-1 max-w-xl leading-relaxed">
+                    {adSettings.enabled
+                      ? 'Iklan aktif pada paket gratis dan halaman non-katalog. Tamu paket berbayar tetap 100% bebas iklan.'
+                      : 'Iklan nonaktif. Seluruh undangan gratis dan web platform saat ini 100% bersih tanpa iklan.'}
+                  </p>
+                </div>
+
+                <label className="flex items-center gap-3 cursor-pointer bg-white px-4 py-2.5 border border-ink/20 rounded shadow-xs hover:border-gold-deep">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(adSettings.enabled)}
+                    onChange={(e) => setAdSettings({ ...adSettings, enabled: e.target.checked })}
+                    className="w-5 h-5 accent-gold-deep cursor-pointer"
+                  />
+                  <span className="text-xs uppercase tracking-wider font-bold text-ink">
+                    {adSettings.enabled ? 'Iklan Aktif (ON)' : 'Iklan Nonaktif (OFF)'}
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {/* Provider Selector */}
+            <div className="bg-paper border border-ink/15 p-6 rounded-sm space-y-6">
+              <div>
+                <h3 className="font-display text-lg font-bold text-ink">1. Pilih Sumber / Provider Iklan</h3>
+                <p className="text-xs text-stone mt-0.5">Pilih model iklan yang ingin ditayangkan saat iklan diaktifkan.</p>
+                
+                <div className="grid sm:grid-cols-2 gap-3 mt-4">
+                  <label className={`p-4 border rounded cursor-pointer transition-all ${
+                    adSettings.provider === 'custom'
+                      ? 'border-gold-deep bg-gold-deep/5 ring-1 ring-gold-deep'
+                      : 'border-ink/15 bg-white hover:border-ink/30'
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="adProvider"
+                        value="custom"
+                        checked={adSettings.provider === 'custom'}
+                        onChange={() => setAdSettings({ ...adSettings, provider: 'custom' })}
+                        className="mt-1 accent-gold-deep"
+                      />
+                      <div>
+                        <strong className="text-xs uppercase tracking-wider block text-ink">Custom Sponsor Banner (Rekomendasi)</strong>
+                        <p className="text-[11px] text-stone mt-1 leading-relaxed">
+                          Tampilkan banner sponsor vendor pernikahan (MUA, Foto, Souvenir, dll) yang serasi dengan tema undangan &amp; tidak mengganggu.
+                        </p>
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className={`p-4 border rounded cursor-pointer transition-all ${
+                    adSettings.provider === 'adsense'
+                      ? 'border-gold-deep bg-gold-deep/5 ring-1 ring-gold-deep'
+                      : 'border-ink/15 bg-white hover:border-ink/30'
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="adProvider"
+                        value="adsense"
+                        checked={adSettings.provider === 'adsense'}
+                        onChange={() => setAdSettings({ ...adSettings, provider: 'adsense' })}
+                        className="mt-1 accent-gold-deep"
+                      />
+                      <div>
+                        <strong className="text-xs uppercase tracking-wider block text-ink">Google AdSense</strong>
+                        <p className="text-[11px] text-stone mt-1 leading-relaxed">
+                          Tampilkan iklan programatik otomatis dari Google. Membutuhkan akun Google AdSense yang sudah disetujui.
+                        </p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Form Custom Sponsor Banner */}
+              {adSettings.provider === 'custom' && (
+                <div className="border-t border-ink/10 pt-5 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={16} className="text-gold-deep" />
+                    <h4 className="font-display text-base font-bold">Konfigurasi Banner Sponsor Kustom</h4>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                        Label Badge Sponsor
+                      </label>
+                      <input
+                        type="text"
+                        value={adSettings.customBanner?.badgeText || ''}
+                        onChange={(e) => setAdSettings({
+                          ...adSettings,
+                          customBanner: { ...adSettings.customBanner, badgeText: e.target.value }
+                        })}
+                        placeholder="Contoh: Sponsor & Rekomendasi / Partner Resmi"
+                        className="w-full border border-ink/20 p-2.5 text-xs focus:border-ink focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                        Judul Sponsor / Nama Vendor
+                      </label>
+                      <input
+                        type="text"
+                        value={adSettings.customBanner?.title || ''}
+                        onChange={(e) => setAdSettings({
+                          ...adSettings,
+                          customBanner: { ...adSettings.customBanner, title: e.target.value }
+                        })}
+                        placeholder="Contoh: Dejavu Wedding Photography / Aruna Undangan"
+                        className="w-full border border-ink/20 p-2.5 text-xs focus:border-ink focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                      Deskripsi Singkat / Penawaran Promo
+                    </label>
+                    <input
+                      type="text"
+                      value={adSettings.customBanner?.subtitle || ''}
+                      onChange={(e) => setAdSettings({
+                        ...adSettings,
+                        customBanner: { ...adSettings.customBanner, subtitle: e.target.value }
+                      })}
+                      placeholder="Contoh: Diskon 20% Dokumentasi Foto & Video Pernikahan Eksklusif"
+                      className="w-full border border-ink/20 p-2.5 text-xs focus:border-ink focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                        Tautan Tujuan Klik (URL Link)
+                      </label>
+                      <input
+                        type="url"
+                        value={adSettings.customBanner?.targetUrl || ''}
+                        onChange={(e) => setAdSettings({
+                          ...adSettings,
+                          customBanner: { ...adSettings.customBanner, targetUrl: e.target.value }
+                        })}
+                        placeholder="https://..."
+                        className="w-full border border-ink/20 p-2.5 text-xs font-mono focus:border-ink focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                        Gambar / Banner Sponsor (Opsional)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={adSettings.customBanner?.imageUrl || ''}
+                          onChange={(e) => setAdSettings({
+                            ...adSettings,
+                            customBanner: { ...adSettings.customBanner, imageUrl: e.target.value }
+                          })}
+                          placeholder="https://... atau upload file"
+                          className="flex-1 border border-ink/20 p-2.5 text-xs focus:border-ink focus:outline-none"
+                        />
+                        <label className="bg-paper border border-ink/20 px-3 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer hover:bg-ink hover:text-ivory transition-colors shrink-0 inline-flex items-center gap-1">
+                          <Upload size={13} /> {uploadingBanner ? '...' : 'Upload'}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0]
+                              if (!file) return
+                              setUploadingBanner(true)
+                              try {
+                                const url = await uploadFile(file, `ads/banner_${Date.now()}`)
+                                setAdSettings((prev) => ({
+                                  ...prev,
+                                  customBanner: { ...prev.customBanner, imageUrl: url }
+                                }))
+                              } catch (err) {
+                                alert('Gagal upload: ' + err.message)
+                              } finally {
+                                setUploadingBanner(false)
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Live Preview Box */}
+                  <div className="mt-4 p-4 border border-gold-deep/30 bg-ivory/60 rounded">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-gold-deep mb-2 flex items-center gap-1">
+                      <Eye size={12} /> Pratinjau Tampilan Banner Sponsor:
+                    </p>
+                    <div className="border border-gold-deep/20 bg-paper p-3.5 rounded-lg flex flex-col sm:flex-row items-center gap-3">
+                      {adSettings.customBanner?.imageUrl ? (
+                        <img
+                          src={adSettings.customBanner.imageUrl}
+                          alt=""
+                          className="h-16 w-16 sm:w-20 rounded object-cover border border-ink/10"
+                        />
+                      ) : (
+                        <div className="h-14 w-14 rounded bg-gold-deep/10 text-gold-deep flex items-center justify-center border border-gold-deep/20">
+                          <Sparkles size={20} />
+                        </div>
+                      )}
+                      <div className="flex-1 text-center sm:text-left">
+                        <div className="flex items-center justify-center sm:justify-start gap-1.5">
+                          <span className="text-[9px] uppercase tracking-wider bg-gold-deep/10 text-gold-deep px-1.5 py-0.5 rounded font-bold">
+                            {adSettings.customBanner?.badgeText || 'Sponsor'}
+                          </span>
+                          <p className="font-display text-sm font-semibold text-ink">
+                            {adSettings.customBanner?.title || 'Judul Sponsor'}
+                          </p>
+                        </div>
+                        <p className="text-xs text-stone mt-0.5">
+                          {adSettings.customBanner?.subtitle || 'Deskripsi promo vendor'}
+                        </p>
+                      </div>
+                      <span className="px-3 py-1 bg-ink text-ivory text-[10px] uppercase tracking-wider rounded font-semibold">
+                        Kunjungi →
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Form Google AdSense */}
+              {adSettings.provider === 'adsense' && (
+                <div className="border-t border-ink/10 pt-5 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <CreditCard size={16} className="text-gold-deep" />
+                    <h4 className="font-display text-base font-bold">Konfigurasi Google AdSense</h4>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                      AdSense Client ID (Publisher ID)
+                    </label>
+                    <input
+                      type="text"
+                      value={adSettings.adsenseClient || ''}
+                      onChange={(e) => setAdSettings({ ...adSettings, adsenseClient: e.target.value })}
+                      placeholder="ca-pub-xxxxxxxxxxxxxxxx"
+                      className="w-full border border-ink/20 p-2.5 text-xs font-mono focus:border-ink focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                        Slot ID Footer
+                      </label>
+                      <input
+                        type="text"
+                        value={adSettings.adsenseSlotFooter || ''}
+                        onChange={(e) => setAdSettings({ ...adSettings, adsenseSlotFooter: e.target.value })}
+                        placeholder="1234567890"
+                        className="w-full border border-ink/20 p-2.5 text-xs font-mono focus:border-ink focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                        Slot ID RSVP / Doa
+                      </label>
+                      <input
+                        type="text"
+                        value={adSettings.adsenseSlotRsvp || ''}
+                        onChange={(e) => setAdSettings({ ...adSettings, adsenseSlotRsvp: e.target.value })}
+                        placeholder="1234567890"
+                        className="w-full border border-ink/20 p-2.5 text-xs font-mono focus:border-ink focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Slot Placements Toggles */}
+              <div className="border-t border-ink/10 pt-5 space-y-3">
+                <h4 className="font-display text-base font-bold text-ink">2. Titik Penempatan Slot Iklan</h4>
+                <p className="text-xs text-stone">Tentukan di bagian mana saja slot iklan diperbolehkan muncul:</p>
+
+                <div className="grid sm:grid-cols-2 gap-3 pt-2">
+                  <label className="flex items-center gap-2 text-xs text-ink cursor-pointer bg-white p-3 border border-ink/10 rounded">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(adSettings.showStickyBottom)}
+                      onChange={(e) => setAdSettings({ ...adSettings, showStickyBottom: e.target.checked })}
+                      className="w-4 h-4 accent-gold-deep"
+                    />
+                    <span>Sticky Floating Bottom (Bawah HP + Tombol Tutup [✕])</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-ink cursor-pointer bg-white p-3 border border-ink/10 rounded">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(adSettings.showRsvpAd)}
+                      onChange={(e) => setAdSettings({ ...adSettings, showRsvpAd: e.target.checked })}
+                      className="w-4 h-4 accent-gold-deep"
+                    />
+                    <span>Di Bawah Form RSVP &amp; Kolom Doa</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-ink cursor-pointer bg-white p-3 border border-ink/10 rounded">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(adSettings.showFooterAd)}
+                      onChange={(e) => setAdSettings({ ...adSettings, showFooterAd: e.target.checked })}
+                      className="w-4 h-4 accent-gold-deep"
+                    />
+                    <span>Footer Undangan (Di Atas Watermark)</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs text-ink cursor-pointer bg-white p-3 border border-ink/10 rounded">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(adSettings.showHomeAd)}
+                      onChange={(e) => setAdSettings({ ...adSettings, showHomeAd: e.target.checked })}
+                      className="w-4 h-4 accent-gold-deep"
+                    />
+                    <span>Beranda Utama Platform (Home)</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-4 border-t border-ink/10 flex items-center justify-between">
+                <p className="text-[11px] text-stone">
+                  Perubahan akan tersimpan langsung ke database dan tersinkron ke semua perangkat.
+                </p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setSavingAds(true)
+                    try {
+                      await saveAdSettings(adSettings)
+                      alert('Pengaturan iklan berhasil disimpan!')
+                    } catch (err) {
+                      alert('Gagal menyimpan: ' + err.message)
+                    } finally {
+                      setSavingAds(false)
+                    }
+                  }}
+                  disabled={savingAds}
+                  className="bg-ink text-ivory px-6 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                >
+                  {savingAds ? 'Menyimpan...' : 'Simpan Pengaturan Iklan'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 8: PENGATURAN TEMPLATE WHATSAPP */}
+        {mainTab === 'wa_templates' && (
+          <div className="space-y-6 max-w-4xl">
+            <div className="bg-paper border border-ink/15 p-6 rounded-sm shadow-xs space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <MessageSquareQuote size={18} className="text-gold-deep" />
+                    <h2 className="font-display text-xl font-bold text-ink">Pusat Edit Template Pesan WhatsApp</h2>
+                  </div>
+                  <p className="text-xs text-stone mt-1 max-w-xl leading-relaxed">
+                    Kustomisasi pesan WhatsApp otomatis untuk pengingat tagihan, konfirmasi lunas, dan kirim link undangan ke calon pengantin.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSaveWaTemplates}
+                  disabled={savingWaTemplates}
+                  className="bg-ink text-ivory px-5 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-sm"
+                >
+                  <Check size={14} /> {savingWaTemplates ? 'Menyimpan...' : 'Simpan Template'}
+                </button>
+              </div>
+
+              {/* Subtabs Template Selection */}
+              <div className="flex border-b border-ink/10 gap-2 overflow-x-auto text-xs uppercase tracking-wider font-semibold">
+                {[
+                  ['tagihan', 'Pemberitahuan Tagihan'],
+                  ['lunas', 'Konfirmasi Lunas'],
+                  ['undangan', 'Kirim Link Undangan'],
+                  ['kwitansi', 'Bukti Kwitansi / Tanda Terima'],
+                ].map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setActiveWaTab(key)}
+                    className={`pb-2.5 px-3 border-b-2 transition-colors ${
+                      activeWaTab === key
+                        ? 'border-gold-deep text-gold-deep font-bold'
+                        : 'border-transparent text-stone hover:text-ink'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Variable Tags Help */}
+              <div className="bg-ivory/60 border border-ink/10 p-3 rounded-xs space-y-2">
+                <p className="text-[11px] font-bold text-ink uppercase tracking-wider">
+                  Klik variabel di bawah untuk menambahkan langsung ke dalam pesan:
+                </p>
+                <div className="flex flex-wrap gap-1.5 text-[11px] font-mono">
+                  {[
+                    '{nama}',
+                    '{mempelai}',
+                    '{kode_order}',
+                    '{paket}',
+                    '{total}',
+                    '{link_klien}',
+                    '{link_undangan}',
+                    '{nomor_kwitansi}',
+                    '{status}',
+                  ].map((v) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => {
+                        setWaTemplates((prev) => ({
+                          ...prev,
+                          [activeWaTab]: (prev[activeWaTab] || '') + ' ' + v,
+                        }))
+                      }}
+                      className="bg-paper border border-ink/20 px-2 py-0.5 rounded text-gold-deep hover:border-gold-deep hover:bg-gold/10 transition-colors"
+                      title="Klik untuk menambahkan variabel ini ke template"
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Textarea Editor */}
+              <div className="space-y-2">
+                <label className="block text-xs uppercase tracking-wider font-semibold text-stone">
+                  Isi Template Pesan WhatsApp:
+                </label>
+                <textarea
+                  rows={8}
+                  value={waTemplates[activeWaTab] || ''}
+                  onChange={(e) =>
+                    setWaTemplates({ ...waTemplates, [activeWaTab]: e.target.value })
+                  }
+                  className="w-full border border-ink/20 p-3 text-xs font-mono bg-white focus:border-ink focus:outline-none leading-relaxed"
+                />
+              </div>
+
+              {/* Live Preview Box */}
+              <div className="space-y-2 pt-2 border-t border-ink/10">
+                <p className="text-[11px] uppercase tracking-wider font-bold text-stone flex items-center gap-1">
+                  <Eye size={12} /> Pratinjau Tampilan Pesan Contoh:
+                </p>
+                <div className="bg-[#EFEAE2] border border-[#D1D7DB] p-4 rounded-md shadow-xs max-w-xl text-xs text-[#111B21] font-sans leading-relaxed whitespace-pre-wrap">
+                  {formatWaMessage(activeWaTab, {
+                    customerName: 'Sarah Azzahra',
+                    bride: { nick: 'Sarah' },
+                    groom: { nick: 'Budi' },
+                    orderCode: 'AR8821',
+                    packageId: 'lengkap',
+                    slug: 'sarah-budi',
+                    editKey: 'secret-key-123',
+                    status: 'paid',
+                  }, { invNumber: 'INV-2026-08-001', status: 'LUNAS' })}
+                </div>
+              </div>
+
+              {/* Reset to Default Button */}
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm('Kembalikan template ini ke standar default?')) {
+                      setWaTemplates((prev) => ({
+                        ...prev,
+                        [activeWaTab]: defaultWaTemplates[activeWaTab],
+                      }))
+                    }
+                  }}
+                  className="text-[11px] text-stone hover:text-red-700 underline"
+                >
+                  Kembalikan ke Teks Standar Default
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 9: PENGATURAN PLATFORM, SEO, KEAMANAN & BACKUP */}
+        {mainTab === 'platform_settings' && (
+          <div className="space-y-6 max-w-4xl">
+            <div className="bg-paper border border-ink/15 p-6 rounded-sm shadow-xs space-y-6">
+              {/* Header */}
+              <div className="border-b border-ink/10 pb-4">
+                <div className="flex items-center gap-2">
+                  <Settings size={20} className="text-gold-deep" />
+                  <h2 className="font-display text-xl font-bold text-ink">Pengaturan Platform &amp; Keamanan</h2>
+                </div>
+                <p className="text-xs text-stone mt-1">
+                  Kelola informasi kontak bisnis, tautan media sosial, pengaturan SEO Google, kata sandi akun, serta cadangan database.
+                </p>
+              </div>
+
+              {/* Sub-Navigation Tabs */}
+              <div className="flex border-b border-ink/10 gap-2 overflow-x-auto text-xs uppercase tracking-wider font-semibold">
+                {[
+                  ['profil_kontak', 'Profil & Kontak'],
+                  ['seo_og', 'SEO & Pratinjau Share'],
+                  ['maintenance', 'Mode Pemeliharaan'],
+                  ['keamanan', 'Kata Sandi Admin'],
+                  ['backup_restore', 'Cadangan & Pemulihan'],
+                ].map(([subKey, subLabel]) => (
+                  <button
+                    key={subKey}
+                    type="button"
+                    onClick={() => setPlatformSubTab(subKey)}
+                    className={`pb-2.5 px-3 border-b-2 transition-colors ${
+                      platformSubTab === subKey
+                        ? 'border-gold-deep text-gold-deep font-bold'
+                        : 'border-transparent text-stone hover:text-ink'
+                    }`}
+                  >
+                    {subLabel}
+                  </button>
+                ))}
+              </div>
+
+              {/* SUBTAB 1: PROFIL BISNIS & KONTAK */}
+              {platformSubTab === 'profil_kontak' && (
+                <div className="space-y-5 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between border-b border-ink/5 pb-2">
+                    <h3 className="font-display text-sm font-bold text-ink uppercase tracking-wider">
+                      Identitas Platform &amp; Kontak Resmi
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={handleSaveProfile}
+                      disabled={savingProfile}
+                      className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Check size={13} /> {savingProfile ? 'Menyimpan...' : 'Simpan Profil'}
+                    </button>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Nama Platform / Brand:
+                      </label>
+                      <input
+                        type="text"
+                        value={siteProfile.name || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, name: e.target.value })}
+                        placeholder="Aruna"
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Tagline Singkat:
+                      </label>
+                      <input
+                        type="text"
+                        value={siteProfile.tagline || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, tagline: e.target.value })}
+                        placeholder="Undangan digital yang terasa seperti kertas mahal."
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Deskripsi Platform:
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={siteProfile.description || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, description: e.target.value })}
+                        className="w-full border border-ink/20 p-2.5 bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Nomor WhatsApp Customer Service:
+                      </label>
+                      <input
+                        type="text"
+                        value={siteProfile.whatsapp || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, whatsapp: e.target.value })}
+                        placeholder="0851-5744-0439"
+                        className="w-full border border-ink/20 p-2.5 font-mono bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Email Bantuan / CS:
+                      </label>
+                      <input
+                        type="email"
+                        value={siteProfile.email || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, email: e.target.value })}
+                        placeholder="halo@aruna.undangan"
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Akun Instagram Resmi:
+                      </label>
+                      <input
+                        type="text"
+                        value={siteProfile.instagram || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, instagram: e.target.value })}
+                        placeholder="aruna.undangan"
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Akun TikTok Resmi:
+                      </label>
+                      <input
+                        type="text"
+                        value={siteProfile.tiktok || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, tiktok: e.target.value })}
+                        placeholder="aruna.undangan"
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Pesan Awal WhatsApp CS (Saat Pengunjung Klik Chat):
+                      </label>
+                      <input
+                        type="text"
+                        value={siteProfile.whatsappText || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, whatsappText: e.target.value })}
+                        placeholder="Halo tim Aruna, saya ingin bertanya seputar pembuatan undangan pernikahan..."
+                        className="w-full border border-ink/20 p-2.5 bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Teks Copyright Footer:
+                      </label>
+                      <input
+                        type="text"
+                        value={siteProfile.copyright || ''}
+                        onChange={(e) => setSiteProfile({ ...siteProfile, copyright: e.target.value })}
+                        placeholder="Undangan digital untuk hari yang tidak diulang."
+                        className="w-full border border-ink/20 p-2.5 bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SUBTAB 2: SEO & SHARE PREVIEW */}
+              {platformSubTab === 'seo_og' && (
+                <div className="space-y-5 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between border-b border-ink/5 pb-2">
+                    <h3 className="font-display text-sm font-bold text-ink uppercase tracking-wider">
+                      Optimasi Mesin Pencari (SEO) &amp; OpenGraph
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={handleSaveSeo}
+                      disabled={savingSeo}
+                      className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Check size={13} /> {savingSeo ? 'Menyimpan...' : 'Simpan SEO'}
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 text-xs">
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Judul Halaman Web (Meta Title):
+                      </label>
+                      <input
+                        type="text"
+                        value={seoSettings.metaTitle || ''}
+                        onChange={(e) => setSeoSettings({ ...seoSettings, metaTitle: e.target.value })}
+                        placeholder="Aruna — Undangan Pernikahan Digital Eksklusif & Modern"
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Deskripsi Meta (Tampil di Pencarian Google &amp; WhatsApp):
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={seoSettings.metaDescription || ''}
+                        onChange={(e) => setSeoSettings({ ...seoSettings, metaDescription: e.target.value })}
+                        placeholder="Buat undangan pernikahan digital elegan, mewah, responsif, dan siap sebar via WhatsApp dalam hitungan menit."
+                        className="w-full border border-ink/20 p-2.5 bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Kata Kunci Pencarian (Keywords):
+                      </label>
+                      <input
+                        type="text"
+                        value={seoSettings.keywords || ''}
+                        onChange={(e) => setSeoSettings({ ...seoSettings, keywords: e.target.value })}
+                        placeholder="undangan digital, wedding invitation, undangan pernikahan online, aruna"
+                        className="w-full border border-ink/20 p-2.5 bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        URL Gambar Banner Pratinjau WhatsApp (OG Image):
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={seoSettings.ogImageUrl || ''}
+                          onChange={(e) => setSeoSettings({ ...seoSettings, ogImageUrl: e.target.value })}
+                          placeholder="https://.../og-banner.jpg"
+                          className="flex-1 border border-ink/20 p-2.5 font-mono bg-white focus:outline-none focus:border-ink"
+                        />
+                        <label className="border border-ink/20 bg-paper hover:bg-gold/10 hover:border-gold-deep px-3.5 py-2.5 font-semibold text-xs cursor-pointer inline-flex items-center gap-1.5 shadow-xs">
+                          <Upload size={13} /> Upload Gambar
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const f = e.target.files?.[0]
+                              if (!f) return
+                              try {
+                                const res = await uploadFile(f)
+                                setSeoSettings((prev) => ({ ...prev, ogImageUrl: res.url }))
+                              } catch (err) {
+                                alert('Upload banner gagal: ' + err.message)
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Social Share Preview Card */}
+                    <div className="pt-3 border-t border-ink/10 space-y-2">
+                      <p className="text-[11px] uppercase tracking-wider font-bold text-stone flex items-center gap-1">
+                        <Eye size={12} /> Pratinjau Tampilan Tautan Saat Dibagikan di WhatsApp:
+                      </p>
+                      <div className="max-w-md bg-[#EFEAE2] p-3 rounded-md border border-[#D1D7DB] shadow-xs space-y-2">
+                        <div className="bg-white rounded overflow-hidden border border-ink/10">
+                          {seoSettings.ogImageUrl && (
+                            <img
+                              src={seoSettings.ogImageUrl}
+                              alt="OG Preview"
+                              className="w-full h-36 object-cover"
+                            />
+                          )}
+                          <div className="p-2.5 space-y-0.5">
+                            <p className="font-bold text-xs text-ink line-clamp-1">
+                              {seoSettings.metaTitle || 'Aruna — Undangan Pernikahan Digital'}
+                            </p>
+                            <p className="text-[11px] text-stone line-clamp-2 leading-relaxed">
+                              {seoSettings.metaDescription || 'Buat undangan pernikahan digital elegan siap sebar via WhatsApp.'}
+                            </p>
+                            <p className="text-[10px] text-stone/80 font-mono pt-1">aruna.id</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SUBTAB: MODE PEMELIHARAAN (MAINTENANCE MODE) */}
+              {platformSubTab === 'maintenance' && (
+                <div className="space-y-6 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between border-b border-ink/5 pb-2">
+                    <div>
+                      <h3 className="font-display text-sm font-bold text-ink uppercase tracking-wider flex items-center gap-1.5">
+                        <ShieldAlert size={16} className="text-gold-deep" /> Saklar Mode Pemeliharaan Platform
+                      </h3>
+                      <p className="text-xs text-stone mt-0.5">
+                        Kunci sementara akses ke halaman publik (Beranda &amp; Form Checkout), sementara seluruh undangan pernikahan tamu dan dashboard kelola klien tetap aktif normal 100%.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleSaveMaintenance}
+                      disabled={savingMaintenance}
+                      className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Check size={13} /> {savingMaintenance ? 'Menyimpan...' : 'Simpan Status'}
+                    </button>
+                  </div>
+
+                  {/* Main Toggle Switch Card */}
+                  <div className={`p-4 sm:p-5 border rounded-xs transition-colors space-y-3 ${
+                    maintenanceSettings.enabled
+                      ? 'border-amber-400 bg-amber-50/70 text-amber-950'
+                      : 'border-ink/15 bg-ivory/50 text-ink'
+                  }`}>
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className={`w-3 h-3 rounded-full ${maintenanceSettings.enabled ? 'bg-amber-500 animate-pulse' : 'bg-green-600'}`} />
+                          <p className="font-display text-base font-bold">
+                            Status: {maintenanceSettings.enabled ? 'MODE PEMELIHARAAN SEDANG AKTIF' : 'WEBSITE AKTIF NORMAL'}
+                          </p>
+                        </div>
+                        <p className="text-xs text-stone mt-1">
+                          {maintenanceSettings.enabled
+                            ? 'Pengunjung umum yang membuka aruna.id atau halaman checkout akan dialihkan ke layar pemeliharaan.'
+                            : 'Seluruh pengunjung publik dapat menjelajah katalog tema dan membuat pesanan baru.'}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setMaintenanceSettings((prev) => ({ ...prev, enabled: !prev.enabled }))
+                        }
+                        className={`px-5 py-2.5 text-xs uppercase tracking-wider font-bold rounded-xs transition-colors shadow-xs ${
+                          maintenanceSettings.enabled
+                            ? 'bg-amber-600 text-white hover:bg-amber-700'
+                            : 'bg-green-700 text-white hover:bg-green-800'
+                        }`}
+                      >
+                        {maintenanceSettings.enabled ? 'Matikan Pemeliharaan (Go Live)' : 'Aktifkan Mode Pemeliharaan'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Customization Fields */}
+                  <div className="space-y-4 text-xs">
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Judul Pesan Pemeliharaan:
+                      </label>
+                      <input
+                        type="text"
+                        value={maintenanceSettings.title || ''}
+                        onChange={(e) =>
+                          setMaintenanceSettings({ ...maintenanceSettings, title: e.target.value })
+                        }
+                        placeholder="Platform Sedang Dalam Pembaruan Berkala"
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Deskripsi Penjelasan untuk Pengunjung:
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={maintenanceSettings.message || ''}
+                        onChange={(e) =>
+                          setMaintenanceSettings({ ...maintenanceSettings, message: e.target.value })
+                        }
+                        placeholder="Kami sedang melakukan peningkatan sistem dan penambahan fitur baru untuk kenyamanan Anda."
+                        className="w-full border border-ink/20 p-2.5 bg-white focus:outline-none focus:border-ink leading-relaxed"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Keterangan Estimasi Selesai:
+                      </label>
+                      <input
+                        type="text"
+                        value={maintenanceSettings.estimatedTime || ''}
+                        onChange={(e) =>
+                          setMaintenanceSettings({ ...maintenanceSettings, estimatedTime: e.target.value })
+                        }
+                        placeholder="Estimasi selesai: 30 menit (Pukul 15:00 WIB)"
+                        className="w-full border border-ink/20 p-2.5 bg-white focus:outline-none focus:border-ink font-mono"
+                      />
+                    </div>
+
+                    <label className="flex items-center gap-2 cursor-pointer bg-white p-3 border border-ink/10 rounded-xs">
+                      <input
+                        type="checkbox"
+                        checked={maintenanceSettings.showContactButton !== false}
+                        onChange={(e) =>
+                          setMaintenanceSettings({
+                            ...maintenanceSettings,
+                            showContactButton: e.target.checked,
+                          })
+                        }
+                        className="w-4 h-4 accent-gold-deep"
+                      />
+                      <span className="font-medium text-ink">
+                        Tampilkan tombol bantuan WhatsApp Customer Service di layar pemeliharaan
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* SUBTAB 3: GANTI KATA SANDI ADMIN */}
+              {platformSubTab === 'keamanan' && (
+                <div className="space-y-5 animate-in fade-in duration-150 max-w-lg">
+                  <div className="border-b border-ink/5 pb-2">
+                    <h3 className="font-display text-sm font-bold text-ink uppercase tracking-wider flex items-center gap-1.5">
+                      <Lock size={15} className="text-gold-deep" /> Ubah Kata Sandi Super Admin
+                    </h3>
+                    <p className="text-xs text-stone mt-0.5">
+                      Ganti kata sandi bawaan dengan kata sandi kustom yang lebih aman.
+                    </p>
+                  </div>
+
+                  {passwordMsg && (
+                    <div className="bg-green-50 border border-green-300 text-green-900 p-3 text-xs rounded-xs">
+                      {passwordMsg}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleChangePassword} className="space-y-4 text-xs">
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Kata Sandi Baru:
+                      </label>
+                      <input
+                        type="password"
+                        value={newAdminPassword}
+                        onChange={(e) => setNewAdminPassword(e.target.value)}
+                        placeholder="Minimal 4 karakter"
+                        required
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Ulangi Kata Sandi Baru:
+                      </label>
+                      <input
+                        type="password"
+                        value={confirmAdminPassword}
+                        onChange={(e) => setConfirmAdminPassword(e.target.value)}
+                        placeholder="Ketik ulang kata sandi baru"
+                        required
+                        className="w-full border border-ink/20 p-2.5 font-medium bg-white focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={savingPassword || !newAdminPassword}
+                        className="bg-ink text-ivory px-5 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                      >
+                        <Key size={13} /> {savingPassword ? 'Menyimpan...' : 'Perbarui Kata Sandi'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* SUBTAB 4: BACKUP & RESTORE DATABASE */}
+              {platformSubTab === 'backup_restore' && (
+                <div className="space-y-6 animate-in fade-in duration-150">
+                  <div className="border-b border-ink/5 pb-2">
+                    <h3 className="font-display text-sm font-bold text-ink uppercase tracking-wider flex items-center gap-1.5">
+                      <Database size={15} className="text-gold-deep" /> Cadangan &amp; Pemulihan Database Lengkap
+                    </h3>
+                    <p className="text-xs text-stone mt-0.5">
+                      Simpan cadangan offline seluruh data sistem atau pulihkan data dari file cadangan JSON.
+                    </p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-5">
+                    {/* Export / Download Backup Card */}
+                    <div className="bg-ivory/50 border border-ink/15 p-5 rounded-sm space-y-3 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <FileDown size={16} className="text-gold-deep" />
+                          <h4 className="font-display text-sm font-bold text-ink">Unduh Cadangan (.JSON)</h4>
+                        </div>
+                        <p className="text-xs text-stone leading-relaxed">
+                          Mencakup seluruh daftar pesanan ({items.length} undangan), tema studio kustom ({customThemesList.length}), voucher diskon, pengaturan rekening, paket harga, dan template pesan.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleDownloadBackup}
+                        disabled={exportingBackup}
+                        className="w-full bg-ink text-ivory py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2 shadow-xs"
+                      >
+                        <Download size={14} /> {exportingBackup ? 'Membuat File Cadangan...' : 'Unduh File Cadangan Lengkap'}
+                      </button>
+                    </div>
+
+                    {/* Import / Restore Card */}
+                    <div className="bg-ivory/50 border border-ink/15 p-5 rounded-sm space-y-3 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <FileUp size={16} className="text-amber-800" />
+                          <h4 className="font-display text-sm font-bold text-ink">Pulihkan Database (.JSON)</h4>
+                        </div>
+                        <p className="text-xs text-stone leading-relaxed">
+                          Unggah file cadangan JSON yang sebelumnya pernah diunduh untuk mengembalikan data jika terjadi kerusakan atau perpindahan server.
+                        </p>
+                      </div>
+
+                      <label className="w-full border border-ink/30 bg-paper text-ink hover:bg-gold/10 hover:border-gold-deep py-2.5 text-xs uppercase tracking-widest font-semibold text-center cursor-pointer inline-flex items-center justify-center gap-2 shadow-xs">
+                        <Upload size={14} /> {importingBackup ? 'Memulihkan Data...' : 'Pilih File Cadangan JSON'}
+                        <input
+                          type="file"
+                          accept=".json"
+                          className="hidden"
+                          onChange={handleRestoreBackupFile}
+                          disabled={importingBackup}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {backupRestoreSummary && (
+                    <div className="bg-green-50 border border-green-300 p-4 rounded-xs text-xs space-y-1 text-green-950">
+                      <p className="font-bold">Hasil Pemulihan Database:</p>
+                      <p>- {backupRestoreSummary.invitationsCount} data pesanan undangan dipulihkan</p>
+                      <p>- {backupRestoreSummary.themesCount} tema kustom studio dipulihkan</p>
+                      <p>- {backupRestoreSummary.vouchersCount} voucher diskon dipulihkan</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+            </div>
+          </div>
+        )}
       </main>
 
       {/* WHATSAPP TEMPLATE SELECTOR MODAL */}
@@ -1711,7 +3242,7 @@ export default function Admin() {
                   onClick={() => {
                     const phone = (invoiceModalItem.customerWhatsapp || '').replace(/[^0-9]/g, '')
                     const cleanPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone
-                    const msg = `Halo Kak ${invoiceModalItem.customerName || ''}! Berikut tanda terima resmi pembayaran undangan digital Aruna:\n\n📄 *Nomor Kwitansi:* ${invNumber}\n💍 *Mempelai:* ${invoiceModalItem.bride?.nick} & ${invoiceModalItem.groom?.nick}\n📦 *Paket:* ${pack?.name || invoiceModalItem.packageId}\n💰 *Total:* ${formatRupiah(price)}\n✅ *Status:* ${isPaid ? 'LUNAS' : 'MENUNGGU PEMBAYARAN'}\n\nTerima kasih telah mempercayakan momen bahagia Anda bersama Aruna! 🙏✨`
+                    const msg = formatWaMessage('kwitansi', invoiceModalItem, { invNumber, status: isPaid ? 'LUNAS' : 'MENUNGGU PEMBAYARAN' })
                     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank')
                   }}
                   className="bg-green-700 text-white px-4 py-2 text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1.5 hover:bg-green-800 transition-colors shadow-xs"
@@ -2026,6 +3557,280 @@ export default function Admin() {
           item={printCardModalItem}
           onClose={() => setPrintCardModalItem(null)}
         />
+      )}
+
+      {/* INSTANT DEMO INVITATION GENERATOR MODAL */}
+      {demoModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-paper border border-ink/20 max-w-md w-full p-6 sm:p-7 rounded-sm space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-ink/10 pb-3">
+              <div className="flex items-center gap-2 text-ink">
+                <Sparkles className="text-gold-deep" size={20} />
+                <h3 className="font-display text-lg font-bold">Generate Undangan Demo Instan</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDemoModalOpen(false)}
+                className="text-stone hover:text-ink text-xs font-bold px-2 py-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs text-stone leading-relaxed bg-ivory/40 p-3 border border-ink/10 rounded-xs">
+              Buat undangan uji coba yang terisi 100% data mempelai lengkap, foto estetik, musik, akad, resepsi, dan peta dalam 1 detik untuk melihat hasil nyata tema.
+            </p>
+
+            {demoSuccessSlug ? (
+              <div className="space-y-4 pt-2">
+                <div className="p-4 bg-green-50 border border-green-300 rounded text-center space-y-2">
+                  <CheckCircle2 size={24} className="text-green-700 mx-auto" />
+                  <p className="text-sm font-bold text-green-900">Undangan Demo Berhasil Dibuat</p>
+                  <p className="text-xs text-green-800 font-mono">/u/{demoSuccessSlug}</p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 justify-center pt-2">
+                  <a
+                    href={`/u/${demoSuccessSlug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="bg-ink text-ivory px-4 py-2.5 text-xs uppercase tracking-wider font-semibold hover:bg-gold-deep transition-colors inline-flex items-center gap-1.5 shadow-sm"
+                  >
+                    <ExternalLink size={13} /> Buka Undangan di Tab Baru
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDemoSuccessSlug('')
+                      setDemoModalOpen(false)
+                    }}
+                    className="border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault()
+                  if (!demoSlug.trim()) return
+                  setDemoGenerating(true)
+                  try {
+                    const dummyData = getDummyWeddingData(demoThemeId)
+                    const payload = {
+                      ...dummyData,
+                      slug: demoSlug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-'),
+                      themeId: demoThemeId,
+                    }
+                    const created = await createInvitation(payload)
+                    setDemoSuccessSlug(created.slug)
+                    load()
+                  } catch (err) {
+                    alert('Gagal membuat undangan demo: ' + err.message)
+                  } finally {
+                    setDemoGenerating(false)
+                  }
+                }}
+                className="space-y-4 pt-1"
+              >
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                    Pilih Tema yang Ingin Dites:
+                  </label>
+                  <select
+                    value={demoThemeId}
+                    onChange={(e) => {
+                      const tId = e.target.value
+                      setDemoThemeId(tId)
+                      setDemoSlug(`demo-${tId.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Math.floor(100 + Math.random() * 900)}`)
+                    }}
+                    className="w-full border border-ink/20 bg-white p-2.5 text-xs font-semibold focus:outline-none"
+                  >
+                    <optgroup label="Tema Resmi Aruna">
+                      {themes.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name} ({t.id})
+                        </option>
+                      ))}
+                    </optgroup>
+                    {customThemesList.length > 0 && (
+                      <optgroup label="Tema Kustom Studio">
+                        {customThemesList.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.name} ({t.id})
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-semibold">
+                    Tautan / Slug Undangan:
+                  </label>
+                  <div className="flex items-center border border-ink/20 bg-white">
+                    <span className="px-2.5 text-xs text-stone font-mono bg-ivory border-r border-ink/10">/u/</span>
+                    <input
+                      type="text"
+                      value={demoSlug}
+                      onChange={(e) => setDemoSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '-'))}
+                      placeholder="contoh: demo-adat-jawa-01"
+                      required
+                      className="flex-1 p-2 text-xs font-mono font-bold focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-ink/10">
+                  <button
+                    type="button"
+                    onClick={() => setDemoModalOpen(false)}
+                    className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={demoGenerating || !demoSlug.trim()}
+                    className="bg-ink text-ivory px-5 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+                  >
+                    <Sparkles size={13} /> {demoGenerating ? 'Membuat...' : 'Buat Demo Sekarang'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* SOCIAL MEDIA MARKETING MOCKUP GENERATOR MODAL */}
+      {socialMockupItem && (
+        <SocialMockupModal
+          item={socialMockupItem}
+          onClose={() => setSocialMockupItem(null)}
+        />
+      )}
+
+      {/* WHITE-LABEL & WATERMARK MODAL (SUPER ADMIN) */}
+      {whiteLabelModalItem && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-paper border border-ink/20 max-w-lg w-full p-6 rounded-sm space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-ink/10 pb-3">
+              <div>
+                <h3 className="font-display text-lg font-bold flex items-center gap-2">
+                  <Tag size={16} className="text-gold-deep" /> Kelola White-Label &amp; Watermark
+                </h3>
+                <p className="text-xs text-stone">
+                  {whiteLabelModalItem.bride?.nick} &amp; {whiteLabelModalItem.groom?.nick} ({whiteLabelModalItem.slug})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setWhiteLabelModalItem(null)}
+                className="text-stone hover:text-ink text-xs font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <p className="text-stone leading-relaxed">
+                Tentukan bagaimana teks watermark brand muncul di bagian footer undangan digital tamu pesanan ini:
+              </p>
+
+              {/* Mode Selector */}
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  ['default', 'Standar Aruna', 'Dibuat dengan Aruna'],
+                  ['custom', 'White-Label Kustom', 'Nama Brand WO / Vendor'],
+                  ['hidden', 'Sembunyikan Total', '100% Bersih'],
+                ].map(([mVal, mTitle, mDesc]) => (
+                  <button
+                    key={mVal}
+                    type="button"
+                    onClick={() => setWlMode(mVal)}
+                    className={`p-2.5 border text-left rounded-xs transition-colors space-y-0.5 ${
+                      wlMode === mVal
+                        ? 'border-gold-deep bg-gold/10 font-bold text-ink shadow-xs'
+                        : 'border-ink/15 text-stone hover:border-ink/40'
+                    }`}
+                  >
+                    <p className="font-semibold text-ink">{mTitle}</p>
+                    <p className="text-[10px] text-stone">{mDesc}</p>
+                  </button>
+                ))}
+              </div>
+
+              {wlMode === 'custom' && (
+                <div className="space-y-3 bg-ivory/60 p-3.5 border border-ink/10 rounded-xs animate-in fade-in">
+                  <div>
+                    <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                      Teks Watermark Brand / WO:
+                    </label>
+                    <input
+                      type="text"
+                      value={wlText}
+                      onChange={(e) => setWlText(e.target.value)}
+                      placeholder="Contoh: Organized by Mahkota Wedding Planner"
+                      className="w-full border border-ink/20 p-2.5 bg-white font-medium focus:outline-none focus:border-ink"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                      Tautan Saat Diklik (Instagram / Website, Opsional):
+                    </label>
+                    <input
+                      type="url"
+                      value={wlUrl}
+                      onChange={(e) => setWlUrl(e.target.value)}
+                      placeholder="https://instagram.com/mahkotawo"
+                      className="w-full border border-ink/20 p-2.5 bg-white font-mono focus:outline-none focus:border-ink"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Simulation Preview */}
+              <div className="pt-2 border-t border-ink/10 space-y-1.5">
+                <p className="text-[11px] font-bold text-stone uppercase tracking-wider">Pratinjau Footer Undangan:</p>
+                <div className="bg-ink/5 border border-ink/10 p-3 text-center rounded-xs">
+                  {wlMode === 'hidden' ? (
+                    <span className="text-stone italic text-[11px]">Watermark tersembunyi (footer bersih)</span>
+                  ) : wlMode === 'custom' ? (
+                    <span className="font-semibold text-ink uppercase tracking-widest text-[11px]">
+                      {wlText || 'Organized by Your Brand Name'}
+                    </span>
+                  ) : (
+                    <span className="text-stone uppercase tracking-widest text-[11px]">
+                      Dibuat dengan Aruna · Tema {whiteLabelModalItem.themeId || 'Elegan'}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-ink/10">
+                <button
+                  type="button"
+                  onClick={() => setWhiteLabelModalItem(null)}
+                  className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveWhiteLabelAdmin}
+                  disabled={savingWl}
+                  className="bg-ink text-ivory px-5 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                >
+                  <Check size={13} /> {savingWl ? 'Menyimpan...' : 'Simpan White-Label'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       <SiteFooter />

@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Heart, MapPin, Calendar, Clock, Music, Pause, Play, 
-  Copy, Check, Send, ChevronRight, User, Users, MessageSquare, Home, Sparkles
+  Copy, Check, Send, ChevronRight, User, Users, MessageSquare, Home, Sparkles, Camera
 } from 'lucide-react'
 import { copyText, googleCalendarUrl, wazeUrl } from '../lib/utils'
+import Watermark from '../components/Watermark'
 import './ThemeArtJawaBiru.css'
 
 function formatLongDate(dateStr) {
@@ -324,8 +325,8 @@ export default function ThemeArtJawaBiru({ data, guest = '', preview = false }) 
                     <h3 className="jb-person-name">{data.groom.full || data.groom.nick}</h3>
                     <p className="jb-person-parents">{data.groom.parents}</p>
                     {data.groom.ig && (
-                      <a href={`https://instagram.com/${String(data.groom.ig).replace('@', '')}`} target="_blank" rel="noreferrer" className="jb-person-ig">
-                        <span>📷</span> {data.groom.ig}
+                      <a href={`https://instagram.com/${String(data.groom.ig).replace('@', '')}`} target="_blank" rel="noreferrer" className="jb-person-ig inline-flex items-center gap-1">
+                        <Camera size={13} /> {data.groom.ig}
                       </a>
                     )}
                   </motion.article>
@@ -346,8 +347,8 @@ export default function ThemeArtJawaBiru({ data, guest = '', preview = false }) 
                     <h3 className="jb-person-name">{data.bride.full || data.bride.nick}</h3>
                     <p className="jb-person-parents">{data.bride.parents}</p>
                     {data.bride.ig && (
-                      <a href={`https://instagram.com/${String(data.bride.ig).replace('@', '')}`} target="_blank" rel="noreferrer" className="jb-person-ig">
-                        <span>📷</span> {data.bride.ig}
+                      <a href={`https://instagram.com/${String(data.bride.ig).replace('@', '')}`} target="_blank" rel="noreferrer" className="jb-person-ig inline-flex items-center gap-1">
+                        <Camera size={13} /> {data.bride.ig}
                       </a>
                     )}
                   </motion.article>
@@ -697,6 +698,9 @@ export default function ThemeArtJawaBiru({ data, guest = '', preview = false }) 
                 Atas doa dan kehadiran Bapak/Ibu/Saudara/i sekalian,<br />
                 kami ucapkan terima kasih yang tulus.
               </p>
+              <div style={{ color: 'rgba(184, 205, 228, 0.7)', fontSize: '0.75rem', marginTop: '1.5rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <Watermark data={data} theme={{ name: 'Art Jawa Biru' }} />
+              </div>
             </div>
           </footer>
 

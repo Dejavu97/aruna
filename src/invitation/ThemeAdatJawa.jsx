@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, MapPin, Play, Home, Users, CalendarDays, Images, Heart, Gift as GiftIcon, MailOpen, ExternalLink } from 'lucide-react'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
+import AdSlot from '../components/AdSlot'
 import {
   copyText,
   countdownParts,
@@ -653,11 +654,14 @@ export default function ThemeAdatJawa({ data, guest = '', preview = false }) {
             <Reveal><CheckIn data={data} guest={guest} onOpen={() => setShowPass(true)} /></Reveal>
             {data.gallery?.length > 0 && <Reveal><Gallery images={data.gallery} onOpen={setLightbox} /></Reveal>}
             <Reveal><RsvpAndWishes data={data} guest={guest} demo={data.demo} preview={preview} onDone={refresh} wishes={local.wishes || []} /></Reveal>
+            <AdSlot slot="rsvp" data={data} />
             <Reveal><Gift banks={data.banks || []} qris={data.qris} copied={copied} onCopy={onCopy} /></Reveal>
+            <AdSlot slot="footer" data={data} />
             <Reveal><Footer bride={bride} groom={groom} /></Reveal>
             <BottomNav />
           </main>
         )}
+        <AdSlot slot="sticky-bottom" data={data} />
       </div>
 
       {showPass && (

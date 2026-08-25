@@ -5,6 +5,8 @@ import SiteFooter from '../components/SiteFooter'
 import { fetchInvitation, fetchSettings, getEditKey, rememberEditKey } from '../lib/api'
 import { copyText, invitationUrl } from '../lib/utils'
 import { formatRupiah, packages, waLink } from '../data/site'
+import AdSlot from '../components/AdSlot'
+import { CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react'
 
 export default function Success() {
   const { slug } = useParams()
@@ -86,31 +88,46 @@ Mohon dicek pembayarannya.`
           </div>
         </div>
 
-        <div className="mt-5 border border-gold/40 bg-paper p-5">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-gold-deep">Transfer paket {pack.name}</p>
-          <p className="mt-2 font-display text-4xl">{formatRupiah(pack.price)}</p>
-          {bank && (
-            <div className="mt-3 text-sm">
-              <p>
-                {bank.bank} · {bank.number}
-              </p>
-              <p className="text-stone">a.n. {bank.name}</p>
-              <button type="button" className="mt-3 text-xs underline" onClick={() => copy(bank.number, 'rek')}>
-                {copied === 'rek' ? 'Nomor tersalin' : 'Salin nomor rekening'}
-              </button>
+        {pack.price > 0 ? (
+          <div className="mt-5 border border-gold/40 bg-paper p-5">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-gold-deep">Transfer paket {pack.name}</p>
+            <p className="mt-2 font-display text-4xl">{formatRupiah(pack.price)}</p>
+            {bank && (
+              <div className="mt-3 text-sm">
+                <p>
+                  {bank.bank} · {bank.number}
+                </p>
+                <p className="text-stone">a.n. {bank.name}</p>
+                <button type="button" className="mt-3 text-xs underline" onClick={() => copy(bank.number, 'rek')}>
+                  {copied === 'rek' ? 'Nomor tersalin' : 'Salin nomor rekening'}
+                </button>
+              </div>
+            )}
+            <a
+              href={waLink(payText)}
+              className="mt-5 inline-flex bg-ink px-4 py-3 text-xs uppercase tracking-[0.16em] text-ivory"
+            >
+              Konfirmasi bayar via WhatsApp
+            </a>
+          </div>
+        ) : (
+          <div className="mt-5 border border-gold-deep/30 bg-paper/80 p-5 rounded">
+            <div className="flex items-center gap-2 text-gold-deep font-semibold text-xs uppercase tracking-wider">
+              <CheckCircle2 size={15} /> Paket Gratis Aktif
             </div>
-          )}
-          <a
-            href={waLink(payText)}
-            className="mt-5 inline-flex bg-ink px-4 py-3 text-xs uppercase tracking-[0.16em] text-ivory"
-          >
-            Konfirmasi bayar via WhatsApp
-          </a>
-        </div>
+            <p className="mt-2 text-sm text-stone leading-relaxed">
+              Undangan digital Anda sudah aktif dan siap disebar ke para tamu. Bebas biaya dan didukung oleh sponsor iklan platform.
+            </p>
+          </div>
+        )}
+
+        <AdSlot slot="success" data={data} />
 
         {editKey && (
           <div className="mt-5 border-l-4 border-red-600 bg-red-50 p-5 text-sm">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-red-800 font-bold">⚠️ SANGAT PENTING: SIMPAN AKSES INI</p>
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-red-800 font-bold">
+              <AlertTriangle size={14} /> PERHATIAN PENTING: SIMPAN AKSES INI
+            </div>
             <p className="mt-2 text-red-900 leading-relaxed">
               Demi keamanan, sistem kami <strong>tidak akan pernah</strong> menampilkan kunci akses ini lagi di masa depan. 
               Segera salin dan simpan <strong>Kode Edit</strong> atau <strong>Link Dashboard</strong> di bawah ini ke catatan Anda (atau *bookmark* halaman ini).

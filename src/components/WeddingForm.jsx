@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatRupiah, packages } from '../data/site'
 import { getTheme, themes, getThemeFeatures } from '../data/themes'
+import { getDummyWeddingData } from '../data/dummyData'
 import MediaUpload from './MediaUpload'
 import Invitation from '../invitation/Invitation'
 import { slugify } from '../lib/utils'
+import { Sparkles, RotateCcw, Wand2, Globe, ShieldCheck } from 'lucide-react'
 
 const emptyEvent = () => ({
   title: '',
@@ -226,6 +228,42 @@ export default function WeddingForm({
       </aside>
 
       <form onSubmit={submit} className="border border-ink/10 bg-paper p-5 md:p-8">
+        {/* Quick Auto-Fill Helper Bar */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-sm bg-gold/10 border border-gold-deep/30 p-3">
+          <div className="flex items-center gap-2.5">
+            <Wand2 size={16} className="text-gold-deep shrink-0" />
+            <div>
+              <p className="text-xs font-bold text-ink">Mode Pengujian Cepat (Admin / Review)</p>
+              <p className="text-[10px] text-stone">Isi seluruh data pernikahan contoh yang lengkap &amp; estetik dalam 1-klik.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const dummy = getDummyWeddingData(themeId)
+                setForm(dummy)
+              }}
+              className="bg-gold-deep text-ivory px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-xs hover:bg-gold transition-colors inline-flex items-center gap-1.5 shadow-xs"
+            >
+              <Sparkles size={13} /> Auto-Fill Data Dummy
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (confirm('Kosongkan semua isian form?')) {
+                  setForm(blankWedding(themeId))
+                  localStorage.removeItem(draftKey)
+                }
+              }}
+              className="border border-ink/20 bg-paper px-2.5 py-1.5 text-xs text-stone hover:text-red-700 transition-colors inline-flex items-center gap-1 rounded-xs font-medium"
+              title="Reset Form Kosong"
+            >
+              <RotateCcw size={12} /> Reset
+            </button>
+          </div>
+        </div>
+
         <ol 
           className="mb-8 grid gap-2 text-center text-[10px] uppercase tracking-[0.16em] text-stone"
           style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
@@ -568,29 +606,40 @@ export default function WeddingForm({
                 {packages.map((p) => (
                   <label
                     key={p.id}
-                    className={`flex cursor-pointer items-start justify-between gap-4 border p-4 ${
-                      form.packageId === p.id ? 'border-gold bg-ivory' : 'border-ink/10'
+                    className={`flex cursor-pointer items-start justify-between gap-4 border p-4 transition-colors ${
+                      form.packageId === p.id ? 'border-gold bg-ivory shadow-xs' : 'border-ink/10 bg-white/40 hover:border-ink/20'
                     }`}
                   >
                     <span>
                       <input
                         type="radio"
-                        className="mr-3"
+                        className="mr-3 accent-gold-deep"
                         checked={form.packageId === p.id}
                         onChange={() => update('packageId', p.id)}
                       />
                       <strong className="font-display text-xl">{p.name}</strong>
+                      {p.price === 0 ? (
+                        <span className="ml-2 inline-block rounded bg-amber-100 text-amber-900 border border-amber-300 text-[10px] uppercase font-bold px-2 py-0.5 tracking-wider">
+                          Terdapat Iklan Sponsor
+                        </span>
+                      ) : (
+                        <span className="ml-2 inline-block rounded bg-green-100 text-green-800 border border-green-300 text-[10px] uppercase font-bold px-2 py-0.5 tracking-wider">
+                          100% Bebas Iklan
+                        </span>
+                      )}
                       <span className="mt-1 block text-sm normal-case tracking-normal text-stone">{p.blurb}</span>
                     </span>
-                    <span className="shrink-0 font-display text-xl">{formatRupiah(p.price)}</span>
+                    <span className="shrink-0 font-display text-xl font-semibold">
+                      {p.price === 0 ? 'Rp 0 (Gratis)' : formatRupiah(p.price)}
+                    </span>
                   </label>
                 ))}
-                <div className="flex items-start gap-4 rounded bg-ivory/50 p-4 border border-ink/10">
-                  <div className="text-xl mt-1 opacity-70">🌐</div>
+                <div className="flex items-start gap-3 rounded bg-ivory/50 p-4 border border-ink/10">
+                  <Globe size={18} className="text-stone mt-0.5 shrink-0" />
                   <div>
                     <strong className="font-display text-lg">Domain Pribadi (Kustom)</strong>
                     <span className="mt-1 block text-sm normal-case tracking-normal text-stone leading-relaxed">
-                      Kabar baik! Anda dapat memasang domain pribadi secara <strong>mandiri & gratis</strong> melalui Dashboard Pelanggan setelah pesanan ini selesai. Hubungi Admin jika Anda memerlukan bantuan konfigurasi.
+                      Kabar baik! Anda dapat memasang domain pribadi secara <strong>mandiri &amp; gratis</strong> melalui Dashboard Pelanggan setelah pesanan ini selesai. Hubungi Admin jika Anda memerlukan bantuan konfigurasi.
                     </span>
                   </div>
                 </div>

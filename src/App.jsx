@@ -1,4 +1,5 @@
-import { Link, Route, Routes } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Themes from './pages/Themes'
 import ThemePreview from './pages/ThemePreview'
@@ -10,13 +11,38 @@ import Edit from './pages/Edit'
 import Manage from './pages/Manage'
 import ThemeStudio from './pages/ThemeStudio'
 import CustomDomainPage from './pages/CustomDomainPage'
+import MaintenanceScreen from './components/MaintenanceScreen'
+import { defaultMaintenanceSettings, fetchMaintenanceSettings } from './lib/api'
 
 export default function App() {
+  const [maintenance, setMaintenance] = useState(defaultMaintenanceSettings)
+  const location = useLocation()
   const hostname = window.location.hostname
-  const isCustomDomain = !hostname.includes('localhost') && !hostname.includes('127.0.0.1') && !hostname.includes('aruna.com') && !hostname.includes('vercel.app') && !hostname.includes('ngrok-free.app')
-  
+  const isCustomDomain =
+    !hostname.includes('localhost') &&
+    !hostname.includes('127.0.0.1') &&
+    !hostname.includes('aruna.com') &&
+    !hostname.includes('vercel.app') &&
+    !hostname.includes('ngrok-free.app')
+
+  useEffect(() => {
+    fetchMaintenanceSettings().then(setMaintenance).catch(() => {})
+  }, [location.pathname])
+
   if (isCustomDomain) {
     return <CustomDomainPage domain={hostname} />
+  }
+
+  // Exempt routes that MUST ALWAYS REMAIN ACTIVE during maintenance
+  const isExempt =
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/kelola') ||
+    location.pathname.startsWith('/edit') ||
+    location.pathname.startsWith('/u/') ||
+    location.pathname.startsWith('/berhasil')
+
+  if (maintenance?.enabled && !isExempt) {
+    return <MaintenanceScreen settings={maintenance} />
   }
 
   return (

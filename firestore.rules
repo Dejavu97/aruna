@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.admin == true ||
+        request.auth.token.email in ['admin@aruna.id', 'owner@aruna.id']
+      );
+    }
+
+    // 1. SETTINGS COLLECTION (Payment, Packages, Ads, Vouchers)
+    match /settings/{settingId} {
+      // Publik diizinkan membaca rekening pembayaran, paket harga, dan iklan
+      allow read: if true;
+      // Hanya Admin yang berhak mengubah nomor rekening atau harga paket
+      allow write: if isAdmin();
+    }
+
+    // 2. CUSTOM THEMES COLLECTION (Tema Buatan Komunitas & Studio)
+    match /custom_themes/{themeId} {
+      // Publik boleh membaca tema yang berstatus publik
+      allow read: if resource.data.isPublic == true || isAdmin();
+      // Siapapun boleh membuat tema custom baru dari studio
+      allow create: if request.resource.data.name is string && request.resource.data.name.size() > 0;
+      // Hanya pembuat tema atau Admin yang boleh mengedit atau menghapus
+      allow update, delete: if isAdmin() || (
+        request.auth != null && resource.data.creatorId == request.auth.uid
+      );
+    }
+
+    // 3. INVITATIONS COLLECTION (Data Undangan Klien)
+    match /invitations/{invitationId} {
+      // Publik boleh membaca undangan
+      allow read: if true;
+      // Klien boleh membuat pesanan undangan baru
+      allow create: if request.resource.data.date is string;
+      // Edit data acara hanya oleh pemilik atau Admin; Tamu hanya boleh mengirim RSVP & Ucapan
+      allow update: if isAdmin() || (
+        // Memastikan field sensitif (status pembayaran & editKey) tidak bisa diubah sembarangan oleh tamu
+        request.resource.data.status == resource.data.status &&
+        request.resource.data.editKey == resource.data.editKey
+      );
+      // Hanya Admin yang berhak menghapus undangan
+      allow delete: if isAdmin();
+
+      // Sub-koleksi Ucapan Doa Restu & Buku Tamu
+      match /wishes/{wishId} {
+        allow read: if true;
+        allow create: if request.resource.data.name is string && request.resource.data.name.size() > 0;
+        allow update, delete: if isAdmin();
+      }
+
+      // Sub-koleksi Konfirmasi Kehadiran (RSVP)
+      match /rsvps/{rsvpId} {
+        allow read: if true;
+        allow create: if request.resource.data.name is string;
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // 4. WHITELABEL VENDORS (Data Vendor WO & Domain Kustom)
+    match /whitelabel_vendors/{vendorId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || (
+        request.auth != null && request.auth.uid == vendorId
+      );
+      allow delete: if isAdmin();
+    }
+
+    // 5. VOUCHERS COLLECTION (Kode Diskon & Promo)
+    match /vouchers/{voucherId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Aturan Default: Blokir semua akses ke koleksi lain yang tidak terdaftar
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

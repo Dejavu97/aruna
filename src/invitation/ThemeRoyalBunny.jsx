@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { addRsvp, addWish } from '../lib/api'
 import { copyText, formatLongDate, googleCalendarUrl } from '../lib/utils'
+import AdSlot from '../components/AdSlot'
 import './ThemeRoyalBunny.css'
 
 const A = {
@@ -780,23 +781,16 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
             </motion.div>
           </section>
 
-          {/* SCENE 10 — Farewell */}
-          <footer className="rb-farewell">
-            <div className="rb-stars" aria-hidden>
-              <span /><span /><span /><span /><span /><span /><span /><span />
-            </div>
-            <div className="rb-moon" />
-            <motion.div
-              className="rb-farewell-pair-wrap"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.9 }}
-            >
-              <img src={A.formal} alt="" className="rb-farewell-pair" />
-            </motion.div>
-            <p className="rb-farewell-kicker">Matur nuwun &amp; terima kasih</p>
-            <h3 className="rb-names">{couple}</h3>
+          <AdSlot slot="rsvp" data={data} theme={theme} />
+
+          {/* SCENE 7 — Farewell / Footer */}
+          <footer className="rb-footer">
+            <AdSlot slot="footer" data={data} theme={theme} />
+            <img src={A.cute} alt="" className="rb-footer-bunny" />
+            <h3 className="rb-script">Sampai Jumpa di Hari Bahagia Kami</h3>
+            <p className="rb-farewell-names">
+              {data.bride?.nick || 'Sarah'} &amp; {data.groom?.nick || 'Budi'}
+            </p>
             <p className="rb-farewell-msg">
               Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu bagi lembaran baru kehidupan kami.
             </p>
@@ -811,6 +805,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
             <a href="#gallery"><Camera size={15} /><span>Galeri</span></a>
             <a href="#rsvp"><MessageSquare size={15} /><span>RSVP</span></a>
           </nav>
+          <AdSlot slot="sticky-bottom" data={data} theme={theme} />
         </motion.div>
       )}
 

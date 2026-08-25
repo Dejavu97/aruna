@@ -87,11 +87,6 @@ export default function InvitationPage() {
           </Link>
         </div>
       )}
-      {data.status === 'unpaid' && !data.demo && (
-        <div className="relative z-50 bg-gold px-4 py-2 text-center text-[11px] uppercase tracking-[0.16em] text-ink">
-          Menunggu pelunasan — undangan sudah bisa dibuka untuk dicek
-        </div>
-      )}
       <Invitation data={data} guest={guestFromSearch(search)} />
     </div>
   )

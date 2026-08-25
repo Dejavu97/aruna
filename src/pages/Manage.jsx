@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX, Shield } from 'lucide-react'
+import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX, Shield, Megaphone, Tag } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import QrCameraScanner from '../components/QrCameraScanner'
@@ -36,6 +36,12 @@ export default function Manage() {
   const [copied, setCopied] = useState('')
   const [saved, setSaved] = useState(false)
   const [tab, setTab] = useState('ringkas')
+
+  // White-Label & Custom Branding State
+  const [watermarkMode, setWatermarkMode] = useState('default') // 'default' | 'custom' | 'hidden'
+  const [customWatermarkText, setCustomWatermarkText] = useState('')
+  const [customWatermarkUrl, setCustomWatermarkUrl] = useState('')
+  const [savingWatermark, setSavingWatermark] = useState(false)
   
   // State for replying to wishes
   const [replyingTo, setReplyingTo] = useState(null)
@@ -73,6 +79,9 @@ export default function Manage() {
         if (data?.waTemplate) setWaTemplate(data.waTemplate)
         if (data?.waReminderTemplate) setWaReminderTemplate(data.waReminderTemplate)
         if (data?.customDomain) setCustomDomain(data.customDomain)
+        if (data?.watermarkMode) setWatermarkMode(data.watermarkMode)
+        if (data?.customWatermarkText) setCustomWatermarkText(data.customWatermarkText)
+        if (data?.customWatermarkUrl) setCustomWatermarkUrl(data.customWatermarkUrl)
         setGlobalAnnouncement(ann || '')
         setError('')
       })
@@ -398,6 +407,32 @@ export default function Manage() {
     }
   }
 
+  async function handleSaveWatermark() {
+    setSavingWatermark(true)
+    try {
+      await updateInvitation(
+        slug,
+        {
+          watermarkMode,
+          customWatermarkText,
+          customWatermarkUrl,
+        },
+        editKey
+      )
+      setItem((prev) => ({
+        ...prev,
+        watermarkMode,
+        customWatermarkText,
+        customWatermarkUrl,
+      }))
+      alert('Pengaturan watermark & branding berhasil disimpan!')
+    } catch (err) {
+      alert('Gagal menyimpan watermark: ' + err.message)
+    } finally {
+      setSavingWatermark(false)
+    }
+  }
+
   async function handleReply(wishId) {
     if (!replyText.trim()) return
     setReplying(true)
@@ -512,7 +547,9 @@ export default function Manage() {
       <section className="mx-auto max-w-5xl px-5 py-10 md:py-14">
         {globalAnnouncement && (
           <div className="mb-8 border border-gold bg-gold/10 px-6 py-4 rounded-md shadow-sm">
-            <h3 className="text-xs uppercase tracking-widest text-gold-deep mb-1 font-bold">📢 Pengumuman</h3>
+            <h3 className="text-xs uppercase tracking-widest text-gold-deep mb-1 font-bold inline-flex items-center gap-1.5">
+              <Megaphone size={14} /> Pengumuman
+            </h3>
             <p className="text-sm text-ink font-medium leading-relaxed">{globalAnnouncement}</p>
           </div>
         )}
@@ -700,6 +737,83 @@ export default function Manage() {
                 >
                   {item.protectPhotos ? '✓ Proteksi Foto Aktif' : 'Aktifkan Proteksi Foto'}
                 </button>
+              </div>
+
+              {/* White-Label & Custom Branding Card */}
+              <div className="border border-ink/10 bg-paper p-5 lg:col-span-3 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-3">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <Tag className="text-gold-deep" size={16} />
+                      <h4 className="font-display text-base font-bold text-ink">Branding Footer &amp; Watermark Mandiri (White-Label)</h4>
+                    </div>
+                    <p className="text-xs text-stone max-w-xl leading-relaxed">
+                      Atur nama brand Wedding Organizer / fotografer Anda di bagian footer undangan tamu atau sembunyikan watermark sepenuhnya.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveWatermark}
+                    disabled={savingWatermark}
+                    className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                  >
+                    <Check size={13} /> {savingWatermark ? 'Menyimpan...' : 'Simpan Branding'}
+                  </button>
+                </div>
+
+                <div className="grid sm:grid-cols-3 gap-3 text-xs">
+                  {/* Mode Selector */}
+                  {[
+                    ['default', 'Standar Aruna', 'Menampilkan: Dibuat dengan Aruna · Tema ...'],
+                    ['custom', 'White-Label Kustom', 'Menampilkan nama brand / WO / Fotografer Anda'],
+                    ['hidden', 'Sembunyikan Total', '100% Bersih tanpa teks watermark sama sekali'],
+                  ].map(([modeVal, modeTitle, modeDesc]) => (
+                    <button
+                      key={modeVal}
+                      type="button"
+                      onClick={() => setWatermarkMode(modeVal)}
+                      className={`p-3 border text-left rounded-xs transition-colors space-y-1 ${
+                        watermarkMode === modeVal
+                          ? 'border-gold-deep bg-gold/10 font-semibold text-ink shadow-xs'
+                          : 'border-ink/15 text-stone hover:border-ink/40'
+                      }`}
+                    >
+                      <p className="font-bold text-ink">{modeTitle}</p>
+                      <p className="text-[11px] text-stone leading-tight">{modeDesc}</p>
+                    </button>
+                  ))}
+                </div>
+
+                {watermarkMode === 'custom' && (
+                  <div className="grid sm:grid-cols-2 gap-3 pt-2 text-xs bg-ivory/50 p-3.5 border border-ink/10 rounded-xs animate-in fade-in">
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Teks Watermark Brand / WO:
+                      </label>
+                      <input
+                        type="text"
+                        value={customWatermarkText}
+                        onChange={(e) => setCustomWatermarkText(e.target.value)}
+                        placeholder="Contoh: Organized by Mahkota Wedding Planner"
+                        className="w-full border border-ink/20 p-2.5 bg-white font-medium focus:outline-none focus:border-ink"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block uppercase tracking-wider text-stone font-semibold mb-1">
+                        Tautan Saat Diklik (Instagram / Website, Opsional):
+                      </label>
+                      <input
+                        type="url"
+                        value={customWatermarkUrl}
+                        onChange={(e) => setCustomWatermarkUrl(e.target.value)}
+                        placeholder="https://instagram.com/mahkotawo"
+                        className="w-full border border-ink/20 p-2.5 bg-white font-mono focus:outline-none focus:border-ink"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
             </div>
@@ -897,7 +1011,7 @@ export default function Manage() {
                             )}
                             {g.phone && (
                               <span className="bg-ink/5 border border-ink/10 px-2 py-0.5 text-xs text-stone font-mono">
-                                📱 {g.phone}
+                                {g.phone}
                               </span>
                             )}
                           </div>
@@ -1206,11 +1320,11 @@ export default function Manage() {
                             setMessageMode('reminder')
                             setStatusFilter('unconfirmed')
                           }}
-                          className={`px-2.5 py-1 text-[10px] uppercase tracking-wider font-medium transition-colors ${
+                          className={`px-2.5 py-1 text-[10px] uppercase tracking-wider font-medium transition-colors inline-flex items-center gap-1 ${
                             messageMode === 'reminder' ? 'bg-gold-deep text-ivory' : 'text-stone hover:text-ink'
                           }`}
                         >
-                          🔔 Pengingat RSVP
+                          <Bell size={11} /> Pengingat RSVP
                         </button>
                       </div>
                     </div>
@@ -1343,13 +1457,13 @@ export default function Manage() {
                               )}
                               {g.status === 'unconfirmed' && (
                                 <span className="bg-gold/15 text-gold-deep border border-gold/30 text-[10px] px-2 py-0.5 rounded font-medium">
-                                  ⏳ Belum Konfirmasi
+                                  Belum Konfirmasi
                                 </span>
                               )}
 
                               {g.phone && (
                                 <span className="bg-ink/5 border border-ink/10 px-2 py-0.5 text-xs text-stone font-mono">
-                                  📱 {g.phone}
+                                  {g.phone}
                                 </span>
                               )}
                             </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Camera, Download, Share2, X, ZoomIn, ZoomOut, RotateCw, Image as ImageIcon, Sparkles, Check } from 'lucide-react'
+import { Camera, Download, Share2, X, ZoomIn, ZoomOut, RotateCw, Image as ImageIcon, Sparkles, Check, Smartphone } from 'lucide-react'
 import { formatLongDate, qrImageUrl, invitationUrl } from '../lib/utils'
 
 export default function WeddingFrameModal({ data, guest, couple, onClose }) {
@@ -348,20 +348,20 @@ export default function WeddingFrameModal({ data, guest, couple, onClose }) {
           <button
             type="button"
             onClick={() => setMode('frame')}
-            className={`flex-1 py-2 rounded transition-colors ${
+            className={`flex-1 py-2 rounded transition-colors inline-flex items-center justify-center gap-1.5 ${
               mode === 'frame' ? 'bg-ink text-ivory shadow-sm' : 'text-stone hover:text-ink'
             }`}
           >
-            📸 Frame Foto Tamu (1:1)
+            <Camera size={13} /> Frame Foto Tamu (1:1)
           </button>
           <button
             type="button"
             onClick={() => setMode('story')}
-            className={`flex-1 py-2 rounded transition-colors ${
+            className={`flex-1 py-2 rounded transition-colors inline-flex items-center justify-center gap-1.5 ${
               mode === 'story' ? 'bg-gold-deep text-ivory shadow-sm' : 'text-stone hover:text-ink'
             }`}
           >
-            📱 Instagram Story (9:16)
+            <Smartphone size={13} /> Instagram Story (9:16)
           </button>
         </div>
 

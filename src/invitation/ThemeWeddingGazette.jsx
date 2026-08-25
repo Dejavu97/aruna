@@ -7,6 +7,7 @@ import {
   Award, Ticket, Star
 } from 'lucide-react'
 import { copyText, googleCalendarUrl, wazeUrl, formatLongDate } from '../lib/utils'
+import Watermark from '../components/Watermark'
 import { addRsvp, addWish } from '../lib/api'
 import './ThemeWeddingGazette.css'
 
@@ -367,9 +368,9 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                     href={`https://instagram.com/${String(data.groom.ig).replace(/^@/, '')}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="gz-profile-ig"
+                    className="gz-profile-ig inline-flex items-center gap-1"
                   >
-                    <span>📷</span> @{String(data.groom.ig).replace(/^@/, '')}
+                    <Camera size={13} /> @{String(data.groom.ig).replace(/^@/, '')}
                   </a>
                 )}
               </motion.div>
@@ -393,9 +394,9 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                     href={`https://instagram.com/${String(data.bride.ig).replace(/^@/, '')}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="gz-profile-ig"
+                    className="gz-profile-ig inline-flex items-center gap-1"
                   >
-                    <span>📷</span> @{String(data.bride.ig).replace(/^@/, '')}
+                    <Camera size={13} /> @{String(data.bride.ig).replace(/^@/, '')}
                   </a>
                 )}
               </motion.div>
@@ -817,9 +818,9 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
             <p className="text-xs text-stone-700 max-w-md mx-auto leading-relaxed">
               Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu bagi lembaran baru kehidupan kami.
             </p>
-            <p className="font-mono text-[10px] text-stone-600 mt-5 uppercase tracking-widest">
-              Published &amp; Printed with Love by Aruna Digital Wedding
-            </p>
+            <div className="font-mono text-[10px] text-stone-600 mt-5 uppercase tracking-widest">
+              <Watermark data={data} theme={{ name: 'Wedding Gazette' }} />
+            </div>
           </footer>
 
           {/* ===================================================

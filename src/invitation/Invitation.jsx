@@ -18,6 +18,7 @@ import {
   qrImageUrl,
   wazeUrl,
 } from '../lib/utils'
+import Watermark from '../components/Watermark'
 import { getTheme } from '../data/themes'
 import AttariInvitation from './AttariInvitation'
 import BoardingInvitation from './BoardingInvitation'
@@ -26,6 +27,7 @@ import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 import ThemeRoyalBunny from './ThemeRoyalBunny'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
+import AdSlot from '../components/AdSlot'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
@@ -248,6 +250,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
               onDone={refresh}
               scene={scenes.wishes}
             /></Reveal>
+            <AdSlot slot="rsvp" data={data} theme={theme} />
             <Reveal><Gift
               banks={data.banks || []}
               qris={data.qris}
@@ -257,10 +260,12 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
               onCopy={onCopy}
               scene={scenes.gift}
             /></Reveal>
-            <Reveal><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} /></Reveal>
+            <AdSlot slot="footer" data={data} theme={theme} />
+            <Reveal><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} data={data} /></Reveal>
             <BottomNav />
           </main>
         )}
+        <AdSlot slot="sticky-bottom" data={data} theme={theme} />
       </div>
 
       {showPass && (
@@ -775,14 +780,14 @@ function Gift({ banks, qris, address, wishlist, copied, onCopy, scene }) {
   )
 }
 
-function Closer({ couple, theme, hashtag, scene }) {
+function Closer({ couple, theme, hashtag, scene, data }) {
   return (
     <footer className="inv-foot" data-scene={scene}>
       <Divider />
       <p>Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.</p>
       <h3>{couple}</h3>
       {hashtag && <p className="hashtag">{hashtag.startsWith('#') ? hashtag : `#${hashtag}`}</p>}
-      <p className="brand-mini">Dibuat dengan Aruna · Tema {theme.name}</p>
+      <Watermark data={data} theme={theme} className="brand-mini block" />
     </footer>
   )
 }
@@ -987,12 +992,12 @@ function CoupleAttari({ data, scene }) {
                 <p className="attari-parents">{formatParents(item.who, item.role === 'THE BRIDE' ? 'Putri' : 'Putra')}</p>
                 {item.who.ig && (
                   <a
-                    className="attari-ig"
+                    className="attari-ig inline-flex items-center gap-1"
                     href={`https://instagram.com/${String(item.who.ig).replace(/^@/, '')}`}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <span>📷</span> @{String(item.who.ig).replace(/^@/, '')}
+                    <Camera size={13} /> @{String(item.who.ig).replace(/^@/, '')}
                   </a>
                 )}
               </div>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Megaphone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
@@ -7,6 +7,7 @@ import ThemeCard from '../components/ThemeCard'
 import { faqs, features, formatRupiah, packages, site, steps, testimonials, waLink } from '../data/site'
 import { themes } from '../data/themes'
 import { getAnnouncement } from '../lib/api'
+import AdSlot from '../components/AdSlot'
 
 export default function Home() {
   const [globalAnnouncement, setGlobalAnnouncement] = useState('')
@@ -28,9 +29,9 @@ export default function Home() {
       {/* Content wrapper */}
       <div className="relative z-10">
         {globalAnnouncement && (
-          <div className="bg-gold-deep text-ivory px-5 py-3 text-center text-sm font-medium">
-            <span className="mr-2">📢</span>
-            {globalAnnouncement}
+          <div className="bg-gold-deep text-ivory px-5 py-3 text-center text-sm font-medium flex items-center justify-center gap-2">
+            <Megaphone size={15} />
+            <span>{globalAnnouncement}</span>
           </div>
         )}
         <SiteNav />
@@ -39,6 +40,7 @@ export default function Home() {
         <Themes />
         <FeatureGrid />
         <Pricing />
+        <AdSlot slot="home" className="max-w-4xl" />
         <Words />
         <Faq />
         <Close />
