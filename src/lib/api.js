@@ -375,8 +375,53 @@ export async function setInvitationStatus(slug, status) {
 
 export async function deleteInvitation(slug) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  const docRef = doc(db, 'invitations', slug)
-  await deleteDoc(docRef)
+
+  let deleted = false
+
+  // 1. Jalur Utama Serverless API (Firebase Admin SDK - Menghapus tanpa terhambat aturan permissions)
+  try {
+    const res = await fetch('/api/delete-invitation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, adminKey: getAdminKey() })
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (data.success) deleted = true
+    }
+  } catch (apiErr) {
+    console.warn('Backend delete API notice:', apiErr)
+  }
+
+  // 2. Jalur Express Local Server (saat development)
+  if (!deleted) {
+    try {
+      const res = await fetch(`/api/invitations/${slug}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-key': getAdminKey() }
+      })
+      if (res.ok) deleted = true
+    } catch {}
+  }
+
+  // 3. Jalur Firestore Client SDK
+  try {
+    const docRef = doc(db, 'invitations', slug)
+    await deleteDoc(docRef)
+    deleted = true
+  } catch (clientErr) {
+    if (!deleted) {
+      console.error('Firestore client delete error:', clientErr)
+      throw new Error(`Gagal menghapus undangan dari database: ${clientErr.message}`)
+    }
+  }
+
+  // 4. Bersihkan brankas private_keys
+  try {
+    const secretRef = doc(db, 'private_keys', slug)
+    await deleteDoc(secretRef)
+  } catch {}
+
   return { success: true }
 }
 

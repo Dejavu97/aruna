@@ -1433,11 +1433,17 @@ export default function Admin() {
 
                           <button
                             type="button"
-                            className="px-2 py-1.5 text-red-700 hover:text-red-900 ml-auto"
+                            className="px-2.5 py-1.5 text-red-700 hover:text-red-900 ml-auto border border-transparent hover:border-red-200 hover:bg-red-50 rounded-xs transition-colors"
+                            title="Hapus permanen undangan ini"
                             onClick={async () => {
-                              if (!confirm(`Hapus permanen undangan ${item.slug}?`)) return
-                              await deleteInvitation(item.slug)
-                              load()
+                              if (!confirm(`Hapus permanen undangan "${item.slug}"? Data tidak dapat dipulihkan.`)) return
+                              try {
+                                await deleteInvitation(item.slug)
+                                alert(`Undangan ${item.slug} berhasil dihapus permanen.`)
+                                await load()
+                              } catch (err) {
+                                alert(`Gagal menghapus: ${err.message}`)
+                              }
                             }}
                           >
                             <Trash2 size={14} />
