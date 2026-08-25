@@ -142,4 +142,19 @@ export function parseColors(value) {
     .map((c) => (c.startsWith('#') ? c : `#${c}`))
 }
 
+/**
+ * Memeriksa apakah masa edit undangan telah berakhir (H+1 pasca hari acara).
+ * @param {string} eventDate - format ISO YYYY-MM-DD
+ * @param {number} graceDays - default 1 hari (H+1)
+ * @returns {boolean} true jika masa edit terkunci
+ */
+export function isEventEditLocked(eventDate, graceDays = 1) {
+  if (!eventDate) return false
+  const dateStr = String(eventDate).slice(0, 10)
+  const evt = new Date(`${dateStr}T23:59:59`)
+  if (Number.isNaN(evt.getTime())) return false
+  const lockTime = evt.getTime() + (graceDays * 24 * 60 * 60 * 1000)
+  return Date.now() > lockTime
+}
+
 

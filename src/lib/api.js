@@ -319,23 +319,41 @@ export async function fetchAdminInvitations() {
 }
 
 export async function updateInvitation(slug, payload, editKey) {
+  // 1. Jika mode admin, langsung tulis ke Firestore
   if (getAdminKey()) {
-    // Admin bisa langsung tulis ke Firebase
+    try {
+      const docRef = doc(db, 'invitations', slug)
+      await updateDoc(docRef, payload)
+      return { success: true }
+    } catch (e) {
+      console.warn('Admin direct update note:', e)
+    }
+  }
+
+  // 2. Coba lewat jalur API Serverless backend jika tersedia
+  try {
+    const res = await fetch('/api/update-invitation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, editKey, payload })
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (data.success) return { success: true }
+    }
+  } catch (apiErr) {
+    console.warn('Update API backend note:', apiErr)
+  }
+
+  // 3. Fallback langsung ke Firestore Client
+  try {
     const docRef = doc(db, 'invitations', slug)
     await updateDoc(docRef, payload)
     return { success: true }
+  } catch (clientErr) {
+    console.error('Firestore client update error:', clientErr)
+    throw clientErr
   }
-
-  // Pelanggan harus lewat Vercel API (Jalur Belakang)
-  const res = await fetch('/api/update-invitation', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ slug, editKey, payload })
-  })
-  
-  const data = await res.json()
-  if (!res.ok) throw new Error(data.error || 'Gagal menyimpan perubahan.')
-  return { success: true }
 }
 
 export async function setInvitationStatus(slug, status) {

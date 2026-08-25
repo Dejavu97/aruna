@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX, Shield, Megaphone, Tag, Heart } from 'lucide-react'
+import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCode, Search, Send, Share2, Trash2, Upload, UserCheck, UserX, Shield, Megaphone, Tag, Heart, Lock } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import QrCameraScanner from '../components/QrCameraScanner'
@@ -8,7 +8,7 @@ import WeddingFrameModal from '../components/WeddingFrameModal'
 import PrintCardModal from '../components/PrintCardModal'
 import LoveQRCardGenerator from '../components/LoveQRCardGenerator'
 import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../lib/api'
-import { copyText, formatLongDate, invitationUrl, uid } from '../lib/utils'
+import { copyText, formatLongDate, invitationUrl, uid, isEventEditLocked } from '../lib/utils'
 import { shareWaLink, waLink } from '../data/site'
 import { backFromInvite, invitePath } from '../lib/nav'
 import { getTheme } from '../data/themes'
@@ -561,9 +561,16 @@ export default function Manage() {
 
         <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">
-              {isAdmin ? 'Admin · Dashboard undangan' : 'Dashboard pelanggan'}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">
+                {isAdmin ? 'Admin · Dashboard undangan' : 'Dashboard pelanggan'}
+              </p>
+              {isEventEditLocked(item?.date, 1) && (
+                <span className="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-xs inline-flex items-center gap-1">
+                  <Lock size={10} /> Arsip Kenangan (H+1)
+                </span>
+              )}
+            </div>
             <h1 className="mt-2 font-display text-4xl md:text-5xl">{couple}</h1>
             <p className="mt-2 text-sm text-stone">
               {item?.date ? formatLongDate(item.date) : ''}
@@ -572,15 +579,24 @@ export default function Manage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.14em]">
-            <Link to={`/u/${slug}`} className="bg-ink px-3 py-2 text-ivory">
+            <Link to={`/u/${slug}`} className="bg-ink px-3 py-2 text-ivory hover:bg-gold-deep transition-colors">
               Buka undangan
             </Link>
-            <Link
-              to={invitePath(`/edit/${slug}`, { key: editKey, from: isAdmin ? 'admin' : 'customer' })}
-              className="border border-ink/20 px-3 py-2"
-            >
-              Edit data
-            </Link>
+            {!isAdmin && isEventEditLocked(item?.date, 1) ? (
+              <span
+                className="border border-ink/20 bg-ink/5 px-3 py-2 text-stone opacity-60 cursor-not-allowed inline-flex items-center gap-1 font-medium"
+                title="Masa edit telah berakhir (H+1 pasca hari acara)"
+              >
+                <Lock size={11} /> Edit Terkunci
+              </span>
+            ) : (
+              <Link
+                to={invitePath(`/edit/${slug}`, { key: editKey, from: isAdmin ? 'admin' : 'customer' })}
+                className="border border-ink/20 px-3 py-2 hover:border-gold-deep transition-colors"
+              >
+                Edit data
+              </Link>
+            )}
             <button
               type="button"
               onClick={() => setShowPrintCardModal(true)}
@@ -588,11 +604,26 @@ export default function Manage() {
             >
               <QrCode size={13} /> Kartu Souvenir &amp; QR
             </button>
-            <button type="button" onClick={reload} className="border border-ink/20 px-3 py-2">
+            <button type="button" onClick={reload} className="border border-ink/20 px-3 py-2 hover:bg-ink/5 transition-colors">
               Segarkan
             </button>
           </div>
         </div>
+
+        {/* H+1 Grace Period Banner */}
+        {!isAdmin && isEventEditLocked(item?.date, 1) && (
+          <div className="mt-6 border border-amber-300 bg-amber-50/90 p-4 rounded-sm flex items-start gap-3 text-amber-950 shadow-xs">
+            <Shield size={18} className="text-amber-700 shrink-0 mt-0.5" />
+            <div className="space-y-1 text-xs">
+              <p className="font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                <Lock size={12} /> Masa Edit Telah Berakhir (H+1 Pasca Acara)
+              </p>
+              <p className="text-stone leading-relaxed">
+                Acara pada tanggal <strong>{formatLongDate(item?.date)}</strong> telah sukses terselenggara. Fitur revisi data mandiri kini terkunci otomatis. Seluruh galeri kenangan, tautan undangan, dan buku tamu Anda tetap aktif dan tersimpan abadi seumur hidup.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">

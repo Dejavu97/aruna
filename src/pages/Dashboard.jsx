@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import { fetchUserInvitations } from '../lib/api'
-import { formatLongDate, invitationUrl } from '../lib/utils'
+import { formatLongDate, invitationUrl, isEventEditLocked } from '../lib/utils'
 import { formatRupiah, packages } from '../data/site'
 import {
   Plus,
@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   Calendar,
   Layers,
+  Lock,
 } from 'lucide-react'
 
 export default function Dashboard() {
@@ -178,15 +179,21 @@ export default function Dashboard() {
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute top-3 right-3 flex gap-1.5">
-                          <span
-                            className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-xs shadow-xs ${
-                              item.status === 'paid'
-                                ? 'bg-green-700 text-white'
-                                : 'bg-gold-deep text-ivory'
-                            }`}
-                          >
-                            {item.status === 'paid' ? 'Aktif' : 'Draft / Unpaid'}
-                          </span>
+                          {isEventEditLocked(item.date, 1) ? (
+                            <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-xs shadow-xs bg-amber-800 text-white inline-flex items-center gap-1">
+                              <Lock size={9} /> Arsip Kenangan
+                            </span>
+                          ) : (
+                            <span
+                              className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-xs shadow-xs ${
+                                item.status === 'paid'
+                                  ? 'bg-green-700 text-white'
+                                  : 'bg-gold-deep text-ivory'
+                              }`}
+                            >
+                              {item.status === 'paid' ? 'Aktif' : 'Draft / Unpaid'}
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -227,12 +234,21 @@ export default function Dashboard() {
                         Buku Tamu &amp; QR
                       </Link>
 
-                      <Link
-                        to={`/edit/${item.slug}`}
-                        className="border border-ink/25 text-ink bg-white py-2 text-center uppercase tracking-wider font-semibold rounded-xs hover:bg-ink hover:text-ivory transition-colors"
-                      >
-                        Edit Data
-                      </Link>
+                      {isEventEditLocked(item.date, 1) ? (
+                        <span
+                          className="border border-ink/15 text-stone/70 bg-ink/5 py-2 text-center uppercase tracking-wider font-semibold rounded-xs inline-flex items-center justify-center gap-1 cursor-not-allowed text-[11px]"
+                          title="Masa revisi mandiri telah selesai (H+1 pasca hari acara)"
+                        >
+                          <Lock size={11} /> Terkunci (H+1)
+                        </span>
+                      ) : (
+                        <Link
+                          to={`/edit/${item.slug}`}
+                          className="border border-ink/25 text-ink bg-white py-2 text-center uppercase tracking-wider font-semibold rounded-xs hover:bg-ink hover:text-ivory transition-colors"
+                        >
+                          Edit Data
+                        </Link>
+                      )}
 
                       <a
                         href={invitationUrl(item.slug)}
