@@ -25,6 +25,7 @@ import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
 import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 import ThemeRoyalBunny from './ThemeRoyalBunny'
+import ThemeWeddingGazette from './ThemeWeddingGazette'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 import AdSlot from '../components/AdSlot'
@@ -54,6 +55,11 @@ export default function Invitation({ data, guest = '', preview = false }) {
   // Komponen khusus Boarding Pass
   if (theme.layout === 'boarding') {
     return <BoardingInvitation data={data} guest={guest} preview={preview} />
+  }
+
+  // Komponen khusus Wedding Gazette / Koran Vintage Editorial
+  if (theme.layout === 'wedding-gazette' || theme.id === 'wedding-gazette') {
+    return <ThemeWeddingGazette data={data} guest={guest} preview={preview} theme={theme} />
   }
 
   return <StandardInvitation data={data} guest={guest} preview={preview} theme={theme} />

@@ -1109,6 +1109,231 @@ export const demos = {
       { bank: 'Bank Mandiri', name: 'Sarah Anindya', number: '1370019283741' },
     ],
   }),
+
+  'sweet-seventeen': demo({
+    themeId: 'sweet-seventeen',
+    slug: 'sarah-sweet-17',
+    eventType: 'birthday',
+    bride: {
+      nick: 'Sarah Bella',
+      full: 'Sarah Bella Aurelia',
+      parents: 'Putri tercinta dari Bpk. Ir. Wijaya & Ibu Ratna',
+      photo: '/assets/local/teenager_party_dress.jpg',
+      ig: '@sarahbella17',
+    },
+    groom: {
+      nick: 'Sarah Bella',
+      full: 'Sarah Bella Aurelia',
+      parents: '',
+      photo: '/assets/local/teenager_party_dress.jpg',
+    },
+    date: '2026-09-18',
+    quote: 'Youth is a dream, a form of chemical madness. Celebrating 17 years of laughter, dreams, and endless gratitude.',
+    quoteSource: 'F. Scott Fitzgerald',
+    story: [
+      { year: '2009', title: 'Chapter 1: The Beginning', text: 'Hari di mana aku pertama kali menyapa dunia dengan tangis bahagia keluarga.' },
+      { year: '2021', title: 'Chapter 2: Growing & Learning', text: 'Masa-masa penuh petualangan di SMP dan persahabatan yang tulus.' },
+      { year: '2026', title: 'Chapter 3: Sweet Seventeen', text: 'Menatap masa depan dengan keberanian, mimpi besar, dan cinta keluarga.' },
+    ],
+    gallery: [
+      '/assets/local/teenager_birthday.jpg',
+      '/assets/local/teenager_party_dress.jpg',
+      '/assets/local/birthday_party_cover.jpg',
+      '/assets/local/tropical_flowers_pattern.jpg',
+    ],
+    events: [
+      {
+        title: 'Sweet 17th Glamour Night',
+        date: '2026-09-18',
+        time: '18:30 - 22:00 WIB',
+        venue: 'Sky Lounge Ballroom Hotel Grand Indonesia',
+        address: 'Jl. M.H. Thamrin No. 1, Menteng, Jakarta Pusat',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Sarah Bella Aurelia', number: '5271928401' },
+    ],
+  }),
+
+  'graduation-honors': demo({
+    themeId: 'graduation-honors',
+    slug: 'wisuda-dr-sarah',
+    eventType: 'graduation',
+    bride: {
+      nick: 'dr. Sarah',
+      full: 'dr. Sarah Bella Aurelia, Sp.A',
+      parents: 'Putri dari Bpk. Prof. Dr. Hendra & Ibu Dr. Susi',
+      photo: '/assets/local/graduate_toga.jpg',
+      ig: '@drsarahbella',
+    },
+    groom: {
+      nick: 'dr. Sarah',
+      full: 'dr. Sarah Bella Aurelia, Sp.A',
+      parents: '',
+      photo: '/assets/local/graduate_toga.jpg',
+    },
+    date: '2026-10-10',
+    quote: 'The beautiful thing about learning is that no one can take it away from you. Sembah sujud syukur atas gelar dan amanah baru.',
+    quoteSource: 'B.B. King',
+    story: [
+      { year: '2018', title: 'Awal Perjuangan', text: 'Memulai langkah di Fakultas Kedokteran dengan tekad mengabdi.' },
+      { year: '2023', title: 'Sumpah Dokter', text: 'Mengambil sumpah profesi kedokteran dengan penuh rasa tanggung jawab.' },
+      { year: '2026', title: 'Gelar Spesialis Anak', text: 'Menyelesaikan pendidikan dokter spesialis anak demi senyum generasi penerus bangsa.' },
+    ],
+    gallery: [
+      '/assets/local/graduate_toga.jpg',
+      '/assets/local/graduate_smiling.jpg',
+      '/assets/local/graduation_campus_cover.jpg',
+      '/assets/local/graduation_cap.jpg',
+    ],
+    events: [
+      {
+        title: 'Tasyakuran & Ramah Tamah Wisuda Spesialis',
+        date: '2026-10-10',
+        time: '12:00 - 15:30 WIB',
+        venue: 'Auditorium Sasana Budaya Ganesha',
+        address: 'Jl. Ganesa No. 10, Coblong, Kota Bandung',
+        maps: 'https://maps.google.com/?q=Bandung',
+      },
+    ],
+    banks: [
+      { bank: 'Bank Mandiri', name: 'Sarah Bella Aurelia', number: '1370019284729' },
+    ],
+  }),
+
+  'aqiqah-al-fatih': demo({
+    themeId: 'aqiqah-al-fatih',
+    slug: 'aqiqah-muhammad-al-fatih',
+    eventType: 'aqiqah',
+    bride: {
+      nick: 'Al-Fatih',
+      full: 'Muhammad Aruna Al-Fatih',
+      parents: 'Putra tercinta dari Bpk. Yogi Pradipta & Ibu Ratna Dewi',
+      photo: '/assets/local/baby_sleeping.jpg',
+    },
+    groom: {
+      nick: 'Al-Fatih',
+      full: 'Muhammad Aruna Al-Fatih',
+      parents: 'Putra tercinta dari Bpk. Yogi Pradipta & Ibu Ratna Dewi',
+      photo: '/assets/local/baby_sleeping.jpg',
+    },
+    date: '2026-11-08',
+    quote: 'Setiap anak yang lahir tergadai dengan aqiqahnya, disembelihkan untuknya hewan pada hari ketujuh, dicukur rambutnya, dan diberi nama yang baik.',
+    quoteSource: 'HR. Abu Dawud',
+    story: [
+      { year: '2026', title: 'Kelahiran Penuh Berkah', text: 'Lahir dengan selamat dan sehat pada 1 November 2026 pukul 05:15 WIB.' },
+      { year: '2026', title: 'Arti Nama Indah', text: 'Muhammad (Yang Terpuji) Aruna (Fajar Penyejuk) Al-Fatih (Sang Pembuka Kebaikan).' },
+    ],
+    gallery: [
+      '/assets/local/baby_sleeping.jpg',
+      '/assets/local/aqiqah_cradle_cover.jpg',
+      '/assets/local/aqiqah_safari_cover.jpg',
+      '/assets/local/pastel_flower_texture.jpg',
+    ],
+    events: [
+      {
+        title: 'Walimatul Tasmiyah & Aqiqah',
+        date: '2026-11-08',
+        time: '09:00 - 12:00 WIB',
+        venue: 'Kediaman Keluarga Besar Yogi & Ratna',
+        address: 'Jl. Melati Indah No. 12, Cilandak, Jakarta Selatan',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Yogi Pradipta', number: '8820491823' },
+    ],
+  }),
+
+  'corporate-gala': demo({
+    themeId: 'corporate-gala',
+    slug: 'aruna-tech-summit-2026',
+    eventType: 'corporate',
+    bride: {
+      nick: 'Aruna Summit',
+      full: 'Aruna Technology & Innovation Summit 2026',
+      parents: 'Diselenggarakan oleh ByAruna Digital Indonesia',
+      photo: '/assets/local/corporate_executive.jpg',
+    },
+    groom: {
+      nick: 'Aruna Summit',
+      full: 'Aruna Technology & Innovation Summit 2026',
+      parents: 'Diselenggarakan oleh ByAruna Digital Indonesia',
+      photo: '/assets/local/corporate_executive.jpg',
+    },
+    date: '2026-12-05',
+    quote: 'Innovate, Inspire, and Elevate: Empowering Next-Generation Digital Experiences.',
+    quoteSource: 'Aruna Annual Summit',
+    story: [
+      { year: '2024', title: 'Foundations of Digital Elegance', text: 'Meluncurkan platform undangan berestetika tinggi pertama di Indonesia.' },
+      { year: '2026', title: 'Global Scale & AI Integration', text: 'Menghubungkan ratusan ribu pengguna dengan arsitektur cloud serverless super cepat.' },
+    ],
+    gallery: [
+      '/assets/local/corporate_stage_cover.jpg',
+      '/assets/local/corporate_executive.jpg',
+      '/assets/local/attari_wedding.jpg',
+      '/assets/local/marble_texture.jpg',
+    ],
+    events: [
+      {
+        title: 'Keynote Summit & Annual Gala Dinner',
+        date: '2026-12-05',
+        time: '16:00 - 21:30 WIB',
+        venue: 'Grand Ballroom Hotel Mulia Senayan',
+        address: 'Jl. Asia Afrika, Gelora, Senayan, Jakarta Pusat',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'PT ByAruna Digital Indonesia', number: '8910284910' },
+    ],
+  }),
+
+  'birthday-memory-capsule': demo({
+    themeId: 'birthday-memory-capsule',
+    slug: 'kapsul-spesial-sarah',
+    eventType: 'birthday',
+    bride: {
+      nick: 'Sarah',
+      full: 'Sarah Anindya',
+      parents: '',
+      photo: '/assets/local/teenager_birthday.jpg',
+    },
+    groom: {
+      nick: 'Sarah',
+      full: 'Sarah Anindya',
+      parents: '',
+      photo: '/assets/local/teenager_birthday.jpg',
+    },
+    date: '2026-09-18',
+    quote: 'Untukmu yang kelahirannya adalah hadiah terindah bagi semesta. Terima kasih telah selalu menjadi rumah ternyaman bagi hatiku.',
+    quoteSource: 'Special Love Letter',
+    story: [
+      { year: '2022', title: 'Saat Pertama Berjumpa', text: 'Senyuman pertamamu yang tak pernah pudar dalam ingatanku.' },
+      { year: '2024', title: 'Melewati Ribuan Cerita', text: 'Setiap tawa kecil dan perjalanan sederhana yang kita ukir berdua.' },
+      { year: '2026', title: 'Selamat Bertambah Usia!', text: 'Semoga bahagiamu seluas samudra, dan setiap mimpimu terwujud nyata.' },
+    ],
+    gallery: [
+      '/assets/local/teenager_birthday.jpg',
+      '/assets/local/teenager_party_dress.jpg',
+      '/assets/local/couple_garden.jpg',
+      '/assets/local/pastel_flower_texture.jpg',
+    ],
+    events: [
+      {
+        title: 'Private Birthday Dinner & Keepsake Night',
+        date: '2026-09-18',
+        time: '19:00 - 22:00 WIB',
+        venue: 'The Glass House Romantic Dining',
+        address: 'Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Sarah Anindya', number: '5271928401' },
+    ],
+  }),
 }
 
 function demo(partial) {
