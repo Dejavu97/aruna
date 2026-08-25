@@ -68,3 +68,22 @@ Dokumen ini mencatat seluruh rincian pembaruan, evolusi fitur, dan penguatan sis
   - Kustomisasi nama brand agensi, logo, warna identitas, nomor WhatsApp layanan klien, dan footer hak cipta.
   - Menghilangkan jejak branding Aruna untuk klien agensi.
   - Generator tautan proposal dan pratinjau tema bertema agensi.
+
+---
+
+### 5. Super Admin Operational & Marketing Suite (`/admin`)
+* **Dashboard Operasional & Pemesanan:**
+  - Manajemen pesanan dengan filter status, konfirmasi pembayaran, dan tombol bypass kelola langsung.
+  - Fitur 1-Click Clone pesanan (duplikasi 100% data dan foto dengan slug baru).
+  - Semi-Automatic WhatsApp Dispatcher untuk sebar link undangan ke daftar kontak massal.
+* **Manajemen Iklan Banner & Sponsor (`/admin` -> Tab Iklan):**
+  - Pengaturan iklan banner (Header, Footer, Cover Popup) dengan slot banner custom, link tujuan, dan pelacakan impresi/klik.
+* **Manajemen Voucher & Kode Diskon (`/admin` -> Tab Voucher):**
+  - Pembuatan kode kupon diskon persentase (%) atau potongan nominal tetap (Rp), tanggal kedaluwarsa, dan batas kuota penggunaan.
+* **Manajemen Paket Harga Dinamis (`/admin` -> Tab Paket):**
+  - Mengubah harga paket Bronze, Silver, Gold, Platinum secara real-time tanpa perlu deployment ulang.
+* **Generator Mockup Pemasaran Media Sosial (`SocialMockupModal.jsx`):**
+  - Pembuat materi promosi 3D frame HP smartphone, feed Instagram 1:1, dan story 9:16 langsung dari pesanan klien.
+* **Mode Pemeliharaan Sistem (Maintenance Mode Toggle):**
+  - Saklar darurat pemeliharaan sistem dengan layar tunggu elegan saat pembaruan besar berlangsung.
+
