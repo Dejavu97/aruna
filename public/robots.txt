@@ -1,0 +1,20 @@
+# Robots.txt for ByAruna (https://byaruna.my.id)
+User-agent: *
+Allow: /
+Allow: /tema
+Allow: /studio
+Allow: /pesan
+Allow: /masuk
+Allow: /u/*
+
+# Protect private admin and client management URLs from public search index
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /kelola/*
+Disallow: /edit/*
+Disallow: /berhasil/*
+Disallow: /dashboard
+Disallow: /api/*
+
+# Official Sitemap Location
+Sitemap: https://byaruna.my.id/sitemap.xml
