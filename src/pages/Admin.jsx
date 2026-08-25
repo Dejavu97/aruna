@@ -393,6 +393,11 @@ export default function Admin() {
     }
   }, [items, customThemesList, adminPackages])
 
+  // Custom Domain Directory Items
+  const customDomainItems = useMemo(() => {
+    return items.filter((it) => it.customDomain && String(it.customDomain).trim())
+  }, [items])
+
   // Filtered & Searched Orders
   const filteredOrders = useMemo(() => {
     const now = new Date().setHours(0, 0, 0, 0)
@@ -402,6 +407,7 @@ export default function Admin() {
       if (orderTab === 'unpaid' && item.status === 'paid') return false
       if (orderTab === 'paid' && (item.status !== 'paid' || isPast)) return false
       if (orderTab === 'past' && (item.status !== 'paid' || !isPast)) return false
+      if (orderTab === 'custom_domain' && (!item.customDomain || !String(item.customDomain).trim())) return false
 
       // 2. Package Filter
       if (filterPackage !== 'all' && item.packageId !== filterPackage) return false
@@ -415,7 +421,8 @@ export default function Admin() {
         const matchWa = item.customerWhatsapp?.toLowerCase().includes(q)
         const matchSlug = item.slug?.toLowerCase().includes(q)
         const matchCode = item.orderCode?.toLowerCase().includes(q)
-        return matchBride || matchGroom || matchCustomer || matchWa || matchSlug || matchCode
+        const matchDomain = item.customDomain?.toLowerCase().includes(q)
+        return matchBride || matchGroom || matchCustomer || matchWa || matchSlug || matchCode || matchDomain
       }
 
       return true
@@ -1173,12 +1180,13 @@ export default function Admin() {
             </div>
 
             {/* Sub Status Tabs */}
-            <div className="flex gap-2 text-xs uppercase tracking-wider font-medium">
+            <div className="flex gap-2 overflow-x-auto text-xs uppercase tracking-wider font-medium">
               {[
                 ['all', `Semua (${items.length})`],
                 ['unpaid', `Belum Bayar (${analytics.unpaidCount})`],
                 ['paid', `Lunas Aktif (${analytics.paidCount})`],
                 ['past', `Selesai (${analytics.pastCount})`],
+                ['custom_domain', `Domain Pribadi (${customDomainItems.length})`],
               ].map(([sub, lbl]) => (
                 <button
                   key={sub}
@@ -1665,6 +1673,17 @@ export default function Admin() {
                 }`}
               >
                 Voucher Diskon ({vouchersList.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setMonetizationSubTab('domains')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  monetizationSubTab === 'domains'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Domain Terpasang ({customDomainItems.length})
               </button>
               <button
                 type="button"
@@ -2417,7 +2436,7 @@ export default function Admin() {
                     setSavingAds(true)
                     try {
                       await saveAdSettings(adSettings)
-                      alert('Pengaturan iklan berhasil disimpan!')
+                      alert('Pengaturan iklan & monetisasi berhasil disimpan!')
                     } catch (err) {
                       alert('Gagal menyimpan: ' + err.message)
                     } finally {
@@ -2432,6 +2451,173 @@ export default function Admin() {
               </div>
             </div>
           </div>
+            )}
+
+            {/* SUBTAB 3: DIREKTORI DOMAIN PRIBADI TERPASANG */}
+            {monetizationSubTab === 'domains' && (
+              <div className="space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-4 bg-paper border border-ink/15 p-5 rounded-sm shadow-xs">
+                  <div>
+                    <div className="flex items-center gap-2 text-gold-deep">
+                      <Globe size={20} />
+                      <h2 className="font-display text-xl font-bold text-ink">Direktori Domain Pribadi Klien (Self-Service)</h2>
+                    </div>
+                    <p className="text-xs text-stone mt-1 max-w-2xl leading-relaxed">
+                      Daftar seluruh domain kustom (.com / .id / .wedding) yang aktif terhubung ke undangan pelanggan. Anda dapat memantau status DNS, menguji tautan langsung, atau mengelola pemetaan domain.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="bg-ivory border border-ink/15 px-3.5 py-2 rounded-xs text-xs font-semibold text-ink shadow-xs">
+                      Total Terpasang: <span className="font-mono font-bold text-gold-deep">{customDomainItems.length}</span> Domain
+                    </div>
+                  </div>
+                </div>
+
+                {/* DNS Server Info Guide Box */}
+                <div className="bg-ivory/70 border border-gold-deep/30 p-4 rounded-sm grid sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <p className="font-bold text-ink uppercase tracking-wider mb-1">Target DNS Server Aruna:</p>
+                    <p className="text-stone">Setiap domain pelanggan harus diarahkan ke DNS Vercel:</p>
+                    <div className="mt-2 font-mono text-[11px] bg-paper p-2.5 border border-ink/10 rounded-xs space-y-1">
+                      <div><span className="text-stone">Type A (@):</span> <strong className="text-ink">76.76.21.21</strong></div>
+                      <div><span className="text-stone">CNAME (www):</span> <strong className="text-ink">cname.vercel-dns.com</strong></div>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 text-stone leading-relaxed">
+                    <p className="font-bold text-ink uppercase tracking-wider">Catatan Pengelolaan Super Admin:</p>
+                    <p>• Jika domain dilepas oleh Admin, undangan otomatis kembali ke tautan standar <code className="bg-paper px-1 py-0.5 border border-ink/10">/u/[slug]</code>.</p>
+                    <p>• Sertifikat SSL HTTPS otomatis aktif setelah propagasi DNS selesai (biasanya 5–30 menit).</p>
+                  </div>
+                </div>
+
+                {/* Custom Domain Table */}
+                {customDomainItems.length === 0 ? (
+                  <div className="border border-dashed border-ink/20 p-12 text-center bg-paper rounded-sm space-y-3">
+                    <Globe size={32} className="mx-auto text-stone/40" />
+                    <p className="text-sm font-semibold text-ink">Belum Ada Domain Pribadi Terpasang</p>
+                    <p className="text-xs text-stone max-w-md mx-auto leading-relaxed">
+                      Ketika pelanggan memasang domain khusus melalui menu "Domain Pribadi" di dashboard mereka, daftar domain dan undangan tujuan akan otomatis tercatat di sini.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="border border-ink/15 bg-paper rounded-sm overflow-hidden shadow-xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="border-b border-ink/15 bg-ivory text-stone uppercase tracking-wider font-semibold">
+                            <th className="py-3 px-4">Nama Domain</th>
+                            <th className="py-3 px-4">Undangan Tujuan &amp; Mempelai</th>
+                            <th className="py-3 px-4">Pemesan &amp; Kontak WA</th>
+                            <th className="py-3 px-4">Paket &amp; Status</th>
+                            <th className="py-3 px-4">Tanggal Acara</th>
+                            <th className="py-3 px-4 text-right">Aksi</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-ink/10">
+                          {customDomainItems.map((inv) => {
+                            const isSingle = !inv.groom?.nick || inv.groom?.nick === inv.bride?.nick
+                            const coupleName = isSingle ? inv.bride?.nick || inv.customerName || 'Acara' : `${inv.bride?.nick} & ${inv.groom?.nick}`
+                            const pack = adminPackages.find((p) => p.id === inv.packageId) || defaultPackages.find((p) => p.id === inv.packageId)
+                            const cleanPhone = (inv.customerWhatsapp || '').replace(/[^0-9]/g, '')
+
+                            return (
+                              <tr key={inv.slug} className="hover:bg-ivory/40 transition-colors">
+                                {/* Domain Name */}
+                                <td className="py-3.5 px-4 font-mono font-bold text-ink">
+                                  <a
+                                    href={`https://${inv.customDomain}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-purple-900 hover:text-gold-deep inline-flex items-center gap-1.5 group"
+                                    title="Uji buka domain di tab baru"
+                                  >
+                                    <Globe size={13} className="text-purple-700 group-hover:text-gold-deep" />
+                                    <span className="underline decoration-purple-300 group-hover:decoration-gold-deep">{inv.customDomain}</span>
+                                    <ExternalLink size={11} className="opacity-60" />
+                                  </a>
+                                </td>
+
+                                {/* Target Invitation */}
+                                <td className="py-3.5 px-4 space-y-0.5">
+                                  <div className="font-semibold text-ink font-display text-sm">{coupleName}</div>
+                                  <div className="font-mono text-[11px] text-stone">/u/{inv.slug}</div>
+                                  <div className="text-[10px] text-stone">Order: {inv.orderCode || '-'}</div>
+                                </td>
+
+                                {/* Customer Info */}
+                                <td className="py-3.5 px-4 space-y-0.5">
+                                  <div className="font-medium text-ink">{inv.customerName || 'Pelanggan'}</div>
+                                  {cleanPhone ? (
+                                    <a
+                                      href={`https://wa.me/${cleanPhone}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-green-800 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
+                                    >
+                                      <MessageCircle size={11} className="text-green-700" /> {inv.customerWhatsapp}
+                                    </a>
+                                  ) : (
+                                    <span className="text-stone text-[11px]">-</span>
+                                  )}
+                                </td>
+
+                                {/* Package & Payment Status */}
+                                <td className="py-3.5 px-4 space-y-1">
+                                  <span className="inline-block bg-ink/5 border border-ink/15 text-stone px-2 py-0.5 text-[10px] font-semibold uppercase rounded-xs">
+                                    {pack?.name || 'Paket Lengkap'}
+                                  </span>
+                                  <div>
+                                    <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-xs ${
+                                      inv.status === 'paid' ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-gold/15 text-gold-deep border border-gold-deep/30'
+                                    }`}>
+                                      {inv.status === 'paid' ? 'Lunas' : 'Belum Bayar'}
+                                    </span>
+                                  </div>
+                                </td>
+
+                                {/* Event Date */}
+                                <td className="py-3.5 px-4 text-stone text-xs">
+                                  {inv.date ? formatLongDate(inv.date) : '-'}
+                                </td>
+
+                                {/* Actions */}
+                                <td className="py-3.5 px-4 text-right">
+                                  <div className="inline-flex items-center gap-1.5 justify-end">
+                                    <Link
+                                      to={`/kelola/${inv.slug}`}
+                                      className="border border-ink/20 px-2.5 py-1 text-[11px] font-semibold hover:bg-ink/5 uppercase tracking-wider rounded-xs transition-colors"
+                                    >
+                                      Kelola
+                                    </Link>
+                                    <button
+                                      type="button"
+                                      onClick={async () => {
+                                        if (!confirm(`Putuskan domain "${inv.customDomain}" dari undangan "${coupleName}"? Undangan akan kembali ke URL standar /u/${inv.slug}.`)) return
+                                        try {
+                                          await updateInvitation(inv.slug, { customDomain: null })
+                                          alert(`Domain ${inv.customDomain} berhasil dilepas.`)
+                                          load()
+                                        } catch (err) {
+                                          alert('Gagal melepas domain: ' + err.message)
+                                        }
+                                      }}
+                                      className="border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 text-[11px] font-semibold rounded-xs transition-colors"
+                                      title="Lepas domain dari undangan ini"
+                                    >
+                                      Putuskan
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         )}
