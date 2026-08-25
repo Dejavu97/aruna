@@ -385,11 +385,15 @@ export async function replyWish(slug, editKey, wishId, replyText) {
   return updatedWishes
 }
   
-export async function fetchInvitationByDomain(domain) {  
-  const q = query(collection(db, 'invitations'), where('customDomain', '==', domain))  
-  const snap = await getDocs(q)  
-  if (snap.empty) throw new Error('Undangan tidak ditemukan untuk domain ini.')  
-  return { slug: snap.docs[0].id, ...snap.docs[0].data() }  
+export async function fetchInvitationByDomain(rawDomain) {
+  const domain = (rawDomain || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+  const bare = domain.replace(/^www\./, '')
+  const withWww = 'www.' + bare
+
+  const q = query(collection(db, 'invitations'), where('customDomain', 'in', [domain, bare, withWww]))
+  const snap = await getDocs(q)
+  if (snap.empty) throw new Error('Undangan tidak ditemukan untuk domain ini.')
+  return { slug: snap.docs[0].id, ...snap.docs[0].data() }
 } 
   
 export async function getAnnouncement() {

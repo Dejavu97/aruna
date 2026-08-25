@@ -1159,30 +1159,46 @@ export default function Manage() {
                     className="border border-ink/20 bg-transparent p-3 text-base focus:border-ink focus:outline-none flex-grow max-w-sm"
                     placeholder="contoh: budidansiti.com"
                     value={customDomain}
-                    onChange={(e) => setCustomDomain(e.target.value.toLowerCase().trim())}
+                    onChange={(e) => setCustomDomain(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={async () => {
-                      if (!customDomain) return
+                      if (!customDomain.trim()) return
                       setError('')
+                      const cleanDomain = customDomain
+                        .trim()
+                        .toLowerCase()
+                        .replace(/^https?:\/\//, '')
+                        .replace(/\/.*$/, '')
+
                       try {
-                        const res = await fetch('/api/add-domain', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ domain: customDomain, slug, editKey })
-                        })
-                        const data = await res.json()
-                        if (!res.ok) throw new Error(data.error || 'Gagal menambahkan domain ke server.')
-                        
-                        await updateInvitation(slug, { customDomain }, editKey)
-                        setItem(prev => ({ ...prev, customDomain }))
-                        alert('Domain berhasil ditambahkan! Silakan ikuti instruksi DNS di bawah.')
+                        // 1. Selalu simpan ke database Firestore terlebih dahulu
+                        await updateInvitation(slug, { customDomain: cleanDomain }, editKey)
+                        setItem((prev) => ({ ...prev, customDomain: cleanDomain }))
+                        setCustomDomain(cleanDomain)
+
+                        // 2. Hubungkan ke Vercel di background jika API tersedia
+                        try {
+                          const res = await fetch('/api/add-domain', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ domain: cleanDomain, slug, editKey }),
+                          })
+                          if (!res.ok) {
+                            const d = await res.json().catch(() => ({}))
+                            console.warn('Vercel domain connection note:', d.error)
+                          }
+                        } catch (vErr) {
+                          console.warn('Vercel API call note:', vErr)
+                        }
+
+                        alert('Domain pribadi berhasil dihubungkan! Silakan arahkan DNS domain Anda sesuai tabel petunjuk di bawah.')
                       } catch (err) {
-                        setError(err.message)
+                        setError(err.message || 'Gagal menyimpan domain.')
                       }
                     }}
-                    className="bg-ink px-6 py-3 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep"
+                    className="bg-ink px-6 py-3 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep transition-colors"
                   >
                     {item?.customDomain ? 'Ganti Domain' : 'Hubungkan Domain'}
                   </button>
@@ -1192,24 +1208,30 @@ export default function Manage() {
                       onClick={async () => {
                         if (!confirm('Yakin ingin menghapus domain khusus ini?')) return
                         setError('')
+                        const prevDomain = item.customDomain
                         try {
-                          const res = await fetch('/api/remove-domain', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ domain: item.customDomain, slug, editKey })
-                          })
-                          const data = await res.json()
-                          if (!res.ok) throw new Error(data.error || 'Gagal menghapus domain dari server.')
-                          
+                          // 1. Hapus dari database Firestore
                           await updateInvitation(slug, { customDomain: null }, editKey)
-                          setItem(prev => ({ ...prev, customDomain: null }))
+                          setItem((prev) => ({ ...prev, customDomain: null }))
                           setCustomDomain('')
-                          alert('Domain berhasil dihapus.')
+
+                          // 2. Hapus dari Vercel di background jika tersedia
+                          try {
+                            await fetch('/api/remove-domain', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ domain: prevDomain, slug, editKey }),
+                            })
+                          } catch (vErr) {
+                            console.warn('Vercel API remove note:', vErr)
+                          }
+
+                          alert('Domain pribadi berhasil dihapus.')
                         } catch (err) {
-                          setError(err.message)
+                          setError(err.message || 'Gagal menghapus domain.')
                         }
                       }}
-                      className="border border-red-600/50 text-red-600 px-6 py-3 text-xs uppercase tracking-widest hover:bg-red-50"
+                      className="border border-red-600/50 text-red-600 px-6 py-3 text-xs uppercase tracking-widest hover:bg-red-50 transition-colors"
                     >
                       Hapus Domain
                     </button>

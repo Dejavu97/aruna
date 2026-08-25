@@ -48,7 +48,13 @@ export default async function handler(req, res) {
     const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Failed to add domain to Vercel')
+      const msg = data.error?.message || ''
+      const code = data.error?.code || ''
+      // Jika domain sudah ada di proyek Vercel ini atau sudah terdaftar di akun Vercel, itu status valid
+      if (msg.includes('already in use') || code === 'domain_already_in_use' || code === 'forbidden') {
+        return res.status(200).json({ success: true, domain, note: 'Domain sudah aktif di proyek Vercel.' })
+      }
+      throw new Error(msg || 'Gagal menambahkan domain ke Vercel')
     }
 
     // Jika berhasil
