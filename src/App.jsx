@@ -24,6 +24,8 @@ export default function App() {
   const isCustomDomain =
     !hostname.includes('localhost') &&
     !hostname.includes('127.0.0.1') &&
+    !hostname.includes('byaruna.my.id') &&
+    !hostname.includes('byaruna') &&
     !hostname.includes('aruna.com') &&
     !hostname.includes('vercel.app') &&
     !hostname.includes('ngrok-free.app')
