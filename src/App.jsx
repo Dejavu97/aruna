@@ -13,6 +13,7 @@ import ThemeStudio from './pages/ThemeStudio'
 import CustomDomainPage from './pages/CustomDomainPage'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Inspiration from './pages/Inspiration'
 import MaintenanceScreen from './components/MaintenanceScreen'
 import { AuthProvider } from './context/AuthContext'
 import { defaultMaintenanceSettings, fetchMaintenanceSettings } from './lib/api'
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="/tema/:themeId" element={<ThemePreview />} />
         <Route path="/studio" element={<ThemeStudio />} />
         <Route path="/studio/:themeId" element={<ThemeStudio />} />
+        <Route path="/inspirasi" element={<Inspiration />} />
         <Route path="/pesan" element={<Order />} />
         <Route path="/pesan/:themeId" element={<Order />} />
         <Route path="/berhasil/:slug" element={<Success />} />

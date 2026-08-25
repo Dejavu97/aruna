@@ -23,8 +23,9 @@ export default function SiteFooter() {
           <p className="mb-3 uppercase tracking-[0.2em] text-ink/50">Jelajah</p>
           <div className="grid gap-2">
             <Link to="/tema" className="hover:text-ink">Katalog tema</Link>
+            <Link to="/inspirasi" className="hover:text-ink">Inspirasi kata-kata</Link>
+            <Link to="/studio" className="hover:text-ink">Theme studio</Link>
             <a href="/#harga" className="hover:text-ink">Harga</a>
-            <Link to="/admin" className="hover:text-ink">Admin undangan</Link>
           </div>
         </div>
         <div className="text-sm text-stone">

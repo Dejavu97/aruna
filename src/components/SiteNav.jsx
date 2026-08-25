@@ -6,8 +6,8 @@ import { useAuth } from '../context/AuthContext'
 
 const links = [
   { to: '/tema', label: 'Katalog Tema' },
+  { to: '/inspirasi', label: 'Inspirasi Kata-Kata' },
   { to: '/#fitur', label: 'Fitur' },
-  { to: '/#cara-kerja', label: 'Cara Kerja' },
   { to: '/#harga', label: 'Harga' },
   { to: '/studio', label: 'Theme Studio' },
 ]
