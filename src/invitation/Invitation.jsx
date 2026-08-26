@@ -27,12 +27,18 @@ import ThemeAdatJawa from './ThemeAdatJawa'
 import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 import ThemeRoyalBunny from './ThemeRoyalBunny'
 import ThemeWeddingGazette from './ThemeWeddingGazette'
+import ThemeCinematicMinimal from '../themes/ThemeCinematicMinimal'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 import AdSlot from '../components/AdSlot'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
+
+  // Tema Reference: Cinematic Editorial Minimal
+  if (theme.layout === 'cinematic-minimal' || theme.id === 'cinematic-minimal') {
+    return <ThemeCinematicMinimal data={data} guest={guest} preview={preview} theme={theme} />
+  }
 
   // Tema Royal Bunny Fairytale
   if (theme.layout === 'royal-bunny' || theme.id === 'royal-bunny') {

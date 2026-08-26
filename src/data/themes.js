@@ -9,6 +9,32 @@ const galleryClassic = [
 
 export const themes = [
   {
+    id: 'cinematic-minimal',
+    name: 'Cinematic Editorial Minimal',
+    tag: 'Reference',
+    tags: ['editorial', 'cinematic', 'minimalis', 'modern', 'dark-mode', 'storytelling'],
+    popular: true,
+    collection: 'premium',
+    description: 'Tema sinematik modern dengan fokus pada visual editorial, babak cerita interaktif, dan palet dark slate champagne.',
+    cover: '/themes/cinematic-cover.jpg',
+    layout: 'cinematic-minimal',
+    opener: 'AN EDITORIAL BY',
+    fonts: {
+      display: '"Playfair Display", serif',
+      script: '"Alex Brush", cursive',
+      body: '"Plus Jakarta Sans", sans-serif',
+    },
+    colors: {
+      bg: '#0D1117',
+      paper: '#161B22',
+      fg: '#F0F6FC',
+      muted: '#8B949E',
+      accent: '#D4AF37',
+      accentSoft: '#21262D',
+      cover: '#05070A',
+    },
+  },
+  {
     id: 'royal-bunny',
     name: 'Royal Bunny Fairytale',
     tag: 'Premium',
@@ -1544,6 +1570,62 @@ export const demos = {
     ],
     banks: [
       { bank: 'BCA', name: 'PT ByAruna Digital Indonesia', number: '8910284910' },
+    ],
+  }),
+
+  'cinematic-minimal': demo({
+    themeId: 'cinematic-minimal',
+    slug: 'cinematic-editorial-demo',
+    eventType: 'wedding',
+    bride: {
+      nick: 'Sarah',
+      full: 'Sarah Michelle Anindya, S.Ds',
+      parents: 'Putri tercinta Bpk. Bambang & Ibu Citra',
+      photo: '/assets/local/couple_garden.jpg',
+      ig: 'sarahanindya',
+    },
+    groom: {
+      nick: 'Budi',
+      full: 'Budi Santoso, M.B.A',
+      parents: 'Putra tercinta Bpk. Hendra & Ibu Maya',
+      photo: '/assets/local/attari_wedding.jpg',
+      ig: 'budisantoso',
+    },
+    date: '2026-10-24',
+    quote: 'Dalam setiap babak cerita yang kita lewati bersama, kita menemukan bahwa cinta bukanlah tentang kesempurnaan, melainkan tentang saling memilih tanpa ragu.',
+    quoteSource: 'Babak Pertama Kita',
+    story: [
+      { year: '2021', title: 'Sebuah Percakapan Sederhana', text: 'Di sebuah kafe kecil di Jakarta Selatan, pertemuan yang tak disengaja menjadi awal dari perjalanan panjang kita.' },
+      { year: '2024', title: 'Komitmen Seumur Hidup', text: 'Di bawah matahari terbenam Pulau Dewata, dua hati berjanji untuk saling mendampingi dalam suka dan duka.' },
+      { year: '2026', title: 'Hari Bahagia Dimulai', text: 'Merayakan ikatan suci di hadapan keluarga dan sahabat tercinta.' },
+    ],
+    gallery: [
+      '/assets/local/couple_garden.jpg',
+      '/assets/local/couple_classical.jpg',
+      '/assets/local/couple_laughing_1.jpg',
+      '/assets/local/wedding_rings_2.jpg',
+    ],
+    events: [
+      {
+        title: 'Akad Nikah & Pemberkatan',
+        date: '2026-10-24',
+        time: '09:00 - 11:00 WIB',
+        venue: 'The Glass House Arboretum',
+        address: 'Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+      {
+        title: 'Editorial Celebration & Dinner',
+        date: '2026-10-24',
+        time: '18:30 - 21:30 WIB',
+        venue: 'Grand Glass Ballroom',
+        address: 'Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan',
+        maps: 'https://maps.google.com/?q=Jakarta',
+      },
+    ],
+    banks: [
+      { bank: 'BCA', name: 'Sarah Michelle', number: '5420192834' },
+      { bank: 'Mandiri', name: 'Budi Santoso', number: '1370019284910' },
     ],
   }),
 
