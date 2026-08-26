@@ -20,7 +20,12 @@ export default function SiteNav() {
     <header className="sticky top-0 z-30 border-b border-ink/10 bg-ivory/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo.png" alt="ByAruna" className="h-10 w-auto object-contain" />
+          <img
+            src="/logo.png"
+            alt="ByAruna"
+            className="h-14 w-auto object-contain"
+            style={{ filter: 'brightness(0.72) saturate(1.3)' }}
+          />
         </Link>
         <nav className="hidden items-center gap-6 text-sm text-stone md:flex">
           {links.map((l) =>
