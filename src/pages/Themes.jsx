@@ -101,8 +101,11 @@ export default function Themes() {
     if (eventTab === 'pernikahan') {
       return allThemes.filter((t) => !t.eventType || t.eventType === 'wedding' || (t.tags || []).includes('pernikahan'))
     }
+    if (eventTab === 'kartu-ucapan') {
+      return allThemes.filter((t) => t.eventType === 'memory-capsule' || (t.tags || []).includes('surat-cinta') || (t.tags || []).includes('kartu-ucapan'))
+    }
     if (eventTab === 'ulang-tahun') {
-      return allThemes.filter((t) => t.eventType === 'birthday' || (t.tags || []).includes('ulang-tahun') || (t.tags || []).includes('birthday'))
+      return allThemes.filter((t) => (t.eventType === 'birthday' && t.eventType !== 'memory-capsule') || (t.tags || []).includes('ulang-tahun') || (t.tags || []).includes('birthday'))
     }
     if (eventTab === 'wisuda') {
       return allThemes.filter((t) => t.eventType === 'graduation' || (t.tags || []).includes('wisuda') || (t.tags || []).includes('graduation'))
@@ -309,7 +312,8 @@ export default function Themes() {
           <div className="flex flex-wrap items-center gap-2 pb-3">
             {[
               { id: 'pernikahan', label: 'Undangan Pernikahan' },
-              { id: 'ulang-tahun', label: 'Ulang Tahun & Sweet 17' },
+              { id: 'kartu-ucapan', label: 'Kartu Ucapan & Surat Cinta' },
+              { id: 'ulang-tahun', label: 'Undangan Ulang Tahun' },
               { id: 'wisuda', label: 'Wisuda & Kelulusan' },
               { id: 'aqiqah', label: 'Aqiqah & Bayi' },
               { id: 'perusahaan', label: 'Acara Perusahaan' },
