@@ -652,28 +652,42 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
               {(data.banks || [
                 { bank: 'BCA', name: data.groom?.nick || 'Dimas Pratama', number: '7281920391' },
                 { bank: 'Bank Mandiri', name: data.bride?.nick || 'Andini Putri', number: '1370019283741' },
-              ]).map((b, idx) => (
-                <div key={idx} className="gz-bank-card">
-                  <p className="gz-bank-name">{b.bank}</p>
-                  <p className="gz-acc-num">{b.number}</p>
-                  <p className="gz-acc-holder">a.n. {b.name}</p>
-                  <button
-                    type="button"
-                    onClick={() => handleCopyWire(b.number, idx)}
-                    className="gz-copy-btn"
-                  >
-                    {copiedIndex === idx ? (
-                      <>
-                        <Check size={13} /> NOMOR TERSALIN
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={13} /> SALIN NOMOR REKENING
-                      </>
-                    )}
-                  </button>
+              ]).map((b, idx) => {
+                const accNumber = b.number || b.no || b.account || ''
+                return (
+                  <div key={idx} className="gz-bank-card">
+                    <p className="gz-bank-name">{b.bank}</p>
+                    <p className="gz-acc-num">{accNumber}</p>
+                    <p className="gz-acc-holder">a.n. {b.name}</p>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyWire(accNumber, idx)}
+                      className="gz-copy-btn"
+                    >
+                      {copiedIndex === idx ? (
+                        <>
+                          <Check size={13} /> NOMOR TERSALIN
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={13} /> SALIN NOMOR REKENING
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )
+              })}
+
+              {data.qris && (
+                <div className="gz-bank-card text-center" style={{ marginTop: '1rem' }}>
+                  <p className="gz-bank-name">QRIS PERSEMBAHAN KASIH</p>
+                  <img
+                    src={data.qris}
+                    alt="QRIS"
+                    style={{ width: '220px', margin: '0.8rem auto', display: 'block', background: '#fff', padding: '6px', border: '1px solid #18120C' }}
+                  />
                 </div>
-              ))}
+              )}
             </div>
           </motion.section>
 

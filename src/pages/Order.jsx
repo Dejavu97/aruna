@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import WeddingForm from '../components/WeddingForm'
+import InvitationForm from '../components/WeddingForm'
 import { getTheme, hasTheme, themes } from '../data/themes'
 import { waLink } from '../data/site'
 import { createInvitation, rememberEditKey, fetchCustomTheme, fetchCustomThemes } from '../lib/api'
@@ -236,9 +236,9 @@ export default function Order() {
         </div>
       )}
 
-      {/* Main Wedding Order Form */}
+      {/* Main Invitation Order Form */}
       <div className="flex-1">
-        <WeddingForm
+        <InvitationForm
           key={activeThemeId}
           themeId={activeThemeId}
           customThemes={customThemes}

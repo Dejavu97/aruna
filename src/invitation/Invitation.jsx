@@ -19,7 +19,7 @@ import {
   wazeUrl,
 } from '../lib/utils'
 import Watermark from '../components/Watermark'
-import { getTheme } from '../data/themes'
+import { getTheme, getFormMode, getThemeFeatures } from '../data/themes'
 import AttariInvitation from './AttariInvitation'
 import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
@@ -66,6 +66,9 @@ export default function Invitation({ data, guest = '', preview = false }) {
 }
 
 function StandardInvitation({ data, guest = '', preview = false, theme }) {
+  const formConfig = useMemo(() => getFormMode(theme), [theme])
+  const features = useMemo(() => getThemeFeatures(theme), [theme])
+  const isLoveLetter = formConfig.mode === 'love-letter'
   const [open, setOpen] = useState(false)
   const [tick, setTick] = useState(() => countdownParts(data.date, data.events?.[0]?.time || '09:00'))
   const [lightbox, setLightbox] = useState(null)
@@ -79,6 +82,9 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
   const [useA, setUseA] = useState(true)
   const isDark = ['sage', 'noir', 'batik'].includes(theme.id)
   const scenes = useMemo(() => sceneMap(data, theme), [data, theme])
+  const showEvents = formConfig.showEvents && features.events?.enabled !== false && (data.events || []).length > 0
+  const showGift = formConfig.showBanks && ((data.banks || []).length > 0 || data.qris || data.giftAddress)
+  const showCouple = formConfig.showCoupleCard !== false && !isLoveLetter
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -203,8 +209,8 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
               theme={theme}
               data={data}
               guest={guest}
-              couple={couple}
               coverImg={coverImg}
+              formConfig={formConfig}
               onOpen={() => {
                 setOpen(true)
                 setMusicOn(Boolean(data.music))
@@ -227,28 +233,40 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
             )}
             {data.music && musicOn && <audio src={data.music} autoPlay loop />}
 
-            <Reveal>{theme.layout === 'attari' ? <HeroAttari theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} /> : <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} />}</Reveal>
+            <Reveal>{theme.layout === 'attari' ? <HeroAttari theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} /> : <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} formConfig={formConfig} />}</Reveal>
             <Reveal><Greeting theme={theme} text={theme.greeting} scene={scenes.home} /></Reveal>
             {data.quote && <Reveal><Quote data={data} theme={theme} scene={scenes.story} /></Reveal>}
-            <Reveal>{theme.layout === 'attari' ? <CoupleAttari data={data} scene={scenes.couple} /> : <Couple theme={theme} data={data} scene={scenes.couple} />}</Reveal>
-            {data.story?.length > 0 && <Reveal><Story story={data.story} scene={scenes.story} /></Reveal>}
-            <Reveal><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
-            <Reveal>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
-            <Reveal><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
-            <Reveal><DressCode data={data} scene={scenes.date} /></Reveal>
-            <Reveal><Live data={data} scene={scenes.story} /></Reveal>
-            <Reveal><Frame data={data} guest={guest} couple={couple} onOpen={() => setShowFrameModal(true)} scene={scenes.gallery} /></Reveal>
+            {showCouple && (
+              <Reveal>{theme.layout === 'attari' ? <CoupleAttari data={data} scene={scenes.couple} /> : <Couple theme={theme} data={data} scene={scenes.couple} formConfig={formConfig} />}</Reveal>
+            )}
+            {data.story?.length > 0 && <Reveal><Story story={data.story} scene={scenes.story} isLoveLetter={isLoveLetter} /></Reveal>}
+            {!isLoveLetter && (
+              <Reveal><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
+            )}
+            {showEvents && (
+              <Reveal>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
+            )}
+            {formConfig.showCheckIn && showEvents && (
+              <Reveal><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
+            )}
+            {formConfig.showDressLive && <Reveal><DressCode data={data} scene={scenes.date} /></Reveal>}
+            {formConfig.showDressLive && <Reveal><Live data={data} scene={scenes.story} /></Reveal>}
+            {formConfig.showFrame && (
+              <Reveal><Frame data={data} guest={guest} couple={couple} onOpen={() => setShowFrameModal(true)} scene={scenes.gallery} /></Reveal>
+            )}
             {data.gallery?.length > 0 && (
               <Reveal><Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} /></Reveal>
             )}
-            <Reveal><Rsvp
-              slug={data.slug}
-              guest={guest}
-              demo={data.demo}
-              preview={preview}
-              onDone={refresh}
-              scene={scenes.wishes}
-            /></Reveal>
+            {formConfig.showRsvp && (
+              <Reveal><Rsvp
+                slug={data.slug}
+                guest={guest}
+                demo={data.demo}
+                preview={preview}
+                onDone={refresh}
+                scene={scenes.wishes}
+              /></Reveal>
+            )}
             <Reveal><Wishes
               slug={data.slug}
               wishes={local.wishes || []}
@@ -259,18 +277,20 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
               scene={scenes.wishes}
             /></Reveal>
             <AdSlot slot="rsvp" data={data} theme={theme} />
-            <Reveal><Gift
-              banks={data.banks || []}
-              qris={data.qris}
-              address={data.giftAddress}
-              wishlist={data.wishlist || []}
-              copied={copied}
-              onCopy={onCopy}
-              scene={scenes.gift}
-            /></Reveal>
+            {showGift && (
+              <Reveal><Gift
+                banks={data.banks || []}
+                qris={data.qris}
+                address={data.giftAddress}
+                wishlist={data.wishlist || []}
+                copied={copied}
+                onCopy={onCopy}
+                scene={scenes.gift}
+              /></Reveal>
+            )}
             <AdSlot slot="footer" data={data} theme={theme} />
             <Reveal><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} data={data} /></Reveal>
-            <BottomNav />
+            {!isLoveLetter && <BottomNav />}
           </main>
         )}
         <AdSlot slot="sticky-bottom" data={data} theme={theme} />
@@ -303,7 +323,14 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
   )
 }
 
-function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
+function Cover({ theme, data, guest, coverImg, onOpen, formConfig }) {
+  const isLoveLetter = formConfig?.mode === 'love-letter'
+  const guestName = guest || (isLoveLetter ? formConfig?.guestFallback : '')
+  const showGuest = Boolean(guestName)
+  const displayName = isLoveLetter
+    ? (data.bride?.nick ? `Sayangku ${data.bride.nick}` : (data.bride?.nick || data.customerName || 'Sayangku'))
+    : (data.bride?.nick || data.customerName || 'Nama Acara')
+
   return (
     <motion.section 
       className={`cover${theme.layout === 'attari' ? ' attari-cover-wrap' : ''}`} 
@@ -331,8 +358,8 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
           {theme.opener}
         </motion.p>
         <motion.h1 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } }} className={`cover-names${theme.layout === 'attari' ? ' attari-cover-names' : ''}`}>
-          {data.bride?.nick || data.customerName || 'Nama Acara'}
-          {data.groom?.nick && data.groom?.nick !== data.bride?.nick && (
+          {displayName}
+          {!isLoveLetter && data.groom?.nick && data.groom?.nick !== data.bride?.nick && (
             <>
               <em className="attari-amp">&</em>
               {data.groom?.nick}
@@ -346,10 +373,10 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
           {formatLongDate(data.date)}
         </motion.p>
         
-        {guest && (
+        {showGuest && (
           <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="cover-guest glass-panel">
-            <span>Kepada Yth.</span>
-            <strong>{guest}</strong>
+            <span>{formConfig?.guestLabel || 'Kepada Yth.'}</span>
+            <strong>{guestName}</strong>
           </motion.div>
         )}
         
@@ -364,7 +391,7 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <MailOpen size={16} /> BUKA UNDANGAN
+            <MailOpen size={16} /> {formConfig?.openCta || 'BUKA UNDANGAN'}
           </motion.button>
         </motion.div>
       </motion.div>
@@ -372,13 +399,16 @@ function Cover({ theme, data, guest, couple, coverImg, onOpen }) {
   )
 }
 
-function Hero({ theme, couple, data, coverImg, scene }) {
+function Hero({ theme, couple, data, coverImg, scene, formConfig }) {
+  const title = formConfig?.mode === 'love-letter' && data.bride?.nick
+    ? `Sayangku ${data.bride.nick}`
+    : couple
   return (
     <section className="hero-inv" data-scene={scene || coverImg}>
       <div className="hero-photo" style={{ backgroundImage: `url(${coverImg})` }} />
       <div className="hero-copy">
         <p className="kicker">{theme.opener}</p>
-        <h2>{couple}</h2>
+        <h2>{title}</h2>
         <p className="hero-date">{formatLongDate(data.date)}</p>
       </div>
     </section>
@@ -404,9 +434,10 @@ function Greeting({ theme, text, scene }) {
   )
 }
 
-function Couple({ theme, data, scene }) {
+function Couple({ theme, data, scene, formConfig }) {
   const isSingle = !data.groom?.nick || data.groom?.nick === data.bride?.nick
   const getSingleRole = () => {
+    if (formConfig?.singleRole) return formConfig.singleRole
     if (theme.eventType === 'birthday') return 'Bintang Ulang Tahun'
     if (theme.eventType === 'graduation') return 'Wisudawan / Wisudawati'
     if (theme.eventType === 'aqiqah') return 'Buah Hati / Bayi'
@@ -574,16 +605,16 @@ function Quote({ data, theme, scene }) {
   )
 }
 
-function Story({ story, scene }) {
+function Story({ story, scene, isLoveLetter = false }) {
   return (
     <section className="pad" data-scene={scene}>
-      <p className="kicker center">Cerita kami</p>
+      <p className="kicker center">{isLoveLetter ? 'Kilas balik kita' : 'Cerita kami'}</p>
       <ol className="story">
         {story.map((s) => (
           <li key={s.year + s.title}>
             <span>{s.year}</span>
             <h4>{s.title}</h4>
-            <p>{s.body}</p>
+            <p>{s.body || s.text}</p>
           </li>
         ))}
       </ol>

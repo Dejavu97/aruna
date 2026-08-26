@@ -58,7 +58,7 @@ import {
 } from '../lib/api'
 import { getDummyWeddingData } from '../data/dummyData'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
-import { formatRupiah, packages as defaultPackages } from '../data/site'
+import { formatRupiah, packages as defaultPackages, getPackageById } from '../data/site'
 import { invitePath } from '../lib/nav'
 
 export default function Admin() {
@@ -673,15 +673,16 @@ export default function Admin() {
   // Format Dynamic WhatsApp Message with Variables
   function formatWaMessage(type, item, customVars = {}) {
     const rawTemplate = waTemplates[type] || defaultWaTemplates[type] || ''
-    const pack = adminPackages.find((p) => p.id === item?.packageId) || defaultPackages.find((p) => p.id === item?.packageId)
+    const pack = getPackageById(item?.packageId, item?.eventType)
     const clientUrl = `${window.location.origin}/kelola/${item?.slug}?key=${item?.editKey || ''}`
     const invUrl = invitationUrl(item?.slug || '')
-    const price = pack ? pack.price : 0
     const priceText = pack ? formatRupiah(pack.price) : ''
-    const mempelai = `${item?.bride?.nick || ''} & ${item?.groom?.nick || ''}`
+    const isSingle = !item?.groom?.nick || item?.groom?.nick === item?.bride?.nick
+    const mempelai = isSingle ? (item?.bride?.nick || item?.customerName || 'Tamu') : `${item?.bride?.nick || ''} & ${item?.groom?.nick || ''}`
+    const customerName = item?.customerName || (isSingle ? item?.bride?.nick : 'Pelanggan')
 
     return rawTemplate
-      .replaceAll('{nama}', item?.customerName || 'Calon Pengantin')
+      .replaceAll('{nama}', customerName)
       .replaceAll('{mempelai}', mempelai)
       .replaceAll('{kode_order}', item?.orderCode || 'NO-CODE')
       .replaceAll('{paket}', pack?.name || item?.packageId || '')

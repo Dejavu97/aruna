@@ -72,26 +72,30 @@ export default function PrintCardModal({ item, onClose }) {
   // Auto-fill from item data
   const handleAutoFill = () => {
     const bNick = item.bride?.nick || 'Sarah'
-    const gNick = item.groom?.nick || 'Budi'
+    const gNick = item.groom?.nick || ''
+    const isSingle = !gNick || gNick === bNick
     const akad = item.events?.[0] || {}
     const resepsi = item.events?.[1] || {}
     
+    const defaultEventKicker = item.eventType === 'birthday' ? 'PERAYAAN ULANG TAHUN' : item.eventType === 'graduation' ? 'TASYAKURAN WISUDA' : item.eventType === 'aqiqah' ? 'TASYAKURAN AQIQAH' : item.eventType === 'corporate' ? 'UNDANGAN RESMI' : 'UNDANGAN PERNIKAHAN'
+    const defaultSouvenirKicker = item.eventType === 'birthday' ? 'BIRTHDAY SOUVENIR' : item.eventType === 'graduation' ? 'GRADUATION SOUVENIR' : item.eventType === 'aqiqah' ? 'SOUVENIR AQIQAH' : item.eventType === 'corporate' ? 'OFFICIAL SOUVENIR' : 'WEDDING SOUVENIR'
+
     setFormData({
-      kicker: cardType === 'souvenir' ? 'WEDDING SOUVENIR' : cardType === 'table' ? 'NOMOR MEJA RESEPSI' : 'UNDANGAN PERNIKAHAN',
+      kicker: cardType === 'souvenir' ? defaultSouvenirKicker : cardType === 'table' ? 'NOMOR MEJA' : defaultEventKicker,
       brideNick: bNick,
-      groomNick: gNick,
+      groomNick: isSingle ? '' : gNick,
       brideFull: item.bride?.full || bNick,
-      groomFull: item.groom?.full || gNick,
+      groomFull: isSingle ? '' : (item.groom?.full || gNick),
       brideParents: item.bride?.parents || '',
-      groomParents: item.groom?.parents || '',
+      groomParents: isSingle ? '' : (item.groom?.parents || ''),
       eventDate: formatLongDate(item.date),
-      akadTitle: akad.title || 'Akad Nikah',
+      akadTitle: akad.title || (item.eventType === 'wedding' ? 'Akad Nikah' : 'Acara Utama'),
       akadTime: akad.time || '08.00 - 10.00 WIB',
-      akadVenue: akad.venue || item.location || 'Masjid / Gedung Akad',
+      akadVenue: akad.venue || item.location || 'Lokasi Acara',
       akadAddress: akad.address || '',
-      resepsiTitle: resepsi.title || 'Resepsi Pernikahan',
+      resepsiTitle: resepsi.title || (item.eventType === 'wedding' ? 'Resepsi Pernikahan' : 'Ramah Tamah / Sesi 2'),
       resepsiTime: resepsi.time || '11.00 - 14.00 WIB',
-      resepsiVenue: resepsi.venue || item.location || 'Grand Ballroom',
+      resepsiVenue: resepsi.venue || item.location || 'Lokasi Acara',
       resepsiAddress: resepsi.address || '',
       quote: item.quote || 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu...',
       subtitle: cardType === 'souvenir' ? 'Terima kasih atas kehadiran & doa restu Anda' : cardType === 'table' ? 'Selamat Menikmati Jamuan' : 'Pindai QR Code untuk melihat undangan digital & konfirmasi kehadiran',

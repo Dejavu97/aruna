@@ -14,6 +14,12 @@ export default function MediaUpload({
   async function onFiles(list) {
     const files = [...list]
     if (!files.length) return
+    for (const f of files) {
+      if (f.size > 15 * 1024 * 1024) {
+        setError(`Ukuran file "${f.name}" terlalu besar (maksimal 15MB).`)
+        return
+      }
+    }
     setBusy(true)
     setError('')
     try {
@@ -22,7 +28,7 @@ export default function MediaUpload({
       if (multiple) onChange([...(value || []), ...urls])
       else onChange(urls[0])
     } catch (err) {
-      setError(err.message || 'Gagal mengunggah.')
+      setError(err.message || 'Gagal mengunggah file. Pastikan koneksi internet stabil.')
     } finally {
       setBusy(false)
     }
@@ -51,8 +57,8 @@ export default function MediaUpload({
       {error && <span className="normal-case tracking-normal text-red-800">{error}</span>}
       {images.length > 0 && (
         <span className="flex flex-wrap gap-2">
-          {images.map((src) => (
-            <span key={src} className="relative">
+          {images.map((src, idx) => (
+            <span key={src + idx} className="relative">
               {src.match(/\.(mp3|wav|ogg)$/i) || accept.includes('audio') ? (
                 <span className="block max-w-[12rem] truncate text-[11px] normal-case">{src}</span>
               ) : (
@@ -63,7 +69,7 @@ export default function MediaUpload({
                 className="absolute -right-1 -top-1 bg-ink px-1 text-[10px] text-ivory"
                 onClick={(e) => {
                   e.preventDefault()
-                  if (multiple) onChange(images.filter((x) => x !== src))
+                  if (multiple) onChange(images.filter((_, i) => i !== idx))
                   else onChange('')
                 }}
               >

@@ -34,8 +34,10 @@ export default function CustomDomainPage({ domain }) {
 
   useEffect(() => {
     if (!data) return
-    const couple = `${data.bride?.nick || ''} & ${data.groom?.nick || ''}`
-    document.title = `${couple} — Undangan Pernikahan`
+    const isSingle = !data.groom?.nick || data.groom?.nick === data.bride?.nick
+    const heroName = isSingle ? (data.bride?.nick || data.customerName || 'Acara') : `${data.bride?.nick} & ${data.groom?.nick}`
+    const eventLabel = data.eventType === 'birthday' ? 'Undangan Ulang Tahun' : data.eventType === 'graduation' ? 'Tasyakuran Wisuda' : data.eventType === 'aqiqah' ? 'Tasyakuran Aqiqah' : data.eventType === 'corporate' ? 'Undangan Resmi' : data.eventType === 'love-letter' ? 'Surat & Kenangan' : 'Undangan Pernikahan'
+    document.title = `${heroName} — ${eventLabel}`
   }, [data])
 
   if (loading) {

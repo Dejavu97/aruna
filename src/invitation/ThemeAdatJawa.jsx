@@ -219,9 +219,10 @@ function Quote({ data }) {
 }
 
 function Couple({ data }) {
+  const isSingle = !data.groom?.nick || data.groom?.nick === data.bride?.nick
   const people = [
-    { who: data.groom, role: 'THE GROOM', delay: 0 },
-    { who: data.bride, role: 'THE BRIDE', delay: 0.3 },
+    ...(!isSingle && data.groom?.nick ? [{ who: data.groom, role: 'THE GROOM', delay: 0 }] : []),
+    ...(data.bride?.nick ? [{ who: data.bride, role: isSingle ? (data.singleRole || 'TOKOH UTAMA') : 'THE BRIDE', delay: 0.3 }] : []),
   ]
   return (
     <section className="jw-pad jw-batik-bg" id="couple" style={{ position: 'relative', overflow: 'hidden' }}>
@@ -509,7 +510,12 @@ function RsvpAndWishes({ data, guest, demo, preview, onDone, wishes }) {
           {wishes.map((w) => (
             <li key={w.id} className="jw-wish-item">
               <strong>{w.name}</strong>
-              <p>{w.message}</p>
+              <p>{w.message || w.text}</p>
+              {w.reply && (
+                <div className="jw-wish-reply" style={{ marginTop: '0.4rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9a96e', fontSize: '0.85em', color: '#8a7a5a' }}>
+                  <strong>Balasan mempelai:</strong> {w.reply}
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -527,16 +533,24 @@ function Gift({ banks, qris, copied, onCopy }) {
       <p className="jw-lead">Tanpa mengurangi rasa hormat bagi tamu yang ingin mengirimkan hadiah kepada kami, bisa melalui nomor rekening di bawah ini.</p>
       <div className="jw-banks">
         {banks.map((b) => (
-          <article key={b.number} className="jw-bank-card">
+          <article key={b.number || b.no} className="jw-bank-card">
             <span className="jw-bank-name">{b.bank}</span>
-            <strong className="jw-bank-number">{b.number}</strong>
+            <strong className="jw-bank-number">{b.number || b.no}</strong>
             <p className="jw-bank-holder">a.n. {b.name}</p>
-            <button type="button" className="jw-btn-outline jw-btn-sm" onClick={() => onCopy(b.number, b.number)}>
-              {copied === b.number ? <><Check size={12} /> TERSALIN</> : <><Copy size={12} /> SALIN</>}
+            <button type="button" className="jw-btn-outline jw-btn-sm" onClick={() => onCopy(b.number || b.no, b.number || b.no)}>
+              {copied === (b.number || b.no) ? <><Check size={12} /> TERSALIN</> : <><Copy size={12} /> SALIN</>}
             </button>
           </article>
         ))}
       </div>
+      {qris && (
+        <div className="jw-banks" style={{ marginTop: '1.2rem' }}>
+          <article className="jw-bank-card" style={{ textAlign: 'center' }}>
+            <span className="jw-bank-name">QRIS</span>
+            <img src={qris} alt="QRIS" style={{ width: '200px', margin: '0.8rem auto', display: 'block', mixBlendMode: 'multiply' }} />
+          </article>
+        </div>
+      )}
     </section>
   )
 }

@@ -8,3 +8,4 @@ server/data/settings.json
 server/data/*.tmp
 *.log
 .vercel
+scratch/

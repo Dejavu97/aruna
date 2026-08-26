@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { formatRupiah, packages } from '../data/site'
-import { getTheme, themes, getThemeFeatures } from '../data/themes'
+import { formatRupiah, packages, getPackagesByEventType } from '../data/site'
+import { getTheme, themes, getThemeFeatures, getFormMode } from '../data/themes'
 import { getDummyWeddingData } from '../data/dummyData'
 import MediaUpload from './MediaUpload'
 import Invitation from '../invitation/Invitation'
 import { slugify } from '../lib/utils'
 import { useAuth } from '../context/AuthContext'
-import { Sparkles, RotateCcw, Wand2, Globe, ShieldCheck, CheckCircle2, User } from 'lucide-react'
+import { Sparkles, RotateCcw, Wand2, Globe, CheckCircle2 } from 'lucide-react'
 
 const emptyEvent = () => ({
   title: '',
@@ -18,9 +18,13 @@ const emptyEvent = () => ({
   maps: '',
 })
 
-export function blankWedding(themeId) {
+export function blankInvitation(themeId, customThemes = []) {
+  const theme = getTheme(themeId, customThemes)
+  const cfg = getFormMode(theme, customThemes)
   return {
     themeId,
+    eventType: cfg.eventType,
+    formMode: cfg.mode,
     bride: { nick: '', full: '', degree: '', fatherName: '', fatherDegree: '', motherName: '', motherDegree: '', parents: '', photo: '', ig: '' },
     groom: { nick: '', full: '', degree: '', fatherName: '', fatherDegree: '', motherName: '', motherDegree: '', parents: '', photo: '', ig: '' },
     date: '',
@@ -32,14 +36,15 @@ export function blankWedding(themeId) {
       { year: '', title: '', body: '', image: '' },
       { year: '', title: '', body: '', image: '' },
     ],
-    events: [
-      { title: 'Akad Nikah', date: '', time: '09:00', venue: '', address: '', maps: '' },
-      { title: 'Resepsi', date: '', time: '19:00', venue: '', address: '', maps: '' },
-    ],
-    banks: [
-      { bank: 'BCA', name: '', number: '' },
-      { bank: '', name: '', number: '' },
-    ],
+    events: cfg.showEvents
+      ? (cfg.defaultEvents?.length ? cfg.defaultEvents.map((e) => ({ ...e })) : [emptyEvent(), emptyEvent()])
+      : [],
+    banks: cfg.showBanks
+      ? [
+          { bank: 'BCA', name: '', number: '' },
+          { bank: '', name: '', number: '' },
+        ]
+      : [],
     gallery: [],
     music: '',
     qris: '',
@@ -55,11 +60,13 @@ export function blankWedding(themeId) {
     frameImage: '',
     frameLink: '',
     giftAddress: '',
-    wishlist: [
-      { title: '', price: '', image: '', url: '' },
-      { title: '', price: '', image: '', url: '' },
-      { title: '', price: '', image: '', url: '' },
-    ],
+    wishlist: cfg.showWishlist
+      ? [
+          { title: '', price: '', image: '', url: '' },
+          { title: '', price: '', image: '', url: '' },
+          { title: '', price: '', image: '', url: '' },
+        ]
+      : [],
     customerName: '',
     customerWhatsapp: '',
     customerNote: '',
@@ -69,108 +76,10 @@ export function blankWedding(themeId) {
   }
 }
 
-function getEventTypeConfig(eventType) {
-  if (eventType === 'birthday') {
-    return {
-      type: 'birthday',
-      step1Label: 'Tokoh Ultah',
-      person1Title: 'Data Bintang Ulang Tahun',
-      person1NickLabel: 'Nama Panggilan & Usia',
-      person1NickHint: 'Contoh: Sarah (17th)',
-      person1FullLabel: 'Nama Lengkap',
-      person1PhotoLabel: 'Foto Tokoh Ulang Tahun',
-      person2Title: 'Pasangan / Sahabat Terdekat (Opsional)',
-      person2Optional: true,
-      parentsLabel: 'Orang Tua / Penyelenggara',
-      dateLabel: 'Tanggal Pesta Ulang Tahun',
-      defaultEvent1: 'Pesta Ulang Tahun & Games',
-      defaultEvent2: 'Celebration Dinner & Music',
-      quoteLabel: 'Pesan / Harapan Ulang Tahun',
-      quoteHint: 'Harapan dan doa di usia yang baru',
-      storyTitle: 'Kilas Balik Kenangan',
-    }
-  }
-  if (eventType === 'graduation') {
-    return {
-      type: 'graduation',
-      step1Label: 'Wisudawan',
-      person1Title: 'Data Wisudawan / Wisudawati',
-      person1NickLabel: 'Nama Panggilan',
-      person1NickHint: 'Contoh: Sarah',
-      person1FullLabel: 'Nama Lengkap & Gelar',
-      person1PhotoLabel: 'Foto Wisudawan',
-      person2Title: 'Rekan Wisuda / Pasangan (Opsional)',
-      person2Optional: true,
-      parentsLabel: 'Orang Tua',
-      dateLabel: 'Tanggal Wisuda / Kelulusan',
-      defaultEvent1: 'Upacara Wisuda & Sumpah',
-      defaultEvent2: 'Syukuran & Ramah Tamah',
-      quoteLabel: 'Kutipan / Motto Kelulusan',
-      quoteHint: 'Kata mutiara atau rasa syukur atas kelulusan',
-      storyTitle: 'Perjalanan Meraih Gelar',
-    }
-  }
-  if (eventType === 'aqiqah') {
-    return {
-      type: 'aqiqah',
-      step1Label: 'Buah Hati',
-      person1Title: 'Data Buah Hati / Bayi',
-      person1NickLabel: 'Nama Panggilan Anak',
-      person1NickHint: 'Contoh: Al-Fatih',
-      person1FullLabel: 'Nama Lengkap Anak',
-      person1PhotoLabel: 'Foto Si Kecil',
-      person2Title: 'Data Tambahan (Opsional)',
-      person2Optional: true,
-      parentsLabel: 'Ayah & Ibu Kandung',
-      dateLabel: 'Tanggal Tasyakuran Aqiqah',
-      defaultEvent1: 'Cukur Rambut & Tausiyah',
-      defaultEvent2: 'Santap Siang & Doa Bersama',
-      quoteLabel: 'Doa Syukuran Aqiqah',
-      quoteHint: 'Doa untuk keselamatan dan keberkahan si kecil',
-      storyTitle: 'Arti Nama & Harapan',
-    }
-  }
-  if (eventType === 'corporate') {
-    return {
-      type: 'corporate',
-      step1Label: 'Host & Acara',
-      person1Title: 'Penyelenggara / Host Acara',
-      person1NickLabel: 'Nama Singkat Acara',
-      person1NickHint: 'Contoh: Aruna Summit',
-      person1FullLabel: 'Nama Lengkap Acara / Organisasi',
-      person1PhotoLabel: 'Logo / Foto Keynote Speaker',
-      person2Title: 'Keynote Speaker / VIP (Opsional)',
-      person2Optional: true,
-      parentsLabel: 'Board / Komite Penyelenggara',
-      dateLabel: 'Tanggal Acara',
-      defaultEvent1: 'Keynote Presentation & Launching',
-      defaultEvent2: 'Gala Dinner & Awarding Night',
-      quoteLabel: 'Visi / Tema Utama Acara',
-      quoteHint: 'Tema besar konferensi atau gala',
-      storyTitle: 'Agenda & Latar Belakang',
-    }
-  }
-  return {
-    type: 'wedding',
-    step1Label: 'Pengantin',
-    person1Title: 'Mempelai Wanita',
-    person1NickLabel: 'Nama Panggilan',
-    person1NickHint: '',
-    person1FullLabel: 'Nama Lengkap',
-    person1PhotoLabel: 'Foto Mempelai Wanita',
-    person2Title: 'Mempelai Pria',
-    person2Optional: false,
-    parentsLabel: 'Orang Tua',
-    dateLabel: 'Tanggal Pernikahan',
-    defaultEvent1: 'Akad Nikah',
-    defaultEvent2: 'Resepsi Pernikahan',
-    quoteLabel: 'Kutipan / Ayat Suci',
-    quoteHint: 'Kutipan atau ayat suci yang akan muncul di undangan.',
-    storyTitle: 'Cerita / Kisah Cinta',
-  }
-}
+// Backward-compatibility alias
+export const blankWedding = blankInvitation
 
-export default function WeddingForm({
+export default function InvitationForm({
   themeId,
   initial,
   mode = 'create',
@@ -181,46 +90,75 @@ export default function WeddingForm({
 }) {
   const { user, loginWithGoogle } = useAuth()
   const theme = getTheme(themeId, customThemes)
-  const eventConfig = getEventTypeConfig(theme?.eventType)
+  const formConfig = getFormMode(theme, customThemes)
   const features = getThemeFeatures(theme)
   const [step, setStep] = useState(0)
   const [showPreview, setShowPreview] = useState(false)
-  const [form, setForm] = useState(initial || blankWedding(themeId))
+  const [form, setForm] = useState(initial || blankInvitation(themeId, customThemes))
   const draftKey = `aruna.draft.${themeId}`
+
+  const showBanks = formConfig.showBanks && features.banks
+  const showDress = formConfig.showDressLive && features.dressCode
+  const showLive = formConfig.showDressLive && features.streaming
+  const showFrame = formConfig.showFrame && features.frameImage
+  const showWishlist = formConfig.showWishlist && features.wishlist
+  const showQris = formConfig.showBanks && features.qris
 
   const hasPelengkap = Boolean(
     features.quote ||
     features.story?.enabled ||
-    features.banks ||
+    showBanks ||
     features.gallery ||
     features.heroImage ||
     features.backdrop ||
     features.textColor ||
-    features.qris ||
+    showQris ||
     features.music ||
-    features.dressCode ||
-    features.streaming ||
-    features.frameImage ||
-    features.wishlist
+    showDress ||
+    showLive ||
+    showFrame ||
+    showWishlist
   )
 
   const steps = [
-    { id: 'pengantin', label: eventConfig.step1Label },
-    { id: 'acara', label: 'Acara' },
-    ...(hasPelengkap ? [{ id: 'pelengkap', label: 'Pelengkap' }] : []),
+    { id: 'pengantin', label: formConfig.step1Label },
+    ...(formConfig.showEvents && features.events?.enabled !== false
+      ? [{ id: 'acara', label: 'Acara' }]
+      : []),
+    ...(hasPelengkap ? [{ id: 'pelengkap', label: formConfig.pelengkapLabel || 'Pelengkap' }] : []),
     { id: 'pemesan', label: mode === 'create' ? 'Bayar' : 'Pemesan' },
   ]
 
   useEffect(() => {
     if (mode !== 'create') return
+    const fresh = blankWedding(themeId, customThemes)
     try {
       const raw = localStorage.getItem(draftKey)
-      if (raw) setForm({ ...blankWedding(themeId), ...JSON.parse(raw), themeId })
+      if (raw) {
+        const draft = JSON.parse(raw)
+        // Saat ganti jenis tema, jangan bawa events/banks wedding ke mode yang tidak butuh
+        setForm({
+          ...fresh,
+          ...draft,
+          themeId,
+          eventType: fresh.eventType,
+          formMode: fresh.formMode,
+          events: fresh.formMode !== draft.formMode ? fresh.events : (draft.events ?? fresh.events),
+          banks: fresh.formMode === 'corporate' || fresh.formMode === 'love-letter'
+            ? []
+            : (draft.banks ?? fresh.banks),
+          wishlist: fresh.formMode === 'love-letter' || fresh.formMode === 'corporate' || fresh.formMode === 'aqiqah'
+            ? []
+            : (draft.wishlist ?? fresh.wishlist),
+        })
+      } else {
+        setForm(fresh)
+      }
     } catch {
-      setForm(blankWedding(themeId))
+      setForm(fresh)
     }
     setStep(0)
-  }, [themeId, mode, draftKey])
+  }, [themeId, mode, draftKey, customThemes])
 
   useEffect(() => {
     if (mode === 'edit' && initial) setForm(initial)
@@ -252,9 +190,14 @@ export default function WeddingForm({
 
   function submit(e) {
     e.preventDefault()
-    const isSinglePerson = eventConfig.type !== 'wedding'
-    if (!form.bride.nick || (!isSinglePerson && !form.groom.nick) || !form.date) {
-      onSubmit(null, isSinglePerson ? 'Nama dan tanggal acara wajib diisi.' : 'Nama panggilan kedua mempelai dan tanggal wajib diisi.')
+    const needPerson2 = formConfig.showPerson2
+    if (!form.bride.nick || (needPerson2 && !form.groom.nick) || !form.date) {
+      onSubmit(
+        null,
+        needPerson2
+          ? 'Nama panggilan kedua mempelai dan tanggal wajib diisi.'
+          : `${formConfig.person1NickLabel || 'Nama'} dan tanggal wajib diisi.`,
+      )
       setStep(0)
       return
     }
@@ -271,11 +214,13 @@ export default function WeddingForm({
       customerName: form.customerName || user?.displayName || '',
       themeId,
       slug,
+      eventType: formConfig.eventType,
+      formMode: formConfig.mode,
       packageId: form.packageId || 'lengkap',
-      story: form.story.filter((s) => s.title || s.body || s.image),
-      banks: form.banks.filter((b) => b.bank && b.number),
-      events: form.events.filter((ev) => ev.title && ev.venue),
-      wishlist: (form.wishlist || []).filter((w) => w.title),
+      story: (form.story || []).filter((s) => s.title || s.body || s.image),
+      banks: showBanks ? (form.banks || []).filter((b) => b.bank && b.number) : [],
+      events: formConfig.showEvents ? (form.events || []).filter((ev) => ev.title || ev.venue || ev.address) : [],
+      wishlist: showWishlist ? (form.wishlist || []).filter((w) => w.title) : [],
     }
     onSubmit(payload)
   }
@@ -345,14 +290,18 @@ export default function WeddingForm({
             <Wand2 size={16} className="text-gold-deep shrink-0" />
             <div>
               <p className="text-xs font-bold text-ink">Mode Pengujian Cepat (Admin / Review)</p>
-              <p className="text-[10px] text-stone">Isi seluruh data pernikahan contoh yang lengkap &amp; estetik dalam 1-klik.</p>
+              <p className="text-[10px] text-stone">Isi seluruh data contoh yang lengkap &amp; estetik sesuai tema dalam 1-klik.</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => {
-                const dummy = getDummyWeddingData(themeId)
+                const dummy = {
+                  ...getDummyWeddingData(themeId),
+                  eventType: formConfig.eventType,
+                  formMode: formConfig.mode,
+                }
                 setForm(dummy)
               }}
               className="bg-gold-deep text-ivory px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-xs hover:bg-gold transition-colors inline-flex items-center gap-1.5 shadow-xs"
@@ -363,7 +312,7 @@ export default function WeddingForm({
               type="button"
               onClick={() => {
                 if (confirm('Kosongkan semua isian form?')) {
-                  setForm(blankWedding(themeId))
+                  setForm(blankInvitation(themeId, customThemes))
                   localStorage.removeItem(draftKey)
                 }
               }}
@@ -395,102 +344,111 @@ export default function WeddingForm({
         {/* STEP: PENGANTIN / DATA TOKOH */}
         {steps[step]?.id === 'pengantin' && (
           <div className="grid gap-6">
-            <Pair title={eventConfig.person1Title}>
+            <Pair title={formConfig.person1Title}>
               <Field
-                label={eventConfig.person1NickLabel}
+                label={formConfig.person1NickLabel}
                 value={form.bride.nick}
                 onChange={(v) => update('bride.nick', v)}
-                hint={eventConfig.person1NickHint}
+                hint={formConfig.person1NickHint}
               />
               <div className="grid gap-4 sm:grid-cols-4">
                 <div className="sm:col-span-3">
-                  <Field label={eventConfig.person1FullLabel} value={form.bride.full} onChange={(v) => update('bride.full', v)} />
+                  <Field label={formConfig.person1FullLabel} value={form.bride.full} onChange={(v) => update('bride.full', v)} />
                 </div>
-                <div className="sm:col-span-1">
-                  <Field label="Gelar / Tambahan" value={form.bride.degree} onChange={(v) => update('bride.degree', v)} hint="S.E., M.B.A." />
-                </div>
-              </div>
-              <div className="mt-2 border-l-2 border-ink/10 pl-4">
-                <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">{eventConfig.parentsLabel}</p>
-                <div className="grid gap-4 sm:grid-cols-4">
-                  <div className="sm:col-span-3">
-                    <Field label="Nama Bapak / Penyelenggara 1" value={form.bride.fatherName} onChange={(v) => update('bride.fatherName', v)} />
-                  </div>
+                {formConfig.mode !== 'love-letter' && (
                   <div className="sm:col-span-1">
-                    <Field label="Gelar" value={form.bride.fatherDegree} onChange={(v) => update('bride.fatherDegree', v)} />
+                    <Field label="Gelar / Tambahan" value={form.bride.degree} onChange={(v) => update('bride.degree', v)} hint="S.E., M.B.A." />
                   </div>
-                </div>
-                <div className="mt-3 grid gap-4 sm:grid-cols-4">
-                  <div className="sm:col-span-3">
-                    <Field label="Nama Ibu / Penyelenggara 2" value={form.bride.motherName} onChange={(v) => update('bride.motherName', v)} />
-                  </div>
-                  <div className="sm:col-span-1">
-                    <Field label="Gelar" value={form.bride.motherDegree} onChange={(v) => update('bride.motherDegree', v)} />
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <Field label="Teks Lengkap (Opsional)" value={form.bride.parents} onChange={(v) => update('bride.parents', v)} hint="Kosongkan jika ingin nama orang tua di atas dirangkai otomatis." />
-                </div>
+                )}
               </div>
+              {formConfig.showParents && (
+                <div className="mt-2 border-l-2 border-ink/10 pl-4">
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">{formConfig.parentsLabel || 'Orang tua'}</p>
+                  <div className="grid gap-4 sm:grid-cols-4">
+                    <div className="sm:col-span-3">
+                      <Field label="Nama Bapak / Penyelenggara 1" value={form.bride.fatherName} onChange={(v) => update('bride.fatherName', v)} />
+                    </div>
+                    <div className="sm:col-span-1">
+                      <Field label="Gelar" value={form.bride.fatherDegree} onChange={(v) => update('bride.fatherDegree', v)} />
+                    </div>
+                  </div>
+                  <div className="mt-3 grid gap-4 sm:grid-cols-4">
+                    <div className="sm:col-span-3">
+                      <Field label="Nama Ibu / Penyelenggara 2" value={form.bride.motherName} onChange={(v) => update('bride.motherName', v)} />
+                    </div>
+                    <div className="sm:col-span-1">
+                      <Field label="Gelar" value={form.bride.motherDegree} onChange={(v) => update('bride.motherDegree', v)} />
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <Field label="Teks Lengkap (Opsional)" value={form.bride.parents} onChange={(v) => update('bride.parents', v)} hint="Kosongkan jika ingin nama orang tua di atas dirangkai otomatis." />
+                  </div>
+                </div>
+              )}
               <MediaUpload
-                label={eventConfig.person1PhotoLabel}
+                label={formConfig.person1PhotoLabel}
                 value={form.bride.photo}
                 onChange={(v) => update('bride.photo', v)}
               />
-              <Field
-                label="Akun Instagram (opsional)"
-                value={form.bride.ig}
-                onChange={(v) => update('bride.ig', v)}
-                hint="Contoh: @andini (tanpa spasi)"
-              />
+              {formConfig.showIg && (
+                <Field
+                  label="Akun Instagram (opsional)"
+                  value={form.bride.ig}
+                  onChange={(v) => update('bride.ig', v)}
+                  hint="Contoh: @andini (tanpa spasi)"
+                />
+              )}
             </Pair>
 
-            {/* PERSON 2 (Hanya wajib untuk wedding, opsional untuk kategori lain) */}
-            {(!eventConfig.person2Optional || form.groom.nick || eventConfig.type === 'wedding') && (
-              <Pair title={eventConfig.person2Title}>
-                <Field label={eventConfig.type === 'wedding' ? 'Nama panggilan' : 'Nama Panggilan / Rekan'} value={form.groom.nick} onChange={(v) => update('groom.nick', v)} />
+            {formConfig.showPerson2 && (
+              <Pair title={formConfig.person2Title}>
+                <Field label="Nama panggilan" value={form.groom.nick} onChange={(v) => update('groom.nick', v)} />
                 <div className="grid gap-4 sm:grid-cols-4">
                   <div className="sm:col-span-3">
-                    <Field label={eventConfig.type === 'wedding' ? 'Nama lengkap' : 'Nama Lengkap'} value={form.groom.full} onChange={(v) => update('groom.full', v)} />
+                    <Field label="Nama lengkap" value={form.groom.full} onChange={(v) => update('groom.full', v)} />
                   </div>
                   <div className="sm:col-span-1">
                     <Field label="Gelar" value={form.groom.degree} onChange={(v) => update('groom.degree', v)} hint="S.T., M.Sc." />
                   </div>
                 </div>
-                <div className="mt-2 border-l-2 border-ink/10 pl-4">
-                  <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">Orang Tua / Penyelenggara</p>
-                  <div className="grid gap-4 sm:grid-cols-4">
-                    <div className="sm:col-span-3">
-                      <Field label="Nama Bapak" value={form.groom.fatherName} onChange={(v) => update('groom.fatherName', v)} />
+                {formConfig.showParents && (
+                  <div className="mt-2 border-l-2 border-ink/10 pl-4">
+                    <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">Orang tua</p>
+                    <div className="grid gap-4 sm:grid-cols-4">
+                      <div className="sm:col-span-3">
+                        <Field label="Nama Bapak" value={form.groom.fatherName} onChange={(v) => update('groom.fatherName', v)} />
+                      </div>
+                      <div className="sm:col-span-1">
+                        <Field label="Gelar Bapak" value={form.groom.fatherDegree} onChange={(v) => update('groom.fatherDegree', v)} />
+                      </div>
                     </div>
-                    <div className="sm:col-span-1">
-                      <Field label="Gelar Bapak" value={form.groom.fatherDegree} onChange={(v) => update('groom.fatherDegree', v)} />
+                    <div className="mt-3 grid gap-4 sm:grid-cols-4">
+                      <div className="sm:col-span-3">
+                        <Field label="Nama Ibu" value={form.groom.motherName} onChange={(v) => update('groom.motherName', v)} />
+                      </div>
+                      <div className="sm:col-span-1">
+                        <Field label="Gelar Ibu" value={form.groom.motherDegree} onChange={(v) => update('groom.motherDegree', v)} />
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-3 grid gap-4 sm:grid-cols-4">
-                    <div className="sm:col-span-3">
-                      <Field label="Nama Ibu" value={form.groom.motherName} onChange={(v) => update('groom.motherName', v)} />
-                    </div>
-                    <div className="sm:col-span-1">
-                      <Field label="Gelar Ibu" value={form.groom.motherDegree} onChange={(v) => update('groom.motherDegree', v)} />
-                    </div>
-                  </div>
-                </div>
+                )}
                 <MediaUpload
-                  label={eventConfig.type === 'wedding' ? 'Foto mempelai pria' : 'Foto Tambahan'}
+                  label="Foto mempelai pria"
                   value={form.groom.photo}
                   onChange={(v) => update('groom.photo', v)}
                 />
-                <Field
-                  label="Akun Instagram (opsional)"
-                  value={form.groom.ig}
-                  onChange={(v) => update('groom.ig', v)}
-                  hint="Contoh: @raka (tanpa spasi)"
-                />
+                {formConfig.showIg && (
+                  <Field
+                    label="Akun Instagram (opsional)"
+                    value={form.groom.ig}
+                    onChange={(v) => update('groom.ig', v)}
+                    hint="Contoh: @raka (tanpa spasi)"
+                  />
+                )}
               </Pair>
             )}
 
-            <Field label={eventConfig.dateLabel} type="date" value={form.date} onChange={(v) => update('date', v)} />
+            <Field label={formConfig.dateLabel} type="date" value={form.date} onChange={(v) => update('date', v)} />
             {mode === 'create' && (
               <Field
                 label="Tautan kustom (opsional)"
@@ -505,7 +463,7 @@ export default function WeddingForm({
         {/* STEP: ACARA */}
         {steps[step]?.id === 'acara' && (
           <div className="grid gap-6">
-            {form.events.map((ev, i) => (
+            {(form.events || []).map((ev, i) => (
               <Pair key={i} title={`Acara ${i + 1}`}>
                 <Field label="Judul" value={ev.title} onChange={(v) => update(`events.${i}.title`, v)} />
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -517,11 +475,11 @@ export default function WeddingForm({
                 <Field label="Link Google Maps" value={ev.maps} onChange={(v) => update(`events.${i}.maps`, v)} />
               </Pair>
             ))}
-            {form.events.length < (features.events?.max || 3) && (
+            {(form.events || []).length < (features.events?.max || 3) && (
               <button
                 type="button"
                 className="text-sm underline"
-                onClick={() => setForm((p) => ({ ...p, events: [...p.events, emptyEvent()] }))}
+                onClick={() => setForm((p) => ({ ...p, events: [...(p.events || []), emptyEvent()] }))}
               >
                 + Tambah acara
               </button>
@@ -535,16 +493,22 @@ export default function WeddingForm({
             {features.quote && (
               <>
                 <Field 
-                  label={eventConfig.quoteLabel} 
+                  label={formConfig.quoteLabel} 
                   value={form.quote} 
                   onChange={(v) => update('quote', v)} 
-                  hint={eventConfig.quoteHint}
+                  hint={formConfig.quoteHint}
                 />
                 <Field 
                   label="Sumber kutipan / Keterangan" 
                   value={form.quoteSource} 
                   onChange={(v) => update('quoteSource', v)} 
-                  hint={eventConfig.type === 'wedding' ? 'Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa.' : 'Contoh: Sweet 17th, Doctor of Medicine, Doa Aqiqah, atau Annual Summit.'}
+                  hint={
+                    formConfig.mode === 'wedding'
+                      ? 'Contoh: Q.S Ar-Rum: 21, Anonim, atau Pepatah Jawa.'
+                      : formConfig.mode === 'love-letter'
+                        ? 'Contoh: Surat Cinta untuk Sarah, Dari hatiku.'
+                        : 'Contoh: Sweet 17th, Doctor of Medicine, Doa Aqiqah, atau Annual Summit.'
+                  }
                 />
               </>
             )}
@@ -552,7 +516,7 @@ export default function WeddingForm({
             {features.story?.enabled && (
               <>
                 {form.story.map((s, i) => (
-                  <Pair key={i} title={`${eventConfig.storyTitle} ${i + 1}`}>
+                  <Pair key={i} title={`${formConfig.storyTitle} ${i + 1}`}>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Field label="Tahun / Momen" value={s.year} onChange={(v) => update(`story.${i}.year`, v)} hint="Contoh: 2024" />
                       <Field label="Judul" value={s.title} onChange={(v) => update(`story.${i}.title`, v)} hint="Contoh: Kilas Balik / Awal Bertemu" />
@@ -570,10 +534,10 @@ export default function WeddingForm({
               </>
             )}
 
-            {features.banks && (
+            {showBanks && (
               <div className="grid gap-4 sm:grid-cols-2">
-                {form.banks.map((b, i) => (
-                  <Pair key={i} title={`Rekening kado ${i + 1}`}>
+                {(form.banks || []).map((b, i) => (
+                  <Pair key={i} title={`Rekening tanda kasih / kado ${i + 1}`}>
                     <Field label="Bank" value={b.bank} onChange={(v) => update(`banks.${i}.bank`, v)} />
                     <Field label="Nama" value={b.name} onChange={(v) => update(`banks.${i}.name`, v)} />
                     <Field label="Nomor" value={b.number} onChange={(v) => update(`banks.${i}.number`, v)} />
@@ -607,7 +571,7 @@ export default function WeddingForm({
               </label>
             )}
 
-            {features.qris && (
+            {showQris && (
               <MediaUpload
                 label="Foto QRIS (opsional)"
                 value={form.qris}
@@ -642,7 +606,7 @@ export default function WeddingForm({
               />
             )}
 
-            {features.dressCode && (
+            {showDress && (
               <>
                 <Field label="Hashtag" value={form.hashtag} onChange={(v) => update('hashtag', v)} hint="Contoh: #AndiniRaka" />
                 <Field
@@ -660,7 +624,7 @@ export default function WeddingForm({
               </>
             )}
 
-            {features.streaming && (
+            {showLive && (
               <>
                 <Field 
                   label="Link live streaming" 
@@ -676,15 +640,15 @@ export default function WeddingForm({
                   label="Catatan live" 
                   value={form.liveNote} 
                   onChange={(v) => update('liveNote', v)} 
-                  hint="Contoh: Siaran langsung akan dimulai 15 menit sebelum akad."
+                  hint="Contoh: Siaran langsung akan dimulai 15 menit sebelum acara."
                 />
               </>
             )}
 
-            {features.frameImage && (
+            {showFrame && (
               <>
                 <MediaUpload
-                  label="Gambar wedding frame (opsional)"
+                  label="Gambar frame foto (opsional)"
                   value={form.frameImage}
                   onChange={(v) => update('frameImage', v)}
                 />
@@ -696,10 +660,10 @@ export default function WeddingForm({
               </>
             )}
 
-            {features.wishlist && (
+            {showWishlist && (
               <>
                 <Field label="Alamat kirim kado" value={form.giftAddress} onChange={(v) => update('giftAddress', v)} />
-                {form.wishlist.map((w, i) => (
+                {(form.wishlist || []).map((w, i) => (
                   <Pair key={i} title={`Wishlist ${i + 1}`}>
                     <Field label="Nama barang" value={w.title} onChange={(v) => update(`wishlist.${i}.title`, v)} />
                     <Field label="Harga" value={w.price} onChange={(v) => update(`wishlist.${i}.price`, v)} />
@@ -721,7 +685,7 @@ export default function WeddingForm({
           <div className="grid gap-5">
             {mode === 'create' && (
               <div className="grid gap-3">
-                {packages.map((p) => (
+                {getPackagesByEventType(formConfig.eventType).map((p) => (
                   <label
                     key={p.id}
                     className={`flex cursor-pointer items-start justify-between gap-4 border p-4 transition-colors ${

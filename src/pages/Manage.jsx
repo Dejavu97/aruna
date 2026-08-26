@@ -13,8 +13,22 @@ import { shareWaLink, waLink } from '../data/site'
 import { backFromInvite, invitePath } from '../lib/nav'
 import { getTheme } from '../data/themes'
 
-const defaultWaTemplate = `Kepada Yth. [nama]\n\nDengan hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di pernikahan kami.\n\n[link]`
-const defaultReminderTemplate = `Kepada Yth. [nama]\n\nMengingatkan kembali undangan pernikahan kami yang akan diselenggarakan pada [tanggal].\n\nBagi yang belum sempat konfirmasi, mohon kesediaannya untuk mengisi konfirmasi kehadiran (RSVP) melalui tautan berikut:\n[link]\n\nKehadiran dan doa restu Anda sangat berarti bagi kami. Terima kasih.`
+function getDefaultWaTemplate(eventType) {
+  if (eventType === 'birthday') return `Kepada Yth. [nama]\n\nDengan hormat, kami mengundang Anda untuk hadir di perayaan ulang tahun kami.\n\n[link]`
+  if (eventType === 'graduation') return `Kepada Yth. [nama]\n\nDengan hormat, kami mengundang Anda untuk hadir di tasyakuran kelulusan / wisuda kami.\n\n[link]`
+  if (eventType === 'aqiqah') return `Kepada Yth. [nama]\n\nDengan hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di tasyakuran kelahiran & aqiqah buah hati kami.\n\n[link]`
+  if (eventType === 'corporate') return `Kepada Yth. [nama]\n\nDengan hormat, kami mengundang Bapak/Ibu/Rekan sekalian untuk menghadiri acara kami.\n\n[link]`
+  if (eventType === 'love-letter') return `Untuk [nama],\n\nAda surat dan kenangan spesial untukmu. Silakan buka melalui tautan berikut:\n\n[link]`
+  return `Kepada Yth. [nama]\n\nDengan hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di pernikahan kami.\n\n[link]`
+}
+
+function getDefaultReminderTemplate(eventType) {
+  if (eventType === 'birthday') return `Kepada Yth. [nama]\n\nMengingatkan kembali undangan perayaan ulang tahun kami yang akan diselenggarakan pada [tanggal].\n\nBagi yang belum sempat konfirmasi, mohon kesediaannya untuk mengisi konfirmasi kehadiran melalui tautan berikut:\n[link]\n\nKehadiran Anda sangat berarti bagi kami. Terima kasih.`
+  if (eventType === 'graduation') return `Kepada Yth. [nama]\n\nMengingatkan kembali tasyakuran wisuda kami yang akan diselenggarakan pada [tanggal].\n\nBagi yang belum sempat konfirmasi, mohon kesediaannya mengisi konfirmasi kehadiran melalui tautan berikut:\n[link]\n\nTerima kasih atas doa dan dukungannya.`
+  if (eventType === 'aqiqah') return `Kepada Yth. [nama]\n\nMengingatkan kembali tasyakuran aqiqah buah hati kami yang akan diselenggarakan pada [tanggal].\n\nBagi yang belum sempat konfirmasi, mohon kesediaannya mengisi RSVP melalui tautan berikut:\n[link]\n\nTerima kasih.`
+  if (eventType === 'corporate') return `Kepada Yth. [nama]\n\nMengingatkan kembali undangan acara resmi yang akan diselenggarakan pada [tanggal].\n\nMohon konfirmasi kehadiran Anda melalui tautan berikut:\n[link]\n\nTerima kasih.`
+  return `Kepada Yth. [nama]\n\nMengingatkan kembali undangan pernikahan kami yang akan diselenggarakan pada [tanggal].\n\nBagi yang belum sempat konfirmasi, mohon kesediaannya untuk mengisi konfirmasi kehadiran (RSVP) melalui tautan berikut:\n[link]\n\nKehadiran dan doa restu Anda sangat berarti bagi kami. Terima kasih.`
+}
 
 export default function Manage() {
   const { slug } = useParams()
@@ -27,8 +41,8 @@ export default function Manage() {
 
   const [item, setItem] = useState(null)
   const [text, setText] = useState('')
-  const [waTemplate, setWaTemplate] = useState(defaultWaTemplate)
-  const [waReminderTemplate, setWaReminderTemplate] = useState(defaultReminderTemplate)
+  const [waTemplate, setWaTemplate] = useState('')
+  const [waReminderTemplate, setWaReminderTemplate] = useState('')
   const [messageMode, setMessageMode] = useState('invitation') // 'invitation' | 'reminder'
   const [statusFilter, setStatusFilter] = useState('all') // 'all' | 'unconfirmed' | 'hadir' | 'tidak' | 'ragu'
   const [customDomain, setCustomDomain] = useState('')
@@ -77,8 +91,8 @@ export default function Manage() {
         if (!live) return
         setItem(data)
         setText((data?.guests || []).join('\n'))
-        if (data?.waTemplate) setWaTemplate(data.waTemplate)
-        if (data?.waReminderTemplate) setWaReminderTemplate(data.waReminderTemplate)
+        setWaTemplate(data?.waTemplate || getDefaultWaTemplate(data?.eventType))
+        setWaReminderTemplate(data?.waReminderTemplate || getDefaultReminderTemplate(data?.eventType))
         if (data?.customDomain) setCustomDomain(data.customDomain)
         if (data?.watermarkMode) setWatermarkMode(data.watermarkMode)
         if (data?.customWatermarkText) setCustomWatermarkText(data.customWatermarkText)

@@ -390,12 +390,12 @@ export const themes = [
     tags: ['ulang-tahun', 'birthday', 'surat-cinta', 'sahabat', 'romantis', 'kenangan', 'premium'],
     collection: 'premium',
     eventType: 'birthday',
-    description: 'Kapsul ucapan ulang tahun interaktif untuk pasangan atau sahabat: surat rahasia, kilas balik foto, voice note, dan kupon kado virtual.',
-    cover: '/assets/local/teenager_birthday.jpg',
+    description: 'Kapsul ucapan ulang tahun romantis untuk pasangan: surat cinta, kilas balik perjalanan, dan galeri kenangan — tanpa undangan lokasi acara.',
+    cover: '/assets/local/couple_garden.jpg',
     coverPosition: 'object-center',
-    layout: 'classic',
-    greeting: 'Merayakan hari kelahiranmu dengan penuh cinta, terima kasih telah menjadi bagian paling berharga dalam hidupku.',
-    opener: 'A Special Birthday Love Letter',
+    layout: 'memory-capsule',
+    greeting: 'Untukmu yang lahir membawa cahaya ke hidupku—selamat ulang tahun, rumah hatiku.',
+    opener: 'A Love Letter for Your Birthday',
     fonts: {
       display: '"Playfair Display", serif',
       script: '"Alex Brush", cursive',
@@ -424,9 +424,266 @@ export function hasTheme(id, customThemes = []) {
   return themes.some((t) => t.id === id) || (customThemes || []).some((t) => t.id === id)
 }
 
+/**
+ * Mode form/preview adaptif per jenis acara.
+ * love-letter = surat ultah pribadi (bukan undangan tamu).
+ */
+export function getFormMode(themeOrId, customThemes = []) {
+  const theme = typeof themeOrId === 'string' ? getTheme(themeOrId, customThemes) : (themeOrId || themes[0])
+  const id = theme?.id || ''
+  const layout = theme?.layout || 'classic'
+  const eventType = theme?.eventType || 'wedding'
+
+  if (layout === 'memory-capsule' || id === 'birthday-memory-capsule' || (theme?.tags || []).includes('surat-cinta')) {
+    return {
+      mode: 'love-letter',
+      eventType: 'birthday',
+      step1Label: 'Untuknya',
+      person1Title: 'Data Pasangan / Orang Tersayang',
+      person1NickLabel: 'Nama panggilan',
+      person1NickHint: 'Contoh: Sarah — akan disapa Sayangku / Cintaku',
+      person1FullLabel: 'Nama lengkap (opsional)',
+      person1PhotoLabel: 'Foto atau gambar sampul (opsional)',
+      person2Title: '',
+      showPerson2: false,
+      showParents: false,
+      showIg: false,
+      showEvents: false,
+      showBanks: false,
+      showDressLive: false,
+      showFrame: false,
+      showWishlist: false,
+      showCoupleCard: false,
+      showRsvp: false,
+      showCheckIn: false,
+      guestLabel: 'Untukmu,',
+      guestFallback: 'Sayangku',
+      openCta: 'BUKA SURAT',
+      dateLabel: 'Tanggal ulang tahun',
+      defaultEvents: [],
+      quoteLabel: 'Isi surat cinta / ucapan',
+      quoteHint: 'Tulis ucapan romantis yang ingin dibaca pasanganmu',
+      storyTitle: 'Kilas balik kenangan',
+      pelengkapLabel: 'Surat & Kenangan',
+      singleRole: 'Sayangku',
+    }
+  }
+
+  if (eventType === 'birthday') {
+    return {
+      mode: 'birthday',
+      eventType: 'birthday',
+      step1Label: 'Tokoh Ultah',
+      person1Title: 'Data Bintang Ulang Tahun',
+      person1NickLabel: 'Nama panggilan & usia',
+      person1NickHint: 'Contoh: Sarah (17th)',
+      person1FullLabel: 'Nama lengkap',
+      person1PhotoLabel: 'Foto tokoh ulang tahun',
+      person2Title: 'Pasangan / sahabat (opsional)',
+      showPerson2: false,
+      showParents: true,
+      showIg: true,
+      showEvents: true,
+      showBanks: true,
+      showDressLive: true,
+      showFrame: true,
+      showWishlist: true,
+      showCoupleCard: true,
+      showRsvp: true,
+      showCheckIn: true,
+      guestLabel: 'Kepada Yth.',
+      guestFallback: '',
+      openCta: 'BUKA UNDANGAN',
+      dateLabel: 'Tanggal pesta ulang tahun',
+      defaultEvents: [
+        { title: 'Pesta Ulang Tahun & Games', date: '', time: '16:00', venue: '', address: '', maps: '' },
+        { title: 'Celebration Dinner & Music', date: '', time: '19:00', venue: '', address: '', maps: '' },
+      ],
+      quoteLabel: 'Pesan / harapan ulang tahun',
+      quoteHint: 'Harapan dan doa di usia yang baru',
+      storyTitle: 'Kilas balik kenangan',
+      pelengkapLabel: 'Harapan & Galeri',
+      singleRole: 'Bintang Ulang Tahun',
+      parentsLabel: 'Orang tua / penyelenggara',
+    }
+  }
+
+  if (eventType === 'graduation') {
+    return {
+      mode: 'graduation',
+      eventType: 'graduation',
+      step1Label: 'Wisudawan',
+      person1Title: 'Data wisudawan / wisudawati',
+      person1NickLabel: 'Nama panggilan',
+      person1NickHint: 'Contoh: Sarah',
+      person1FullLabel: 'Nama lengkap & gelar',
+      person1PhotoLabel: 'Foto wisudawan',
+      person2Title: 'Rekan wisuda (opsional)',
+      showPerson2: false,
+      showParents: true,
+      showIg: true,
+      showEvents: true,
+      showBanks: true,
+      showDressLive: true,
+      showFrame: true,
+      showWishlist: true,
+      showCoupleCard: true,
+      showRsvp: true,
+      showCheckIn: true,
+      guestLabel: 'Kepada Yth.',
+      guestFallback: '',
+      openCta: 'BUKA UNDANGAN',
+      dateLabel: 'Tanggal wisuda / kelulusan',
+      defaultEvents: [
+        { title: 'Upacara Wisuda & Sumpah', date: '', time: '08:00', venue: '', address: '', maps: '' },
+        { title: 'Syukuran & Ramah Tamah', date: '', time: '13:00', venue: '', address: '', maps: '' },
+      ],
+      quoteLabel: 'Kutipan / motto kelulusan',
+      quoteHint: 'Kata mutiara atau rasa syukur atas kelulusan',
+      storyTitle: 'Perjalanan meraih gelar',
+      pelengkapLabel: 'Pelengkap',
+      singleRole: 'Wisudawan / Wisudawati',
+      parentsLabel: 'Orang tua',
+    }
+  }
+
+  if (eventType === 'aqiqah') {
+    return {
+      mode: 'aqiqah',
+      eventType: 'aqiqah',
+      step1Label: 'Buah Hati',
+      person1Title: 'Data buah hati / bayi',
+      person1NickLabel: 'Nama panggilan anak',
+      person1NickHint: 'Contoh: Al-Fatih',
+      person1FullLabel: 'Nama lengkap anak',
+      person1PhotoLabel: 'Foto si kecil',
+      person2Title: '',
+      showPerson2: false,
+      showParents: true,
+      showIg: false,
+      showEvents: true,
+      showBanks: true,
+      showDressLive: false,
+      showFrame: false,
+      showWishlist: false,
+      showCoupleCard: true,
+      showRsvp: true,
+      showCheckIn: true,
+      guestLabel: 'Kepada Yth.',
+      guestFallback: '',
+      openCta: 'BUKA UNDANGAN',
+      dateLabel: 'Tanggal tasyakuran aqiqah',
+      defaultEvents: [
+        { title: 'Cukur Rambut & Tausiyah', date: '', time: '09:00', venue: '', address: '', maps: '' },
+        { title: 'Santap Siang & Doa Bersama', date: '', time: '12:00', venue: '', address: '', maps: '' },
+      ],
+      quoteLabel: 'Doa syukuran aqiqah',
+      quoteHint: 'Doa untuk keselamatan dan keberkahan si kecil',
+      storyTitle: 'Arti nama & harapan',
+      pelengkapLabel: 'Pelengkap',
+      singleRole: 'Buah Hati / Bayi',
+      parentsLabel: 'Ayah & ibu kandung',
+    }
+  }
+
+  if (eventType === 'corporate') {
+    return {
+      mode: 'corporate',
+      eventType: 'corporate',
+      step1Label: 'Host & Acara',
+      person1Title: 'Penyelenggara / host acara',
+      person1NickLabel: 'Nama singkat acara',
+      person1NickHint: 'Contoh: Aruna Summit',
+      person1FullLabel: 'Nama lengkap acara / organisasi',
+      person1PhotoLabel: 'Logo / foto keynote',
+      person2Title: 'Keynote / VIP (opsional)',
+      showPerson2: false,
+      showParents: true,
+      showIg: true,
+      showEvents: true,
+      showBanks: false,
+      showDressLive: true,
+      showFrame: false,
+      showWishlist: false,
+      showCoupleCard: true,
+      showRsvp: true,
+      showCheckIn: true,
+      guestLabel: 'Kepada Yth.',
+      guestFallback: '',
+      openCta: 'BUKA UNDANGAN',
+      dateLabel: 'Tanggal acara',
+      defaultEvents: [
+        { title: 'Keynote Presentation & Launching', date: '', time: '09:00', venue: '', address: '', maps: '' },
+        { title: 'Gala Dinner & Awarding Night', date: '', time: '19:00', venue: '', address: '', maps: '' },
+      ],
+      quoteLabel: 'Visi / tema utama acara',
+      quoteHint: 'Tema besar konferensi atau gala',
+      storyTitle: 'Agenda & latar belakang',
+      pelengkapLabel: 'Pelengkap',
+      singleRole: 'Host / Penyelenggara',
+      parentsLabel: 'Board / komite penyelenggara',
+    }
+  }
+
+  return {
+    mode: 'wedding',
+    eventType: 'wedding',
+    step1Label: 'Pengantin',
+    person1Title: 'Mempelai wanita',
+    person1NickLabel: 'Nama panggilan',
+    person1NickHint: '',
+    person1FullLabel: 'Nama lengkap',
+    person1PhotoLabel: 'Foto mempelai wanita',
+    person2Title: 'Mempelai pria',
+    showPerson2: true,
+    showParents: true,
+    showIg: true,
+    showEvents: true,
+    showBanks: true,
+    showDressLive: true,
+    showFrame: true,
+    showWishlist: true,
+    showCoupleCard: true,
+    showRsvp: true,
+    showCheckIn: true,
+    guestLabel: 'Kepada Yth.',
+    guestFallback: '',
+    openCta: 'BUKA UNDANGAN',
+    dateLabel: 'Tanggal pernikahan',
+    defaultEvents: [
+      { title: 'Akad Nikah', date: '', time: '09:00', venue: '', address: '', maps: '' },
+      { title: 'Resepsi', date: '', time: '19:00', venue: '', address: '', maps: '' },
+    ],
+    quoteLabel: 'Kutipan / ayat suci',
+    quoteHint: 'Kutipan atau ayat suci yang akan muncul di undangan.',
+    storyTitle: 'Cerita / kisah cinta',
+    pelengkapLabel: 'Pelengkap',
+    singleRole: 'Tokoh Utama',
+    parentsLabel: 'Orang tua',
+  }
+}
+
 export function getThemeFeatures(themeOrId) {
   const theme = typeof themeOrId === 'string' ? getTheme(themeOrId) : (themeOrId || themes[0])
   const layout = theme.layout || 'classic'
+
+  if (layout === 'memory-capsule') {
+    return {
+      quote: true,
+      story: { enabled: true, withPhoto: false },
+      events: { enabled: false, max: 0 },
+      gallery: true,
+      banks: false,
+      music: true,
+      qris: false,
+      dressCode: false,
+      streaming: false,
+      wishlist: false,
+      backdrop: false,
+      textColor: false,
+      frameImage: false,
+    }
+  }
 
   if (layout === 'royal-bunny') {
     return {
@@ -1294,44 +1551,64 @@ export const demos = {
     themeId: 'birthday-memory-capsule',
     slug: 'kapsul-spesial-sarah',
     eventType: 'birthday',
+    formMode: 'love-letter',
     bride: {
       nick: 'Sarah',
       full: 'Sarah Anindya',
       parents: '',
-      photo: '/assets/local/teenager_birthday.jpg',
+      photo: '/assets/local/couple_garden.jpg',
+      ig: '',
     },
     groom: {
-      nick: 'Sarah',
-      full: 'Sarah Anindya',
+      nick: '',
+      full: '',
       parents: '',
-      photo: '/assets/local/teenager_birthday.jpg',
+      photo: '',
     },
     date: '2026-09-18',
-    quote: 'Untukmu yang kelahirannya adalah hadiah terindah bagi semesta. Terima kasih telah selalu menjadi rumah ternyaman bagi hatiku.',
-    quoteSource: 'Special Love Letter',
+    quote:
+      'Selamat ulang tahun, sayangku. Dunia terasa lebih hangat sejak kamu ada—terima kasih telah lahir, memilihku, dan menjadi tempat pulang yang selalu kutunggu.',
+    quoteSource: 'Surat Cinta untuk Sarah',
     story: [
-      { year: '2022', title: 'Saat Pertama Berjumpa', text: 'Senyuman pertamamu yang tak pernah pudar dalam ingatanku.' },
-      { year: '2024', title: 'Melewati Ribuan Cerita', text: 'Setiap tawa kecil dan perjalanan sederhana yang kita ukir berdua.' },
-      { year: '2026', title: 'Selamat Bertambah Usia!', text: 'Semoga bahagiamu seluas samudra, dan setiap mimpimu terwujud nyata.' },
-    ],
-    gallery: [
-      '/assets/local/teenager_birthday.jpg',
-      '/assets/local/teenager_party_dress.jpg',
-      '/assets/local/couple_garden.jpg',
-      '/assets/local/pastel_flower_texture.jpg',
-    ],
-    events: [
       {
-        title: 'Private Birthday Dinner & Keepsake Night',
-        date: '2026-09-18',
-        time: '19:00 - 22:00 WIB',
-        venue: 'The Glass House Romantic Dining',
-        address: 'Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan',
-        maps: 'https://maps.google.com/?q=Jakarta',
+        year: '2022',
+        title: 'Pertama Kali Hatiku Berbisik',
+        body: 'Di antara keramaian biasa, senyummu membuat waktu melambat. Aku belum tahu namamu sepenuhnya—tapi hatiku sudah mengenal rumah.',
+      },
+      {
+        year: '2024',
+        title: 'Kita Menjadi Cerita',
+        body: 'Dari obrolan malam, tawa kecil, sampai air mata yang kita pegang berdua. Kamu bukan sekadar pasangan; kamu adalah sahabat paling lembut di hidupku.',
+      },
+      {
+        year: '2026',
+        title: 'Selamat Bertambah Usia, Cintaku',
+        body: 'Di ulang tahunmu ini aku berdoa: panjang umur dalam kebaikan, sehat selalu, dan bahagia yang tidak perlu kau cari sendirian—karena aku di sini.',
       },
     ],
-    banks: [
-      { bank: 'BCA', name: 'Sarah Anindya', number: '5271928401' },
+    gallery: [
+      '/assets/local/couple_garden.jpg',
+      '/assets/local/couple_laughing_1.jpg',
+      '/assets/local/couple_laughing_2.jpg',
+      '/assets/local/pastel_flower_texture.jpg',
+    ],
+    events: [],
+    banks: [],
+    wishes: [
+      {
+        id: 'w1',
+        name: 'Dari hatiku',
+        message:
+          'Happy birthday, Sarah. Semoga setiap doa yang kamu bisikkan di malam sunyi perlahan menjadi nyata. Aku mencintaimu—hari ini, dan di setiap ulang tahun yang akan datang.',
+        at: Date.now() - 86400000,
+      },
+      {
+        id: 'w2',
+        name: 'Untukmu saja',
+        message:
+          'Terima kasih sudah lahir ke dunia. Kalau cinta punya tanggal, mungkin aku akan merayakan dua kali: hari kamu dilahirkan, dan hari kamu memilihku.',
+        at: Date.now() - 3600000,
+      },
     ],
   }),
 }

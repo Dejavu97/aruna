@@ -28,10 +28,10 @@ const DEMO_VIDEOS = [
     title: 'Surat Romantis & Kapsul Kenangan',
     tag: 'Love Letter Capsule',
     url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    poster: '/assets/local/teenager_birthday.jpg',
+    poster: '/assets/local/couple_garden.jpg',
     link: '/tema/birthday-memory-capsule',
-    couple: 'Romantic Memory Capsule',
-    date: 'Spesial Pasangan & Bestie',
+    couple: 'Untuk Sarah · Birthday Love Letter',
+    date: 'Surat Cinta & Kilas Balik Pasangan',
   },
 ]
 

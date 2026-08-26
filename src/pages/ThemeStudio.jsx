@@ -949,16 +949,26 @@ export default function ThemeStudio() {
       ctx.fillText('Scan QR Code atau Buka Undangan di Aruna', 540, 1500)
 
       // 8. Trigger Download
+      const fileSlug = eventType === 'wedding'
+        ? `${previewData.bride.nick || 'bride'}-${previewData.groom.nick || 'groom'}`
+        : (previewData.bride?.nick || 'event')
+      const fileName = `${eventType}-story-${fileSlug}.png`
+
       const link = document.createElement('a')
-      link.download = `wedding-story-${previewData.bride.nick}-${previewData.groom.nick}.png`
+      link.download = fileName
       link.href = canvas.toDataURL('image/png')
       link.click()
       setExportingPoster(false)
     }
     img.onerror = () => {
       // Fallback without photo if CORS blocked
+      const fileSlug = eventType === 'wedding'
+        ? `${previewData.bride.nick || 'bride'}-${previewData.groom.nick || 'groom'}`
+        : (previewData.bride?.nick || 'event')
+      const fileName = `${eventType}-story-${fileSlug}.png`
+
       const link = document.createElement('a')
-      link.download = `wedding-story-${previewData.bride.nick}-${previewData.groom.nick}.png`
+      link.download = fileName
       link.href = canvas.toDataURL('image/png')
       link.click()
       setExportingPoster(false)

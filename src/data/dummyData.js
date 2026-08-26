@@ -4,10 +4,80 @@ export function getDummyWeddingData(themeId = 'adat-jawa') {
   targetDate.setDate(targetDate.getDate() + 30)
   const dateStr = targetDate.toISOString().slice(0, 10)
 
+  const isMemoryCapsule = themeId.includes('memory-capsule') || themeId.includes('surat-cinta')
   const isBirthday = themeId.includes('birthday') || themeId.includes('sweet')
   const isGraduation = themeId.includes('graduation') || themeId.includes('wisuda')
   const isAqiqah = themeId.includes('aqiqah') || themeId.includes('bayi')
   const isCorporate = themeId.includes('corporate') || themeId.includes('gala')
+
+  if (isMemoryCapsule) {
+    return {
+      themeId,
+      eventType: 'birthday',
+      bride: {
+        nick: 'Sarah',
+        full: 'Sarah Anindya',
+        degree: '',
+        fatherName: '',
+        fatherDegree: '',
+        motherName: '',
+        motherDegree: '',
+        parents: '',
+        photo: '/assets/local/couple_garden.jpg',
+        ig: 'sarahanindya',
+      },
+      groom: {
+        nick: '',
+        full: '',
+        degree: '',
+        fatherName: '',
+        fatherDegree: '',
+        motherName: '',
+        motherDegree: '',
+        parents: '',
+        photo: '',
+        ig: '',
+      },
+      date: dateStr,
+      slug: `kapsul-spesial-sarah`,
+      formMode: 'love-letter',
+      quote:
+        'Selamat ulang tahun, sayangku. Dunia terasa lebih hangat sejak kamu ada—terima kasih telah lahir, memilihku, dan menjadi tempat pulang yang selalu kutunggu.',
+      quoteSource: 'Surat Cinta untuk Sarah',
+      story: [
+        {
+          year: '2022',
+          title: 'Pertama Kali Hatiku Berbisik',
+          body: 'Di antara keramaian biasa, senyummu membuat waktu melambat. Aku belum tahu namamu sepenuhnya—tapi hatiku sudah mengenal rumah.',
+          image: '/assets/local/couple_garden.jpg',
+        },
+        {
+          year: '2024',
+          title: 'Kita Menjadi Cerita',
+          body: 'Dari obrolan malam, tawa kecil, sampai air mata yang kita pegang berdua. Kamu bukan sekadar pasangan; kamu adalah sahabat paling lembut di hidupku.',
+          image: '/assets/local/couple_laughing_1.jpg',
+        },
+        {
+          year: '2026',
+          title: 'Selamat Bertambah Usia, Cintaku',
+          body: 'Di ulang tahunmu ini aku berdoa: panjang umur dalam kebaikan, sehat selalu, dan bahagia yang tidak perlu kau cari sendirian—karena aku di sini.',
+          image: '/assets/local/couple_laughing_2.jpg',
+        },
+      ],
+      events: [],
+      banks: [],
+      gallery: [
+        '/assets/local/couple_garden.jpg',
+        '/assets/local/couple_laughing_1.jpg',
+        '/assets/local/couple_laughing_2.jpg',
+        '/assets/local/pastel_flower_texture.jpg',
+      ],
+      music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+      customerName: 'Sarah Anindya (Love Letter Demo)',
+      customerWhatsapp: '081234567890',
+      packageId: 'lengkap',
+    }
+  }
 
   if (isBirthday) {
     return {
@@ -360,3 +430,5 @@ export function getDummyWeddingData(themeId = 'adat-jawa') {
     guests: ['Bapak Joko Widodo & Keluarga', 'Ibu Sri Mulyani', 'Keluarga Besar Bpk. H. Rahmat', 'dr. Farah Maulida & Partner'],
   }
 }
+
+export const getDummyInvitationData = getDummyWeddingData

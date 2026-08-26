@@ -5,6 +5,7 @@ import {
   Copy, Check, Send, ChevronRight, User, Users, MessageSquare, Home, Sparkles, Camera
 } from 'lucide-react'
 import { copyText, googleCalendarUrl, wazeUrl } from '../lib/utils'
+import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import Watermark from '../components/Watermark'
 import './ThemeArtJawaBiru.css'
 
@@ -183,15 +184,36 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
   const [opened, setOpened] = useState(false)
   const [copied, setCopied] = useState('')
   const [copiedIndex, setCopiedIndex] = useState(null)
+  const [local, setLocal] = useState(data)
   const [wishes, setWishes] = useState(() => (Array.isArray(data?.wishes) && data.wishes.length > 0) ? data.wishes : [
     { name: 'Bpk. H. Bambang Setyo', status: 'Hadir', text: 'Selamat menempuh hidup baru untuk kedua mempelai. Semoga sakinah mawaddah warahmah, langgeng sampai kaken ninen.' },
     { name: 'Keluarga Besar Sasana Krida', status: 'Hadir', text: 'Ndherek mangayubagya temanten sarimbit. Mugi tansah pinaringan berkah lan karaharjan wonten ing bebrayan agung.' },
     { name: 'Dian & Prasetyo', status: 'Hadir', text: 'Happy wedding! Bahagia selalu selamanya, dilancarkan seluruh prosesi acaranya.' },
   ])
-  const [wishName, setWishName] = useState('')
+  const [wishName, setWishName] = useState(guest || '')
   const [wishStatus, setWishStatus] = useState('Hadir')
   const [wishText, setWishText] = useState('')
   const [timeLeft, setTimeLeft] = useState(() => countdownParts(data?.date || '2026-11-20'))
+  const [wishBusy, setWishBusy] = useState(false)
+  const [wishSuccess, setWishSuccess] = useState(false)
+
+  useEffect(() => {
+    setLocal(data)
+    if (Array.isArray(data?.wishes) && data.wishes.length > 0) {
+      setWishes(data.wishes)
+    }
+  }, [data])
+
+  async function refresh() {
+    if (data.demo || preview || !data.slug) return
+    try {
+      const stored = await fetchInvitation(data.slug)
+      if (stored) {
+        setLocal(stored)
+        if (stored.wishes) setWishes(stored.wishes)
+      }
+    } catch { /* ignore */ }
+  }
 
   // Timer countdown
   useEffect(() => {
@@ -207,15 +229,35 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
     setTimeout(() => setCopiedIndex(null), 2500)
   }
 
-  const handleSendWish = (e) => {
+  const handleSendWish = async (e) => {
     e.preventDefault()
     if (!wishName.trim() || !wishText.trim()) return
-    setWishes([
-      { name: wishName.trim(), status: wishStatus, text: wishText.trim() },
-      ...wishes
-    ])
-    setWishName('')
-    setWishText('')
+    setWishBusy(true)
+
+    const newWish = {
+      name: wishName.trim(),
+      status: wishStatus,
+      message: wishText.trim(),
+      text: wishText.trim(),
+      date: new Date().toISOString()
+    }
+
+    try {
+      if (!data.demo && !preview && data.slug) {
+        await addRsvp(data.slug, { name: wishName.trim(), status: wishStatus.toLowerCase().includes('tidak') ? 'tidak' : wishStatus.toLowerCase().includes('ragu') ? 'ragu' : 'hadir', guests: 1 })
+        await addWish(data.slug, { name: wishName.trim(), message: wishText.trim(), status: wishStatus })
+      }
+      setWishes((prev) => [newWish, ...prev])
+      setWishName(guest || '')
+      setWishText('')
+      setWishSuccess(true)
+      setTimeout(() => setWishSuccess(false), 4000)
+      refresh()
+    } catch (err) {
+      alert('Gagal mengirim ucapan: ' + err.message)
+    } finally {
+      setWishBusy(false)
+    }
   }
 
   return (
@@ -312,7 +354,7 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
 
               <div className="jb-couple-grid">
                 {/* Groom */}
-                {data.groom && (
+                {Boolean(data.groom?.nick || data.groom?.full) && data.groom?.nick !== data.bride?.nick && (
                   <motion.article 
                     className="jb-person-card"
                     initial={{ opacity: 0, x: -40 }}
@@ -579,7 +621,7 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
           )}
 
           {/* 6. WEDDING GIFT / AMPLOP DIGITAL */}
-          {data.banks && data.banks.length > 0 && (
+          {(data.banks && data.banks.length > 0 || data.qris) && (
             <section className="jb-pad" id="gift">
               <div className="jb-container">
                 <div className="jb-section-head">
@@ -591,28 +633,49 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                   </p>
                 </div>
 
-                {data.banks.map((b, idx) => (
-                  <motion.div 
-                    key={b.no} 
+                {(data.banks || []).map((b, idx) => {
+                  const num = b.number || b.no || ''
+                  return (
+                    <motion.div 
+                      key={num || idx} 
+                      className="jb-gift-card"
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: idx * 0.15 }}
+                    >
+                      <p className="jb-bank-name">{b.bank}</p>
+                      <p className="jb-bank-no">{num}</p>
+                      <p className="jb-bank-holder">a.n. {b.name}</p>
+                      <button 
+                        type="button" 
+                        onClick={() => handleCopy(num, idx)} 
+                        className="jb-copy-btn"
+                      >
+                        {copiedIndex === idx ? <Check size={14} /> : <Copy size={14} />}
+                        {copiedIndex === idx ? 'BERHASIL DISALIN' : 'SALIN NO. REKENING'}
+                      </button>
+                    </motion.div>
+                  )
+                })}
+
+                {data.qris && (
+                  <motion.div
                     className="jb-gift-card"
+                    style={{ textAlign: 'center' }}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: idx * 0.15 }}
+                    transition={{ duration: 0.6 }}
                   >
-                    <p className="jb-bank-name">{b.bank}</p>
-                    <p className="jb-bank-no">{b.no}</p>
-                    <p className="jb-bank-holder">a.n. {b.name}</p>
-                    <button 
-                      type="button" 
-                      onClick={() => handleCopy(b.no, idx)} 
-                      className="jb-copy-btn"
-                    >
-                      {copiedIndex === idx ? <Check size={14} /> : <Copy size={14} />}
-                      {copiedIndex === idx ? 'BERHASIL DISALIN' : 'SALIN NO. REKENING'}
-                    </button>
+                    <p className="jb-bank-name">QRIS</p>
+                    <img
+                      src={data.qris}
+                      alt="QRIS"
+                      style={{ width: '220px', margin: '1rem auto', display: 'block', borderRadius: '8px', background: '#fff', padding: '8px' }}
+                    />
                   </motion.div>
-                ))}
+                )}
               </div>
             </section>
           )}
@@ -635,6 +698,11 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
+                {wishSuccess && (
+                  <div style={{ padding: '0.75rem', marginBottom: '1rem', background: 'rgba(74, 222, 128, 0.15)', border: '1px solid rgba(74, 222, 128, 0.4)', borderRadius: '6px', color: '#86efac', fontSize: '0.85rem', textAlign: 'center' }}>
+                    ✓ Ucapan dan doa restu Anda telah berhasil dikirim!
+                  </div>
+                )}
                 <div className="jb-form-group">
                   <label className="jb-form-label">Nama Anda</label>
                   <input 
@@ -672,18 +740,23 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                   />
                 </div>
 
-                <button type="submit" className="jb-open-btn" style={{ width: '100%', justifyContent: 'center' }}>
-                  <Send size={16} /> KIRIM UCAPAN
+                <button type="submit" disabled={wishBusy} className="jb-open-btn" style={{ width: '100%', justifyContent: 'center' }}>
+                  <Send size={16} /> {wishBusy ? 'MENGIRIM...' : 'KIRIM UCAPAN'}
                 </button>
               </motion.form>
 
               {/* Feed */}
               <div className="jb-wishes-feed">
-                {wishes.map((w, idx) => (
-                  <div key={idx} className="jb-wish-item">
+                {(local.wishes && local.wishes.length > 0 ? local.wishes : wishes).map((w, idx) => (
+                  <div key={w.id || idx} className="jb-wish-item">
                     <p className="jb-wish-sender">{w.name}</p>
-                    <span className="jb-wish-status">{w.status}</span>
-                    <p className="jb-wish-text">{w.text}</p>
+                    <span className="jb-wish-status">{w.status || 'Hadir'}</span>
+                    <p className="jb-wish-text">{w.message || w.text}</p>
+                    {w.reply && (
+                      <div style={{ marginTop: '0.6rem', paddingLeft: '0.75rem', borderLeft: '2px solid var(--jb-gold-main)', fontSize: '0.82rem', color: '#fef08a' }}>
+                        <strong>Balasan Mempelai:</strong> {w.reply}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

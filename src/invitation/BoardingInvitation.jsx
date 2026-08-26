@@ -9,6 +9,11 @@ export default function BoardingInvitation({ data, guest = '', preview = false }
   const [tick, setTick] = useState(() => countdownParts(data.date, data.events?.[0]?.time || '09:00'))
   const [copied, setCopied] = useState('')
   const [local, setLocal] = useState(data)
+  const [rsvpForm, setRsvpForm] = useState({ name: guest || '', status: 'hadir', guests: 1, note: '' })
+  const [wishForm, setWishForm] = useState({ name: guest || '', message: '' })
+  const [rsvpSent, setRsvpSent] = useState(false)
+  const [wishBusy, setWishBusy] = useState(false)
+  const [rsvpBusy, setRsvpBusy] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => setTick(countdownParts(data.date, data.events?.[0]?.time || '09:00')), 1000)
@@ -20,6 +25,14 @@ export default function BoardingInvitation({ data, guest = '', preview = false }
   const bride = data.bride?.nick || ''
   const groom = data.groom?.nick || ''
   const coverImg = data.gallery?.[0] || data.backdrop || '/themes/marmer.jpg'
+
+  async function refresh() {
+    if (data.demo || preview) return
+    try {
+      const stored = await fetchInvitation(data.slug)
+      if (stored) setLocal(stored)
+    } catch { /* ignore */ }
+  }
 
   async function onCopy(value, key) {
     if (await copyText(value)) { setCopied(key); setTimeout(() => setCopied(''), 1600) }
@@ -193,6 +206,152 @@ export default function BoardingInvitation({ data, guest = '', preview = false }
                 </div>
               </section>
             )}
+
+            {/* Passenger Check-In (RSVP) */}
+            <hr className="border-dashed border-slate-300" />
+
+            <section>
+              <p className="text-xs uppercase tracking-widest text-slate-500 mb-6">Passenger Check-In (RSVP)</p>
+              {rsvpSent ? (
+                <div className="bg-[#E0F2FE] border border-[#0284C7]/30 p-4 rounded-lg text-center">
+                  <Check size={20} className="mx-auto text-[#0284C7] mb-2" />
+                  <p className="font-bold text-sm">Check-in Berhasil!</p>
+                  <p className="text-xs text-slate-600 mt-1">Terima kasih telah mengonfirmasi kehadiran Anda.</p>
+                </div>
+              ) : (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault()
+                    if (data.demo || preview || !rsvpForm.name.trim()) return
+                    setRsvpBusy(true)
+                    try {
+                      await addRsvp(data.slug, { ...rsvpForm, guests: Number(rsvpForm.guests) || 1 })
+                      setRsvpSent(true)
+                      refresh()
+                    } finally {
+                      setRsvpBusy(false)
+                    }
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="text-[10px] uppercase tracking-widest text-slate-500">Passenger Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={rsvpForm.name}
+                      onChange={(e) => setRsvpForm({ ...rsvpForm, name: e.target.value })}
+                      placeholder="Nama tamu"
+                      className="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg font-mono text-sm bg-slate-50 focus:outline-none focus:border-[#0284C7]"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] uppercase tracking-widest text-slate-500">Status</label>
+                      <select
+                        value={rsvpForm.status}
+                        onChange={(e) => setRsvpForm({ ...rsvpForm, status: e.target.value })}
+                        className="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg font-mono text-sm bg-slate-50"
+                      >
+                        <option value="hadir">Boarding (Hadir)</option>
+                        <option value="tidak">Not Boarding (Tidak Hadir)</option>
+                        <option value="ragu">Standby (Ragu-ragu)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase tracking-widest text-slate-500">Passengers</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={rsvpForm.guests}
+                        onChange={(e) => setRsvpForm({ ...rsvpForm, guests: e.target.value })}
+                        className="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg font-mono text-sm bg-slate-50"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={data.demo || preview || rsvpBusy}
+                    className="w-full bg-[#0284C7] text-white py-3 rounded-lg font-bold tracking-widest uppercase text-xs flex items-center justify-center gap-2 hover:bg-[#0369A1] transition-colors disabled:opacity-50"
+                  >
+                    <Check size={14} />
+                    {data.demo || preview ? 'Preview Mode' : rsvpBusy ? 'Processing...' : 'CONFIRM CHECK-IN'}
+                  </button>
+                </form>
+              )}
+            </section>
+
+            {/* In-Flight Messages (Wishes) */}
+            <hr className="border-dashed border-slate-300" />
+
+            <section>
+              <p className="text-xs uppercase tracking-widest text-slate-500 mb-6">In-Flight Messages (Doa &amp; Ucapan)</p>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault()
+                  if (data.demo || preview || !wishForm.name.trim() || !wishForm.message.trim()) return
+                  setWishBusy(true)
+                  try {
+                    await addWish(data.slug, wishForm)
+                    setWishForm({ name: guest || '', message: '' })
+                    refresh()
+                  } finally {
+                    setWishBusy(false)
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="text-[10px] uppercase tracking-widest text-slate-500">Sender</label>
+                  <input
+                    type="text"
+                    required
+                    value={wishForm.name}
+                    onChange={(e) => setWishForm({ ...wishForm, name: e.target.value })}
+                    placeholder="Nama Anda"
+                    className="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg font-mono text-sm bg-slate-50 focus:outline-none focus:border-[#0284C7]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-widest text-slate-500">Message</label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={wishForm.message}
+                    onChange={(e) => setWishForm({ ...wishForm, message: e.target.value })}
+                    placeholder="Tuliskan doa dan ucapan untuk kedua mempelai..."
+                    className="w-full mt-1 px-3 py-2.5 border border-slate-200 rounded-lg font-mono text-sm bg-slate-50 focus:outline-none focus:border-[#0284C7] resize-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={data.demo || preview || wishBusy}
+                  className="w-full bg-[#0F172A] text-white py-3 rounded-lg font-bold tracking-widest uppercase text-xs flex items-center justify-center gap-2 hover:bg-[#0284C7] transition-colors disabled:opacity-50"
+                >
+                  {data.demo || preview ? 'Preview Mode' : wishBusy ? 'Sending...' : 'SEND MESSAGE'}
+                </button>
+              </form>
+
+              {/* Wishes Feed */}
+              {(local.wishes || []).length > 0 && (
+                <div className="mt-6 space-y-3">
+                  {(local.wishes || []).map((w, idx) => (
+                    <div key={w.id || idx} className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-sm font-bold">{w.name}</strong>
+                      </div>
+                      <p className="text-sm text-slate-600 mt-1">{w.message || w.text}</p>
+                      {w.reply && (
+                        <div className="mt-2 pl-3 border-l-2 border-[#0284C7] text-xs text-slate-500">
+                          <strong>Balasan mempelai:</strong> {w.reply}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
           
           <div className="bg-[#0F172A] text-white p-6 mt-10 text-center">

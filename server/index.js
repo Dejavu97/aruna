@@ -135,11 +135,13 @@ app.post('/api/invitations', async (req, res) => {
   const body = req.body || {}
   const bride = body.bride?.nick || ''
   const groom = body.groom?.nick || ''
-  if (!bride || !groom || !body.date) {
-    res.status(400).json({ error: 'Nama kedua mempelai dan tanggal wajib diisi.' })
+  const eventType = body.eventType || 'wedding'
+  const isWedding = eventType === 'wedding'
+  if (!bride || (isWedding && !groom) || !body.date) {
+    res.status(400).json({ error: 'Nama dan tanggal wajib diisi.' })
     return
   }
-  const slug = await uniqueSlug(body.slug || `${bride}-${groom}`)
+  const slug = await uniqueSlug(body.slug || (groom && groom !== bride ? `${bride}-${groom}` : bride))
   const now = Date.now()
   const record = {
     id: uid(),

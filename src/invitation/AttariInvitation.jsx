@@ -435,7 +435,12 @@ function RsvpAndWishes({ data, guest, demo, preview, onDone, wishes }) {
           {wishes.map((w) => (
             <li key={w.id} className="at-wish-item">
               <strong>{w.name}</strong>
-              <p>{w.message}</p>
+              <p>{w.message || w.text}</p>
+              {w.reply && (
+                <div className="at-wish-reply" style={{ marginTop: '0.4rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9a96e', fontSize: '0.85em', color: '#8a7a5a' }}>
+                  <strong>Balasan mempelai:</strong> {w.reply}
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -453,16 +458,24 @@ function Gift({ banks, qris, copied, onCopy }) {
       <p className="at-lead">Tanpa mengurangi rasa hormat bagi tamu yang ingin mengirimkan hadiah kepada kami, bisa melalui nomor rekening di bawah ini.</p>
       <div className="at-banks">
         {banks.map((b) => (
-          <article key={b.number} className="at-bank-card">
+          <article key={b.number || b.no} className="at-bank-card">
             <span className="at-bank-name">{b.bank}</span>
-            <strong className="at-bank-number">{b.number}</strong>
+            <strong className="at-bank-number">{b.number || b.no}</strong>
             <p className="at-bank-holder">a.n. {b.name}</p>
-            <button type="button" className="at-btn-outline at-btn-sm" onClick={() => onCopy(b.number, b.number)}>
-              {copied === b.number ? <><Check size={12} /> TERSALIN</> : <><Copy size={12} /> SALIN</>}
+            <button type="button" className="at-btn-outline at-btn-sm" onClick={() => onCopy(b.number || b.no, b.number || b.no)}>
+              {copied === (b.number || b.no) ? <><Check size={12} /> TERSALIN</> : <><Copy size={12} /> SALIN</>}
             </button>
           </article>
         ))}
       </div>
+      {qris && (
+        <div className="at-banks" style={{ marginTop: '1.2rem' }}>
+          <article className="at-bank-card" style={{ textAlign: 'center' }}>
+            <span className="at-bank-name">QRIS</span>
+            <img src={qris} alt="QRIS" style={{ width: '200px', margin: '0.8rem auto', display: 'block', mixBlendMode: 'multiply' }} />
+          </article>
+        </div>
+      )}
     </section>
   )
 }

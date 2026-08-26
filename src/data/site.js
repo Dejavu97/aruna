@@ -9,69 +9,261 @@ export const site = {
   city: 'Indonesia',
 }
 
-export const packages = [
-  {
-    id: 'gratis',
-    name: 'Gratis',
-    price: 0,
-    blurb: 'Buat & sebar undangan pernikahan tanpa biaya.',
-    features: [
-      '1 tema pilihan',
-      'Nama, tanggal, lokasi & peta',
-      'RSVP & buku ucapan doa',
-      'Galeri foto & musik latar',
-      'Didukung sponsor iklan platform',
-      'Aktif 3 bulan',
-    ],
-  },
-  {
-    id: 'hemat',
-    name: 'Hemat',
-    price: 25000,
-    blurb: 'Cukup untuk sebar undangan yang rapi dan bersih.',
-    features: [
-      '1 tema pilihan',
-      'Nama, tanggal, lokasi',
-      'Countdown & peta',
-      'RSVP tamu',
-      '100% Bebas Iklan',
-      'Revisi data 2x',
-      'Aktif 3 bulan',
-    ],
-  },
-  {
-    id: 'lengkap',
-    name: 'Lengkap',
-    price: 50000,
-    popular: true,
-    blurb: 'Paling sering dipesan. Terasa utuh & mewah.',
-    features: [
-      'Semua di paket Hemat',
-      'Galeri foto & cerita kami',
-      'Musik latar',
-      'Amplop digital / QRIS',
-      'Buku ucapan tamu',
-      '100% Bebas Iklan',
-      'Revisi data 5x',
-      'Aktif 6 bulan',
-    ],
-  },
-  {
-    id: 'premium',
-    name: 'Premium',
-    price: 150000,
-    blurb: 'Kalau mau beda dan ditangani sampai beres.',
-    features: [
-      'Semua di paket Lengkap',
-      'Penyesuaian warna & ornament',
-      'Bantuan isi data 1-on-1',
-      'Prioritas pengerjaan',
-      '100% Bebas Iklan',
-      'Revisi sampai puas',
-      'Aktif 12 bulan',
-    ],
-  },
-]
+export const eventPackages = {
+  wedding: [
+    {
+      id: 'gratis',
+      name: 'Gratis',
+      price: 0,
+      blurb: 'Buat & sebar undangan pernikahan tanpa biaya.',
+      features: [
+        '1 tema pilihan',
+        'Nama, tanggal, lokasi & peta',
+        'RSVP & buku ucapan doa',
+        'Galeri foto & musik latar',
+        'Didukung sponsor iklan platform',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'hemat',
+      name: 'Hemat',
+      price: 35000,
+      blurb: 'Cukup untuk sebar undangan yang rapi dan bersih.',
+      features: [
+        '1 tema pilihan',
+        'Nama, tanggal & peta navigasi',
+        'RSVP konfirmasi kehadiran',
+        '100% Bebas Iklan',
+        'Revisi data mandiri',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'lengkap',
+      name: 'Lengkap',
+      price: 50000,
+      popular: true,
+      blurb: 'Paling sering dipesan. Terasa utuh & mewah.',
+      features: [
+        'Semua di paket Hemat',
+        'Galeri foto & cerita kami',
+        'Musik latar romantis',
+        'Amplop digital & QRIS',
+        'Buku ucapan doa & balasan',
+        '100% Bebas Iklan',
+        'Aktif 6 bulan',
+      ],
+    },
+    {
+      id: 'premium',
+      name: 'VIP Exclusive',
+      price: 100000,
+      blurb: 'Fitur terlengkap dengan bantuan pengerjaan dan masa aktif panjang.',
+      features: [
+        'Semua di paket Lengkap',
+        'QR Card generator fisik & frame foto',
+        'Buku tamu & QR check-in lokasi',
+        'Prioritas bantuan admin',
+        '100% Bebas Iklan',
+        'Aktif 12 bulan',
+      ],
+    },
+  ],
+  birthday: [
+    {
+      id: 'gratis',
+      name: 'Gratis',
+      price: 0,
+      blurb: 'Buat undangan pesta ulang tahun tanpa biaya.',
+      features: [
+        '1 tema ulang tahun',
+        'Nama & usia, tanggal pesta',
+        'RSVP kehadiran teman',
+        'Galeri foto & musik latar',
+        'Didukung sponsor iklan',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'basic-party',
+      name: 'Party Basic',
+      price: 25000,
+      blurb: 'Undangan pesta ulang tahun rapi, bersih & bebas iklan.',
+      features: [
+        '1 tema pilihan',
+        'Waktu, peta lokasi & games',
+        'RSVP teman sebaya',
+        'Wishlist kado ulang tahun',
+        '100% Bebas Iklan',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'lengkap',
+      name: 'Sweet Celebration',
+      price: 40000,
+      popular: true,
+      blurb: 'Paling diminati untuk perayaan Sweet 17 & pesta meriah.',
+      features: [
+        'Semua di Party Basic',
+        'Galeri foto momen',
+        'Dress code warna pesta',
+        'Amplop kado digital & QRIS',
+        'Buku ucapan & doa selamat',
+        '100% Bebas Iklan',
+        'Aktif 6 bulan',
+      ],
+    },
+  ],
+  graduation: [
+    {
+      id: 'gratis',
+      name: 'Gratis',
+      price: 0,
+      blurb: 'Undangan syukuran wisuda tanpa biaya.',
+      features: [
+        '1 tema wisuda',
+        'Nama & gelar, lokasi upacara',
+        'RSVP tamu syukuran',
+        'Didukung sponsor iklan',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'lengkap',
+      name: 'Wisuda Reguler',
+      price: 25000,
+      popular: true,
+      blurb: 'Undangan tasyakuran wisuda resmi dan bebas iklan.',
+      features: [
+        '1 tema akademik elegan',
+        'Nama, gelar & motto kelulusan',
+        'Lokasi upacara & syukuran',
+        'RSVP tamu & keluarga',
+        '100% Bebas Iklan',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'premium',
+      name: 'Wisuda Prestise',
+      price: 40000,
+      blurb: 'Tampilan prestisius dengan galeri toga & apresiasi.',
+      features: [
+        'Semua di paket Reguler',
+        'Galeri foto kenangan wisuda',
+        'Apresiasi tanda kasih / kado',
+        'Buku ucapan selamat & sukses',
+        '100% Bebas Iklan',
+        'Aktif 6 bulan',
+      ],
+    },
+  ],
+  aqiqah: [
+    {
+      id: 'gratis',
+      name: 'Gratis',
+      price: 0,
+      blurb: 'Undangan tasyakuran kelahiran & aqiqah gratis.',
+      features: [
+        '1 tema islami pastel',
+        'Nama si kecil & orang tua',
+        'Waktu & lokasi cukur rambut',
+        'Didukung sponsor iklan',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'lengkap',
+      name: 'Tasyakuran Barakah',
+      price: 30000,
+      popular: true,
+      blurb: 'Paling sering dipilih untuk tasyakuran aqiqah keluarga.',
+      features: [
+        '1 tema pilihan',
+        'Arti nama & doa tasyakuran',
+        'Jadwal cukur & santap siang',
+        'Amplop tanda kasih berkah',
+        'Buku doa untuk si kecil',
+        '100% Bebas Iklan',
+        'Aktif 6 bulan',
+      ],
+    },
+  ],
+  corporate: [
+    {
+      id: 'lengkap',
+      name: 'Corporate Event',
+      price: 75000,
+      popular: true,
+      blurb: 'Standar resmi untuk seminar, peluncuran produk, dan gala.',
+      features: [
+        '1 tema modern korporat',
+        'Agenda keynote & rundown',
+        'QR access card & check-in',
+        'Dress code & streaming link',
+        '100% Bebas Iklan',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'premium',
+      name: 'Enterprise VIP',
+      price: 150000,
+      blurb: 'Untuk konferensi berskala besar dengan dukungan prioritas.',
+      features: [
+        'Semua di Corporate Event',
+        'Domain kustom mandiri',
+        'Bantuan setup data oleh admin',
+        'Statistik kehadiran lengkap',
+        '100% Bebas Iklan',
+        'Aktif 12 bulan',
+      ],
+    },
+  ],
+  'love-letter': [
+    {
+      id: 'gratis',
+      name: 'Gratis',
+      price: 0,
+      blurb: 'Kirim surat cinta digital tanpa biaya.',
+      features: [
+        '1 tema kapsul kenangan',
+        'Surat cinta romantis',
+        'Musik latar romantis',
+        'Didukung sponsor iklan',
+        'Aktif 3 bulan',
+      ],
+    },
+    {
+      id: 'lengkap',
+      name: 'Forever Capsule',
+      price: 25000,
+      popular: true,
+      blurb: 'Kado digital abadi dan intim untuk orang tersayang.',
+      features: [
+        'Surat cinta mendalam & judul',
+        'Kilas balik momen perjalanan (foto + cerita)',
+        'Galeri foto bersama',
+        'Musik latar romantis pilihan',
+        '100% Bebas Iklan',
+        'Aktif 12 bulan',
+      ],
+    },
+  ],
+}
+
+export function getPackagesByEventType(eventType = 'wedding') {
+  return eventPackages[eventType] || eventPackages.wedding
+}
+
+export function getPackageById(packageId, eventType = 'wedding') {
+  const list = getPackagesByEventType(eventType)
+  return list.find((p) => p.id === packageId) || list.find((p) => p.popular) || list[0] || packages[0]
+}
+
+export const packages = eventPackages.wedding
 
 export const steps = [
   {
@@ -114,7 +306,7 @@ export const features = [
     category: 'Kenangan',
     tag: 'Kapsul Kenangan',
     title: 'Birthday Memory Capsule & Surat Cinta',
-    body: 'Format spesial kapsul digital untuk surat cinta romantis pasangan atau kenangan persahabatan bestie dengan kilas balik foto dan countdown.',
+    body: 'Format spesial kapsul digital untuk surat cinta ulang tahun pasangan: kilas balik foto, quote romantis, dan undangan private dinner dalam satu tautan.',
   },
   {
     category: 'Konsep',

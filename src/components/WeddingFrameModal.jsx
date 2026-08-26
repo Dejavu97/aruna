@@ -19,10 +19,16 @@ export default function WeddingFrameModal({ data, guest, couple, onClose }) {
   const fileInputRef = useRef(null)
 
   const brideName = data?.bride?.nick || data?.bride?.name || 'Bride'
-  const groomName = data?.groom?.nick || data?.groom?.name || 'Groom'
+  const groomName = data?.groom?.nick || data?.groom?.name || ''
+  const isSingle = !groomName || groomName === brideName || groomName === 'Groom'
+  const displayName = isSingle ? brideName : `${brideName} & ${groomName}`
   const weddingDate = data?.date ? formatLongDate(data.date) : ''
   const hashtag = data?.hashtag ? (data.hashtag.startsWith('#') ? data.hashtag : `#${data.hashtag}`) : ''
   const coverImage = data?.gallery?.[0] || data?.bride?.photo || `/themes/${data?.themeId || 'emas-senja'}.jpg`
+  
+  const frameHeaderGold = data?.eventType === 'birthday' ? 'SPECIAL BIRTHDAY' : data?.eventType === 'graduation' ? 'ACADEMIC HONORS' : data?.eventType === 'aqiqah' ? 'TASYAKURAN AQIQAH' : data?.eventType === 'corporate' ? 'OFFICIAL EVENT' : 'THE WEDDING OF'
+  const frameHeaderDark = data?.eventType === 'birthday' ? 'HAPPY BIRTHDAY' : data?.eventType === 'graduation' ? 'CONGRATULATIONS' : data?.eventType === 'aqiqah' ? 'TASYAKURAN AQIQAH' : data?.eventType === 'corporate' ? 'GALA INVITATION' : 'HAPPY WEDDING'
+  const frameHeaderEditorial = data?.eventType === 'birthday' ? 'CELEBRATING LIFE' : data?.eventType === 'graduation' ? 'CELEBRATING SUCCESS' : data?.eventType === 'aqiqah' ? 'BARAKALLAH FIIL UMUR' : data?.eventType === 'corporate' ? 'ANNUAL SUMMIT' : 'CELEBRATING LOVE'
 
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.canShare) {
@@ -115,12 +121,12 @@ export default function WeddingFrameModal({ data, guest, couple, onClose }) {
         ctx.font = '24px "Montserrat", sans-serif'
         ctx.textAlign = 'center'
         ctx.letterSpacing = '6px'
-        ctx.fillText('THE WEDDING OF', 540, 110)
+        ctx.fillText(frameHeaderGold, 540, 110)
 
         // Footer Names & Hashtag
         ctx.fillStyle = '#1c1917'
         ctx.font = 'italic 52px "Playfair Display", Georgia, serif'
-        ctx.fillText(`${brideName} & ${groomName}`, 540, 900)
+        ctx.fillText(displayName, 540, 900)
 
         ctx.fillStyle = '#78716c'
         ctx.font = '24px "Montserrat", sans-serif'
@@ -140,10 +146,10 @@ export default function WeddingFrameModal({ data, guest, couple, onClose }) {
         ctx.font = '700 32px "Montserrat", sans-serif'
         ctx.textAlign = 'center'
         ctx.letterSpacing = '8px'
-        ctx.fillText('CELEBRATING LOVE', 540, 115)
+        ctx.fillText(frameHeaderEditorial, 540, 115)
 
         ctx.font = 'italic 58px "Playfair Display", Georgia, serif'
-        ctx.fillText(`${brideName} & ${groomName}`, 540, 905)
+        ctx.fillText(displayName, 540, 905)
 
         ctx.font = '24px "Montserrat", sans-serif'
         ctx.fillStyle = '#57534e'
@@ -162,11 +168,11 @@ export default function WeddingFrameModal({ data, guest, couple, onClose }) {
         ctx.font = '24px "Montserrat", sans-serif'
         ctx.textAlign = 'center'
         ctx.letterSpacing = '6px'
-        ctx.fillText('HAPPY WEDDING', 540, 110)
+        ctx.fillText(frameHeaderDark, 540, 110)
 
         ctx.fillStyle = '#ffffff'
         ctx.font = 'italic 54px "Playfair Display", Georgia, serif'
-        ctx.fillText(`${brideName} & ${groomName}`, 540, 900)
+        ctx.fillText(displayName, 540, 900)
 
         ctx.fillStyle = '#94a3b8'
         ctx.font = '24px "Montserrat", sans-serif'
@@ -210,7 +216,7 @@ export default function WeddingFrameModal({ data, guest, couple, onClose }) {
         ctx.fillStyle = '#a8a29e'
         ctx.font = '32px "Cinzel", Georgia, serif'
         ctx.textAlign = 'center'
-        ctx.fillText('The Wedding Celebration', 540, 740)
+        ctx.fillText(data?.eventType === 'birthday' ? 'Birthday Celebration' : data?.eventType === 'graduation' ? 'Graduation Celebration' : data?.eventType === 'aqiqah' ? 'Tasyakuran Aqiqah' : data?.eventType === 'corporate' ? 'Special Event Gala' : 'The Wedding Celebration', 540, 740)
       }
 
       // Elegant Borders
@@ -230,7 +236,7 @@ export default function WeddingFrameModal({ data, guest, couple, onClose }) {
 
       ctx.fillStyle = '#ffffff'
       ctx.font = 'italic 74px "Playfair Display", Georgia, serif'
-      ctx.fillText(`${brideName} & ${groomName}`, 540, 1340)
+      ctx.fillText(displayName, 540, 1340)
 
       ctx.fillStyle = '#c5a059'
       ctx.font = '32px "Montserrat", sans-serif'

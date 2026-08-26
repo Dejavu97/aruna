@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Lock, Shield } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import WeddingForm, { blankWedding } from '../components/WeddingForm'
-import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation } from '../lib/api'
+import InvitationForm, { blankInvitation } from '../components/WeddingForm'
+import { fetchInvitation, fetchCustomThemes, getAdminKey, getEditKey, rememberEditKey, updateInvitation } from '../lib/api'
 import { isEventEditLocked, formatLongDate } from '../lib/utils'
 
 export default function Edit() {
@@ -12,13 +12,23 @@ export default function Edit() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const [item, setItem] = useState(null)
-  const fromAdmin = params.get('from') === 'admin' || Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
+  const [customThemes, setCustomThemes] = useState([])
+  const hasAdminKey = Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
+  const fromAdmin = params.get('from') === 'admin' && hasAdminKey
   const initialKey = params.get('key') || getEditKey(slug) || (fromAdmin ? 'admin-bypass' : '')
   const [key, setKey] = useState(initialKey)
   const [typed, setTyped] = useState(key)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchCustomThemes()
+      .then((list) => {
+        if (Array.isArray(list)) setCustomThemes(list)
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     let live = true
@@ -77,6 +87,11 @@ export default function Edit() {
       : '/'
 
   const isLocked = !fromAdmin && isEventEditLocked(item?.date, 1)
+
+  const initialFormData = useMemo(() => {
+    if (!item) return null
+    return { ...blankInvitation(item.themeId, customThemes), ...item }
+  }, [item?.slug, item?.themeId, customThemes])
 
   return (
     <div className="bg-ivory">
@@ -152,9 +167,11 @@ export default function Edit() {
           </div>
         </section>
       ) : (
-        <WeddingForm
+        <InvitationForm
+          key={item.slug || item.themeId}
           themeId={item.themeId}
-          initial={{ ...blankWedding(item.themeId), ...item }}
+          initial={initialFormData}
+          customThemes={customThemes}
           mode="edit"
           submitting={busy}
           error={error}

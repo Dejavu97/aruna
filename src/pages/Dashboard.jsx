@@ -5,7 +5,7 @@ import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import { fetchUserInvitations } from '../lib/api'
 import { formatLongDate, invitationUrl, isEventEditLocked } from '../lib/utils'
-import { formatRupiah, packages } from '../data/site'
+import { formatRupiah, packages, getPackageById } from '../data/site'
 import {
   Plus,
   ExternalLink,
@@ -158,7 +158,7 @@ export default function Dashboard() {
                 const title = isSingle
                   ? item.bride?.nick || item.customerName || 'Acara Spesial'
                   : `${item.bride?.nick} & ${item.groom?.nick}`
-                const pack = packages.find((p) => p.id === item.packageId) || packages[1]
+                const pack = getPackageById(item.packageId, item.eventType)
 
                 return (
                   <article

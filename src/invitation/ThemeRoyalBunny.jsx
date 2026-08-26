@@ -181,7 +181,8 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
   const [wishSuccess, setWishSuccess] = useState(false)
   const audioRef = useRef(null)
 
-  const couple = `${data.bride?.nick || 'Sarah'} & ${data.groom?.nick || 'Budi'}`
+  const isSingle = !data.groom?.nick || data.groom?.nick === data.bride?.nick
+  const couple = isSingle ? (data.bride?.nick || data.customerName || 'Sarah') : `${data.bride?.nick || 'Sarah'} & ${data.groom?.nick || 'Budi'}`
   const bgMusic = data.music || theme?.music || '/music/tiny_paws.mp3'
   const realGroom = !isThemeArt(data.groom?.photo) ? data.groom.photo : ''
   const realBride = !isThemeArt(data.bride?.photo) ? data.bride.photo : ''
@@ -418,30 +419,32 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
             </motion.div>
 
             <div className="rb-couple-stage">
-              <motion.article
-                className="rb-character"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8 }}
-              >
-                <div className="rb-character-art-wrap">
-                  <img src={A.groom} alt={data.groom?.nick || 'Mempelai pria'} className="rb-character-art" />
-                </div>
-                {realGroom && (
-                  <motion.div className="rb-portrait-frame" initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}>
-                    <img src={realGroom} alt="" />
-                  </motion.div>
-                )}
-                <p className="rb-rank">The Royal Groom</p>
-                <h4 className="rb-names">{data.groom?.full || data.groom?.nick || 'Budi Santoso, S.Kom.'}</h4>
-                <p className="rb-lineage">{data.groom?.parents || 'Putra tercinta dari Bpk. Hendra Santoso & Ibu Susi Wardani'}</p>
-                {data.groom?.ig && (
-                  <a className="rb-ig" href={`https://instagram.com/${String(data.groom.ig).replace(/^@/, '')}`} target="_blank" rel="noreferrer">
-                    @{String(data.groom.ig).replace(/^@/, '')}
-                  </a>
-                )}
-              </motion.article>
+              {!isSingle && data.groom?.nick && (
+                <motion.article
+                  className="rb-character"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <div className="rb-character-art-wrap">
+                    <img src={A.groom} alt={data.groom?.nick || 'Mempelai pria'} className="rb-character-art" />
+                  </div>
+                  {realGroom && (
+                    <motion.div className="rb-portrait-frame" initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}>
+                      <img src={realGroom} alt="" />
+                    </motion.div>
+                  )}
+                  <p className="rb-rank">The Royal Groom</p>
+                  <h4 className="rb-names">{data.groom?.full || data.groom?.nick || 'Budi Santoso, S.Kom.'}</h4>
+                  <p className="rb-lineage">{data.groom?.parents || 'Putra tercinta dari Bpk. Hendra Santoso & Ibu Susi Wardani'}</p>
+                  {data.groom?.ig && (
+                    <a className="rb-ig" href={`https://instagram.com/${String(data.groom.ig).replace(/^@/, '')}`} target="_blank" rel="noreferrer">
+                      @{String(data.groom.ig).replace(/^@/, '')}
+                    </a>
+                  )}
+                </motion.article>
+              )}
 
               <motion.article
                 className="rb-character"

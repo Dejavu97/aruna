@@ -4,7 +4,7 @@ import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import { fetchInvitation, fetchSettings, getEditKey, rememberEditKey } from '../lib/api'
 import { copyText, invitationUrl } from '../lib/utils'
-import { formatRupiah, packages, waLink } from '../data/site'
+import { formatRupiah, getPackageById, waLink } from '../data/site'
 import AdSlot from '../components/AdSlot'
 import LoveQRCardGenerator from '../components/LoveQRCardGenerator'
 import { CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react'
@@ -31,7 +31,7 @@ export default function Success() {
       .catch(() => {})
   }, [slug, editKey])
 
-  const pack = packages.find((p) => p.id === data?.packageId) || packages[1]
+  const pack = getPackageById(data?.packageId, data?.eventType)
 
   async function copy(value, key) {
     if (await copyText(value)) {
@@ -40,16 +40,19 @@ export default function Success() {
     }
   }
 
-  const payText = `Halo ByAruna, saya sudah pesan undangan.
-Kode: ${data?.orderCode || '-'}
-Pasangan: ${data?.bride?.nick || ''} & ${data?.groom?.nick || ''}
-Paket: ${pack.name} ${formatRupiah(pack.price)}
+  const isSingle = !data?.groom?.nick || data?.groom?.nick === data?.bride?.nick
+  const heroNames = isSingle
+    ? data?.bride?.nick || data?.customerName || 'Acara Spesial'
+    : `${data?.bride?.nick} & ${data?.groom?.nick}`
+
+  const eventLabel = data?.eventType === 'birthday' ? 'Ulang Tahun' : data?.eventType === 'graduation' ? 'Wisuda' : data?.eventType === 'aqiqah' ? 'Aqiqah' : data?.eventType === 'corporate' ? 'Event Resmi' : data?.eventType === 'love-letter' ? 'Surat Cinta' : 'Pernikahan'
+
+  const payText = `Halo ByAruna, saya sudah pesan undangan digital.
+Kode Order: ${data?.orderCode || '-'}
+Acara (${eventLabel}): ${heroNames}
+Paket: ${pack.name} (${pack.price === 0 ? 'Gratis' : formatRupiah(pack.price)})
 Link: ${url}
 Mohon dicek pembayarannya.`
-
-  const heroNames = data?.groom?.nick && data?.groom?.nick !== data?.bride?.nick
-    ? `${data?.bride?.nick} & ${data?.groom?.nick}`
-    : data?.bride?.nick || data?.customerName || 'Acara Spesial'
 
   return (
     <div className="bg-ivory">
