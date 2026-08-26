@@ -20,8 +20,14 @@ export default function Watermark({ data, theme, className = '' }) {
   }
 
   return (
-    <span className={className}>
-      Dibuat dengan ByAruna · Tema {theme?.name || 'Elegan'}
-    </span>
+    <a
+      href="https://byaruna.my.id"
+      target="_blank"
+      rel="noreferrer"
+      className={`flex items-center justify-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity ${className}`}
+    >
+      <img src="/logo.png" alt="ByAruna" className="h-5 w-auto object-contain" />
+      <span>Dibuat dengan ByAruna · Tema {theme?.name || 'Elegan'}</span>
+    </a>
   )
 }

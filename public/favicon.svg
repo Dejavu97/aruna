@@ -1,5 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" fill="#1A1714"/>
-  <path d="M18 46L32 16L46 46" stroke="#B08D57" stroke-width="2.2"/>
-  <path d="M24 36H40" stroke="#F4EFE6" stroke-width="1.4"/>
+  <!-- Background ivory warm -->
+  <rect width="64" height="64" rx="10" fill="#FAF7F0"/>
+  <!-- Envelope body -->
+  <rect x="10" y="22" width="44" height="30" rx="3" fill="#FBF5E6" stroke="#C9A84C" stroke-width="1.6"/>
+  <!-- Envelope flap (V shape) -->
+  <path d="M10 22 L32 40 L54 22" stroke="#C9A84C" stroke-width="1.6" fill="none"/>
+  <!-- Envelope bottom V -->
+  <path d="M10 52 L26 38" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+  <path d="M54 52 L38 38" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+  <!-- Flower stem -->
+  <path d="M32 22 Q34 16 31 10" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+  <!-- Flower petals (simplified peony) -->
+  <circle cx="30" cy="9" r="4.5" fill="#FBF5E6" stroke="#C9A84C" stroke-width="1.2"/>
+  <circle cx="30" cy="9" r="2" fill="#D4AF37" opacity="0.7"/>
+  <!-- Small leaf left -->
+  <path d="M27 16 Q22 13 23 8" stroke="#C9A84C" stroke-width="1" fill="none"/>
+  <!-- Small leaf right -->
+  <path d="M33 14 Q38 11 37 7" stroke="#C9A84C" stroke-width="1" fill="none"/>
 </svg>
