@@ -43,7 +43,7 @@ export const themes = [
     popular: true,
     collection: 'premium',
     description: 'Tema sinematik modern dengan fokus pada visual editorial, babak cerita interaktif, dan palet dark slate champagne.',
-    cover: '/themes/cinematic-cover.jpg',
+    cover: '/assets/cinematic/image.jpg',
     layout: 'cinematic-minimal',
     opener: 'AN EDITORIAL BY',
     fonts: {
@@ -1645,14 +1645,14 @@ export const demos = {
       nick: 'Sarah',
       full: 'Sarah Michelle Anindya, S.Ds',
       parents: 'Putri tercinta Bpk. Bambang & Ibu Citra',
-      photo: '/assets/local/couple_garden.jpg',
+      photo: '/assets/cinematic/image.jpg',
       ig: 'sarahanindya',
     },
     groom: {
       nick: 'Budi',
       full: 'Budi Santoso, M.B.A',
       parents: 'Putra tercinta Bpk. Hendra & Ibu Maya',
-      photo: '/assets/local/attari_wedding.jpg',
+      photo: '/assets/cinematic/image (1).jpg',
       ig: 'budisantoso',
     },
     date: '2026-10-24',
@@ -1664,10 +1664,12 @@ export const demos = {
       { year: '2026', title: 'Hari Bahagia Dimulai', text: 'Merayakan ikatan suci di hadapan keluarga dan sahabat tercinta.' },
     ],
     gallery: [
-      '/assets/local/couple_garden.jpg',
-      '/assets/local/couple_classical.jpg',
-      '/assets/local/couple_laughing_1.jpg',
-      '/assets/local/wedding_rings_2.jpg',
+      '/assets/cinematic/image (2).jpg',
+      '/assets/cinematic/image (3).jpg',
+      '/assets/cinematic/image (4).jpg',
+      '/assets/cinematic/S3WHW.jpg',
+      '/assets/cinematic/QuRwc.jpg',
+      '/assets/cinematic/DsdVm.jpg',
     ],
     events: [
       {

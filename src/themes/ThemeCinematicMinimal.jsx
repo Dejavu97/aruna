@@ -24,9 +24,10 @@ export default function ThemeCinematicMinimal({ data, guest = '', preview = fals
   const events = data.events || []
   const story = data.story || []
   const gallery = data.gallery || [
-    '/assets/local/couple_garden.jpg',
-    '/assets/local/couple_classical.jpg',
-    '/assets/local/couple_laughing_1.jpg'
+    '/assets/cinematic/image (2).jpg',
+    '/assets/cinematic/image (3).jpg',
+    '/assets/cinematic/image (4).jpg',
+    '/assets/cinematic/S3WHW.jpg'
   ]
 
   const handleStartMovie = () => {
