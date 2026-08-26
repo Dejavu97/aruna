@@ -143,11 +143,11 @@ export const themes = [
     id: 'boarding',
     name: 'Boarding Pass',
     tag: 'Premium',
-    tags: ['premium', 'unik', 'modern'],
+    tags: ['premium', 'unik', 'modern', 'travel', 'boarding-pass'],
     popular: true,
     collection: 'premium',
     description: 'Desain mirip tiket pesawat first class. Sempurna untuk pasangan traveler atau destination wedding.',
-    cover: '/themes/boarding.jpg',
+    cover: '/assets/boardingpass/cover.jpg',
     layout: 'boarding',
     opener: 'First Class Ticket',
     fonts: {
@@ -1416,22 +1416,30 @@ export const demos = {
     slug: 'gilang-tara',
     groom: {
       nick: 'Gilang',
-      full: 'Gilang Saputra',
+      full: 'Gilang Saputra, S.T.',
       parents: 'Putra dari Bapak Herman & Ibu Wati',
-      photo: '/assets/local/couple_temple.jpg',
+      photo: '/assets/boardingpass/groom.jpg',
+      ig: 'gilangsaputra',
     },
     bride: {
       nick: 'Tara',
-      full: 'Tara Anindita',
+      full: 'Tara Anindita, B.A.',
       parents: 'Putri dari Bapak Budi & Ibu Rini',
-      photo: '/assets/local/couple_traditional_wedding.jpg',
+      photo: '/assets/boardingpass/bride.jpg',
+      ig: 'taraanindita',
     },
     date: '2026-11-20',
-    quote: 'Love is the greatest adventure.',
-    quoteSource: 'Unknown',
+    quote: 'Love is the greatest flight of all — and our journey starts together today.',
+    quoteSource: 'First Class Journey',
     story: [
-      { year: '2020', title: 'First Flight', body: 'Bertemu di bandara Soekarno Hatta saat delay pesawat ke Bali.' },
-      { year: '2024', title: 'The Proposal', body: 'Dilamar di atas awan, dalam penerbangan menuju Tokyo.' }
+      { year: '2020', title: 'First Flight Encounter', body: 'Bertemu di bandara Soekarno Hatta saat delay pesawat menuju Bali.' },
+      { year: '2024', title: 'The Sky Proposal', body: 'Dilamar di ketinggian 35.000 kaki dalam penerbangan menuju Tokyo.' },
+      { year: '2026', title: 'The Ultimate Destination', body: 'Memulai perjalanan seumur hidup dalam ikatan pernikahan.' },
+    ],
+    gallery: [
+      '/assets/boardingpass/cover.jpg',
+      '/assets/boardingpass/groom.jpg',
+      '/assets/boardingpass/bride.jpg',
     ],
     events: [
       {
