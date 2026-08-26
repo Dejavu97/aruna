@@ -614,7 +614,7 @@ export default function ThemeAdatJawa({ data, guest = '', preview = false }) {
 
   const bride = data.bride?.nick || ''
   const groom = data.groom?.nick || ''
-  const coverImg = data.gallery?.[0] || data.backdrop || '/themes/marmer.jpg'
+  const coverImg = data.cover || data.backdrop || data.gallery?.[0] || data.bride?.photo || '/themes/marmer.jpg'
 
   useEffect(() => {
     const id = setInterval(() => setTick(countdownParts(data.date, data.events?.[0]?.time || '09:00')), 1000)

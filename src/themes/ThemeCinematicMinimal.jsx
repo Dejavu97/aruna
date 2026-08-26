@@ -24,9 +24,9 @@ export default function ThemeCinematicMinimal({ data, guest = '', preview = fals
   const events = data.events || []
   const story = data.story || []
   const gallery = data.gallery || [
-    '/assets/cinematic/image (2).jpg',
-    '/assets/cinematic/image (3).jpg',
-    '/assets/cinematic/image (4).jpg',
+    '/assets/cinematic/image_2.jpg',
+    '/assets/cinematic/image_3.jpg',
+    '/assets/cinematic/image_4.jpg',
     '/assets/cinematic/S3WHW.jpg'
   ]
 
