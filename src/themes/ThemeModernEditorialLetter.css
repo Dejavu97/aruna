@@ -1,0 +1,618 @@
+/* =========================================================
+   MODERN EDITORIAL LETTER (.mel-*)
+   Ivory paper · charcoal ink · brass rules · asymmetric type
+   Isolated — no global style leakage
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+.mel-root {
+  --mel-bg: #f3eee6;
+  --mel-paper: #faf7f2;
+  --mel-ink: #1c1917;
+  --mel-muted: #7c7166;
+  --mel-accent: #9a7b4f;
+  --mel-accent-soft: #efe6d8;
+  --mel-line: rgba(28, 25, 23, 0.14);
+  --mel-shadow: 0 24px 60px rgba(28, 25, 23, 0.12);
+
+  position: relative;
+  min-height: 100dvh;
+  margin: 0 auto;
+  max-width: 520px;
+  background: var(--mel-bg);
+  color: var(--mel-ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+  box-shadow: var(--mel-shadow);
+}
+
+.mel-paper-grain {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.35;
+  background-image:
+    radial-gradient(rgba(28, 25, 23, 0.05) 0.6px, transparent 0.6px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 40%);
+  background-size: 3px 3px, 100% 100%;
+}
+
+.mel-rule-frame {
+  pointer-events: none;
+  position: absolute;
+  inset: 10px;
+  z-index: 1;
+  border: 1px solid var(--mel-line);
+}
+
+.mel-audio-chip {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--mel-line);
+  background: rgba(250, 247, 242, 0.92);
+  color: var(--mel-ink);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+/* ---------- Envelope cover ---------- */
+.mel-envelope {
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 1.25rem;
+}
+
+.mel-envelope-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(0.25) contrast(1.05);
+  transform: scale(1.04);
+}
+
+.mel-envelope-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(243, 238, 230, 0.55), rgba(243, 238, 230, 0.92) 55%, #f3eee6),
+    radial-gradient(circle at 50% 20%, rgba(154, 123, 79, 0.18), transparent 55%);
+}
+
+.mel-envelope-card {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 380px);
+  padding: 2.5rem 1.75rem 2rem;
+  background: var(--mel-paper);
+  border: 1px solid var(--mel-line);
+  box-shadow: var(--mel-shadow);
+  text-align: center;
+}
+
+.mel-envelope-card::before,
+.mel-envelope-card::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  height: 1px;
+  background: var(--mel-line);
+}
+.mel-envelope-card::before { top: 12px; }
+.mel-envelope-card::after { bottom: 12px; }
+
+.mel-kicker {
+  margin: 0 0 1rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--mel-accent);
+}
+
+.mel-hero-name {
+  margin: 0;
+  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+  font-size: clamp(2.6rem, 10vw, 3.4rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.mel-hero-full {
+  margin: 0.55rem 0 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--mel-muted);
+}
+
+.mel-hero-date {
+  margin: 0.85rem 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mel-muted);
+}
+
+.mel-address-line {
+  margin: 1.35rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--mel-line);
+  font-size: 0.92rem;
+  color: var(--mel-muted);
+  line-height: 1.5;
+}
+.mel-address-line em {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--mel-ink);
+  font-size: 1.15rem;
+}
+
+.mel-seal-wrap {
+  margin-top: 1.75rem;
+  display: grid;
+  place-items: center;
+}
+
+.mel-seal-btn {
+  position: relative;
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(circle at 35% 30%, #b8915c, #7d6238 70%);
+  color: #faf7f2;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow:
+    0 10px 24px rgba(125, 98, 56, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.mel-seal-ring {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 1px dashed rgba(250, 247, 242, 0.45);
+}
+
+.mel-envelope-footnote {
+  margin: 1.5rem 0 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mel-muted);
+}
+
+/* ---------- Letter body ---------- */
+.mel-letter {
+  position: relative;
+  z-index: 2;
+  padding: 1.25rem 1.15rem 2.5rem;
+}
+
+.mel-masthead {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0 1rem;
+  border-bottom: 2px solid var(--mel-ink);
+}
+
+.mel-masthead-issue {
+  margin: 0;
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mel-accent);
+  font-weight: 700;
+}
+
+.mel-masthead-title {
+  margin: 0.2rem 0 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.mel-masthead-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mel-muted);
+  text-align: right;
+}
+
+.mel-chapter-nav {
+  display: flex;
+  gap: 0.45rem;
+  margin: 1rem 0 1.25rem;
+}
+
+.mel-chapter-dot {
+  flex: 1;
+  height: 34px;
+  border: 1px solid var(--mel-line);
+  background: transparent;
+  color: var(--mel-muted);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.mel-chapter-dot.is-done {
+  background: var(--mel-accent-soft);
+  color: var(--mel-ink);
+}
+.mel-chapter-dot.is-active {
+  background: var(--mel-ink);
+  border-color: var(--mel-ink);
+  color: var(--mel-paper);
+}
+
+.mel-spread {
+  min-height: 62vh;
+}
+
+.mel-page {
+  background: var(--mel-paper);
+  border: 1px solid var(--mel-line);
+  padding: 1.35rem 1.15rem 1.15rem;
+  box-shadow: 0 10px 30px rgba(28, 25, 23, 0.06);
+}
+
+.mel-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mel-accent);
+}
+
+.mel-display {
+  margin: 0 0 1rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.1rem, 8vw, 2.8rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+.mel-display span {
+  font-style: italic;
+  color: var(--mel-accent);
+}
+.mel-display-sm {
+  font-size: clamp(1.7rem, 6.5vw, 2.2rem);
+  margin-bottom: 0.85rem;
+}
+
+.mel-lede {
+  margin: 0;
+  color: var(--mel-muted);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+.mel-lede-tight {
+  margin-bottom: 1.1rem;
+}
+
+.mel-ig-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--mel-ink);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mel-split {
+  display: grid;
+  gap: 1.15rem;
+}
+@media (min-width: 420px) {
+  .mel-split {
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: end;
+  }
+}
+
+.mel-portrait {
+  aspect-ratio: 3 / 4;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--mel-line);
+  filter: grayscale(0.15);
+}
+.mel-portrait-caption {
+  margin-top: 0.4rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mel-muted);
+}
+
+.mel-pullquote {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.35rem 0 0.35rem 1rem;
+  border-left: 2px solid var(--mel-accent);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--mel-ink);
+}
+
+.mel-quote-source {
+  margin: 0 0 1.1rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mel-muted);
+}
+
+.mel-letter-body {
+  display: grid;
+  gap: 0.85rem;
+  color: var(--mel-muted);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+.mel-letter-body p { margin: 0; }
+
+.mel-timeline {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0.35rem 0 0.5rem;
+}
+.mel-timeline-item {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+.mel-timeline-year {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--mel-accent);
+  line-height: 1;
+  padding-top: 0.2rem;
+}
+.mel-timeline-card {
+  border-top: 1px solid var(--mel-line);
+  padding-top: 0.45rem;
+}
+.mel-timeline-card h4 {
+  margin: 0 0 0.3rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+.mel-timeline-card p {
+  margin: 0;
+  color: var(--mel-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.mel-timeline-img {
+  margin-top: 0.65rem;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border: 1px solid var(--mel-line);
+  filter: grayscale(0.1);
+}
+
+.mel-essay-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 0.55rem;
+  margin-top: 0.4rem;
+}
+.mel-essay-cell {
+  position: relative;
+  border: 1px solid var(--mel-line);
+  padding: 0;
+  background: #ddd;
+  cursor: zoom-in;
+  overflow: hidden;
+  min-height: 110px;
+}
+.mel-essay-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.12) contrast(1.04);
+  transition: transform 0.45s ease;
+}
+.mel-essay-cell:hover img { transform: scale(1.04); }
+.mel-essay-cell span {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 2px 6px;
+  background: rgba(250, 247, 242, 0.9);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mel-ink);
+}
+.mel-essay-cell-1 { grid-row: span 2; min-height: 230px; }
+.mel-essay-cell-2 { min-height: 110px; }
+.mel-essay-cell-3 { min-height: 110px; }
+
+.mel-reply-panel {
+  border: 1px solid var(--mel-line);
+  background:
+    linear-gradient(135deg, rgba(154, 123, 79, 0.08), transparent 40%),
+    var(--mel-paper);
+  padding: 1rem;
+}
+
+.mel-reply-form {
+  display: grid;
+  gap: 0.8rem;
+}
+.mel-field {
+  display: grid;
+  gap: 0.35rem;
+}
+.mel-field span {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mel-muted);
+  font-weight: 600;
+}
+.mel-field input,
+.mel-field textarea {
+  width: 100%;
+  border: 1px solid var(--mel-line);
+  background: #fffdf9;
+  color: var(--mel-ink);
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  resize: vertical;
+}
+.mel-field input:focus,
+.mel-field textarea:focus {
+  outline: 1px solid var(--mel-accent);
+  border-color: var(--mel-accent);
+}
+
+.mel-reply-success {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.85rem 0.9rem;
+  background: var(--mel-accent-soft);
+  border: 1px solid var(--mel-line);
+  font-size: 0.9rem;
+}
+
+.mel-wish-feed {
+  margin-top: 1.15rem;
+  display: grid;
+  gap: 0.55rem;
+}
+.mel-wish-card {
+  border-left: 2px solid var(--mel-accent);
+  padding: 0.55rem 0.75rem;
+  background: rgba(255, 255, 255, 0.45);
+}
+.mel-wish-card strong {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  margin-bottom: 0.2rem;
+}
+.mel-wish-card p {
+  margin: 0;
+  color: var(--mel-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.mel-page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--mel-line);
+}
+
+.mel-btn-primary,
+.mel-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--mel-ink);
+  padding: 0.65rem 0.95rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.mel-btn-primary {
+  background: var(--mel-ink);
+  color: var(--mel-paper);
+}
+.mel-btn-primary:hover { background: #000; }
+.mel-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.mel-btn-ghost {
+  background: transparent;
+  color: var(--mel-ink);
+}
+.mel-btn-ghost:hover { background: var(--mel-accent-soft); }
+
+.mel-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--mel-line);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mel-muted);
+}
+
+.mel-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(20, 16, 12, 0.88);
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  cursor: zoom-out;
+}
+.mel-lightbox img {
+  max-width: min(100%, 720px);
+  max-height: 85vh;
+  object-fit: contain;
+  border: 1px solid rgba(250, 247, 242, 0.25);
+}
