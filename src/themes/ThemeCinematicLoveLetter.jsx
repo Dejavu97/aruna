@@ -36,10 +36,10 @@ export default function ThemeCinematicLoveLetter({ data, guest = '', preview = f
   const belovedFull = data.bride?.full || ''
   const story = data.story || []
   const gallery = data.gallery || [
-    '/assets/local/couple_garden.jpg',
     '/assets/local/couple_laughing_1.jpg',
-    '/assets/local/couple_classical.jpg',
-    '/assets/local/wedding_rings_2.jpg'
+    '/assets/local/couple_laughing_2.jpg',
+    '/assets/local/couple_laughing_3.jpg',
+    '/assets/local/teenager_birthday.jpg'
   ]
 
   const chapters = [

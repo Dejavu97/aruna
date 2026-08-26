@@ -1663,9 +1663,9 @@ export const demos = {
     formMode: 'love-letter',
     bride: {
       nick: 'Sarah',
-      full: 'Sarah Michelle Anindya',
+      full: 'Sarah Michelle',
       parents: '',
-      photo: '/assets/local/couple_garden.jpg',
+      photo: '/assets/local/teenager_birthday.jpg',
       ig: '',
     },
     groom: {
@@ -1676,30 +1676,30 @@ export const demos = {
     },
     date: '2026-09-18',
     quote:
-      'INT. DESTINY — SCENE: FOREVER.\n\nSelamat ulang tahun untuk pemeran utama dalam hidupku. Di setiap babak cerita yang kita lewati—dari percakapan pertama yang canggung hingga tawa malam yang kita bagi—kamu adalah plot cerita terindah yang tak pernah ingin kuakhiri.\n\nSelamat bertambah usia, cintaku. Mari terus menulis ribuan babak indah lainnya bersama-sama.',
-    quoteSource: 'Babak Pertama Kita',
+      'Selamat bertambah usia untuk manusia favoritku. Di antara miliaran manusia di dunia, hal paling kusyukuri adalah saat semesta mengizinkan aku menemukanmu. Terima kasih sudah selalu ada dan menjadi alasan terbesarku untuk terus tersenyum.',
+    quoteSource: 'Dari Hatiku yang Paling Dalam',
     story: [
       {
         year: '2022',
-        title: 'Scene 01: Pandangan Pertama',
-        body: 'Di tengah keramaian stasiun yang sibuk, mataku berhenti di senyummu. Hari itu, waktu terasa melambat dan skenario hidupku berubah selamanya.',
+        title: 'Momen Pertama Kali Kenal',
+        body: 'Di sebuah sore yang biasa, obrolan santai kita tanpa sengaja jadi awal dari ribuan cerita manis yang kita lewati berdua sampai hari ini.',
       },
       {
         year: '2024',
-        title: 'Scene 02: Dua Hati Menjadi Satu Cerita',
-        body: 'Melalui ratusan malam percakapan, tawa tanpa sebab, hingga saling menguatkan di hari-hari sulit. Kamu membuktikan bahwa rumah bukanlah tempat, melainkan genggaman tanganmu.',
+        title: 'Saling Menguatkan & Tumbuh Bersama',
+        body: 'Melewati hari-hari sulit, tawa malam, hingga jalan-jalan random berdua. Kamu selalu berhasil bikin hal sederhana terasa sangat istimewa.',
       },
       {
         year: '2026',
-        title: 'Scene 03: Selamat Bertambah Usia, Rumah Hatiku',
-        body: 'Di hari kelahiranmu ini, doaku sederhana: semoga bahagiamu selalu mekar, dan semoga aku selalu diizinkan semesta menjadi orang yang merayakanmu setiap tahunnya.',
+        title: 'Selamat Bertambah Usia, Sayang',
+        body: 'Di hari ulang tahunmu ini, semoga semua impianmu tercapai satu per satu, dan semoga aku selalu diizinkan menemanimu di setiap langkah.',
       },
     ],
     gallery: [
-      '/assets/local/couple_garden.jpg',
       '/assets/local/couple_laughing_1.jpg',
       '/assets/local/couple_laughing_2.jpg',
-      '/assets/local/couple_classical.jpg',
+      '/assets/local/couple_laughing_3.jpg',
+      '/assets/local/teenager_birthday.jpg',
     ],
     events: [],
     banks: [],
