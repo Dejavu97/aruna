@@ -4,7 +4,11 @@ export function getDummyWeddingData(themeId = 'adat-jawa') {
   targetDate.setDate(targetDate.getDate() + 30)
   const dateStr = targetDate.toISOString().slice(0, 10)
 
-  const isMemoryCapsule = themeId.includes('memory-capsule') || themeId.includes('surat-cinta')
+  const isMemoryCapsule =
+    themeId.includes('memory-capsule') ||
+    themeId.includes('surat-cinta') ||
+    themeId.includes('love-letter') ||
+    themeId.includes('editorial-letter')
   const isBirthday = themeId.includes('birthday') || themeId.includes('sweet')
   const isGraduation = themeId.includes('graduation') || themeId.includes('wisuda')
   const isAqiqah = themeId.includes('aqiqah') || themeId.includes('bayi')

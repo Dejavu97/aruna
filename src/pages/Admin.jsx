@@ -54,10 +54,14 @@ import {
   fetchMaintenanceSettings,
   saveMaintenanceSettings,
   createFullBackupData,
-  restoreFullBackupData
+  restoreFullBackupData,
+  fetchDemoOverrides,
+  saveDemoOverride,
+  resetDemoOverride
 } from '../lib/api'
 import { getDummyWeddingData } from '../data/dummyData'
 import { copyText, formatLongDate, invitationUrl } from '../lib/utils'
+import { getDemoByTheme } from '../data/themes'
 import { formatRupiah, packages as defaultPackages, getPackageById } from '../data/site'
 import { invitePath } from '../lib/nav'
 
@@ -171,6 +175,13 @@ export default function Admin() {
   const [cloning, setCloning] = useState(false)
   const [deletingDemos, setDeletingDemos] = useState(false)
   
+  // Theme Demo Overrides Editor State
+  const [demoOverrides, setDemoOverrides] = useState({})
+  const [editDemoModalTheme, setEditDemoModalTheme] = useState(null)
+  const [editDemoFormData, setEditDemoFormData] = useState(null)
+  const [savingDemoOverrideState, setSavingDemoOverrideState] = useState(false)
+  const [uploadingDemoPhoto, setUploadingDemoPhoto] = useState(false)
+
   // Instant Demo Generator Modal State
   const [demoModalOpen, setDemoModalOpen] = useState(false)
   const [demoThemeId, setDemoThemeId] = useState('adat-jawa')
@@ -213,7 +224,8 @@ export default function Admin() {
         fetchedWaTemplates,
         fetchedProfile,
         fetchedSeo,
-        fetchedMaintenance
+        fetchedMaintenance,
+        fetchedDemoOverrides
       ] = await Promise.all([
         fetchAdminInvitations().catch(() => []),
         getAnnouncement().catch(() => ''),
@@ -226,6 +238,7 @@ export default function Admin() {
         fetchSiteProfile().catch(() => defaultSiteProfile),
         fetchSeoSettings().catch(() => defaultSeoSettings),
         fetchMaintenanceSettings().catch(() => defaultMaintenanceSettings),
+        fetchDemoOverrides().catch(() => ({})),
       ])
 
       // Merge local custom themes
@@ -248,6 +261,7 @@ export default function Admin() {
       setItems(fetchedItems || [])
       setAnnouncement(fetchedAnnouncement || '')
       setCustomThemesList(finalCustomThemes)
+      setDemoOverrides(fetchedDemoOverrides || {})
       setVouchersList(fetchedVouchers || [])
       
       if (fetchedPayment && Array.isArray(fetchedPayment.banks)) {
@@ -1503,7 +1517,18 @@ export default function Admin() {
         {mainTab === 'themes_announcement' && (
           <div className="space-y-6">
             {/* Sub Tabs Bar */}
-            <div className="flex gap-2 border-b border-ink/10 pb-2 text-xs uppercase tracking-wider font-semibold">
+            <div className="flex flex-wrap gap-2 border-b border-ink/10 pb-2 text-xs uppercase tracking-wider font-semibold">
+              <button
+                type="button"
+                onClick={() => setThemeSubTab('demos')}
+                className={`px-4 py-2 rounded-xs transition-all ${
+                  themeSubTab === 'demos'
+                    ? 'bg-gold-deep text-ivory font-bold shadow-xs'
+                    : 'bg-paper border border-ink/15 text-stone hover:text-ink hover:border-ink'
+                }`}
+              >
+                Kelola Preview &amp; Foto Tema Katalog ({themes.length})
+              </button>
               <button
                 type="button"
                 onClick={() => setThemeSubTab('themes')}
@@ -1527,6 +1552,88 @@ export default function Admin() {
                 Spanduk Pengumuman Global
               </button>
             </div>
+
+            {themeSubTab === 'demos' && (
+              <div className="space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-4 bg-paper border border-ink/15 p-5 rounded-sm shadow-xs">
+                  <div>
+                    <h2 className="font-display text-2xl font-bold text-ink">Kelola Data Preview &amp; Foto Tema Katalog</h2>
+                    <p className="text-xs text-stone mt-1 max-w-2xl leading-relaxed">
+                      Ubah foto cover, foto mempelai, kutipan, judul, dan galeri yang tampil saat pengunjung membuka preview tema dari katalog (<code className="bg-ivory px-1 border">/tema/[themeId]</code>). Perubahan tersimpan secara instan.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {themes.map((t) => {
+                    const demoData = getDemoByTheme(t.id, demoOverrides) || {}
+                    const isCustomized = Boolean(demoOverrides[t.id])
+
+                    return (
+                      <article key={t.id} className="bg-paper border border-ink/15 rounded-sm p-4 space-y-3 shadow-xs flex flex-col justify-between">
+                        <div>
+                          <div className="aspect-video w-full rounded-xs overflow-hidden border mb-3 bg-black/5 relative">
+                            <img 
+                              src={demoData.bride?.photo || demoData.cover || t.cover || '/themes/emas-senja.jpg'} 
+                              alt={t.name} 
+                              className="w-full h-full object-cover" 
+                            />
+                            <span className="absolute top-2 left-2 bg-ink/90 text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-semibold">
+                              {t.tag || t.eventType}
+                            </span>
+                            {isCustomized && (
+                              <span className="absolute top-2 right-2 bg-gold-deep text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-bold shadow-xs">
+                                Foto/Teks Diedit
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-display text-lg font-bold text-ink">{t.name}</h3>
+                          <p className="text-xs text-gold-deep font-semibold">Mempelai/Tokoh: {demoData.bride?.nick || 'Sarah'} {demoData.groom?.nick ? `& ${demoData.groom.nick}` : ''}</p>
+                          <p className="text-[11px] text-stone mt-1 line-clamp-2 leading-relaxed">
+                            {demoData.quote || t.description}
+                          </p>
+                        </div>
+
+                        <div className="pt-3 border-t border-ink/10 flex items-center justify-between gap-2 text-xs uppercase tracking-wider font-semibold">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditDemoModalTheme(t)
+                              setEditDemoFormData({
+                                customerName: demoData.customerName || '',
+                                brideNick: demoData.bride?.nick || '',
+                                brideFull: demoData.bride?.full || '',
+                                bridePhoto: demoData.bride?.photo || '',
+                                groomNick: demoData.groom?.nick || '',
+                                groomFull: demoData.groom?.full || '',
+                                groomPhoto: demoData.groom?.photo || '',
+                                date: demoData.date || '2026-09-18',
+                                quote: demoData.quote || '',
+                                quoteSource: demoData.quoteSource || '',
+                                gallery: demoData.gallery || [],
+                              })
+                            }}
+                            className="bg-gold-deep text-ivory px-3 py-1.5 hover:bg-gold transition-colors inline-flex items-center gap-1 text-[11px]"
+                          >
+                            <Edit size={12} /> Edit Data &amp; Foto
+                          </button>
+
+                          <a
+                            href={`/tema/${t.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="border border-ink/20 px-2.5 py-1.5 hover:bg-ink/5 inline-flex items-center gap-1 text-[11px]"
+                          >
+                            <Eye size={12} /> Buka Preview
+                          </a>
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {themeSubTab === 'themes' && (
           <div className="space-y-6">
@@ -4130,6 +4237,265 @@ export default function Admin() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL EDIT DATA & FOTO DEMO TEMA KATALOG */}
+      {editDemoModalTheme && editDemoFormData && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-paper border border-ink/20 max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 rounded-sm space-y-5 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-ink/10 pb-3">
+              <div>
+                <h3 className="font-display text-xl font-bold flex items-center gap-2">
+                  <Edit size={18} className="text-gold-deep" /> Edit Data Demo: {editDemoModalTheme.name}
+                </h3>
+                <p className="text-xs text-stone">
+                  Data ini akan langsung tampil saat preview tema <code className="bg-ivory px-1 border">/tema/{editDemoModalTheme.id}</code> dibuka oleh pengunjung.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditDemoModalTheme(null)
+                  setEditDemoFormData(null)
+                }}
+                className="text-stone hover:text-ink text-sm font-bold p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault()
+                setSavingDemoOverrideState(true)
+                try {
+                  const payload = {
+                    customerName: editDemoFormData.customerName || editDemoFormData.brideNick || 'Sarah',
+                    bride: {
+                      nick: editDemoFormData.brideNick,
+                      full: editDemoFormData.brideFull,
+                      photo: editDemoFormData.bridePhoto,
+                    },
+                    groom: {
+                      nick: editDemoFormData.groomNick,
+                      full: editDemoFormData.groomFull,
+                      photo: editDemoFormData.groomPhoto,
+                    },
+                    date: editDemoFormData.date,
+                    quote: editDemoFormData.quote,
+                    quoteSource: editDemoFormData.quoteSource,
+                    gallery: editDemoFormData.gallery,
+                  }
+
+                  await saveDemoOverride(editDemoModalTheme.id, payload)
+                  setDemoOverrides((prev) => ({ ...prev, [editDemoModalTheme.id]: payload }))
+                  alert(`Data demo untuk tema ${editDemoModalTheme.name} berhasil disimpan!`)
+                  setEditDemoModalTheme(null)
+                  setEditDemoFormData(null)
+                } catch (err) {
+                  alert('Gagal menyimpan: ' + err.message)
+                } finally {
+                  setSavingDemoOverrideState(false)
+                }
+              }}
+              className="space-y-4 text-xs"
+            >
+              {/* Foto Utama & Mempelai Wanita / Tokoh */}
+              <div className="bg-ivory/50 p-4 border border-ink/10 rounded-xs space-y-3">
+                <h4 className="font-display text-sm font-bold text-ink uppercase tracking-wider">
+                  Foto Utama / Profil ({editDemoModalTheme.eventType === 'wedding' ? 'Mempelai Wanita' : 'Tokoh Acara'})
+                </h4>
+                
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] uppercase font-bold text-stone mb-1">Nama Panggilan</label>
+                    <input
+                      type="text"
+                      value={editDemoFormData.brideNick}
+                      onChange={(e) => setEditDemoFormData({ ...editDemoFormData, brideNick: e.target.value })}
+                      placeholder="contoh: Sarah"
+                      required
+                      className="w-full border border-ink/20 p-2 text-xs bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] uppercase font-bold text-stone mb-1">Nama Lengkap</label>
+                    <input
+                      type="text"
+                      value={editDemoFormData.brideFull}
+                      onChange={(e) => setEditDemoFormData({ ...editDemoFormData, brideFull: e.target.value })}
+                      placeholder="contoh: Sarah Michelle Anindya, S.Ds"
+                      className="w-full border border-ink/20 p-2 text-xs bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] uppercase font-bold text-stone mb-1">URL Foto Utama</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={editDemoFormData.bridePhoto}
+                      onChange={(e) => setEditDemoFormData({ ...editDemoFormData, bridePhoto: e.target.value })}
+                      placeholder="/assets/local/couple_laughing_1.jpg atau https://..."
+                      className="flex-1 border border-ink/20 p-2 text-xs bg-white font-mono"
+                    />
+                    <label className="bg-ink text-ivory px-3 py-2 text-[11px] uppercase font-semibold cursor-pointer hover:bg-gold-deep transition-colors inline-flex items-center gap-1">
+                      <Upload size={12} /> {uploadingDemoPhoto ? '...' : 'Upload'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          setUploadingDemoPhoto(true)
+                          try {
+                            const res = await uploadFile(file)
+                            if (res?.url) {
+                              setEditDemoFormData({ ...editDemoFormData, bridePhoto: res.url })
+                            }
+                          } catch (err) {
+                            alert('Gagal upload: ' + err.message)
+                          } finally {
+                            setUploadingDemoPhoto(false)
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  {editDemoFormData.bridePhoto && (
+                    <div className="mt-2 w-24 h-24 rounded border overflow-hidden bg-black/5">
+                      <img src={editDemoFormData.bridePhoto} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Mempelai Pria (Khusus Pernikahan) */}
+              {editDemoModalTheme.eventType === 'wedding' && (
+                <div className="bg-ivory/50 p-4 border border-ink/10 rounded-xs space-y-3">
+                  <h4 className="font-display text-sm font-bold text-ink uppercase tracking-wider">
+                    Mempelai Pria
+                  </h4>
+                  
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] uppercase font-bold text-stone mb-1">Nama Panggilan</label>
+                      <input
+                        type="text"
+                        value={editDemoFormData.groomNick}
+                        onChange={(e) => setEditDemoFormData({ ...editDemoFormData, groomNick: e.target.value })}
+                        placeholder="contoh: Budi"
+                        className="w-full border border-ink/20 p-2 text-xs bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] uppercase font-bold text-stone mb-1">Nama Lengkap</label>
+                      <input
+                        type="text"
+                        value={editDemoFormData.groomFull}
+                        onChange={(e) => setEditDemoFormData({ ...editDemoFormData, groomFull: e.target.value })}
+                        placeholder="contoh: Budi Santoso, S.Kom"
+                        className="w-full border border-ink/20 p-2 text-xs bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase font-bold text-stone mb-1">URL Foto Pria</label>
+                    <input
+                      type="text"
+                      value={editDemoFormData.groomPhoto}
+                      onChange={(e) => setEditDemoFormData({ ...editDemoFormData, groomPhoto: e.target.value })}
+                      placeholder="/assets/local/groom_suit.jpg atau https://..."
+                      className="w-full border border-ink/20 p-2 text-xs bg-white font-mono"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Tanggal & Kutipan */}
+              <div className="bg-ivory/50 p-4 border border-ink/10 rounded-xs space-y-3">
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] uppercase font-bold text-stone mb-1">Tanggal Acara / Perayaan</label>
+                    <input
+                      type="date"
+                      value={editDemoFormData.date}
+                      onChange={(e) => setEditDemoFormData({ ...editDemoFormData, date: e.target.value })}
+                      className="w-full border border-ink/20 p-2 text-xs bg-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] uppercase font-bold text-stone mb-1">Sumber Kutipan / Judul Babak</label>
+                    <input
+                      type="text"
+                      value={editDemoFormData.quoteSource}
+                      onChange={(e) => setEditDemoFormData({ ...editDemoFormData, quoteSource: e.target.value })}
+                      placeholder="contoh: QS Ar-Rum 21 / Babak Pertama"
+                      className="w-full border border-ink/20 p-2 text-xs bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] uppercase font-bold text-stone mb-1">Kutipan Romantis / Ayat / Pesan Surat</label>
+                  <textarea
+                    rows={3}
+                    value={editDemoFormData.quote}
+                    onChange={(e) => setEditDemoFormData({ ...editDemoFormData, quote: e.target.value })}
+                    placeholder="Tuliskan kata mutiara, ayat, atau surat cinta..."
+                    className="w-full border border-ink/20 p-2 text-xs bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-3 border-t border-ink/10">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (confirm(`Kembalikan tema ${editDemoModalTheme.name} ke foto & data default pabrik?`)) {
+                      await resetDemoOverride(editDemoModalTheme.id)
+                      setDemoOverrides((prev) => {
+                        const copy = { ...prev }
+                        delete copy[editDemoModalTheme.id]
+                        return copy
+                      })
+                      alert('Data demo berhasil direset ke default!')
+                      setEditDemoModalTheme(null)
+                      setEditDemoFormData(null)
+                    }
+                  }}
+                  className="text-red-700 hover:underline text-xs"
+                >
+                  Reset ke Default Pabrik
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditDemoModalTheme(null)
+                      setEditDemoFormData(null)
+                    }}
+                    className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingDemoOverrideState}
+                    className="bg-gold-deep text-ivory px-5 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                  >
+                    <Check size={13} /> {savingDemoOverrideState ? 'Menyimpan...' : 'Simpan Perubahan'}
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       )}

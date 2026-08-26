@@ -464,6 +464,37 @@ export const themes = [
       cover: '#3D2C2E',
     },
   },
+  {
+    id: 'modern-editorial-letter',
+    name: 'Modern Editorial Letter',
+    tag: 'Kartu Ucapan & Surat',
+    tags: ['surat-cinta', 'kartu-ucapan', 'editorial', 'modern', 'love-letter', 'capsule', 'kenangan', 'premium', 'minimalis'],
+    popular: true,
+    collection: 'premium',
+    eventType: 'memory-capsule',
+    supportedEventTypes: ['love-letter', 'birthday'],
+    description: 'Surat cinta editorial modern: tipografi besar asimetris, amplop bersegel, bab dedikasi–isi surat–kilas balik–photo essay–balasan. Bukan undangan acara.',
+    cover: '/assets/local/couple_classical.jpg',
+    coverPosition: 'object-center',
+    layout: 'modern-editorial-letter',
+    greeting: 'Ini bukan undangan resepsi. Ini surat editorial — halaman demi halaman tentang kamu.',
+    opener: 'A MODERN LETTER FOR',
+    particleEffect: null,
+    fonts: {
+      display: '"Cormorant Garamond", "Playfair Display", serif',
+      script: '"Cormorant Garamond", cursive',
+      body: '"Plus Jakarta Sans", sans-serif',
+    },
+    colors: {
+      bg: '#F3EEE6',
+      paper: '#FAF7F2',
+      fg: '#1C1917',
+      muted: '#7C7166',
+      accent: '#9A7B4F',
+      accentSoft: '#EFE6D8',
+      cover: '#1C1917',
+    },
+  },
 ]
 
 export function getTheme(id, customThemes = []) {
@@ -487,7 +518,13 @@ export function getFormMode(themeOrId, customThemes = []) {
   const layout = theme?.layout || 'classic'
   const eventType = theme?.eventType || 'wedding'
 
-  if (layout === 'memory-capsule' || id === 'birthday-memory-capsule' || (theme?.tags || []).includes('surat-cinta')) {
+  if (
+    layout === 'memory-capsule' ||
+    layout === 'modern-editorial-letter' ||
+    layout === 'cinematic-love-letter' ||
+    id === 'birthday-memory-capsule' ||
+    (theme?.tags || []).includes('surat-cinta')
+  ) {
     return {
       mode: 'love-letter',
       eventType: 'birthday',
@@ -720,7 +757,7 @@ export function getThemeFeatures(themeOrId) {
   const theme = typeof themeOrId === 'string' ? getTheme(themeOrId) : (themeOrId || themes[0])
   const layout = theme.layout || 'classic'
 
-  if (layout === 'memory-capsule') {
+  if (layout === 'memory-capsule' || layout === 'modern-editorial-letter' || layout === 'cinematic-love-letter') {
     return {
       quote: true,
       story: { enabled: true, withPhoto: false },
@@ -1777,6 +1814,70 @@ export const demos = {
       },
     ],
   }),
+
+  'modern-editorial-letter': demo({
+    themeId: 'modern-editorial-letter',
+    slug: 'editorial-letter-sarah',
+    eventType: 'birthday',
+    formMode: 'love-letter',
+    bride: {
+      nick: 'Sarah',
+      full: 'Sarah Michelle Anindya',
+      parents: '',
+      photo: '/assets/local/couple_classical.jpg',
+      ig: 'sarahmichelle',
+    },
+    groom: {
+      nick: '',
+      full: '',
+      parents: '',
+      photo: '',
+    },
+    date: '2026-09-18',
+    quote:
+      'Di antara keramaian hari, aku masih memilih menulis tentangmu — pelan, jernih, dan tanpa tergesa. Ini bukan undangan. Ini surat.',
+    quoteSource: 'Editorial Letter · Volume One',
+    greeting: 'Ini bukan undangan resepsi. Ini surat editorial — halaman demi halaman tentang kamu.',
+    story: [
+      {
+        year: '2022',
+        title: 'Awal yang tenang',
+        body: 'Pertemuan yang tidak berisik, tapi meninggalkan jejak. Dari situ halaman pertama kita dimulai.',
+        image: '/assets/local/couple_classical.jpg',
+      },
+      {
+        year: '2024',
+        title: 'Bahasa yang sama',
+        body: 'Kita belajar saling mengerti tanpa harus selalu berbicara. Ruang aman tumbuh di antara kita.',
+        image: '/assets/local/couple_garden.jpg',
+      },
+      {
+        year: '2026',
+        title: 'Hari ini',
+        body: 'Surat ini — bukti bahwa aku masih memilih menuliskanmu, halaman demi halaman.',
+        image: '/assets/local/couple_laughing_1.jpg',
+      },
+    ],
+    gallery: [
+      '/assets/local/couple_classical.jpg',
+      '/assets/local/couple_garden.jpg',
+      '/assets/local/couple_laughing_1.jpg',
+      '/assets/local/couple_laughing_2.jpg',
+      '/assets/local/couple_laughing_3.jpg',
+      '/assets/local/paper_linen_bg.jpg',
+    ],
+    events: [],
+    banks: [],
+    music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+    wishes: [
+      {
+        id: 'w1',
+        name: 'Dari pembaca pertama',
+        message: 'Suratmu terasa seperti majalah yang ingin dibaca pelan. Terima kasih sudah menulis tentangku.',
+        at: Date.now() - 86400000,
+      },
+    ],
+  }),
 }
 
 function demo(partial) {
@@ -1805,11 +1906,38 @@ function demo(partial) {
   }
 }
 
-export function getDemoByTheme(themeId) {
-  return demos[themeId] || null
+export function getDemoByTheme(themeId, overrides = null) {
+  const base = demos[themeId] || null
+  if (!base) return null
+
+  let localOverrides = overrides
+  if (!localOverrides && typeof window !== 'undefined') {
+    try {
+      const stored = JSON.parse(localStorage.getItem('aruna_theme_demo_overrides') || '{}')
+      localOverrides = stored[themeId] || null
+    } catch {}
+  }
+
+  if (localOverrides) {
+    return {
+      ...base,
+      ...localOverrides,
+      bride: { ...(base.bride || {}), ...(localOverrides.bride || {}) },
+      groom: { ...(base.groom || {}), ...(localOverrides.groom || {}) },
+      gallery: localOverrides.gallery || base.gallery,
+      events: localOverrides.events || base.events,
+      story: localOverrides.story || base.story,
+    }
+  }
+
+  return base
 }
 
-export function getDemoBySlug(slug) {
+export function getDemoBySlug(slug, overrides = null) {
+  const matchingThemeId = Object.keys(demos).find((id) => demos[id].slug === slug)
+  if (matchingThemeId) {
+    return getDemoByTheme(matchingThemeId, overrides)
+  }
   return Object.values(demos).find((d) => d.slug === slug) || null
 }
 

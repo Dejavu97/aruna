@@ -29,7 +29,14 @@ export default function InvitationPage() {
           }
         }
       } catch {
-        if (live && !demo) setMissing(true)
+        if (live) {
+          if (demo) {
+            setData(getDemoBySlug(slug))
+            setMissing(false)
+          } else {
+            setMissing(true)
+          }
+        }
       } finally {
         if (live) setLoading(false)
       }
