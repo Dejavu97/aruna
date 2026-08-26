@@ -172,7 +172,7 @@ export async function loginAdmin(password) {
     } catch {}
   }
 
-  // 3. JIKA SUDAH PERNAH GANTI PASSWORD: Wajib menggunakan password baru (admin123 otomatis dinonaktifkan)
+  // 3. JIKA SUDAH PERNAH GANTI PASSWORD: Wajib menggunakan password baru
   if (customPassword) {
     if (password === customPassword) {
       setAdminKey('custom-admin-key')
@@ -182,7 +182,7 @@ export async function loginAdmin(password) {
   }
 
   // 4. Default password HANYA berlaku jika Anda BELUM PERNAH mengganti kata sandi
-  if (password === 'admin123' || password === 'aruna2026' || password === 'byaruna2026') {
+  if (password === 'aruna2026' || password === 'byaruna2026') {
     setAdminKey('firebase-admin')
     return { key: 'local-admin-key' }
   }
@@ -426,8 +426,27 @@ export async function deleteInvitation(slug) {
 }
 
 export async function addRsvp(slug, payload) {
+  const cleanName = String(payload?.name || '').trim().slice(0, 100)
+  if (!cleanName) throw new Error('Nama wajib diisi.')
+
   const docRef = doc(db, 'invitations', slug)
-  const newRsvp = { ...payload, id: generateKey(), createdAt: Date.now() }
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
+
+  const existingRsvps = docSnap.data().rsvps || []
+  if (existingRsvps.length >= 500) {
+    throw new Error('Kapasitas buku tamu RSVP sudah mencapai batas maksimal.')
+  }
+
+  const newRsvp = {
+    id: generateKey(),
+    name: cleanName,
+    status: ['hadir', 'tidak', 'ragu'].includes(payload.status) ? payload.status : 'hadir',
+    guests: Math.min(Math.max(Number(payload.guests) || 1, 1), 10),
+    note: String(payload.note || '').trim().slice(0, 500),
+    createdAt: Date.now()
+  }
+
   await updateDoc(docRef, {
     rsvps: arrayUnion(newRsvp)
   })
@@ -435,8 +454,26 @@ export async function addRsvp(slug, payload) {
 }
 
 export async function addWish(slug, payload) {
+  const cleanName = String(payload?.name || '').trim().slice(0, 100)
+  const cleanMsg = String(payload?.message || payload?.text || '').trim().slice(0, 500)
+  if (!cleanName || !cleanMsg) throw new Error('Nama dan ucapan doa wajib diisi.')
+
   const docRef = doc(db, 'invitations', slug)
-  const newWish = { ...payload, id: generateKey(), createdAt: Date.now() }
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
+
+  const existingWishes = docSnap.data().wishes || []
+  if (existingWishes.length >= 500) {
+    throw new Error('Kapasitas buku ucapan doa sudah mencapai batas maksimal.')
+  }
+
+  const newWish = {
+    id: generateKey(),
+    name: cleanName,
+    message: cleanMsg,
+    createdAt: Date.now()
+  }
+
   await updateDoc(docRef, {
     wishes: arrayUnion(newWish)
   })

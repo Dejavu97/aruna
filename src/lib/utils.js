@@ -157,4 +157,25 @@ export function isEventEditLocked(eventDate, graceDays = 1) {
   return Date.now() > lockTime
 }
 
+/**
+ * Sanitasi URL eksternal agar aman dari serangan XSS (javascript:, data:, vbscript:)
+ * @param {string} url - URL yang akan dibersihkan
+ * @returns {string} URL yang aman diawali http:// atau https://
+ */
+export function safeUrl(url) {
+  if (!url || typeof url !== 'string') return ''
+  const trimmed = url.trim()
+  if (/^(javascript|vbscript|data|file):/i.test(trimmed)) {
+    return ''
+  }
+  if (trimmed.startsWith('/') || trimmed.startsWith('#')) return trimmed
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
+    return `https://${trimmed}`
+  }
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed
+  }
+  return ''
+}
+
 

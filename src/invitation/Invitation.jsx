@@ -17,6 +17,7 @@ import {
   parseColors,
   qrImageUrl,
   wazeUrl,
+  safeUrl,
 } from '../lib/utils'
 import Watermark from '../components/Watermark'
 import { getTheme, getFormMode, getThemeFeatures } from '../data/themes'
@@ -922,7 +923,7 @@ function Live({ data, scene }) {
         </p>
       )}
       {data.liveNote && <p className="lead">{data.liveNote}</p>}
-      <a className="maps" href={data.liveUrl} target="_blank" rel="noreferrer">
+      <a className="maps" href={safeUrl(data.liveUrl)} target="_blank" rel="noopener noreferrer">
         Join live
       </a>
     </section>

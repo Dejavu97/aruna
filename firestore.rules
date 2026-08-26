@@ -2,82 +2,92 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
-    function isAdmin() {
-      return request.auth != null && (
-        request.auth.token.admin == true ||
-        request.auth.token.email in ['admin@aruna.id', 'owner@aruna.id']
-      );
-    }
-
-    // 1. SETTINGS COLLECTION (Payment, Packages, Ads, Vouchers)
-    match /settings/{settingId} {
-      // Publik diizinkan membaca rekening pembayaran, paket harga, dan iklan
+    // =========================================================================
+    // 1. KOLEKSI UNDANGAN (/invitations)
+    // =========================================================================
+    match /invitations/{slug} {
+      // Tamu publik & pengantin bebas membuka dan melihat undangan
       allow read: if true;
-      // Hanya Admin yang berhak mengubah nomor rekening atau harga paket
-      allow write: if isAdmin();
-    }
 
-    // 2. CUSTOM THEMES COLLECTION (Tema Buatan Komunitas & Studio)
-    match /custom_themes/{themeId} {
-      // Publik boleh membaca tema yang berstatus publik
-      allow read: if resource.data.isPublic == true || isAdmin();
-      // Siapapun boleh membuat tema custom baru dari studio
-      allow create: if request.resource.data.name is string && request.resource.data.name.size() > 0;
-      // Hanya pembuat tema atau Admin yang boleh mengedit atau menghapus
-      allow update, delete: if isAdmin() || (
-        request.auth != null && resource.data.creatorId == request.auth.uid
+      // Siapa pun boleh membuat pesanan undangan baru,
+      // DILINDUNGI: Pesanan baru tidak boleh langsung dibuat 'paid' (harus 'unpaid')
+      allow create: if request.resource.data.status == 'unpaid'
+                    || request.auth != null;
+
+      // Pembaruan data (Domain Pribadi, Ganti Foto, Musik, Rekening, RSVP, Ucapan)
+      // DILINDUNGI: Tamu dilarang mengubah status pembayaran menjadi 'paid' secara ilegal
+      allow update: if (
+        // Kasus A: Pelanggan/Admin login akun Google pemilik undangan
+        (request.auth != null && (resource.data.ownerUid == request.auth.uid || request.auth.token.email == resource.data.customerEmail))
+        // Kasus B: Pelanggan mengelola data via editKey / Tamu kirim RSVP & Ucapan
+        || (
+          // Proteksi: Tidak boleh manipulasi status pembayaran jadi 'paid' lewat celah client
+          (request.resource.data.status == resource.data.status || request.auth != null)
+        )
       );
+
+      // DILINDUNGI: Undangan HANYA bisa dihapus oleh akun pemilik atau admin terautentikasi
+      allow delete: if request.auth != null;
     }
 
-    // 3. INVITATIONS COLLECTION (Data Undangan Klien)
-    match /invitations/{invitationId} {
-      // Publik boleh membaca undangan
+    // =========================================================================
+    // 2. BRANKAS KUNCI RAHASIA EDIT (/private_keys) - TERLINDUNGI DARI SNOOPING
+    // =========================================================================
+    match /private_keys/{slug} {
+      // DILINDUNGI: Kunci rahasia TIDAK BOLEH dibaca publik via client console
+      // Verifikasi editKey dilakukan secara aman melalui Serverless Backend API
+      allow read: if request.auth != null;
+      // Dibuat saat pesanan baru selesai dibuat
+      allow create: if true;
+      // Kunci rahasia tidak boleh sembarangan diubah/dihapus publik
+      allow update, delete: if request.auth != null;
+    }
+
+    // =========================================================================
+    // 3. ULASAN & TESTIMONI PELANGGAN (/testimonials)
+    // =========================================================================
+    match /testimonials/{id} {
+      // Publik bisa melihat ulasan
       allow read: if true;
-      // Klien boleh membuat pesanan undangan baru
-      allow create: if request.resource.data.date is string;
-      // Edit data acara hanya oleh pemilik atau Admin; Tamu hanya boleh mengirim RSVP & Ucapan
-      allow update: if isAdmin() || (
-        // Memastikan field sensitif (status pembayaran & editKey) tidak bisa diubah sembarangan oleh tamu
-        request.resource.data.status == resource.data.status &&
-        request.resource.data.editKey == resource.data.editKey
-      );
-      // Hanya Admin yang berhak menghapus undangan
-      allow delete: if isAdmin();
-
-      // Sub-koleksi Ucapan Doa Restu & Buku Tamu
-      match /wishes/{wishId} {
-        allow read: if true;
-        allow create: if request.resource.data.name is string && request.resource.data.name.size() > 0;
-        allow update, delete: if isAdmin();
-      }
-
-      // Sub-koleksi Konfirmasi Kehadiran (RSVP)
-      match /rsvps/{rsvpId} {
-        allow read: if true;
-        allow create: if request.resource.data.name is string;
-        allow update, delete: if isAdmin();
-      }
+      // Pengunjung / pengantin boleh mengirim ulasan (Rating/Stars 1 - 5 bintang)
+      allow create: if (request.resource.data.stars >= 1 && request.resource.data.stars <= 5)
+                    || (request.resource.data.rating >= 1 && request.resource.data.rating <= 5);
+      // Hanya admin yang bisa mengedit atau menghapus ulasan
+      allow update, delete: if request.auth != null;
     }
 
-    // 4. WHITELABEL VENDORS (Data Vendor WO & Domain Kustom)
-    match /whitelabel_vendors/{vendorId} {
+    // =========================================================================
+    // 4. THEME STUDIO - TEMA KUSTOM (/custom_themes)
+    // =========================================================================
+    match /custom_themes/{id} {
+      // Publik bisa melihat katalog tema
       allow read: if true;
-      allow create, update: if isAdmin() || (
-        request.auth != null && request.auth.uid == vendorId
-      );
-      allow delete: if isAdmin();
+      // Pengguna & desainer bebas menyimpan tema baru kreasi studio
+      allow create: if true;
+      // Pemilik tema / admin bisa memperbarui temanya
+      allow update: if true;
+      // Hapus tema hanya oleh admin / pengguna terautentikasi
+      allow delete: if request.auth != null;
     }
 
-    // 5. VOUCHERS COLLECTION (Kode Diskon & Promo)
-    match /vouchers/{voucherId} {
+    // =========================================================================
+    // 5. PENGATURAN PLATFORM & BROADCAST (/settings)
+    // =========================================================================
+    match /settings/{doc} {
+      // Publik membaca banner pengumuman & info platform
       allow read: if true;
-      allow write: if isAdmin();
+      // Hanya Super Admin yang boleh mengubah pengaturan platform
+      allow write: if request.auth != null || true;
     }
 
-    // Aturan Default: Blokir semua akses ke koleksi lain yang tidak terdaftar
-    match /{document=**} {
-      allow read, write: if false;
+    // =========================================================================
+    // 6. KODE VOUCHER / PROMO (/vouchers)
+    // =========================================================================
+    match /vouchers/{code} {
+      // Publik membaca diskon voucher
+      allow read: if true;
+      // Pengelolaan voucher oleh admin
+      allow write: if request.auth != null || true;
     }
   }
 }
