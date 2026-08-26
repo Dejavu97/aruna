@@ -120,7 +120,7 @@ export const themes = [
     popular: true,
     collection: 'premium',
     description: 'Kloning dari desain premium Byattari. Minimalis, tipografi besar, dan estetis modern.',
-    cover: '/assets/local/attari_wedding.jpg',
+    cover: '/assets/attari/cover.jpg',
     coverPosition: 'object-center',
     layout: 'attari',
     opener: 'THE WEDDING OF',
@@ -1362,16 +1362,14 @@ export const demos = {
       nick: 'Bagas',
       full: 'Bagas Aditya, S.T',
       parents: 'Putra Pertama Dari Bapak Hermawan & Ibu Sri Kusuma',
-      photo:
-        '/assets/local/couple_temple.jpg',
+      photo: '/assets/attari/couple_full.jpg',
       ig: 'bagasaditya',
     },
     bride: {
       nick: 'Kirana',
       full: 'Kirana Larasati, S.Ds',
       parents: 'Putri Ketiga Dari Bapak Wahyudi & Ibu Retno',
-      photo:
-        '/assets/local/couple_traditional_wedding.jpg',
+      photo: '/assets/attari/couple_intimate.jpg',
       ig: 'kirana.larasati',
     },
     date: '2026-04-09',
@@ -1380,6 +1378,15 @@ export const demos = {
     story: [
       { year: '2023', title: 'Pertemuan', body: 'April 2023, siapa sangka sebuah pertemuan sederhana bisa meninggalkan kesan yang begitu mendalam...' },
       { year: '2025', title: 'Lamaran', body: 'Pada bulan Mei 2025, dengan penuh haru dan syukur. Kami mengikat niat dalam sebuah lamaran.' },
+    ],
+    gallery: [
+      '/assets/attari/cover.jpg',
+      '/assets/attari/couple_full.jpg',
+      '/assets/attari/couple_intimate.jpg',
+      '/assets/attari/gallery_1.jpg',
+      '/assets/attari/gallery_2.jpg',
+      '/assets/attari/gallery_3.jpg',
+      '/assets/attari/gallery_4.jpg',
     ],
     events: [
       {
