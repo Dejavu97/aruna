@@ -9,6 +9,33 @@ const galleryClassic = [
 
 export const themes = [
   {
+    id: 'cinematic-love-letter',
+    name: 'Cinematic Love Letter',
+    tag: 'Kartu Ucapan & Surat',
+    tags: ['surat-cinta', 'kartu-ucapan', 'love-letter', 'capsule', 'anniversary', 'romantis', 'cinematic', 'kenangan', 'premium'],
+    popular: true,
+    collection: 'premium',
+    eventType: 'memory-capsule',
+    description: 'Kapsul surat cinta romantis anak muda dengan tombol hati panah cupid, 3 alasan cinta, gosok pesan rahasia emas, dan kupon kencan.',
+    cover: '/assets/local/couple_garden.jpg',
+    layout: 'cinematic-love-letter',
+    opener: 'A CINEMATIC LOVE LETTER FOR',
+    fonts: {
+      display: '"Cinzel", serif',
+      script: '"Alex Brush", cursive',
+      body: '"Plus Jakarta Sans", sans-serif',
+    },
+    colors: {
+      bg: '#080606',
+      paper: '#100B0B',
+      fg: '#F7F1ED',
+      muted: '#A38F85',
+      accent: '#E07A5F',
+      accentSoft: '#2E1C18',
+      cover: '#040303',
+    },
+  },
+  {
     id: 'cinematic-minimal',
     name: 'Cinematic Editorial Minimal',
     tag: 'Reference',
@@ -412,11 +439,11 @@ export const themes = [
   {
     id: 'birthday-memory-capsule',
     name: 'Birthday Memory Capsule',
-    tag: 'Surat & Kenangan',
-    tags: ['ulang-tahun', 'birthday', 'surat-cinta', 'sahabat', 'romantis', 'kenangan', 'premium'],
+    tag: 'Kartu Ucapan & Surat',
+    tags: ['surat-cinta', 'kartu-ucapan', 'ulang-tahun', 'birthday', 'sahabat', 'romantis', 'kenangan', 'premium'],
     collection: 'premium',
-    eventType: 'birthday',
-    description: 'Kapsul ucapan ulang tahun romantis untuk pasangan: surat cinta, kilas balik perjalanan, dan galeri kenangan — tanpa undangan lokasi acara.',
+    eventType: 'memory-capsule',
+    description: 'Kapsul ucapan ulang tahun romantis untuk pasangan: surat cinta, kilas balik perjalanan, dan galeri kenangan — murni kartu ucapan personal tanpa lokasi acara.',
     cover: '/assets/local/couple_garden.jpg',
     coverPosition: 'object-center',
     layout: 'memory-capsule',
@@ -1629,6 +1656,63 @@ export const demos = {
     ],
   }),
 
+  'cinematic-love-letter': demo({
+    themeId: 'cinematic-love-letter',
+    slug: 'kapsul-cinta-sinematik-sarah',
+    eventType: 'birthday',
+    formMode: 'love-letter',
+    bride: {
+      nick: 'Sarah',
+      full: 'Sarah Michelle Anindya',
+      parents: '',
+      photo: '/assets/local/couple_garden.jpg',
+      ig: '',
+    },
+    groom: {
+      nick: '',
+      full: '',
+      parents: '',
+      photo: '',
+    },
+    date: '2026-09-18',
+    quote:
+      'INT. DESTINY — SCENE: FOREVER.\n\nSelamat ulang tahun untuk pemeran utama dalam hidupku. Di setiap babak cerita yang kita lewati—dari percakapan pertama yang canggung hingga tawa malam yang kita bagi—kamu adalah plot cerita terindah yang tak pernah ingin kuakhiri.\n\nSelamat bertambah usia, cintaku. Mari terus menulis ribuan babak indah lainnya bersama-sama.',
+    quoteSource: 'Babak Pertama Kita',
+    story: [
+      {
+        year: '2022',
+        title: 'Scene 01: Pandangan Pertama',
+        body: 'Di tengah keramaian stasiun yang sibuk, mataku berhenti di senyummu. Hari itu, waktu terasa melambat dan skenario hidupku berubah selamanya.',
+      },
+      {
+        year: '2024',
+        title: 'Scene 02: Dua Hati Menjadi Satu Cerita',
+        body: 'Melalui ratusan malam percakapan, tawa tanpa sebab, hingga saling menguatkan di hari-hari sulit. Kamu membuktikan bahwa rumah bukanlah tempat, melainkan genggaman tanganmu.',
+      },
+      {
+        year: '2026',
+        title: 'Scene 03: Selamat Bertambah Usia, Rumah Hatiku',
+        body: 'Di hari kelahiranmu ini, doaku sederhana: semoga bahagiamu selalu mekar, dan semoga aku selalu diizinkan semesta menjadi orang yang merayakanmu setiap tahunnya.',
+      },
+    ],
+    gallery: [
+      '/assets/local/couple_garden.jpg',
+      '/assets/local/couple_laughing_1.jpg',
+      '/assets/local/couple_laughing_2.jpg',
+      '/assets/local/couple_classical.jpg',
+    ],
+    events: [],
+    banks: [],
+    wishes: [
+      {
+        id: 'w1',
+        name: 'Dari Hatiku yang Terdalam',
+        message: 'Happy birthday, cintaku. Terima kasih sudah selalu ada dan menjadi alasan terbesarku untuk terus bersyukur setiap hari.',
+        at: Date.now() - 86400000,
+      },
+    ],
+  }),
+
   'birthday-memory-capsule': demo({
     themeId: 'birthday-memory-capsule',
     slug: 'kapsul-spesial-sarah',
@@ -1732,7 +1816,8 @@ export function getDemoBySlug(slug) {
 export const filterChips = [
   { id: 'semua', label: 'Semua Kategori' },
   { id: 'pernikahan', label: 'Pernikahan' },
-  { id: 'ulang-tahun', label: 'Ulang Tahun & Sweet 17' },
+  { id: 'kartu-ucapan', label: 'Kartu Ucapan & Surat Cinta' },
+  { id: 'ulang-tahun', label: 'Undangan Ulang Tahun' },
   { id: 'wisuda', label: 'Wisuda & Kelulusan' },
   { id: 'aqiqah', label: 'Aqiqah & Bayi' },
   { id: 'perusahaan', label: 'Acara Perusahaan' },

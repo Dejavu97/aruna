@@ -22,10 +22,14 @@ const subFiltersByEvent = {
     { id: 'premium', label: 'Koleksi Premium' },
     { id: 'komunitas', label: 'Koleksi Komunitas' },
   ],
-  'ulang-tahun': [
-    { id: 'semua', label: 'Semua Ulang Tahun' },
+  'kartu-ucapan': [
+    { id: 'semua', label: 'Semua Kartu Ucapan' },
     { id: 'surat-cinta', label: 'Surat Romantis Pasangan' },
-    { id: 'sahabat', label: 'Kapsul Sahabat & Bestie' },
+    { id: 'sahabat', label: 'Kapsul Sahabat & Kenangan' },
+    { id: 'anniversary', label: 'Anniversary' },
+  ],
+  'ulang-tahun': [
+    { id: 'semua', label: 'Semua Undangan Ultah' },
     { id: 'sweet17', label: 'Sweet 17 Glamour' },
     { id: 'pesta', label: 'Party & Music' },
     { id: 'elegan', label: 'Elegan' },

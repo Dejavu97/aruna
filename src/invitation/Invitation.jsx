@@ -28,12 +28,18 @@ import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 import ThemeRoyalBunny from './ThemeRoyalBunny'
 import ThemeWeddingGazette from './ThemeWeddingGazette'
 import ThemeCinematicMinimal from '../themes/ThemeCinematicMinimal'
+import ThemeCinematicLoveLetter from '../themes/ThemeCinematicLoveLetter'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 import AdSlot from '../components/AdSlot'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
+
+  // Tema Kapsul Surat Cinta Sinematik
+  if (theme.layout === 'cinematic-love-letter' || theme.id === 'cinematic-love-letter') {
+    return <ThemeCinematicLoveLetter data={data} guest={guest} preview={preview} theme={theme} />
+  }
 
   // Tema Reference: Cinematic Editorial Minimal
   if (theme.layout === 'cinematic-minimal' || theme.id === 'cinematic-minimal') {

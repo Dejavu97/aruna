@@ -123,8 +123,8 @@ export default function Order() {
               </button>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex border-b border-ink/10 px-5 pt-3 gap-2 text-xs uppercase tracking-wider font-medium bg-ivory/20">
+            {/* Filter Tabs by Event Type */}
+            <div className="flex flex-wrap border-b border-ink/10 px-5 pt-3 gap-2 text-xs uppercase tracking-wider font-medium bg-ivory/20">
               <button
                 type="button"
                 onClick={() => setActiveTab('all')}
@@ -132,25 +132,61 @@ export default function Order() {
                   activeTab === 'all' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
                 }`}
               >
-                Semua Tema ({allAvailableThemes.length})
+                Semua Kategori
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('custom')}
+                onClick={() => setActiveTab('wedding')}
                 className={`pb-2.5 px-3 border-b-2 transition-colors ${
-                  activeTab === 'custom' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
+                  activeTab === 'wedding' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
                 }`}
               >
-                Koleksi Kustom Theme Studio ({customThemes.length})
+                Pernikahan
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('official')}
+                onClick={() => setActiveTab('memory-capsule')}
                 className={`pb-2.5 px-3 border-b-2 transition-colors ${
-                  activeTab === 'official' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
+                  activeTab === 'memory-capsule' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
                 }`}
               >
-                Katalog Resmi ByAruna ({themes.length})
+                Kartu Ucapan &amp; Surat Cinta
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('birthday')}
+                className={`pb-2.5 px-3 border-b-2 transition-colors ${
+                  activeTab === 'birthday' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
+                }`}
+              >
+                Undangan Ulang Tahun
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('graduation')}
+                className={`pb-2.5 px-3 border-b-2 transition-colors ${
+                  activeTab === 'graduation' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
+                }`}
+              >
+                Wisuda
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('aqiqah')}
+                className={`pb-2.5 px-3 border-b-2 transition-colors ${
+                  activeTab === 'aqiqah' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
+                }`}
+              >
+                Aqiqah &amp; Bayi
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('corporate')}
+                className={`pb-2.5 px-3 border-b-2 transition-colors ${
+                  activeTab === 'corporate' ? 'border-gold-deep text-ink font-semibold' : 'border-transparent text-stone hover:text-ink'
+                }`}
+              >
+                Corporate
               </button>
             </div>
 
@@ -169,14 +205,14 @@ export default function Order() {
               </Link>
 
               {/* Render Filtered Themes */}
-              {(activeTab === 'custom'
-                ? customThemes
-                : activeTab === 'official'
-                ? themes
-                : allAvailableThemes
-              ).map((t) => {
-                const isSelected = t.id === activeThemeId
-                const isCustom = t.collection === 'community' || t.id.startsWith('theme_')
+              {allAvailableThemes
+                .filter((t) => {
+                  if (activeTab === 'all') return true
+                  return (t.eventType || 'wedding') === activeTab
+                })
+                .map((t) => {
+                  const isSelected = t.id === activeThemeId
+                  const isCustom = t.collection === 'community' || t.id.startsWith('theme_')
                 return (
                   <div
                     key={t.id}

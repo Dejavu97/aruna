@@ -254,32 +254,40 @@ export default function InvitationForm({
         <p className="mt-3 text-stone">{theme.description}</p>
         <img src={theme.cover} alt="" className="mt-6 aspect-[3/4] w-full max-w-sm object-cover" />
         {mode === 'create' && (
-          <>
-            <Link to={`/tema/${theme.id}`} className="mt-4 inline-block text-sm underline">
-              Lihat preview dulu
-            </Link>
-            <div className="mt-8 grid gap-2">
-              <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-[0.2em] text-stone">Ganti tema</p>
-                <Link to="/studio" className="text-[10px] text-gold-deep font-semibold uppercase tracking-wider hover:underline">
-                  + Buat di Studio
-                </Link>
-              </div>
-              <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-1">
-                {[...themes, ...customThemes].map((t) => (
-                  <Link
-                    key={t.id}
-                    to={`/pesan/${t.id}`}
-                    className={`px-3 py-1 text-xs uppercase tracking-[0.14em] transition-colors ${
-                      t.id === theme.id ? 'bg-ink text-ivory font-medium' : 'border border-ink/15 hover:border-ink/40'
-                    }`}
-                  >
-                    {t.name}
-                  </Link>
-                ))}
+          <div className="mt-6 border-t border-ink/10 pt-4">
+            <div className="flex items-center justify-between">
+              <Link to={`/tema/${theme.id}`} className="text-xs uppercase tracking-wider underline text-stone hover:text-ink font-medium">
+                Lihat Preview Tema Ini ↗
+              </Link>
+              <Link to="/tema" className="text-xs uppercase tracking-wider text-gold-deep hover:underline font-semibold">
+                Katalog Lengkap →
+              </Link>
+            </div>
+
+            {/* Tema Terkait (Kategori Serupa) */}
+            <div className="mt-5">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-stone font-semibold mb-2">
+                Pilihan Tema {theme.eventType === 'birthday' ? 'Ulang Tahun' : theme.eventType === 'graduation' ? 'Wisuda' : theme.eventType === 'aqiqah' ? 'Aqiqah' : theme.eventType === 'corporate' ? 'Corporate' : 'Pernikahan'}:
+              </p>
+              <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                {[...themes, ...customThemes]
+                  .filter((t) => (t.eventType || 'wedding') === (theme.eventType || 'wedding'))
+                  .map((t) => (
+                    <Link
+                      key={t.id}
+                      to={`/pesan/${t.id}`}
+                      className={`px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors ${
+                        t.id === theme.id 
+                          ? 'bg-ink text-ivory font-semibold shadow-xs' 
+                          : 'border border-ink/15 hover:border-ink/40 bg-ivory text-stone hover:text-ink'
+                      }`}
+                    >
+                      {t.name}
+                    </Link>
+                  ))}
               </div>
             </div>
-          </>
+          </div>
         )}
       </aside>
 

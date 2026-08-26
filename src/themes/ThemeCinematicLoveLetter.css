@@ -1,0 +1,557 @@
+/* =========================================================
+   WARM ROMANTIC CUPID'S ARROW LOVE CAPSULE (.lv-*)
+   Warna: Soft Rose Blush, Warm Cream, Burgundy, Champagne Gold
+   Tanpa Nuansa Gelap / Gloomy
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap');
+
+.lv-stage {
+  background: #fcf8f5;
+  color: #2b1f1a;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  margin: 0 auto;
+  max-width: 480px;
+  position: relative;
+  overflow-x: hidden;
+  box-shadow: 0 0 50px rgba(180, 100, 90, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP AUDIO BAR */
+.lv-audio-bar {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(224, 49, 49, 0.2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(200, 50, 50, 0.1);
+}
+.lv-audio-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #c92a2a;
+}
+.lv-audio-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #c92a2a;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* =========================================================
+   STAGE 1: WARM ROMANTIC CUPID HEART COVER
+   ========================================================= */
+
+.lv-cover-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff5f5;
+  padding: 2rem 1.5rem;
+}
+.lv-cover-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, #ffe3e3 0%, #fff5f5 100%);
+}
+.lv-floating-petals {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(224, 49, 49, 0.12) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  opacity: 0.7;
+}
+.lv-cover-card-box {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+  background: #ffffff;
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(201, 42, 42, 0.12);
+  border: 1px solid #ffe3e3;
+}
+.lv-cover-kicker {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c92a2a;
+  background: #fff0f0;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  margin-bottom: 1.25rem;
+}
+.lv-cover-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: #2b1f1a;
+  line-height: 1.15;
+  margin-bottom: 0.35rem;
+}
+.lv-cover-full-name {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #c92a2a;
+  margin-bottom: 0.5rem;
+}
+.lv-cover-date {
+  font-size: 0.85rem;
+  color: #8c7a7a;
+  margin-bottom: 2.5rem;
+}
+
+/* CUPID HEART & ARROW WRAPPER */
+.lv-cupid-heart-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.lv-cupid-arrow {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 8px rgba(201, 42, 42, 0.5));
+}
+.lv-heart-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #e03131 100%);
+  color: #ffffff;
+  border: none;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(224, 49, 49, 0.35);
+  transition: all 0.3s ease;
+  position: relative;
+}
+.lv-heart-btn.is-pierced {
+  background: #c92a2a;
+  transform: scale(1.1);
+}
+.lv-main-heart-icon {
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.15));
+}
+.lv-heart-tap-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+.lv-heart-burst {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.6) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* =========================================================
+   STAGE 2: WARM BRIGHT STORY DECK
+   ========================================================= */
+
+.lv-story-deck {
+  padding: 75px 1.5rem 40px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* PROGRESS BAR */
+.lv-progress-bar {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+.lv-progress-step {
+  height: 4px;
+  flex: 1;
+  background: #ffd8d8;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.lv-progress-step.is-active {
+  background: #e03131;
+  box-shadow: 0 0 8px rgba(224, 49, 49, 0.5);
+}
+.lv-progress-step.is-done {
+  background: #ffa8a8;
+}
+
+.lv-chapter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.lv-chapter-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c92a2a;
+}
+.lv-step-counter {
+  font-size: 0.75rem;
+  color: #8c7a7a;
+  font-weight: 600;
+}
+
+/* PARCHMENT CARD */
+.lv-card-viewport {
+  position: relative;
+  min-height: 480px;
+}
+.lv-parchment-card {
+  background: #ffffff;
+  color: #2b1f1a;
+  padding: 2.25rem 1.75rem;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(201, 42, 42, 0.08);
+  border: 1px solid #ffe3e3;
+  position: relative;
+}
+.lv-card-greeting {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #c92a2a;
+  margin-bottom: 0.75rem;
+}
+.lv-card-lead {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #382721;
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+}
+.lv-card-quote {
+  background: #fff5f5;
+  border-left: 3px solid #e03131;
+  padding: 1rem 1.25rem;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #4a3630;
+  margin-bottom: 1.25rem;
+  border-radius: 0 6px 6px 0;
+}
+.lv-card-body-text {
+  font-size: 0.9rem;
+  color: #59453e;
+  line-height: 1.8;
+}
+
+/* NAVIGATION BUTTONS */
+.lv-card-action {
+  margin-top: 2rem;
+  text-align: right;
+}
+.lv-btn-next-card {
+  background: linear-gradient(135deg, #ff6b6b 0%, #e03131 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.85rem 1.6rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(224, 49, 49, 0.3);
+  transition: all 0.2s ease;
+}
+.lv-btn-next-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(224, 49, 49, 0.45);
+}
+.lv-card-nav-btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+}
+.lv-btn-back {
+  background: transparent;
+  border: 1px solid #ffc9c9;
+  color: #8c4a3b;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+/* REASONS */
+.lv-card-title-sm {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2b1f1a;
+  margin-bottom: 0.35rem;
+}
+.lv-hint-tap {
+  font-size: 0.75rem;
+  color: #8c7a7a;
+  margin-bottom: 1.5rem;
+}
+.lv-reasons-list {
+  display: grid;
+  gap: 0.75rem;
+}
+.lv-reason-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff8f8;
+  border: 1px solid #ffe3e3;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.lv-reason-item:hover {
+  border-color: #ff8787;
+  background: #fff0f0;
+}
+.lv-reason-num {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e03131;
+}
+.lv-reason-item strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #2b1f1a;
+}
+.lv-reason-item p {
+  font-size: 0.8rem;
+  color: #634b42;
+  margin-top: 2px;
+}
+
+/* SECRET BOX */
+.lv-gold-scratch-box {
+  background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+  color: #5c3e00;
+  padding: 2.25rem 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(250, 176, 5, 0.25);
+}
+.lv-gold-scratch-box.is-scratched {
+  background: #fff5f5;
+  color: #382721;
+  border: 2px dashed #e03131;
+}
+.lv-gold-shimmer {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.lv-secret-text-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #c92a2a;
+  margin: 0.75rem 0 0.5rem;
+}
+.lv-secret-text-box p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #59453e;
+}
+.lv-heart-pop {
+  animation: heartPulse 1.2s infinite;
+}
+@keyframes heartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* POLAROID */
+.lv-polaroid-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0 1.5rem;
+}
+.lv-polaroid-paper {
+  background: #ffffff;
+  padding: 10px 10px 18px;
+  box-shadow: 0 10px 25px rgba(201, 42, 42, 0.12);
+  border: 1px solid #ffe3e3;
+  border-radius: 4px;
+  transform: rotate(-2deg);
+  max-width: 260px;
+}
+.lv-polaroid-main-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+.lv-polaroid-note {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #c92a2a;
+  text-align: center;
+  margin-top: 10px;
+}
+.lv-story-snippets {
+  display: grid;
+  gap: 0.5rem;
+}
+.lv-snippet-bubble {
+  display: flex;
+  gap: 0.75rem;
+  background: #fff8f8;
+  border: 1px solid #ffe3e3;
+  padding: 0.6rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #634b42;
+}
+.lv-snippet-year {
+  font-weight: 700;
+  color: #e03131;
+}
+
+/* VOUCHERS */
+.lv-vouchers-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+.lv-voucher-card {
+  border: 1px dashed #ffa8a8;
+  background: #fff5f5;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.lv-voucher-card:hover {
+  background: #ffe3e3;
+}
+.lv-voucher-card.is-selected {
+  background: #e03131;
+  color: #ffffff;
+  border-style: solid;
+  border-color: #e03131;
+}
+.lv-voucher-card strong {
+  display: block;
+  font-size: 0.9rem;
+}
+.lv-voucher-card span {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+.lv-voucher-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+/* MINI REPLY FORM */
+.lv-reply-section-card {
+  border-top: 1px dashed #ffc9c9;
+  padding-top: 1.25rem;
+}
+.lv-reply-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2b1f1a;
+  margin-bottom: 0.75rem;
+}
+.lv-reply-mini-form {
+  display: grid;
+  gap: 0.6rem;
+}
+.lv-reply-mini-form input, .lv-reply-mini-form textarea {
+  background: #fff8f8;
+  border: 1px solid #ffc9c9;
+  color: #2b1f1a;
+  padding: 0.65rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+.lv-btn-submit-love {
+  background: #e03131;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(224, 49, 49, 0.3);
+}
+.lv-reply-success-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff0f0;
+  padding: 0.75rem;
+  border: 1px solid #e03131;
+  font-size: 0.8rem;
+  color: #c92a2a;
+  border-radius: 6px;
+}
+.lv-btn-restart {
+  background: transparent;
+  border: 1px solid #c92a2a;
+  color: #c92a2a;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+/* WARM FOOTER */
+.lv-warm-footer {
+  text-align: center;
+  padding: 1.5rem 0;
+  font-size: 0.75rem;
+  color: #a38f85;
+}
