@@ -9,6 +9,33 @@ const galleryClassic = [
 
 export const themes = [
   {
+    id: 'kejora',
+    name: 'Kejora — Langit Malam',
+    tag: '★ Langit Malam',
+    tags: ['kejora', 'langit-malam', 'night-sky', 'bintang', 'bulan', 'antik-astronomis', 'romantis', 'tenang', 'mewah', 'pernikahan', 'elegan'],
+    popular: true,
+    collection: 'premium',
+    description: 'Kejora — pernikahan di bawah langit malam: atlas astronomi antik dengan gerbang bulan, konstelasi perjalanan cinta, dan hitung mundur menuju purnama.',
+    cover: '/themes/covers/kejora.svg',
+    layout: 'kejora',
+    opener: 'DUA BINTANG, SATU LANGIT',
+    music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+    fonts: {
+      display: '"Cormorant Garamond", Georgia, serif',
+      script: '"Cormorant Garamond", serif',
+      body: '"Outfit", "Plus Jakarta Sans", sans-serif',
+    },
+    colors: {
+      bg: '#0B1026',
+      paper: '#131A38',
+      fg: '#E9E6DA',
+      muted: '#A8A4B8',
+      accent: '#C6A55C',
+      accentSoft: '#1B2447',
+      cover: '#0B1026',
+    },
+  },
+  {
     id: 'cinematic-love-letter',
     name: 'Cinematic Love Letter',
     tag: 'Kartu Ucapan & Surat',
@@ -889,6 +916,78 @@ export function getThemeFeatures(themeOrId) {
 }
 
 export const demos = {
+  'kejora': demo({
+    themeId: 'kejora',
+    slug: 'kejora-aurelia-julian',
+    music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+    groom: {
+      nick: 'Julian',
+      full: 'Raden Julian Danendra, B.Arch.',
+      parents: 'Putra tercinta dari Bpk. Dr. H. Suryo Danendra & Ibu Hj. Ratna Sari',
+      photo: '/assets/local/groom_suit.jpg',
+      ig: '@juliandanendra'
+    },
+    bride: {
+      nick: 'Aurelia',
+      full: 'Aurelia Kirana, S.Ds., M.A.',
+      parents: 'Putri tercinta dari Bpk. Ir. Hendra Kusuma & Ibu Dewi Anggraini',
+      photo: '/assets/local/bride_bouquet.jpg',
+      ig: '@aureliakirana'
+    },
+    date: '2026-10-24',
+    quote: 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.',
+    quoteSource: 'Surat Ar-Rum : 21',
+    story: [
+      {
+        year: '2021',
+        title: 'Bertemu di Bawah Langit yang Sama',
+        body: 'Sebuah sore yang biasa, percakapan sederhana, dan perasaan yang perlahan tumbuh tanpa diminta — seperti bintang yang menyala saat langit cukup gelap.',
+        image: '/assets/local/couple_garden.jpg'
+      },
+      {
+        year: '2024',
+        title: 'Menemukan Arah di Antara Ribuhan Kota',
+        body: 'Melalui musim demi musim, kami belajar bahwa rumah bukanlah tempat, melainkan saat kami saling menemukan kembali.',
+        image: '/assets/local/couple_classical.jpg'
+      },
+      {
+        year: '2026',
+        title: 'Menuju Purnama yang Sama',
+        body: 'Dengan penuh syukur, kami mengundang Anda menjadi saksi saat dua cahaya bergerak menyatu dalam satu orbit.',
+        image: '/assets/local/couple_laughing_1.jpg'
+      }
+    ],
+    events: [
+      {
+        title: 'Akad Nikah',
+        date: '2026-10-24',
+        time: '08:30 - 10:30 WIB',
+        venue: 'The Sanctuary Dome',
+        address: 'Jl. Senopati No. 88, Kebayoran Baru, Jakarta Selatan',
+        maps: 'https://maps.google.com'
+      },
+      {
+        title: 'Resepsi Malam Bintang',
+        date: '2026-10-24',
+        time: '18:30 - 21:30 WIB',
+        venue: 'The Observatory Hall',
+        address: 'Jl. Sudirman Kav. 52-53, SCBD, Jakarta Selatan',
+        maps: 'https://maps.google.com'
+      }
+    ],
+    banks: [
+      { bank: 'BCA', no: '8830192841', name: 'AURELIA KIRANA' },
+      { bank: 'Bank Mandiri', no: '1370029481923', name: 'RADEN JULIAN D.' }
+    ],
+    gallery: [
+      '/assets/local/couple_garden.jpg',
+      '/assets/local/couple_classical.jpg',
+      '/assets/local/couple_laughing_1.jpg',
+      '/assets/local/couple_laughing_2.jpg',
+      '/assets/local/couple_laughing_3.jpg',
+      '/assets/local/wedding_rings_1.jpg'
+    ]
+  }),
   'art-jawa-biru': demo({
     themeId: 'art-jawa-biru',
     slug: 'yogi-ratna',

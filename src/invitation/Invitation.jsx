@@ -30,12 +30,18 @@ import ThemeWeddingGazette from './ThemeWeddingGazette'
 import ThemeCinematicMinimal from '../themes/ThemeCinematicMinimal'
 import ThemeCinematicLoveLetter from '../themes/ThemeCinematicLoveLetter'
 import ThemeModernEditorialLetter from '../themes/ThemeModernEditorialLetter'
+import ThemeKejora from '../themes/ThemeKejora'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 import AdSlot from '../components/AdSlot'
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
+
+  // Tema Kejora — Pernikahan di Bawah Langit Malam
+  if (theme.layout === 'kejora' || theme.id === 'kejora') {
+    return <ThemeKejora data={data} guest={guest} preview={preview} theme={theme} />
+  }
 
   // Tema Surat Editorial Modern (bukan undangan acara)
   if (theme.layout === 'modern-editorial-letter' || theme.id === 'modern-editorial-letter') {
