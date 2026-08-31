@@ -84,16 +84,12 @@ export default async function handler(req, res) {
   // 1) Fetch invitation from Firestore (the real data source for invitations
   //    created through the site — the legacy server/store.js never sees them).
   let item = null;
-  let readErr = null;
   try {
     const snap = await adminDb.collection('invitations').doc(req.query.slug).get();
     if (snap.exists) item = { id: snap.id, ...snap.data() };
   } catch (err) {
-    readErr = err.message || 'unknown';
     console.error('OG Firestore read error:', err);
   }
-  // Temporary diagnosis header (remove once OG path is verified in prod)
-  res.setHeader('X-OG-Debug', item ? 'hit' : `miss${readErr ? ': ' + readErr : ': no-doc'}`);
 
   // 2) Load the built SPA shell.
   const html = resolveDistIndex();
