@@ -21,72 +21,48 @@ import {
 } from '../lib/utils'
 import Watermark from '../components/Watermark'
 import { getTheme, getFormMode, getThemeFeatures } from '../data/themes'
+import { registerThemeComponent, getThemeComponent } from './themeRegistry'
 import AttariInvitation from './AttariInvitation'
 import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
 import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 import ThemeRoyalBunny from './ThemeRoyalBunny'
 import ThemeWeddingGazette from './ThemeWeddingGazette'
-import ThemeCinematicMinimal from '../themes/ThemeCinematicMinimal'
-import ThemeCinematicLoveLetter from '../themes/ThemeCinematicLoveLetter'
-import ThemeModernEditorialLetter from '../themes/ThemeModernEditorialLetter'
-import ThemeKejora from '../themes/ThemeKejora'
+import ThemeCinematicMinimal from './ThemeCinematicMinimal'
+import ThemeCinematicLoveLetter from './ThemeCinematicLoveLetter'
+import ThemeModernEditorialLetter from './ThemeModernEditorialLetter'
+import ThemeKejora from './ThemeKejora'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 import AdSlot from '../components/AdSlot'
 
+// ===== Theme Registry (Fase 2 refactor) =====
+// Satu pendaftaran per layout terisolasi. Tema baru cukup: entri di
+// src/data/themes.js + komponen + satu baris registerThemeComponent di sini.
+registerThemeComponent('kejora', ThemeKejora)
+registerThemeComponent('modern-editorial-letter', ThemeModernEditorialLetter)
+registerThemeComponent('cinematic-love-letter', ThemeCinematicLoveLetter)
+registerThemeComponent('cinematic-minimal', ThemeCinematicMinimal)
+registerThemeComponent('royal-bunny', ThemeRoyalBunny)
+registerThemeComponent('adat-jawa', ThemeAdatJawa)
+registerThemeComponent('art-jawa-biru', ThemeArtJawaBiru)
+registerThemeComponent('attari', AttariInvitation)
+registerThemeComponent('boarding', BoardingInvitation)
+registerThemeComponent('wedding-gazette', ThemeWeddingGazette)
+// Alias legacy slug lama 'jawa-biru'
+registerThemeComponent('jawa-biru', ThemeArtJawaBiru)
+
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
-
-  // Tema Kejora — Pernikahan di Bawah Langit Malam
-  if (theme.layout === 'kejora' || theme.id === 'kejora') {
-    return <ThemeKejora data={data} guest={guest} preview={preview} theme={theme} />
+  // Dispatch: registry by layout → by id (kompatibilitas tema kustom yang
+  // menyalin id tema) → by themeId legacy. Tanpa kunci = StandardInvitation.
+  const Isolated =
+    getThemeComponent(theme.layout) ||
+    getThemeComponent(theme.id) ||
+    getThemeComponent(data?.themeId)
+  if (Isolated) {
+    return <Isolated data={data} guest={guest} preview={preview} theme={theme} />
   }
-
-  // Tema Surat Editorial Modern (bukan undangan acara)
-  if (theme.layout === 'modern-editorial-letter' || theme.id === 'modern-editorial-letter') {
-    return <ThemeModernEditorialLetter data={data} guest={guest} preview={preview} theme={theme} />
-  }
-
-  // Tema Kapsul Surat Cinta Sinematik
-  if (theme.layout === 'cinematic-love-letter' || theme.id === 'cinematic-love-letter') {
-    return <ThemeCinematicLoveLetter data={data} guest={guest} preview={preview} theme={theme} />
-  }
-
-  // Tema Reference: Cinematic Editorial Minimal
-  if (theme.layout === 'cinematic-minimal' || theme.id === 'cinematic-minimal') {
-    return <ThemeCinematicMinimal data={data} guest={guest} preview={preview} theme={theme} />
-  }
-
-  // Tema Royal Bunny Fairytale
-  if (theme.layout === 'royal-bunny' || theme.id === 'royal-bunny') {
-    return <ThemeRoyalBunny data={data} guest={guest} preview={preview} theme={theme} />
-  }
-
-  // Tema Adat Jawa
-  if (theme.layout === 'adat-jawa') {
-    return <ThemeAdatJawa data={data} guest={guest} preview={preview} />
-  }
-
-  if (theme.layout === 'art-jawa-biru' || theme.id === 'art-jawa-biru' || theme.id === 'jawa-biru' || data?.themeId === 'art-jawa-biru' || data?.themeId === 'jawa-biru') {
-    return <ThemeArtJawaBiru theme={theme} data={data} guest={guest} preview={preview} />
-  }
-
-  // Gunakan komponen terpisah untuk tema Attari
-  if (theme.layout === 'attari') {
-    return <AttariInvitation data={data} guest={guest} preview={preview} />
-  }
-
-  // Komponen khusus Boarding Pass
-  if (theme.layout === 'boarding') {
-    return <BoardingInvitation data={data} guest={guest} preview={preview} />
-  }
-
-  // Komponen khusus Wedding Gazette / Koran Vintage Editorial
-  if (theme.layout === 'wedding-gazette' || theme.id === 'wedding-gazette') {
-    return <ThemeWeddingGazette data={data} guest={guest} preview={preview} theme={theme} />
-  }
-
   return <StandardInvitation data={data} guest={guest} preview={preview} theme={theme} />
 }
 

@@ -1,5 +1,5 @@
-import { themes as staticThemes } from '../data/themes'
-import { validateThemeManifest, DEFAULT_THEME_COLORS, DEFAULT_THEME_FONTS } from './themeContract'
+import { themes as staticThemes } from '../data/themes.js'
+import { validateThemeManifest, DEFAULT_THEME_COLORS, DEFAULT_THEME_FONTS } from './themeContract.js'
 
 // In-memory registered custom/isolated theme components
 const isolatedComponentRegistry = new Map()

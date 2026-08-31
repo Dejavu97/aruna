@@ -539,210 +539,189 @@ export function hasTheme(id, customThemes = []) {
  * Mode form/preview adaptif per jenis acara.
  * love-letter = surat ultah pribadi (bukan undangan tamu).
  */
-export function getFormMode(themeOrId, customThemes = []) {
-  const theme = typeof themeOrId === 'string' ? getTheme(themeOrId, customThemes) : (themeOrId || themes[0])
-  const id = theme?.id || ''
-  const layout = theme?.layout || 'classic'
-  const eventType = theme?.eventType || 'wedding'
-
-  if (
-    layout === 'memory-capsule' ||
-    layout === 'modern-editorial-letter' ||
-    layout === 'cinematic-love-letter' ||
-    id === 'birthday-memory-capsule' ||
-    (theme?.tags || []).includes('surat-cinta')
-  ) {
-    return {
-      mode: 'love-letter',
-      eventType: 'birthday',
-      step1Label: 'Untuknya',
-      person1Title: 'Data Pasangan / Orang Tersayang',
-      person1NickLabel: 'Nama panggilan',
-      person1NickHint: 'Contoh: Sarah — akan disapa Sayangku / Cintaku',
-      person1FullLabel: 'Nama lengkap (opsional)',
-      person1PhotoLabel: 'Foto atau gambar sampul (opsional)',
-      person2Title: '',
-      showPerson2: false,
-      showParents: false,
-      showIg: false,
-      showEvents: false,
-      showBanks: false,
-      showDressLive: false,
-      showFrame: false,
-      showWishlist: false,
-      showCoupleCard: false,
-      showRsvp: false,
-      showCheckIn: false,
-      guestLabel: 'Untukmu,',
-      guestFallback: 'Sayangku',
-      openCta: 'BUKA SURAT',
-      dateLabel: 'Tanggal ulang tahun',
-      defaultEvents: [],
-      quoteLabel: 'Isi surat cinta / ucapan',
-      quoteHint: 'Tulis ucapan romantis yang ingin dibaca pasanganmu',
-      storyTitle: 'Kilas balik kenangan',
-      pelengkapLabel: 'Surat & Kenangan',
-      singleRole: 'Sayangku',
-    }
-  }
-
-  if (eventType === 'birthday') {
-    return {
-      mode: 'birthday',
-      eventType: 'birthday',
-      step1Label: 'Tokoh Ultah',
-      person1Title: 'Data Bintang Ulang Tahun',
-      person1NickLabel: 'Nama panggilan & usia',
-      person1NickHint: 'Contoh: Sarah (17th)',
-      person1FullLabel: 'Nama lengkap',
-      person1PhotoLabel: 'Foto tokoh ulang tahun',
-      person2Title: 'Pasangan / sahabat (opsional)',
-      showPerson2: false,
-      showParents: true,
-      showIg: true,
-      showEvents: true,
-      showBanks: true,
-      showDressLive: true,
-      showFrame: true,
-      showWishlist: true,
-      showCoupleCard: true,
-      showRsvp: true,
-      showCheckIn: true,
-      guestLabel: 'Kepada Yth.',
-      guestFallback: '',
-      openCta: 'BUKA UNDANGAN',
-      dateLabel: 'Tanggal pesta ulang tahun',
-      defaultEvents: [
-        { title: 'Pesta Ulang Tahun & Games', date: '', time: '16:00', venue: '', address: '', maps: '' },
-        { title: 'Celebration Dinner & Music', date: '', time: '19:00', venue: '', address: '', maps: '' },
-      ],
-      quoteLabel: 'Pesan / harapan ulang tahun',
-      quoteHint: 'Harapan dan doa di usia yang baru',
-      storyTitle: 'Kilas balik kenangan',
-      pelengkapLabel: 'Harapan & Galeri',
-      singleRole: 'Bintang Ulang Tahun',
-      parentsLabel: 'Orang tua / penyelenggara',
-    }
-  }
-
-  if (eventType === 'graduation') {
-    return {
-      mode: 'graduation',
-      eventType: 'graduation',
-      step1Label: 'Wisudawan',
-      person1Title: 'Data wisudawan / wisudawati',
-      person1NickLabel: 'Nama panggilan',
-      person1NickHint: 'Contoh: Sarah',
-      person1FullLabel: 'Nama lengkap & gelar',
-      person1PhotoLabel: 'Foto wisudawan',
-      person2Title: 'Rekan wisuda (opsional)',
-      showPerson2: false,
-      showParents: true,
-      showIg: true,
-      showEvents: true,
-      showBanks: true,
-      showDressLive: true,
-      showFrame: true,
-      showWishlist: true,
-      showCoupleCard: true,
-      showRsvp: true,
-      showCheckIn: true,
-      guestLabel: 'Kepada Yth.',
-      guestFallback: '',
-      openCta: 'BUKA UNDANGAN',
-      dateLabel: 'Tanggal wisuda / kelulusan',
-      defaultEvents: [
-        { title: 'Upacara Wisuda & Sumpah', date: '', time: '08:00', venue: '', address: '', maps: '' },
-        { title: 'Syukuran & Ramah Tamah', date: '', time: '13:00', venue: '', address: '', maps: '' },
-      ],
-      quoteLabel: 'Kutipan / motto kelulusan',
-      quoteHint: 'Kata mutiara atau rasa syukur atas kelulusan',
-      storyTitle: 'Perjalanan meraih gelar',
-      pelengkapLabel: 'Pelengkap',
-      singleRole: 'Wisudawan / Wisudawati',
-      parentsLabel: 'Orang tua',
-    }
-  }
-
-  if (eventType === 'aqiqah') {
-    return {
-      mode: 'aqiqah',
-      eventType: 'aqiqah',
-      step1Label: 'Buah Hati',
-      person1Title: 'Data buah hati / bayi',
-      person1NickLabel: 'Nama panggilan anak',
-      person1NickHint: 'Contoh: Al-Fatih',
-      person1FullLabel: 'Nama lengkap anak',
-      person1PhotoLabel: 'Foto si kecil',
-      person2Title: '',
-      showPerson2: false,
-      showParents: true,
-      showIg: false,
-      showEvents: true,
-      showBanks: true,
-      showDressLive: false,
-      showFrame: false,
-      showWishlist: false,
-      showCoupleCard: true,
-      showRsvp: true,
-      showCheckIn: true,
-      guestLabel: 'Kepada Yth.',
-      guestFallback: '',
-      openCta: 'BUKA UNDANGAN',
-      dateLabel: 'Tanggal tasyakuran aqiqah',
-      defaultEvents: [
-        { title: 'Cukur Rambut & Tausiyah', date: '', time: '09:00', venue: '', address: '', maps: '' },
-        { title: 'Santap Siang & Doa Bersama', date: '', time: '12:00', venue: '', address: '', maps: '' },
-      ],
-      quoteLabel: 'Doa syukuran aqiqah',
-      quoteHint: 'Doa untuk keselamatan dan keberkahan si kecil',
-      storyTitle: 'Arti nama & harapan',
-      pelengkapLabel: 'Pelengkap',
-      singleRole: 'Buah Hati / Bayi',
-      parentsLabel: 'Ayah & ibu kandung',
-    }
-  }
-
-  if (eventType === 'corporate') {
-    return {
-      mode: 'corporate',
-      eventType: 'corporate',
-      step1Label: 'Host & Acara',
-      person1Title: 'Penyelenggara / host acara',
-      person1NickLabel: 'Nama singkat acara',
-      person1NickHint: 'Contoh: Aruna Summit',
-      person1FullLabel: 'Nama lengkap acara / organisasi',
-      person1PhotoLabel: 'Logo / foto keynote',
-      person2Title: 'Keynote / VIP (opsional)',
-      showPerson2: false,
-      showParents: true,
-      showIg: true,
-      showEvents: true,
-      showBanks: false,
-      showDressLive: true,
-      showFrame: false,
-      showWishlist: false,
-      showCoupleCard: true,
-      showRsvp: true,
-      showCheckIn: true,
-      guestLabel: 'Kepada Yth.',
-      guestFallback: '',
-      openCta: 'BUKA UNDANGAN',
-      dateLabel: 'Tanggal acara',
-      defaultEvents: [
-        { title: 'Keynote Presentation & Launching', date: '', time: '09:00', venue: '', address: '', maps: '' },
-        { title: 'Gala Dinner & Awarding Night', date: '', time: '19:00', venue: '', address: '', maps: '' },
-      ],
-      quoteLabel: 'Visi / tema utama acara',
-      quoteHint: 'Tema besar konferensi atau gala',
-      storyTitle: 'Agenda & latar belakang',
-      pelengkapLabel: 'Pelengkap',
-      singleRole: 'Host / Penyelenggara',
-      parentsLabel: 'Board / komite penyelenggara',
-    }
-  }
-
-  return {
+/**
+ * Fase 2 refactor: konfigurasi form sebagai DATA.
+ * Base per mode (verbatim dari if-berantai lama) + tema cukup menambahkan
+ * `formOverrides: { ... }` di entri themes.js untuk menyimpang dari base-nya.
+ */
+const FORM_BASES = {
+  'love-letter': {
+    mode: 'love-letter',
+    eventType: 'birthday',
+    step1Label: 'Untuknya',
+    person1Title: 'Data Pasangan / Orang Tersayang',
+    person1NickLabel: 'Nama panggilan',
+    person1NickHint: 'Contoh: Sarah — akan disapa Sayangku / Cintaku',
+    person1FullLabel: 'Nama lengkap (opsional)',
+    person1PhotoLabel: 'Foto atau gambar sampul (opsional)',
+    person2Title: '',
+    showPerson2: false,
+    showParents: false,
+    showIg: false,
+    showEvents: false,
+    showBanks: false,
+    showDressLive: false,
+    showFrame: false,
+    showWishlist: false,
+    showCoupleCard: false,
+    showRsvp: false,
+    showCheckIn: false,
+    guestLabel: 'Untukmu,',
+    guestFallback: 'Sayangku',
+    openCta: 'BUKA SURAT',
+    dateLabel: 'Tanggal ulang tahun',
+    defaultEvents: [],
+    quoteLabel: 'Isi surat cinta / ucapan',
+    quoteHint: 'Tulis ucapan romantis yang ingin dibaca pasanganmu',
+    storyTitle: 'Kilas balik kenangan',
+    pelengkapLabel: 'Surat & Kenangan',
+    singleRole: 'Sayangku',
+  },
+  birthday: {
+    mode: 'birthday',
+    eventType: 'birthday',
+    step1Label: 'Tokoh Ultah',
+    person1Title: 'Data Bintang Ulang Tahun',
+    person1NickLabel: 'Nama panggilan & usia',
+    person1NickHint: 'Contoh: Sarah (17th)',
+    person1FullLabel: 'Nama lengkap',
+    person1PhotoLabel: 'Foto tokoh ulang tahun',
+    person2Title: 'Pasangan / sahabat (opsional)',
+    showPerson2: false,
+    showParents: true,
+    showIg: true,
+    showEvents: true,
+    showBanks: true,
+    showDressLive: true,
+    showFrame: true,
+    showWishlist: true,
+    showCoupleCard: true,
+    showRsvp: true,
+    showCheckIn: true,
+    guestLabel: 'Kepada Yth.',
+    guestFallback: '',
+    openCta: 'BUKA UNDANGAN',
+    dateLabel: 'Tanggal pesta ulang tahun',
+    defaultEvents: [
+      { title: 'Pesta Ulang Tahun & Games', date: '', time: '16:00', venue: '', address: '', maps: '' },
+      { title: 'Celebration Dinner & Music', date: '', time: '19:00', venue: '', address: '', maps: '' },
+    ],
+    quoteLabel: 'Pesan / harapan ulang tahun',
+    quoteHint: 'Harapan dan doa di usia yang baru',
+    storyTitle: 'Kilas balik kenangan',
+    pelengkapLabel: 'Harapan & Galeri',
+    singleRole: 'Bintang Ulang Tahun',
+    parentsLabel: 'Orang tua / penyelenggara',
+  },
+  graduation: {
+    mode: 'graduation',
+    eventType: 'graduation',
+    step1Label: 'Wisudawan',
+    person1Title: 'Data wisudawan / wisudawati',
+    person1NickLabel: 'Nama panggilan',
+    person1NickHint: 'Contoh: Sarah',
+    person1FullLabel: 'Nama lengkap & gelar',
+    person1PhotoLabel: 'Foto wisudawan',
+    person2Title: 'Rekan wisuda (opsional)',
+    showPerson2: false,
+    showParents: true,
+    showIg: true,
+    showEvents: true,
+    showBanks: true,
+    showDressLive: true,
+    showFrame: true,
+    showWishlist: true,
+    showCoupleCard: true,
+    showRsvp: true,
+    showCheckIn: true,
+    guestLabel: 'Kepada Yth.',
+    guestFallback: '',
+    openCta: 'BUKA UNDANGAN',
+    dateLabel: 'Tanggal wisuda / kelulusan',
+    defaultEvents: [
+      { title: 'Upacara Wisuda & Sumpah', date: '', time: '08:00', venue: '', address: '', maps: '' },
+      { title: 'Syukuran & Ramah Tamah', date: '', time: '13:00', venue: '', address: '', maps: '' },
+    ],
+    quoteLabel: 'Kutipan / motto kelulusan',
+    quoteHint: 'Kata mutiara atau rasa syukur atas kelulusan',
+    storyTitle: 'Perjalanan meraih gelar',
+    pelengkapLabel: 'Pelengkap',
+    singleRole: 'Wisudawan / Wisudawati',
+    parentsLabel: 'Orang tua',
+  },
+  aqiqah: {
+    mode: 'aqiqah',
+    eventType: 'aqiqah',
+    step1Label: 'Buah Hati',
+    person1Title: 'Data buah hati / bayi',
+    person1NickLabel: 'Nama panggilan anak',
+    person1NickHint: 'Contoh: Al-Fatih',
+    person1FullLabel: 'Nama lengkap anak',
+    person1PhotoLabel: 'Foto si kecil',
+    person2Title: '',
+    showPerson2: false,
+    showParents: true,
+    showIg: false,
+    showEvents: true,
+    showBanks: true,
+    showDressLive: false,
+    showFrame: false,
+    showWishlist: false,
+    showCoupleCard: true,
+    showRsvp: true,
+    showCheckIn: true,
+    guestLabel: 'Kepada Yth.',
+    guestFallback: '',
+    openCta: 'BUKA UNDANGAN',
+    dateLabel: 'Tanggal tasyakuran aqiqah',
+    defaultEvents: [
+      { title: 'Cukur Rambut & Tausiyah', date: '', time: '09:00', venue: '', address: '', maps: '' },
+      { title: 'Santap Siang & Doa Bersama', date: '', time: '12:00', venue: '', address: '', maps: '' },
+    ],
+    quoteLabel: 'Doa syukuran aqiqah',
+    quoteHint: 'Doa untuk keselamatan dan keberkahan si kecil',
+    storyTitle: 'Arti nama & harapan',
+    pelengkapLabel: 'Pelengkap',
+    singleRole: 'Buah Hati / Bayi',
+    parentsLabel: 'Ayah & ibu kandung',
+  },
+  corporate: {
+    mode: 'corporate',
+    eventType: 'corporate',
+    step1Label: 'Host & Acara',
+    person1Title: 'Penyelenggara / host acara',
+    person1NickLabel: 'Nama singkat acara',
+    person1NickHint: 'Contoh: Aruna Summit',
+    person1FullLabel: 'Nama lengkap acara / organisasi',
+    person1PhotoLabel: 'Logo / foto keynote',
+    person2Title: 'Keynote / VIP (opsional)',
+    showPerson2: false,
+    showParents: true,
+    showIg: true,
+    showEvents: true,
+    showBanks: false,
+    showDressLive: true,
+    showFrame: false,
+    showWishlist: false,
+    showCoupleCard: true,
+    showRsvp: true,
+    showCheckIn: true,
+    guestLabel: 'Kepada Yth.',
+    guestFallback: '',
+    openCta: 'BUKA UNDANGAN',
+    dateLabel: 'Tanggal acara',
+    defaultEvents: [
+      { title: 'Keynote Presentation & Launching', date: '', time: '09:00', venue: '', address: '', maps: '' },
+      { title: 'Gala Dinner & Awarding Night', date: '', time: '19:00', venue: '', address: '', maps: '' },
+    ],
+    quoteLabel: 'Visi / tema utama acara',
+    quoteHint: 'Tema besar konferensi atau gala',
+    storyTitle: 'Agenda & latar belakang',
+    pelengkapLabel: 'Pelengkap',
+    singleRole: 'Host / Penyelenggara',
+    parentsLabel: 'Board / komite penyelenggara',
+  },
+  wedding: {
     mode: 'wedding',
     eventType: 'wedding',
     step1Label: 'Pengantin',
@@ -777,142 +756,156 @@ export function getFormMode(themeOrId, customThemes = []) {
     pelengkapLabel: 'Pelengkap',
     singleRole: 'Tokoh Utama',
     parentsLabel: 'Orang tua',
+  },
+}
+
+export function getFormMode(themeOrId, customThemes = []) {
+  const theme = typeof themeOrId === 'string' ? getTheme(themeOrId, customThemes) : (themeOrId || themes[0])
+  const id = theme?.id || ''
+  const layout = theme?.layout || 'classic'
+
+  // Penentu mode — kompatibel penuh dengan trigger lama:
+  // tema surat-cinta/kapsul → love-letter; sisanya mengikuti eventType.
+  let modeKey = 'wedding'
+  if (
+    layout === 'memory-capsule' ||
+    layout === 'modern-editorial-letter' ||
+    layout === 'cinematic-love-letter' ||
+    id === 'birthday-memory-capsule' ||
+    (theme?.tags || []).includes('surat-cinta') ||
+    theme?.eventType === 'memory-capsule'
+  ) {
+    modeKey = 'love-letter'
+  } else if (FORM_BASES[theme?.eventType]) {
+    modeKey = theme.eventType
   }
+  return { ...FORM_BASES[modeKey], ...(theme?.formOverrides || {}) }
+}
+
+/**
+ * Fase 2 refactor: fitur pelengkap per tema sebagai DATA.
+ * Tema di luar peta ini memakai DEFAULT_FEATURES; penyimpangan cukup lewat
+ * `features` di entri tema (future) atau tambahkan kunci di FEATURE_SETS.
+ */
+const DEFAULT_FEATURES = {
+  quote: true,
+  story: { enabled: true, withPhoto: false },
+  events: { enabled: true, max: 3 },
+  gallery: true,
+  banks: true,
+  music: true,
+  qris: true,
+  dressCode: true,
+  streaming: true,
+  wishlist: true,
+  backdrop: true,
+  textColor: true,
+  frameImage: true,
+}
+
+const FEATURE_SETS = {
+  // Surat cinta / kapsul kenangan — tanpa acara & bank
+  'memory-capsule': {
+    ...DEFAULT_FEATURES,
+    story: { enabled: true, withPhoto: false },
+    events: { enabled: false, max: 0 },
+    banks: false,
+    qris: false,
+    dressCode: false,
+    streaming: false,
+    wishlist: false,
+    backdrop: false,
+    textColor: false,
+    frameImage: false,
+  },
+  'modern-editorial-letter': {
+    ...DEFAULT_FEATURES,
+    story: { enabled: true, withPhoto: false },
+    events: { enabled: false, max: 0 },
+    banks: false,
+    qris: false,
+    dressCode: false,
+    streaming: false,
+    wishlist: false,
+    backdrop: false,
+    textColor: false,
+    frameImage: false,
+  },
+  'cinematic-love-letter': {
+    ...DEFAULT_FEATURES,
+    story: { enabled: true, withPhoto: false },
+    events: { enabled: false, max: 0 },
+    banks: false,
+    qris: false,
+    dressCode: false,
+    streaming: false,
+    wishlist: false,
+    backdrop: false,
+    textColor: false,
+    frameImage: false,
+  },
+  'royal-bunny': {
+    ...DEFAULT_FEATURES,
+    story: { enabled: true, withPhoto: true },
+    dressCode: false,
+    streaming: false,
+    wishlist: false,
+    backdrop: false,
+    textColor: false,
+    frameImage: false,
+  },
+  'art-jawa-biru': {
+    ...DEFAULT_FEATURES,
+    story: { enabled: true, withPhoto: true },
+    dressCode: true,
+    streaming: false,
+    wishlist: false,
+    backdrop: false,
+    textColor: false,
+    frameImage: false,
+  },
+  boarding: {
+    ...DEFAULT_FEATURES,
+    quote: false,
+    story: { enabled: false },
+    events: { enabled: true, max: 2 },
+    heroImage: true,
+    gallery: false,
+    dressCode: false,
+    streaming: false,
+    wishlist: false,
+    backdrop: false,
+    textColor: false,
+    frameImage: false,
+  },
+  'adat-jawa': {
+    ...DEFAULT_FEATURES,
+    story: { enabled: true, withPhoto: false },
+    dressCode: false,
+    streaming: false,
+    wishlist: false,
+    backdrop: false,
+    textColor: false,
+    frameImage: false,
+  },
+  attari: {
+    ...DEFAULT_FEATURES,
+    story: { enabled: false },
+    dressCode: false,
+    streaming: false,
+    wishlist: false,
+    backdrop: false,
+    textColor: false,
+    frameImage: false,
+  },
 }
 
 export function getThemeFeatures(themeOrId) {
   const theme = typeof themeOrId === 'string' ? getTheme(themeOrId) : (themeOrId || themes[0])
   const layout = theme.layout || 'classic'
-
-  if (layout === 'memory-capsule' || layout === 'modern-editorial-letter' || layout === 'cinematic-love-letter') {
-    return {
-      quote: true,
-      story: { enabled: true, withPhoto: false },
-      events: { enabled: false, max: 0 },
-      gallery: true,
-      banks: false,
-      music: true,
-      qris: false,
-      dressCode: false,
-      streaming: false,
-      wishlist: false,
-      backdrop: false,
-      textColor: false,
-      frameImage: false,
-    }
-  }
-
-  if (layout === 'royal-bunny') {
-    return {
-      quote: true,
-      story: { enabled: true, withPhoto: true },
-      events: { enabled: true, max: 3 },
-      gallery: true,
-      banks: true,
-      music: true,
-      qris: true,
-      dressCode: false,
-      streaming: false,
-      wishlist: false,
-      backdrop: false,
-      textColor: false,
-      frameImage: false,
-    }
-  }
-
-  // Fitur khusus Art Jawa Biru
-  if (layout === 'art-jawa-biru') {
-    return {
-      quote: true,
-      story: { enabled: true, withPhoto: true },
-      events: { enabled: true, max: 3 },
-      gallery: true,
-      banks: true,
-      music: true,
-      qris: true,
-      dressCode: true,
-      streaming: false,
-      wishlist: false,
-      backdrop: false,
-      textColor: false,
-      frameImage: false,
-    }
-  }
-
-  // Fitur khusus Boarding Pass
-  if (layout === 'boarding') {
-    return {
-      quote: false,
-      story: { enabled: false },
-      events: { enabled: true, max: 2 },
-      heroImage: true,
-      gallery: false,
-      banks: true,
-      music: true,
-      qris: true,
-      dressCode: false,
-      streaming: false,
-      wishlist: false,
-      backdrop: false,
-      textColor: false,
-      frameImage: false,
-    }
-  }
-
-  // Fitur khusus Adat Jawa Klasik
-  if (layout === 'adat-jawa') {
-    return {
-      quote: true,
-      story: { enabled: true, withPhoto: false },
-      events: { enabled: true, max: 3 },
-      gallery: true,
-      banks: true,
-      music: true,
-      qris: true,
-      dressCode: false,
-      streaming: false,
-      wishlist: false,
-      backdrop: false,
-      textColor: false,
-      frameImage: false,
-    }
-  }
-
-  // Fitur khusus Attari Elegance
-  if (layout === 'attari') {
-    return {
-      quote: true,
-      story: { enabled: false },
-      events: { enabled: true, max: 3 },
-      gallery: true,
-      banks: true,
-      music: true,
-      qris: true,
-      dressCode: false,
-      streaming: false,
-      wishlist: false,
-      backdrop: false,
-      textColor: false,
-      frameImage: false,
-    }
-  }
-
-  // Default untuk tema klasik / floral / minimalis lainnya
-  return {
-    quote: true,
-    story: { enabled: true, withPhoto: false },
-    events: { enabled: true, max: 3 },
-    gallery: true,
-    banks: true,
-    music: true,
-    qris: true,
-    dressCode: true,
-    streaming: true,
-    wishlist: true,
-    backdrop: true,
-    textColor: true,
-    frameImage: true,
-  }
+  // Pilih set: layout eksplisit → default klasik. Override per tema (future)
+  // bisa lewat theme.features yang di-merge di sini.
+  return { ...DEFAULT_FEATURES, ...(FEATURE_SETS[layout] || {}), ...(theme.features || {}) }
 }
 
 export const demos = {

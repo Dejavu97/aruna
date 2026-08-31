@@ -195,22 +195,22 @@ classDiagram
 
 ## 6. THEME ARCHITECTURE: UNIFIED VS ISOLATED
 
-Themes in ByAruna are structured in two tiers:
+Themes in ByAruna are structured in two tiers, dispatched via **`src/invitation/themeRegistry.js`**:
 
-### Tier 1: Unified Standard Layouts (`theme.layout === 'classic' | 'modern' | 'garden' | 'noir' | 'islamic' | 'batik'`)
-- Managed by `src/invitation/Invitation.jsx`.
-- Controlled purely by CSS Custom Properties (`--bg`, `--paper`, `--fg`, `--muted`, `--accent`, `--display`, `--script`, `--body`).
+### Registry Dispatch (Fase 2 refactor — WAJIB dibaca)
+- `src/invitation/Invitation.jsx` TIDAK lagi berisi if-berantai. Dispatch: `getThemeComponent(theme.layout) || getThemeComponent(theme.id) || getThemeComponent(data?.themeId)` → `StandardInvitation` sebagai fallback.
+- Komponen terisolasi didaftarkan via `registerThemeComponent(layout, component)` di bagian atas `Invitation.jsx` (11 entri, termasuk alias legacy `jawa-biru`).
+- **Menambah tema terisolasi baru = 3 langkah:** (1) entri di `src/data/themes.js`, (2) komponen `src/invitation/Theme<Nama>.jsx` + CSS ber-prefix, (3) satu baris `registerThemeComponent(...)`.
+
+### Tier 1: Unified Standard Layouts (`layout` ∈ `classic | modern | garden | noir | islamic | batik | editorial | memory-capsule`)
+- Dikelola `StandardInvitation` di `src/invitation/Invitation.jsx` (satu komponen, CSS vars).
+- Konfigurasi form/fitur dari DATA: `getFormMode()` = `FORM_BASES[eventType]` + `theme.formOverrides`; `getThemeFeatures()` = `DEFAULT_FEATURES` + `FEATURE_SETS[layout]` + `theme.features`. **Jangan menambah if per tema** — tambahkan `formOverrides`/`features` di entri tema.
 - Safe to customize via Theme Studio.
 
-### Tier 2: Isolated Bespoke Layouts (`theme.layout === 'royal-bunny' | 'art-jawa-biru' | 'adat-jawa' | 'wedding-gazette' | 'boarding' | 'attari'`)
-- Each theme is completely self-contained in its dedicated component file:
-  - `src/invitation/ThemeRoyalBunny.jsx` + `ThemeRoyalBunny.css`
-  - `src/invitation/ThemeArtJawaBiru.jsx` + `ThemeArtJawaBiru.css`
-  - `src/invitation/ThemeAdatJawa.jsx` + `ThemeAdatJawa.css`
-  - `src/invitation/ThemeWeddingGazette.jsx` + `ThemeWeddingGazette.css`
-  - `src/invitation/BoardingInvitation.jsx`
-  - `src/invitation/AttariInvitation.jsx`
-- **Isolation Rule:** All CSS classes MUST be scoped with theme prefixes (e.g. `.rb-`, `.jb-`, `.jw-`, `.gz-`) to eliminate cross-theme style contamination.
+### Tier 2: Isolated Bespoke Layouts (`kejora | modern-editorial-letter | cinematic-love-letter | cinematic-minimal | royal-bunny | adat-jawa | art-jawa-biru | attari | boarding | wedding-gazette`)
+- Self-contained di `src/invitation/Theme<Nama>.jsx` + CSS (semua tema, termasuk yang dulu di `src/themes/`, kini SATU folder: `src/invitation/`).
+- `themeRegistry.js` + `themeContract.js` juga tinggal di `src/invitation/`.
+- **Isolation Rule:** CSS classes wajib ber-prefix theme (`.kj-`, `.rb-`, `.jb-`, `.jw-`, `.gz-`, dll) untuk mencegah kontaminasi lintas tema.
 
 ---
 
@@ -320,27 +320,28 @@ erDiagram
      collection: 'premium',
      cover: '/themes/emerald-cover.jpg',
      opener: 'THE WEDDING OF',
+     // OPSIONAL: field form beda dari base eventType-nya
+     formOverrides: { openCta: 'GAS KANAN' },
    }
    ```
 2. **Create Template Component `src/invitation/ThemeEmeraldLuxury.jsx`:**
    - Import namespaced CSS `./ThemeEmeraldLuxury.css`.
-   - Accept `{ data, guest }`.
+   - Accept `{ data, guest, preview, theme }`.
    - Integrate `addRsvp` and `addWish` from `../lib/api`.
    - Use `safeUrl` for external links.
-3. **Register in `src/invitation/Invitation.jsx`:**
+3. **Register in the registry (top of `src/invitation/Invitation.jsx`):**
    ```jsx
-   if (theme.layout === 'emerald-luxury') {
-     return <ThemeEmeraldLuxury data={data} guest={guest} />
-   }
+   registerThemeComponent('emerald-luxury', ThemeEmeraldLuxury)
    ```
+   JANGAN menambah `if (theme.layout === ...)` baru — dispatch sudah lewat `themeRegistry.js`.
 
 ### 🎈 How to Create a New Event Type (e.g. Khitanan / Engagement)
-1. **Update `getFormMode` in `src/data/themes.js`:**
-   Add `if (eventType === 'khitanan') { ... }` with specialized field labels and defaults.
+1. **Add a base mode in `src/data/themes.js`:**
+   Tambahkan kunci baru di `FORM_BASES` (field visibility, labels, placeholders, default event sessions) — `getFormMode()` otomatis memakainya untuk `eventType` tersebut. JANGAN menambah `if (eventType === ...)` baru.
 2. **Update `eventPackages` in `src/data/site.js`:**
-   Define tier packages and pricing for `khitanan`.
+   Define tier packages and pricing for the new event type.
 3. **Update `document.title` and WhatsApp helpers:**
-   Add `'khitanan'` case in `InvitationPage.jsx`, `CustomDomainPage.jsx`, and `Manage.jsx`.
+   Add the new eventType case in `InvitationPage.jsx`, `CustomDomainPage.jsx`, and `Manage.jsx`.
 
 ---
 

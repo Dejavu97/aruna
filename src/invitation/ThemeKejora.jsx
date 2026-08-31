@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
 import { Volume2, VolumeX, MapPin, Copy, Check } from 'lucide-react'
 import { addRsvp, addWish } from '../lib/api'
 import { formatLongDate, formatTime, safeUrl, countdownParts } from '../lib/utils'
@@ -201,6 +201,34 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
   const daysLeft = count ? count.d + count.h / 24 : 0
   const illumPct = count?.done ? 100 : Math.max(12, Math.min(100, Math.round((1 - daysLeft / totalDays) * 100)))
 
+  /* ====== PELAT ATLAS v5 ====== */
+  const [platesIn, setPlatesIn] = useState(false)
+  const plateRef = useRef(null)
+  useEffect(() => {
+    if (!open || platesIn || !plateRef.current) return undefined
+    const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setPlatesIn(true)), { threshold: 0.3 })
+    io.observe(plateRef.current)
+    return () => io.disconnect()
+  }, [open, platesIn])
+
+  const storyRootRef = useRef(null)
+  const [storyIn, setStoryIn] = useState(false)
+  useEffect(() => {
+    if (!open || storyIn || !storyRootRef.current) return undefined
+    const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setStoryIn(true)), { threshold: 0.12 })
+    io.observe(storyRootRef.current)
+    return () => io.disconnect()
+  }, [open, storyIn])
+
+  const galleryRef = useRef(null)
+  const [galleryIn, setGalleryIn] = useState(false)
+  useEffect(() => {
+    if (!open || galleryIn || !galleryRef.current) return undefined
+    const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setGalleryIn(true)), { threshold: 0.08 })
+    io.observe(galleryRef.current)
+    return () => io.disconnect()
+  }, [open, galleryIn])
+
   /* ====== RASI TAMU v3 ====== */
   const [activeSec, setActiveSec] = useState('ayat')
   const wishCount = (wishesList || []).length
@@ -250,6 +278,25 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
     const t = setTimeout(() => document.getElementById('kj-sec-penutup')?.classList.add('is-dawn'), 2600)
     return () => clearTimeout(t)
   }, [closeLive])
+
+  const [secIn, setSecIn] = useState({})
+  useEffect(() => {
+    if (!open) return undefined
+    const els = document.querySelectorAll('.kj-column > .kj-section')
+    if (!els.length) return undefined
+    const io = new IntersectionObserver((es) => {
+      es.forEach((e) => {
+        if (e.isIntersecting) {
+          const id = e.target.id
+          setSecIn((s) => (s[id] ? s : { ...s, [id]: true }))
+          io.unobserve(e.target)
+        }
+      })
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' })
+    els.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   const railSecs = [
     ['ayat', 'Ayat'], ['mempelai', 'Mempelai'], ['story', 'Kisah'], ['acara', 'Acara'], ['purnama', 'Purnama'],
@@ -308,6 +355,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
   }
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="kj-world" ref={worldRef}>
       {/* ============ LANGIT — satu dunia tetap ============ */}
       <div className="kj-sky" aria-hidden="true">
@@ -406,7 +454,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
           </nav>
 
           {/* ============ AYAT ============ */}
-          <section id="kj-sec-ayat" className="kj-section">
+          <section id="kj-sec-ayat" className={`kj-section ${secIn['kj-sec-ayat'] ? 'is-in' : ''}`}>
             <Reveal>
               <CrescentIcon />
               <p className="kj-verse-text">
@@ -417,14 +465,16 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
           </section>
 
           {/* ============ MEMPELAI ============ */}
-          <section id="kj-sec-mempelai" className="kj-section">
+          <section id="kj-sec-mempelai" className={`kj-section ${secIn['kj-sec-mempelai'] ? 'is-in' : ''}`}>
             <Reveal>
               <SectionHead kicker="Dua Bintang" title="Mempelai" />
-              <div className="kj-couple">
+              <div className={`kj-couple ${platesIn ? 'is-plated' : ''}`} ref={plateRef}>
                 <div className="kj-couple-row">
-                  <div className="kj-person">
+                  <div className="kj-person kj-person-a">
+                  <span className="kj-orbit-ring" aria-hidden="true" />
                     <div className="kj-person-frame">
                       <img src={bride.photo || '/assets/local/bride_bouquet.jpg'} alt={bride.nick || 'Mempelai wanita'} loading="lazy" />
+                      <span className="kj-plate-sheen" aria-hidden="true" />
                     </div>
                     <p className="kj-person-nick">{bride.nick}</p>
                     <p className="kj-person-full">{bride.full}</p>
@@ -436,9 +486,11 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
                       <div className="kj-couple-line" />
                     </div>
                   )}
-                  <div className="kj-person">
+                  <div className="kj-person kj-person-b">
+                    <span className="kj-orbit-ring" aria-hidden="true" />
                     <div className="kj-person-frame">
                       <img src={groom.photo || '/assets/local/groom_suit.jpg'} alt={groom.nick || 'Mempelai pria'} loading="lazy" />
+                      <span className="kj-plate-sheen" aria-hidden="true" />
                     </div>
                     <p className="kj-person-nick">{groom.nick}</p>
                     <p className="kj-person-full">{groom.full}</p>
@@ -451,14 +503,14 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
 
           {/* ============ STORY — PETA LANGIT ============ */}
           {story.length > 0 && (
-            <section id="kj-sec-story" className="kj-section">
+            <section id="kj-sec-story" className={`kj-section ${secIn['kj-sec-story'] ? 'is-in' : ''}`}>
               <Reveal>
                 <SectionHead kicker="Peta Langit Perjalanan" title="Constellation of Us" />
-                <div className="kj-constellation">
+                <div className={`kj-constellation ${storyIn ? 'is-lit' : ''}`} ref={storyRootRef}>
                   {story.map((s, i) => (
-                    <div className="kj-const-item" key={i}>
-                      <Reveal delay={i * 0.08}>
-                        <span className="kj-const-star">{i + 1}</span>
+                    <div className="kj-const-item" key={i} style={{ '--i': i }}>
+                      <Reveal delay={0.62 + i * 0.28}>
+                        <span className="kj-const-star">{i + 1}<i className="kj-star-spark" aria-hidden="true" /></span>
                         <p className="kj-const-year">{s.year}</p>
                         <h3 className="kj-const-title">{s.title}</h3>
                         <p className="kj-const-body">{s.body}</p>
@@ -474,7 +526,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
           )}
 
           {/* ============ ACARA — PELAT ASTRONOMI ============ */}
-          <section id="kj-sec-acara" className="kj-section">
+          <section id="kj-sec-acara" className={`kj-section ${secIn['kj-sec-acara'] ? 'is-in' : ''}`}>
             <Reveal>
               <SectionHead kicker="Rangkaian Malam" title="Acara" />
               <div className="kj-arm-stage" aria-hidden="true">
@@ -516,7 +568,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
           </section>
 
           {/* ============ COUNTDOWN — MENUJU PURNAMA ============ */}
-          <section id="kj-sec-purnama" className="kj-section">
+          <section id="kj-sec-purnama" className={`kj-section ${secIn['kj-sec-purnama'] ? 'is-in' : ''}`}>
             <Reveal>
               <SectionHead kicker="Menuju Purnama" title="Hitung Malam" />
               <div className="kj-moonface-wrap">
@@ -550,7 +602,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
 
           {/* ============ GALERI — ALBUM PURNAMA ============ */}
           {gallery.length > 0 && (
-            <section id="kj-sec-galeri" className="kj-section">
+            <section id="kj-sec-galeri" className={`kj-section ${secIn['kj-sec-galeri'] ? 'is-in' : ''}`} ref={galleryRef}>
               <Reveal>
                 <SectionHead kicker="Album Purnama" title="Galeri" />
                 <div
@@ -560,25 +612,25 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
                   onPointerUp={orrPointerUp}
                   onPointerLeave={orrPointerUp}
                 >
-                  <div className="kj-orr-field" style={{ '--orr-a': `${orrAngle}deg` }}>
-                    <div className="kj-orr-track" />
-                    <div className="kj-orr-track t2" />
-                    <div className="kj-orr-moon" />
-                    {gallery.map((src, i) => (
-                      <div
-                        className="kj-orr-item"
-                        key={i}
-                        style={{ '--i-angle': `${(360 / Math.max(1, gallery.length)) * i}deg`, '--i-z': `${i % 2 ? 18 : 0}px` }}
-                      >
+                  <div className={`kj-orr-field ${galleryIn ? 'is-developed' : ''}`} style={{ '--orr-a': `${orrAngle}deg` }}>
+                      <div className="kj-orr-track" />
+                      <div className="kj-orr-track t2" />
+                      <div className="kj-orr-moon" />
+                      {gallery.map((src, i) => (
+                        <div
+                          className="kj-orr-item"
+                          key={i}
+                          style={{ '--i-angle': `${(360 / Math.max(1, gallery.length)) * i}deg`, '--i-z': `${i % 2 ? 18 : 0}px`, '--gi': i }}
+                        >
                         <img src={src} alt={`Kenangan ${i + 1}`} loading="lazy" />
                       </div>
                     ))}
                   </div>
                   <p className="kj-orr-hint">Geser untuk memutar langit</p>
                 </div>
-                <div className="kj-gallery">
+                <div className={`kj-gallery ${galleryIn ? 'is-developed' : ''}`}>
                   {gallery.map((src, i) => (
-                    <div className="kj-gallery-item" key={i}>
+                    <div className="kj-gallery-item" key={i} style={{ '--gi': i }}>
                       <img src={src} alt={`Kenangan ${i + 1}`} loading="lazy" />
                     </div>
                   ))}
@@ -589,7 +641,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
 
           {/* ============ TANDA KASIH ============ */}
           {banks.length > 0 && (
-            <section id="kj-sec-amplop" className="kj-section">
+            <section id="kj-sec-amplop" className={`kj-section ${secIn['kj-sec-amplop'] ? 'is-in' : ''}`}>
               <Reveal>
                 <SectionHead kicker="Tanda Kasih" title="Amplop Digital" />
                 {banks.map((b, i) => (
@@ -612,7 +664,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
           )}
 
           {/* ============ RSVP + DOA ============ */}
-          <section id="kj-sec-doa" className="kj-section">
+          <section id="kj-sec-doa" className={`kj-section ${secIn['kj-sec-doa'] ? 'is-in' : ''}`}>
             <Reveal>
               <SectionHead kicker="Kehadiran & Doa" title="Hening Bersaksi" />
               {!rsvpSent ? (
@@ -760,5 +812,6 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
         </main>
       )}
     </div>
+    </MotionConfig>
   )
 }

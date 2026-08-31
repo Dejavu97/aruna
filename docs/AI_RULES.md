@@ -14,10 +14,11 @@ Before touching any file in this repository, you MUST perform the following 5 ch
    - Always review [`docs/ARCHITECTURE_CONTRACT.md`](./ARCHITECTURE_CONTRACT.md) to understand current schemas, data flow, and protected files.
 2. **Identify Affected Contracts:**
    - Are you touching a data model? (`bride`, `groom`, `events`, `banks`, `story`).
-   - If yes, verify that all 7 isolated theme templates still receive their expected fields with safe optional chaining (`?.`).
+   - If yes, verify that all isolated theme templates still receive their expected fields with safe optional chaining (`?.`).
 3. **Identify Breaking-Change Risk:**
-   - Changing `getFormMode()` in `themes.js` affects `WeddingForm.jsx`, `Edit.jsx`, and all invitation headers.
+   - Changing `getFormMode()`/`FORM_BASES` in `themes.js` affects `WeddingForm.jsx`, `Edit.jsx`, and all invitation headers. Per-theme deviation = `formOverrides` di entri tema, BUKAN if baru.
    - Changing `getPackagesByEventType()` in `site.js` affects `Order.jsx`, `Success.jsx`, `Dashboard.jsx`, and `Admin.jsx`.
+   - Theme dispatch is via `src/invitation/themeRegistry.js` — JANGAN menambah if-chain di `Invitation.jsx`; daftarkan lewat `registerThemeComponent()`.
 4. **Never Modify Protected Security Architecture:**
    - Do NOT loosen Firestore Rules (`firestore.rules`).
    - Do NOT remove `safeUrl()` from link rendering.
