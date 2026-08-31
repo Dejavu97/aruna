@@ -1,31 +1,18 @@
 import { adminDb } from './_firebase.js';
-import { getAuth } from 'firebase-admin/auth';
 
 // Admin platform tunggal (sinkron dengan loginAdmin di src/lib/api.js)
-const ADMIN_EMAIL = 'admin@byaruna.my.id';
 // Password bootstrap bawaan — hanya berlaku jika settings/admin_auth BELUM ada.
-// Setelah admin menyimpan password kustom (login pertama melakukan bootstrap),
-// nilai default ini mati permanen di server.
 const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
 
 async function isAdminRequest(body) {
-  // 1. Jalur proper: Firebase ID token dari sesi login email admin
-  if (body.idToken) {
-    try {
-      const decoded = await getAuth().verifyIdToken(body.idToken);
-      if (decoded.email === ADMIN_EMAIL) return true;
-    } catch (err) {
-      console.warn('ID token verification failed:', err.message);
-    }
-  }
-
-  // 2. Jalur admin password-kustom: bandingkan dengan password tersimpan
+  // Jalur admin password-kustom: bandingkan dengan password tersimpan.
+  // (Admin sesi Firebase tidak lewat sini — dia tulis langsung, rules
+  // Kasus A/C yang mengizinkan.)
   if (body.adminKey) {
     try {
       const authSnap = await adminDb.collection('settings').doc('admin_auth').get();
       const storedPass = authSnap.exists ? authSnap.data()?.password : null;
       if (storedPass && body.adminKey === storedPass) return true;
-      // Bootstrap: belum ada password tersimpan → terima default bawaan saja
       if (!storedPass && BOOTSTRAP_PASSWORDS.includes(body.adminKey)) return true;
     } catch (authErr) {
       console.warn('Admin password check error:', authErr);
