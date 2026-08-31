@@ -1,4 +1,39 @@
 import { adminDb } from './_firebase.js';
+import { getAuth } from 'firebase-admin/auth';
+
+// Admin platform tunggal (sinkron dengan loginAdmin di src/lib/api.js)
+const ADMIN_EMAIL = 'admin@byaruna.my.id';
+// Password bootstrap bawaan — hanya berlaku jika settings/admin_auth BELUM ada.
+// Setelah admin menyimpan password kustom (login pertama melakukan bootstrap),
+// nilai default ini mati permanen di server.
+const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
+
+async function isAdminRequest(body) {
+  // 1. Jalur proper: Firebase ID token dari sesi login email admin
+  if (body.idToken) {
+    try {
+      const decoded = await getAuth().verifyIdToken(body.idToken);
+      if (decoded.email === ADMIN_EMAIL) return true;
+    } catch (err) {
+      console.warn('ID token verification failed:', err.message);
+    }
+  }
+
+  // 2. Jalur admin password-kustom: bandingkan dengan password tersimpan
+  if (body.adminKey) {
+    try {
+      const authSnap = await adminDb.collection('settings').doc('admin_auth').get();
+      const storedPass = authSnap.exists ? authSnap.data()?.password : null;
+      if (storedPass && body.adminKey === storedPass) return true;
+      // Bootstrap: belum ada password tersimpan → terima default bawaan saja
+      if (!storedPass && BOOTSTRAP_PASSWORDS.includes(body.adminKey)) return true;
+    } catch (authErr) {
+      console.warn('Admin password check error:', authErr);
+    }
+  }
+
+  return false;
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -6,33 +41,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { slug, editKey, adminKey, payload } = req.body
+    const { slug, editKey, payload } = req.body
 
     if (!slug || !payload || typeof payload !== 'object') {
       return res.status(400).json({ error: 'Slug and valid payload are required' })
     }
 
-    let isAuthorized = false
-    let isAdmin = false
+    const isAdmin = await isAdminRequest(req.body)
+    let isAuthorized = isAdmin
 
-    // 1. Cek otorisasi Admin jika adminKey disediakan
-    if (adminKey) {
-      try {
-        const authSnap = await adminDb.collection('settings').doc('admin_auth').get()
-        const storedPass = authSnap.exists ? authSnap.data()?.password : null
-        if (storedPass && adminKey === storedPass) {
-          isAuthorized = true
-          isAdmin = true
-        } else if (['aruna2026', 'byaruna2026', 'firebase-admin'].includes(adminKey)) {
-          isAuthorized = true
-          isAdmin = true
-        }
-      } catch (authErr) {
-        console.warn('Admin check error:', authErr)
-      }
-    }
-
-    // 2. Cek otorisasi EditKey pelanggan jika bukan admin
+    // Otorisasi pelanggan via editKey (brankas private_keys, dibaca Admin SDK)
     if (!isAuthorized && editKey) {
       const secretRef = adminDb.collection('private_keys').doc(slug)
       const secretSnap = await secretRef.get()
@@ -45,7 +63,7 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Akses ditolak: Kunci rahasia (editKey/adminKey) tidak valid.' })
     }
 
-    // 3. Sanitasi payload: Pelanggan non-admin DILARANG memanipulasi status pembayaran atau slug
+    // Sanitasi payload: Pelanggan non-admin DILARANG memanipulasi status pembayaran atau slug
     const safePayload = { ...payload }
     delete safePayload.slug
     delete safePayload.orderCode
@@ -57,7 +75,7 @@ export default async function handler(req, res) {
       delete safePayload.ownerUid
     }
 
-    // 4. Update data undangan
+    // Update data undangan
     const docRef = adminDb.collection('invitations').doc(slug)
     await docRef.update({
       ...safePayload,

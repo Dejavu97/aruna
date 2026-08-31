@@ -175,7 +175,7 @@ export async function loginAdmin(password) {
   // 3. JIKA SUDAH PERNAH GANTI PASSWORD: Wajib menggunakan password baru
   if (customPassword) {
     if (password === customPassword) {
-      setAdminKey('custom-admin-key')
+      setAdminKey(password) // dikirim ke serverless untuk verifikasi server-side
       return { key: 'custom-admin-key' }
     }
     throw new Error('Kata sandi admin salah. Silakan periksa kembali kata sandi kustom Anda.')
@@ -183,7 +183,7 @@ export async function loginAdmin(password) {
 
   // 4. Default password HANYA berlaku jika Anda BELUM PERNAH mengganti kata sandi
   if (password === 'aruna2026' || password === 'byaruna2026') {
-    setAdminKey('firebase-admin')
+    setAdminKey(password)
     return { key: 'local-admin-key' }
   }
 
@@ -206,6 +206,8 @@ export async function changeAdminPassword(newPassword) {
   try {
     const docRef = doc(db, 'settings', 'admin_auth')
     await setDoc(docRef, { password: cleanPass, updatedAt: Date.now() })
+    // Sesuai-kan sesi berjalan agar kredensial yang dikirim ke serverless tetap valid
+    setAdminKey(cleanPass)
   } catch (err) {
     console.warn('Firestore changeAdminPassword error:', err)
   }
@@ -353,9 +355,21 @@ export async function fetchAdminInvitations() {
   })
 }
 
+// Kredensial admin untuk serverless: ID token (sesi Firebase email admin)
+// atau password tersimpan (sesi password-kustom tanpa Firebase session).
+async function getAdminCredentials() {
+  if (auth.currentUser) {
+    try {
+      return { idToken: await auth.currentUser.getIdToken() }
+    } catch {}
+  }
+  const key = getAdminKey()
+  return key ? { adminKey: key } : {}
+}
+
 export async function updateInvitation(slug, payload, editKey) {
-  // 1. Jika mode admin, langsung tulis ke Firestore
-  if (getAdminKey()) {
+  // 1. Admin dengan sesi Firebase: tulis langsung (rules Kasus A/C mengizinkan)
+  if (auth.currentUser && getAdminKey()) {
     try {
       const docRef = doc(db, 'invitations', slug)
       await updateDoc(docRef, payload)
@@ -365,12 +379,13 @@ export async function updateInvitation(slug, payload, editKey) {
     }
   }
 
-  // 2. Coba lewat jalur API Serverless backend jika tersedia
+  // 2. Jalur serverless (Admin SDK) — admin password-kustom & pelanggan editKey
   try {
+    const creds = await getAdminCredentials()
     const res = await fetch('/api/update-invitation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, editKey, payload })
+      body: JSON.stringify({ slug, editKey, payload, ...creds })
     })
     if (res.ok) {
       const data = await res.json()
@@ -393,9 +408,9 @@ export async function updateInvitation(slug, payload, editKey) {
 
 export async function setInvitationStatus(slug, status) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  const docRef = doc(db, 'invitations', slug)
-  await updateDoc(docRef, { status })
-  return { success: true }
+  // Lewat updateInvitation agar kredensial benar (password-kustom tidak punya
+  // Firebase session dan rules baru menutup tulisan anonim).
+  return updateInvitation(slug, { status }, '')
 }
 
 export async function deleteInvitation(slug) {
@@ -405,10 +420,11 @@ export async function deleteInvitation(slug) {
 
   // 1. Jalur Utama Serverless API (Firebase Admin SDK - Menghapus tanpa terhambat aturan permissions)
   try {
+    const creds = await getAdminCredentials()
     const res = await fetch('/api/delete-invitation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, adminKey: getAdminKey() })
+      body: JSON.stringify({ slug, ...creds })
     })
     if (res.ok) {
       const data = await res.json()

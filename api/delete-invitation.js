@@ -1,4 +1,36 @@
 import { adminDb } from './_firebase.js';
+import { getAuth } from 'firebase-admin/auth';
+
+// Admin platform tunggal (sinkron dengan loginAdmin di src/lib/api.js)
+const ADMIN_EMAIL = 'admin@byaruna.my.id';
+// Password bootstrap bawaan — hanya berlaku jika settings/admin_auth BELUM ada.
+const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
+
+async function isAdminRequest(body) {
+  // 1. Jalur proper: Firebase ID token dari sesi login email admin
+  if (body.idToken) {
+    try {
+      const decoded = await getAuth().verifyIdToken(body.idToken);
+      if (decoded.email === ADMIN_EMAIL) return true;
+    } catch (err) {
+      console.warn('ID token verification failed:', err.message);
+    }
+  }
+
+  // 2. Jalur admin password-kustom: bandingkan dengan password tersimpan
+  if (body.adminKey) {
+    try {
+      const authSnap = await adminDb.collection('settings').doc('admin_auth').get();
+      const storedPass = authSnap.exists ? authSnap.data()?.password : null;
+      if (storedPass && body.adminKey === storedPass) return true;
+      if (!storedPass && BOOTSTRAP_PASSWORDS.includes(body.adminKey)) return true;
+    } catch (authErr) {
+      console.warn('Admin password check error:', authErr);
+    }
+  }
+
+  return false;
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -6,36 +38,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { slug, adminKey } = req.body
+    const { slug } = req.body
 
     if (!slug) {
       return res.status(400).json({ error: 'Slug is required' })
     }
 
-    if (!adminKey) {
-      return res.status(401).json({ error: 'Akses ditolak: Kunci otorisasi admin (adminKey) diperlukan.' })
-    }
-
-    // Validasi admin key terhadap Firestore settings atau default keys
-    let isAuthorized = false
-    try {
-      const authSnap = await adminDb.collection('settings').doc('admin_auth').get()
-      if (authSnap.exists && authSnap.data()?.password) {
-        const storedPass = authSnap.data().password
-        if (adminKey === storedPass || adminKey === 'custom-admin-key' || adminKey === 'firebase-admin') {
-          isAuthorized = true
-        }
-      }
-    } catch (authErr) {
-      console.warn('Error reading admin_auth:', authErr)
-    }
-
-    if (!isAuthorized) {
-      const defaultKeys = ['admin123', 'aruna2026', 'byaruna2026', 'firebase-admin', 'local-admin-key', 'custom-admin-key']
-      if (defaultKeys.includes(adminKey)) {
-        isAuthorized = true
-      }
-    }
+    const isAuthorized = await isAdminRequest(req.body)
 
     if (!isAuthorized) {
       return res.status(403).json({ error: 'Akses ditolak: Kunci otorisasi admin tidak valid.' })
