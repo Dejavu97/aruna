@@ -76,12 +76,15 @@ service cloud.firestore {
     // 5. PENGATURAN PLATFORM (/settings)
     // =========================================================================
     match /settings/{doc} {
-      // Read tetap terbuka: loginAdmin & banner pengumuman membaca dari klien.
-      // Write: SEMENTARA mengikuti perilaku lama (buka) demi alur admin sesi
-      // password-kustom yang tidak punya Firebase session. PENGETATAN P1:
-      // pindahkan save settings/vouchers lewat serverless (Admin SDK).
-      allow read: if true;
-      allow write: if true;
+      // Read publik untuk payment/announcement/packages/ads (dipakai form
+      // order & banner) — KECUALI admin_auth: password admin TIDAK BOLEH
+      // terbaca klien (login kini diverifikasi via /api/admin-login).
+      allow read: if doc != 'admin_auth';
+      // Write klien untuk settings operasional sementara tetap terbuka
+      // (admin password-kustom belum punya jalur serverless utk ini) —
+      // KECUALI admin_auth: overwrite dari klien = pembajakan admin.
+      // Pengetatan P1 lanjutan: pindahkan via serverless.
+      allow write: if doc != 'admin_auth';
     }
 
     // =========================================================================
