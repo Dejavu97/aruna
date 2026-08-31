@@ -311,6 +311,31 @@ export async function fetchInvitation(slug, editKey) {
   const docRef = doc(db, 'invitations', slug)
   const docSnap = await getDoc(docRef)
   if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
+
+  // Adopted (Fase 1e): akses edit pelanggan diverifikasi lewat serverless
+  // verify-key (Firebase Admin membaca brankas private_keys yang tertutup
+  // untuk klien). Sebelumnya kunci dipercaya mentah-mentah di sisi klien.
+  if (editKey && editKey !== 'admin-bypass' && !getAdminKey()) {
+    try {
+      const res = await fetch('/api/verify-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, editKey })
+      })
+      if (res.status === 403) throw new Error('Kunci rahasia salah.')
+    } catch (err) {
+      if (err.message === 'Kunci rahasia salah.') throw err
+      // Function tidak terjangkau (offline/dev) → fallback cek klien,
+      // perilaku sama seperti sebelum adopt (tidak lebih longgar dari rules).
+      console.warn('verify-key unreachable, fallback client check:', err)
+      const secretRef = doc(db, 'private_keys', slug)
+      const secretSnap = await getDoc(secretRef)
+      if (secretSnap.exists() && secretSnap.data().editKey !== editKey) {
+        throw new Error('Kunci rahasia salah.')
+      }
+    }
+  }
+
   return docSnap.data()
 }
 
@@ -393,18 +418,7 @@ export async function deleteInvitation(slug) {
     console.warn('Backend delete API notice:', apiErr)
   }
 
-  // 2. Jalur Express Local Server (saat development)
-  if (!deleted) {
-    try {
-      const res = await fetch(`/api/invitations/${slug}`, {
-        method: 'DELETE',
-        headers: { 'x-admin-key': getAdminKey() }
-      })
-      if (res.ok) deleted = true
-    } catch {}
-  }
-
-  // 3. Jalur Firestore Client SDK
+  // 2. Jalur Firestore Client SDK
   try {
     const docRef = doc(db, 'invitations', slug)
     await deleteDoc(docRef)
@@ -416,7 +430,7 @@ export async function deleteInvitation(slug) {
     }
   }
 
-  // 4. Bersihkan brankas private_keys
+  // 3. Bersihkan brankas private_keys
   try {
     const secretRef = doc(db, 'private_keys', slug)
     await deleteDoc(secretRef)
@@ -564,11 +578,6 @@ export async function fetchCustomTheme(id) {
     const found = local.find(t => t.id === id)
     if (found) return found
   } catch {}
-
-  try {
-    const res = await fetch(`/api/custom-themes/${id}`)
-    if (res.ok) return await res.json()
-  } catch {}
   return null
 }
 
@@ -624,10 +633,6 @@ export async function deleteCustomTheme(id) {
       deletedList.push(id)
       localStorage.setItem('aruna_deleted_custom_themes', JSON.stringify(deletedList))
     }
-  } catch {}
-
-  try {
-    await fetch(`/api/custom-themes/${id}`, { method: 'DELETE' })
   } catch {}
 
   return { success: true }
