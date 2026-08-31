@@ -42,32 +42,36 @@ export default function Admin() {
 
   if (!authed) {
     return (
-      <div className="bg-ivory min-h-screen font-body">
+      <div className="bg-ivory min-h-screen flex flex-col font-body">
         <SiteNav />
-        <main className="max-w-md mx-auto px-4 py-16">
-          <form onSubmit={onLogin} className="bg-paper border border-ink/15 p-6 rounded-sm shadow-xs space-y-4">
-            <div className="text-center space-y-1">
-              <Lock size={28} className="text-gold-deep mx-auto" />
-              <h1 className="font-display text-2xl font-bold text-ink">Panel Admin</h1>
-              <p className="text-xs text-stone">Masukkan kata sandi admin untuk melanjutkan.</p>
-            </div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Kata sandi admin"
-              className="w-full border border-ink/25 bg-ivory px-3 py-2.5 text-sm focus:outline-none focus:border-gold"
-            />
-            {error && (
-              <p className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-xs flex items-center gap-1.5">
-                <AlertCircle size={13} /> {error}
-              </p>
-            )}
-            <button type="submit" className="w-full bg-ink text-ivory py-2.5 text-xs uppercase tracking-widest font-bold hover:bg-gold-deep transition-colors">
-              Masuk
-            </button>
-          </form>
-        </main>
+        <section className="mx-auto max-w-md w-full px-5 py-20 flex-1">
+          <div className="bg-paper border border-ink/15 p-6 sm:p-8 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.28em] text-gold-deep font-semibold">Admin Panel</p>
+            <h1 className="mt-2 font-display text-3xl font-bold">Masuk Admin ByAruna</h1>
+            <p className="mt-2 text-xs text-stone leading-relaxed">
+              Gunakan kata sandi akun admin untuk mengelola pesanan, tema studio, dan voucher.
+            </p>
+            <form onSubmit={onLogin} className="mt-6 space-y-3">
+              <input
+                type="password"
+                placeholder="Kata sandi admin..."
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-ink/20 bg-transparent px-4 py-2.5 text-sm focus:outline-none focus:border-gold"
+                autoFocus
+                disabled={loading}
+              />
+              {error && <p className="text-xs text-red-600">✕ {error}</p>}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-ink text-ivory py-2.5 text-xs uppercase tracking-widest font-bold hover:bg-gold-deep transition-colors"
+              >
+                {loading ? 'Memverifikasi...' : 'Masuk Dashboard'}
+              </button>
+            </form>
+          </div>
+        </section>
         <SiteFooter />
       </div>
     )
@@ -84,7 +88,7 @@ export default function Admin() {
               <p className="text-xs uppercase tracking-[0.28em] text-gold-deep font-semibold">ByAruna Studio</p>
               <span className="bg-gold-deep/10 text-gold-deep text-[10px] px-2 py-0.5 font-semibold rounded-full">Super Admin</span>
             </div>
-            <h1 className="mt-1 font-display text-4xl font-bold tracking-tight">Admin &amp; Order Management</h1>
+            <h1 className="mt-1 font-display text-4xl font-bold tracking-tight">Admin &amp; Business Dashboard</h1>
           </div>
 
           <div className="flex items-center gap-3">
