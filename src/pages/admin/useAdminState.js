@@ -282,22 +282,6 @@ export function useAdminState() {
     if (authed) load()
   }, [authed])
 
-  async function onLogin(e) {
-    e.preventDefault()
-    if (!password) return
-    try {
-      setLoading(true)
-      setError('')
-      const res = await loginAdmin(password)
-      setAdminKey(res.key)
-      setAuthed(true)
-    } catch (err) {
-      console.error(err)
-      setError(err.message)
-      setLoading(false)
-    }
-  }
-
   // Calculate Business Analytics
   const analytics = useMemo(() => {
     const now = new Date().setHours(0, 0, 0, 0)
@@ -950,7 +934,6 @@ export function useAdminState() {
     newVoucherDiscount,
     newVoucherQuota,
     newVoucherType,
-    onLogin,
     open,
     openWhatsApp,
     openWhiteLabelModal,
