@@ -39,12 +39,11 @@ export default function ManageTamu({ composeMessage,
   setWaReminderTemplate,
   setWaTemplate,
   statusFilter,
-  tab,
   text,
   tidakCount,
   unconfirmedCount,
   waReminderTemplate,
-  waTemplate }) {
+  waTemplate  }) {
   return (
 
           <div className="grid gap-8">

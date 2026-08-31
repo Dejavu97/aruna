@@ -234,7 +234,6 @@ export default function Manage() {
           {tab === 'love_qr' && (
             <ManageLoveQr
             item={item}
-            tab={tab}
             />
           )}
           {tab === 'ringkas' && (
@@ -262,7 +261,6 @@ export default function Manage() {
             <ManageRsvp
             guests={guests}
             item={item}
-            tab={tab}
             text={text}
             />
           )}
@@ -280,7 +278,6 @@ export default function Manage() {
             setCheckInFilter={setCheckInFilter}
             setCheckInSearch={setCheckInSearch}
             setShowScanner={setShowScanner}
-            tab={tab}
             text={text}
             toggleCheckIn={toggleCheckIn}
             totalCheckedInPax={totalCheckedInPax}
@@ -295,7 +292,6 @@ export default function Manage() {
             replyingTo={replyingTo}
             setReplyText={setReplyText}
             setReplyingTo={setReplyingTo}
-            tab={tab}
             text={text}
             />
           )}
@@ -307,7 +303,6 @@ export default function Manage() {
             setCustomDomain={setCustomDomain}
             setError={setError}
             setItem={setItem}
-            tab={tab}
             text={text}
             />
           )}
@@ -340,7 +335,6 @@ export default function Manage() {
             setWaReminderTemplate={setWaReminderTemplate}
             setWaTemplate={setWaTemplate}
             statusFilter={statusFilter}
-            tab={tab}
             text={text}
             tidakCount={tidakCount}
             unconfirmedCount={unconfirmedCount}

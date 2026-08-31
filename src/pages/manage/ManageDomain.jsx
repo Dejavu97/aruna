@@ -7,8 +7,7 @@ export default function ManageDomain({ customDomain,
   setCustomDomain,
   setError,
   setItem,
-  tab,
-  text }) {
+  text  }) {
   return (
 
           <div className="border border-ink/10 bg-paper p-6">

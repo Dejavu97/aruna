@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { RefreshCw, Sparkles, Lock, AlertCircle, Layers, Tag, CreditCard, Settings } from 'lucide-react'
+import { RefreshCw, Sparkles, Lock, AlertCircle, Download, Layers, Tag, CreditCard, Settings } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { loginAdmin } from '../lib/api'
+import { loginAdmin, setAdminKey } from '../lib/api'
 import { useAdminState } from './admin/useAdminState'
 import { pickOrders, pickThemes, pickMonetization, pickSystem, pickModals } from './admin/pickers'
 import AdminMetrics from './admin/AdminMetrics'
@@ -15,7 +15,7 @@ import AdminModals from './admin/AdminModals'
 export default function Admin() {
   const s = useAdminState()
   const {
-    password, setPassword, authed, setAuthed, error, setError, loading,
+    password, setPassword, authed, setAuthed, error, setError, loading, handleExportCsv,
   } = s
 
   async function onLogin(e) {
@@ -78,19 +78,34 @@ export default function Admin() {
       <SiteNav />
       <main className="max-w-6xl mx-auto px-4 py-6">
         {/* Header Title & Logout */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-5 mb-6">
           <div>
-            <h1 className="font-display text-2xl sm:text-3xl font-bold text-ink flex items-center gap-2">
-              <Sparkles size={22} className="text-gold-deep" /> Admin Studio
-            </h1>
-            <p className="text-xs text-stone mt-1">Kelola pesanan, tema, monetisasi & sistem platform.</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs uppercase tracking-[0.28em] text-gold-deep font-semibold">ByAruna Studio</p>
+              <span className="bg-gold-deep/10 text-gold-deep text-[10px] px-2 py-0.5 font-semibold rounded-full">Super Admin</span>
+            </div>
+            <h1 className="mt-1 font-display text-4xl font-bold tracking-tight">Admin &amp; Order Management</h1>
           </div>
-          <button
-            onClick={() => { setAuthed(false); setPassword('') }}
-            className="border border-ink/20 px-3 py-1.5 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5 inline-flex items-center gap-1.5"
-          >
-            <Lock size={13} /> Keluar
-          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleExportCsv}
+              className="inline-flex items-center gap-1.5 border border-ink/20 bg-paper px-3.5 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5"
+            >
+              <Download size={14} /> Ekspor CSV
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAdminKey('')
+                setAuthed(false)
+              }}
+              className="border border-ink/20 px-3.5 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-ink/5"
+            >
+              Keluar
+            </button>
+          </div>
         </div>
 
         {s.mainTab === 'orders' && (

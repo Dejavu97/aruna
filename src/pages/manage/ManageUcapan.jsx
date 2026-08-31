@@ -8,8 +8,7 @@ export default function ManageUcapan({ handleReply,
   replyingTo,
   setReplyText,
   setReplyingTo,
-  tab,
-  text }) {
+  text  }) {
   return (
 
           <div className="border border-ink/10 bg-paper">

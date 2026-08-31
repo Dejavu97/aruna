@@ -21,10 +21,9 @@ export default function ManageCheckIn({ checkInFilter,
   setCheckInFilter,
   setCheckInSearch,
   setShowScanner,
-  tab,
   text,
   toggleCheckIn,
-  totalCheckedInPax }) {
+  totalCheckedInPax  }) {
   return (
 
           <div className="grid gap-6">

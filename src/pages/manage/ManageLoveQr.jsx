@@ -2,8 +2,7 @@ import LoveQRCardGenerator from '../../components/LoveQRCardGenerator'
 import { copyText } from '../../lib/utils'
 
 /** ManageLoveQr — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
-export default function ManageLoveQr({ item,
-  tab }) {
+export default function ManageLoveQr({ item  }) {
   return (
 
           <div className="space-y-6">
