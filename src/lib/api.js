@@ -149,51 +149,19 @@ export async function recordInvitationView(slug) {
 
 
 export async function loginAdmin(password) {
-  let customPassword = null
-
-  // 1. Check custom admin password in Firestore
-  try {
-    const docRef = doc(db, 'settings', 'admin_auth')
-    const snap = await getDoc(docRef)
-    if (snap.exists() && snap.data()?.password) {
-      customPassword = snap.data().password
-    }
-  } catch (err) {
-    console.warn('Firestore admin_auth fetch error:', err)
+  // Verifikasi pindah ke serverless (Fase 1e hardening): password TIDAK PERNAH
+  // dibaca klien dari Firestore — membandingkan di browser = kebocoran.
+  const res = await fetch('/api/admin-login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'login', password })
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Kata sandi admin salah.')
   }
-
-  // 2. Check custom password in localStorage as backup
-  if (!customPassword) {
-    try {
-      const localCustomPass = localStorage.getItem('aruna_admin_custom_password')
-      if (localCustomPass) {
-        customPassword = localCustomPass
-      }
-    } catch {}
-  }
-
-  // 3. JIKA SUDAH PERNAH GANTI PASSWORD: Wajib menggunakan password baru
-  if (customPassword) {
-    if (password === customPassword) {
-      setAdminKey(password) // dikirim ke serverless untuk verifikasi server-side
-      return { key: 'custom-admin-key' }
-    }
-    throw new Error('Kata sandi admin salah. Silakan periksa kembali kata sandi kustom Anda.')
-  }
-
-  // 4. Default password HANYA berlaku jika Anda BELUM PERNAH mengganti kata sandi
-  if (password === 'aruna2026' || password === 'byaruna2026') {
-    setAdminKey(password)
-    return { key: 'local-admin-key' }
-  }
-
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, 'admin@byaruna.my.id', password)
-    setAdminKey('firebase-admin')
-    return { key: userCredential.user.uid }
-  } catch (err) {
-    throw new Error('Kata sandi admin salah. Silakan periksa kembali kata sandi Anda.')
-  }
+  setAdminKey(password) // disimpan sebagai kredensial, diverifikasi server tiap operasi
+  return { key: data.mode === 'bootstrap' ? 'local-admin-key' : 'custom-admin-key' }
 }
 
 export async function changeAdminPassword(newPassword) {
@@ -204,17 +172,25 @@ export async function changeAdminPassword(newPassword) {
   }
 
   try {
-    const docRef = doc(db, 'settings', 'admin_auth')
-    await setDoc(docRef, { password: cleanPass, updatedAt: Date.now() })
+    const res = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'change', adminKey: getAdminKey(), newPassword: cleanPass })
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Gagal mengganti kata sandi.')
+    }
     // Sesuai-kan sesi berjalan agar kredensial yang dikirim ke serverless tetap valid
     setAdminKey(cleanPass)
+    try {
+      localStorage.removeItem('aruna_admin_custom_password')
+    } catch {}
   } catch (err) {
-    console.warn('Firestore changeAdminPassword error:', err)
+    if (err.message.startsWith('Kata sandi') || err.message.startsWith('Gagal')) throw err
+    console.warn('changeAdminPassword API error:', err)
+    throw new Error('Gagal mengganti kata sandi.')
   }
-
-  try {
-    localStorage.setItem('aruna_admin_custom_password', cleanPass)
-  } catch {}
 
   return { success: true }
 }
