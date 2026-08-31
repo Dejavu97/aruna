@@ -65,7 +65,6 @@ export default function PrintCardModal({ item, onClose }) {
   const [copied, setCopied] = useState(false)
   const [autoFilled, setAutoFilled] = useState(false)
 
-  if (!item) return null
 
   const fullUrl = invitationUrl(item.slug)
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(fullUrl)}&margin=10&format=png`
@@ -184,6 +183,8 @@ export default function PrintCardModal({ item, onClose }) {
       .map((t) => t.trim())
       .filter(Boolean)
   }, [tableMode, tablePrefix, tableStart, tableEnd, customTableListText])
+
+  if (!item) return null
 
   // Handle Photo & BG Upload
   async function handleImageUpload(type, e) {
