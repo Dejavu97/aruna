@@ -553,6 +553,7 @@ export function useManageState() {
     showPrintCardModal,
     showScanner,
     showStoryModal,
+    slug,
     stats,
     statusFilter,
     tab,
