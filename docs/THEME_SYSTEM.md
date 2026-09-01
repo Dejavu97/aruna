@@ -21,7 +21,7 @@
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                        THEME SYSTEM                         │
-│ ├── Isolated Layouts (`src/themes/` & `src/invitation/`)   │
+│ ├── Isolated Layouts (`src/invitation/`)                   │
 │ ├── Unique Storytelling, Narrative, & Chapters              │
 │ ├── Bespoke Interactivity (Curtain Intros, Timelines, etc.) │
 │ ├── Scoped Styling (`.cm-`, `.rb-`, `.jb-`, `.gz-`)        │
@@ -33,7 +33,7 @@
 
 ## 📜 2. THEME MANIFEST CONTRACT
 
-Every theme is defined by a validated manifest via `validateThemeManifest()` in `src/themes/themeContract.js`:
+Every theme is defined by a validated manifest via `validateThemeManifest()` in `src/invitation/themeContract.js`:
 
 ```javascript
 {
@@ -65,7 +65,7 @@ Every theme is defined by a validated manifest via `validateThemeManifest()` in 
 
 ## 🚀 3. HOW TO IMPLEMENT A BESPOKE THEME (4 STEPS)
 
-### Step 1: Create Component in `src/themes/Theme[Name].jsx`
+### Step 1: Create Component in `src/invitation/Theme[Name].jsx`
 ```jsx
 import React from 'react'
 import { safeUrl, formatLongDate } from '../lib/utils'
@@ -82,7 +82,7 @@ export default function ThemeCustom({ data, guest, preview, theme }) {
 }
 ```
 
-### Step 2: Create Scoped CSS in `src/themes/Theme[Name].css`
+### Step 2: Create Scoped CSS in `src/invitation/Theme[Name].css`
 Prefix all classes with a theme identifier (e.g. `.tc-`):
 ```css
 .tc-root {
@@ -97,15 +97,15 @@ Prefix all classes with a theme identifier (e.g. `.tc-`):
 ### Step 3: Register in `src/data/themes.js`
 Add the manifest to the `themes` array.
 
-### Step 4: Dispatch in `src/invitation/Invitation.jsx`
+### Step 4: Register in the Theme Registry (`src/invitation/Invitation.jsx`)
 ```jsx
-import ThemeCustom from '../themes/ThemeCustom'
+import ThemeCustom from './ThemeCustom'
+import { registerThemeComponent } from './themeRegistry'
 
-// Inside Invitation:
-if (theme.layout === 'custom-id' || theme.id === 'custom-id') {
-  return <ThemeCustom data={data} guest={guest} preview={preview} theme={theme} />
-}
+// Top-level, sekali saja:
+registerThemeComponent('custom-id', ThemeCustom)
 ```
+Dispatch otomatis via `getThemeComponent(theme.layout)` di `Invitation.jsx` — JANGAN menambah if-chain `if (theme.layout === ...)`.
 
 ---
 

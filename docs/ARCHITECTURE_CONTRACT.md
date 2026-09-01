@@ -1,9 +1,9 @@
 # 🏛️ ARUNA ARCHITECTURE CONTRACT & MASTER SYSTEM SPECIFICATION
 
-> **Version:** 2.0.0 (Multi-Event & Theme Studio Ready)  
+> **Version:** 2.1.0 (Registry Dispatch & Serverless-Only Backend)
 > **Target Audience:** AI Coding Assistants, Lead Developers, Theme Designers, Core Maintainers  
 > **Status:** Locked & Standardized Contract  
-> **Date:** 2026-08-26  
+> **Date:** 2026-09-01  
 
 ---
 
@@ -12,15 +12,14 @@
 2. [End-to-End Data Lifecycle Flow](#2-end-to-end-data-lifecycle-flow)
 3. [Unified Data Model Contract](#3-unified-data-model-contract)
 4. [Event Type System (`getFormMode`)](#4-event-type-system-getformmode)
-5. [Form System & Input Generation](#5-form-system--input-generation)
-6. [Component Contracts & Responsibilities](#6-component-contracts--responsibilities)
-7. [Theme Architecture (Unified vs Isolated)](#7-theme-architecture-unified-vs-isolated)
-8. [Theme Studio & Customization Engine](#8-theme-studio--customization-engine)
-9. [Database & Storage Contract](#9-database--storage-contract)
-10. [Security Boundaries & Anti-Tampering](#10-security-boundaries--anti-tampering)
-11. [Breaking Change Matrix & Risk Map](#11-breaking-change-matrix--risk-map)
-12. [Step-by-Step Extension Guides](#12-step-by-step-extension-guides)
-13. [File Classification & Access Boundaries](#13-file-classification--access-boundaries)
+5. [Component Contracts & Responsibilities](#5-component-contracts--responsibilities)
+6. [Theme Architecture (Unified vs Isolated)](#6-theme-architecture-unified-vs-isolated)
+7. [Theme Studio & Customization Engine](#7-theme-studio--customization-engine)
+8. [Database & Storage Contract](#8-database--storage-contract)
+9. [Security Boundaries & Anti-Tampering](#9-security-boundaries--anti-tampering)
+10. [Breaking Change Matrix & Risk Map](#10-breaking-change-matrix--risk-map)
+11. [Step-by-Step Extension Guides](#11-step-by-step-extension-guides)
+12. [File Classification & Access Boundaries](#12-file-classification--access-boundaries)
 
 ---
 
@@ -38,7 +37,12 @@ To ensure that **new themes, event types, or visual features NEVER break the res
 3. **No Frontend-Only Security Boundary:**
    - All authorization (`editKey`, `adminKey`, status validation) is strictly enforced in Serverless API Handlers (`api/`) and Cloud Firestore Security Rules (`firestore.rules`).
 4. **Isolated Theme Method for High-Complexity Layouts:**
-   - Bespoke themes (e.g., *Art Jawa Biru, Boarding Pass, Royal Bunny, Wedding Gazette, Adat Jawa*) reside in their own standalone files in `src/invitation/` with namespaced CSS classes to prevent global style leakage.
+   - Bespoke themes (e.g., *Art Jawa Biru, Boarding Pass, Royal Bunny, Wedding Gazette, Adat Jawa, Kejora*) reside in their own standalone files in `src/invitation/` with namespaced CSS classes to prevent global style leakage.
+5. **Single Backend Path (Fase 1 refactor, 2026-08-31):**
+   - Express server (`server/index.js`) SUDAH DIHAPUS. Satu-satunya jalur backend: serverless functions di `api/*.js` (Firebase Admin via `api/_firebase.js`).
+   - `GET /u/:slug` → rewrite `vercel.json` → `api/og.js`: baca `invitations/{slug}`, inject OG tags (og:title, og:image, description, nama tamu dari `?to=`) ke `dist/index.html` — inilah yang membuat preview WhatsApp/Instagram bekerja.
+   - Upload langsung client → Cloudinary (bukan lewat API). Kelima serverless lama (`verify-key`, `update-invitation`, `delete-invitation`, `add-domain`, `remove-domain`) + `admin-login` TERPAKAI klien via `src/lib/api.js`.
+   - GOTCHA: jangan pernah import `firebase-admin`/`firebase/auth` modul berat lain di `api/*.js` di luar pola `api/_firebase.js` — crash saat bundling Vercel.
 
 ---
 
@@ -54,15 +58,10 @@ flowchart TD
     
     E -->|Read Public| G[InvitationPage /u/:slug]
     G -->|Extract guest & fetchInvitation| H[Invitation.jsx Master Selector]
-    H -->|Match theme.layout| I1[Standard Dynamic Layout]
-    H -->|Match theme.layout| I2[ThemeRoyalBunny.jsx]
-    H -->|Match theme.layout| I3[ThemeArtJawaBiru.jsx]
-    H -->|Match theme.layout| I4[ThemeAdatJawa.jsx]
-    H -->|Match theme.layout| I5[ThemeWeddingGazette.jsx]
-    H -->|Match theme.layout| I6[BoardingInvitation.jsx]
-    H -->|Match theme.layout| I7[AttariInvitation.jsx]
+    H -->|themeRegistry getThemeComponent| I1[StandardInvitation fallback]
+    H -->|themeRegistry getThemeComponent| I2[10 Isolated: Kejora, Editorial, Cinematic x2, RoyalBunny, AdatJawa, ArtJawaBiru, Attari, Boarding, Gazette]
     
-    I1 & I2 & I3 & I4 & I5 & I6 & I7 -->|Render UI & Interactivity| J[RSVP & Wishes Feed / Live Audio / Map / QR]
+    I1 & I2 -->|Render UI & Interactivity| J[RSVP & Wishes Feed / Live Audio / Map / QR]
     J -->|addRsvp & addWish API| E
 ```
 
@@ -170,7 +169,7 @@ classDiagram
 ### Core Component Breakdown:
 
 #### 1. `Invitation.jsx` (Master Invitation Controller)
-- **Role:** Entry point for public URL `/u/:slug`. Detects `theme.layout` and renders either isolated themes or standard modular components.
+- **Role:** Entry point for public URL `/u/:slug`. Dispatches via `themeRegistry`: `getThemeComponent(theme.layout) || getThemeComponent(theme.id) || getThemeComponent(data?.themeId)` → `StandardInvitation` fallback. JANGAN menambah if-chain tema baru.
 - **Props Accepted:** `data` (Object), `guest` (String).
 - **Sub-components:** `Cover`, `Hero`, `Greeting`, `Quote`, `Couple`, `Story`, `Countdown`, `Events`, `CheckIn`, `Live`, `DressCode`, `Gallery`, `Rsvp`, `Wishes`, `Gift`, `Closer`, `WeddingFrameModal`.
 - **Side Effects:** AutoPlay background audio on first user touch (`onOpen`), visitor counter increment (`recordInvitationView`).
@@ -299,11 +298,13 @@ erDiagram
 
 | If You Modify... | What Will Break? | Mitigation / Safe Protocol |
 |---|---|---|
-| `bride` / `groom` object keys | All 7 invitation templates, RSVP matching, PDF/Canvas generators | Always preserve `.nick`, `.full`, `.photo`, `.parents`, `.ig`. Use optional chaining `?.`. |
+| `bride` / `groom` object keys | All invitation templates (10 isolated + unified), RSVP matching, PDF/Canvas generators | Always preserve `.nick`, `.full`, `.photo`, `.parents`, `.ig`. Use optional chaining `?.`. |
 | `events` array structure | Countdown timer, Calendar generator, Event session list | Maintain `{ title, date, time, venue, address, maps }`. |
-| `theme.layout` enum | Router selector in `Invitation.jsx` and `App.jsx` | When adding a new layout, register it in `getThemeFeatures()`, `getFormMode()`, and `Invitation.jsx`. |
+| `theme.layout` enum | Router selector in `Invitation.jsx` and `App.jsx` | When adding a new layout, register it via `registerThemeComponent()` (isolated) or via `formOverrides`/`features` di entri tema (unified). Jangan menambah if-chain. |
 | `getPackagesByEventType()` in `src/data/site.js` | Form Step 4 (Bayar), Success Page price calculation, Admin kwitansi | Always provide fallback to `packages[0]`. |
 | `firestore.rules` | Client RSVP submissions, Testimonials, Theme Studio save | Always test rules with Firebase Emulator or verify public create permissions for unpaid invitations. |
+| `api/og.js` (OG injection untuk `/u/:slug`) | Preview link WhatsApp/Instagram tamu | Jangan hapus rewrite `/u/:slug*` di `vercel.json`; uji `curl -s <url>/u/<slug> | grep og:` setelah deploy. |
+| `api/admin-login.js` | Login admin & ganti password | Jalur tunggal server-side auth klien; jangan pindahkan ke client SDK. |
 
 ---
 
@@ -350,9 +351,12 @@ erDiagram
 ```
 ├── 🔒 CRITICAL & PROTECTED (Do NOT modify without architectural approval)
 │   ├── api/_firebase.js
+│   ├── api/og.js
+│   ├── api/admin-login.js
 │   ├── api/update-invitation.js
 │   ├── api/delete-invitation.js
 │   ├── api/verify-key.js
+│   ├── vercel.json (rewrites /u/:slug* → api/og)
 │   ├── firestore.rules
 │   └── src/context/AuthContext.jsx
 │

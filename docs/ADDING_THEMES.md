@@ -63,34 +63,20 @@ Gunakan awalan kelas yang unik (misal: `.floral-`) agar *styling*-nya tidak boco
 }
 ```
 
-## Langkah 4: Hubungkan ke Main Router Undangan
-Langkah terakhir adalah memberitahu aplikasi untuk me-render komponen baru tersebut jika pelanggan memilih tema `premium-floral`.
+## Langkah 4: Daftarkan di Theme Registry
+Langkah terakhir adalah mendaftarkan komponen tema ke registry agar di-render otomatis untuk tema `premium-floral`.
 
-Buka file `src/pages/CustomDomainPage.jsx` atau file utama yang menangani *rendering* undangan (dalam hal ini `src/invitation/Invitation.jsx` atau halaman yang memanggilnya).
-
-**Di dalam `src/invitation/Invitation.jsx` (atau komponen wrapper-nya):**
-1. Lakukan *Import* komponen tema baru yang baru saja dibuat.
-2. Tambahkan logika kondisional (*If/Else* atau *Switch*) berdasarkan `theme.layout`.
+Buka `src/invitation/Invitation.jsx` — di bagian atas file, setelah import, tambahkan satu baris registrasi:
 
 ```jsx
 import ThemePremiumFloral from './ThemePremiumFloral';
-// ... import tema lainnya ...
+import { registerThemeComponent } from './themeRegistry';
 
-export default function InvitationWrapper({ theme, data, guest }) {
-  
-  // Jika tema adalah premium floral, render komponen khusus tersebut sepenuhnya
-  if (theme.layout === 'premium-floral') {
-    return <ThemePremiumFloral data={data} theme={theme} guest={guest} />
-  }
-
-  // Jika tema bukan premium, render arsitektur undangan klasik (default lama)
-  return (
-    <div className="default-invitation">
-       {/* ... struktur undangan default ... */}
-    </div>
-  )
-}
+// Top-level, sekali saja:
+registerThemeComponent('premium-floral', ThemePremiumFloral);
 ```
+
+Dispatch dilakukan otomatis oleh `getThemeComponent(theme.layout)` di `Invitation.jsx` — **JANGAN** menambah logika kondisional (If/Else/Switch) `theme.layout` baru; pola itu sudah diganti `themeRegistry` (Fase 2 refactor).
 
 ## Selesai!
 Dengan cara ini:
