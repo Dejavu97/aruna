@@ -6,7 +6,7 @@ import {
   Radio, Compass, Newspaper, Camera, BookOpen, HelpCircle,
   Award, Ticket, Star
 } from 'lucide-react'
-import { copyText, googleCalendarUrl, wazeUrl, formatLongDate } from '../lib/utils'
+import { copyText, googleCalendarUrl, wazeUrl, formatLongDate, instagramUrl, safeUrl } from '../lib/utils'
 import Watermark from '../components/Watermark'
 import { addRsvp, addWish } from '../lib/api'
 import './ThemeWeddingGazette.css'
@@ -365,7 +365,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 </p>
                 {data.groom?.ig && (
                   <a
-                    href={`https://instagram.com/${String(data.groom.ig).replace(/^@/, '')}`}
+                    href={safeUrl(instagramUrl(data.groom.ig))}
                     target="_blank"
                     rel="noreferrer"
                     className="gz-profile-ig inline-flex items-center gap-1"
@@ -391,7 +391,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                 </p>
                 {data.bride?.ig && (
                   <a
-                    href={`https://instagram.com/${String(data.bride.ig).replace(/^@/, '')}`}
+                    href={safeUrl(instagramUrl(data.bride.ig))}
                     target="_blank"
                     rel="noreferrer"
                     className="gz-profile-ig inline-flex items-center gap-1"
@@ -506,7 +506,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                   </div>
 
                   {ev.maps && (
-                    <a href={ev.maps} target="_blank" rel="noreferrer" className="gz-maps-btn">
+                    <a href={safeUrl(ev.maps)} target="_blank" rel="noreferrer" className="gz-maps-btn">
                       <MapPin size={13} /> BUKA GOOGLE MAPS
                     </a>
                   )}
@@ -558,12 +558,12 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
 
             <div className="text-center mt-3">
               <a
-                href={googleCalendarUrl({
+                href={safeUrl(googleCalendarUrl({
                   title: `The Wedding of ${couple}`,
                   details: `Pernikahan ${couple}. Informasi: ${typeof window !== 'undefined' ? window.location.href : ''}`,
                   location: data.events?.[0]?.venue || data.location || '',
                   date: data.date,
-                })}
+                }))}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 border-2 border-black bg-[#E6D8C3] px-5 py-2.5 font-mono text-xs font-bold uppercase hover:bg-black hover:text-[#E6D8C3] transition-colors"

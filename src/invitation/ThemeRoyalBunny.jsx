@@ -19,7 +19,7 @@ import {
   X,
 } from 'lucide-react'
 import { addRsvp, addWish } from '../lib/api'
-import { copyText, formatLongDate, googleCalendarUrl } from '../lib/utils'
+import { copyText, formatLongDate, googleCalendarUrl, instagramUrl, safeUrl } from '../lib/utils'
 import AdSlot from '../components/AdSlot'
 import './ThemeRoyalBunny.css'
 
@@ -439,7 +439,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
                   <h4 className="rb-names">{data.groom?.full || data.groom?.nick || 'Budi Santoso, S.Kom.'}</h4>
                   <p className="rb-lineage">{data.groom?.parents || 'Putra tercinta dari Bpk. Hendra Santoso & Ibu Susi Wardani'}</p>
                   {data.groom?.ig && (
-                    <a className="rb-ig" href={`https://instagram.com/${String(data.groom.ig).replace(/^@/, '')}`} target="_blank" rel="noreferrer">
+                    <a className="rb-ig" href={safeUrl(instagramUrl(data.groom.ig))} target="_blank" rel="noreferrer">
                       @{String(data.groom.ig).replace(/^@/, '')}
                     </a>
                   )}
@@ -465,7 +465,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
                 <h4 className="rb-names">{data.bride?.full || data.bride?.nick || 'Sarah Anindya, S.Ds.'}</h4>
                 <p className="rb-lineage">{data.bride?.parents || 'Putri tercinta dari Bpk. Ir. Wijaya Kusuma & Ibu Ratna Dewi'}</p>
                 {data.bride?.ig && (
-                  <a className="rb-ig" href={`https://instagram.com/${String(data.bride.ig).replace(/^@/, '')}`} target="_blank" rel="noreferrer">
+                  <a className="rb-ig" href={safeUrl(instagramUrl(data.bride.ig))} target="_blank" rel="noreferrer">
                     @{String(data.bride.ig).replace(/^@/, '')}
                   </a>
                 )}
@@ -517,12 +517,12 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
                 </div>
                 <a
                   className="rb-cal-btn"
-                  href={googleCalendarUrl({
+                  href={safeUrl(googleCalendarUrl({
                     title: `The Fairytale Wedding of ${couple}`,
                     details: `Pernikahan ${couple}. Informasi: ${typeof window !== 'undefined' ? window.location.href : ''}`,
                     location: events[0]?.venue || data.location || '',
                     date: data.date,
-                  })}
+                  }))}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -595,7 +595,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
                     <p className="rb-decree-venue">{ev.venue}</p>
                     {ev.address && <p className="rb-decree-addr">{ev.address}</p>}
                     {ev.maps && (
-                      <a className="rb-maps" href={ev.maps} target="_blank" rel="noreferrer">
+                      <a className="rb-maps" href={safeUrl(ev.maps)} target="_blank" rel="noreferrer">
                         <MapPin size={13} /> Petunjuk lokasi
                       </a>
                     )}

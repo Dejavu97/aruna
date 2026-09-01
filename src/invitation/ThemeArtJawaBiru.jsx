@@ -4,7 +4,7 @@ import {
   Heart, MapPin, Calendar, Clock, Music, Pause, Play, 
   Copy, Check, Send, ChevronRight, User, Users, MessageSquare, Home, Sparkles, Camera
 } from 'lucide-react'
-import { copyText, googleCalendarUrl, wazeUrl } from '../lib/utils'
+import { copyText, googleCalendarUrl, wazeUrl, safeUrl } from '../lib/utils'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import Watermark from '../components/Watermark'
 import './ThemeArtJawaBiru.css'
@@ -368,7 +368,7 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                     <h3 className="jb-person-name">{data.groom.full || data.groom.nick}</h3>
                     <p className="jb-person-parents">{data.groom.parents}</p>
                     {data.groom.ig && (
-                      <a href={`https://instagram.com/${String(data.groom.ig).replace('@', '')}`} target="_blank" rel="noreferrer" className="jb-person-ig inline-flex items-center gap-1">
+                      <a href={safeUrl(instagramUrl(data.groom.ig))} target="_blank" rel="noreferrer" className="jb-person-ig inline-flex items-center gap-1">
                         <Camera size={13} /> {data.groom.ig}
                       </a>
                     )}
@@ -390,7 +390,7 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                     <h3 className="jb-person-name">{data.bride.full || data.bride.nick}</h3>
                     <p className="jb-person-parents">{data.bride.parents}</p>
                     {data.bride.ig && (
-                      <a href={`https://instagram.com/${String(data.bride.ig).replace('@', '')}`} target="_blank" rel="noreferrer" className="jb-person-ig inline-flex items-center gap-1">
+                      <a href={safeUrl(instagramUrl(data.bride.ig))} target="_blank" rel="noreferrer" className="jb-person-ig inline-flex items-center gap-1">
                         <Camera size={13} /> {data.bride.ig}
                       </a>
                     )}
@@ -496,14 +496,14 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.2rem', alignItems: 'center' }}>
                             {ev?.maps && (
-                              <a href={ev.maps} target="_blank" rel="noreferrer" className="jb-maps-btn" style={{ width: '100%' }}>
+                              <a href={safeUrl(ev.maps)} target="_blank" rel="noreferrer" className="jb-maps-btn" style={{ width: '100%' }}>
                                 <MapPin size={15} /> GOOGLE MAPS
                               </a>
                             )}
                             <div style={{ display: 'flex', gap: '0.4rem', width: '100%', flexWrap: 'wrap' }}>
                               {ev?.address && (
                                 <a 
-                                  href={wazeUrl(ev.address, ev.venue)} 
+                                  href={safeUrl(wazeUrl(ev.address, ev.venue))} 
                                   target="_blank" 
                                   rel="noreferrer" 
                                   className="jb-maps-btn"
@@ -513,13 +513,13 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                                 </a>
                               )}
                               <a 
-                                href={googleCalendarUrl({
+                                href={safeUrl(googleCalendarUrl({
                                   title: `${eventTitle} — ${data?.bride?.nick || ''} & ${data?.groom?.nick || ''}`,
                                   date: ev?.date || data?.date,
                                   time: ev?.time || '09:00',
                                   venue: `${ev?.venue || ''}, ${ev?.address || ''}`,
                                   details: `Undangan ${eventTitle} pernikahan ${data?.bride?.nick || ''} & ${data?.groom?.nick || ''}. Lokasi: ${ev?.venue || ''}`,
-                                })}
+                                }))}
                                 target="_blank" 
                                 rel="noreferrer" 
                                 className="jb-maps-btn"

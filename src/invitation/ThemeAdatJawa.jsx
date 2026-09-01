@@ -14,6 +14,7 @@ import {
   invitationUrl,
   pad,
   qrImageUrl,
+  safeUrl,
 } from '../lib/utils'
 import './ThemeAdatJawa.css'
 
@@ -275,7 +276,7 @@ function Couple({ data }) {
                 {item.who.ig && (
                   <a
                     className="jw-ig-link"
-                    href={instagramUrl(item.who.ig)}
+                    href={safeUrl(instagramUrl(item.who.ig))}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -345,7 +346,7 @@ function Countdown({ tick, date, data, bride, groom }) {
         ))}
       </div>
       {cal && (
-        <a className="jw-btn-outline" href={cal} target="_blank" rel="noreferrer">
+        <a className="jw-btn-outline" href={safeUrl(cal)} target="_blank" rel="noreferrer">
           SIMPAN TANGGAL
         </a>
       )}
@@ -376,7 +377,7 @@ function Events({ events }) {
             <p className="jw-event-venue">{ev.venue}</p>
             <p className="jw-event-addr">{ev.address}</p>
             {ev.maps && (
-              <a href={ev.maps} target="_blank" rel="noreferrer" className="jw-btn-secondary">
+              <a href={safeUrl(ev.maps)} target="_blank" rel="noreferrer" className="jw-btn-secondary">
                 GOOGLE MAPS
               </a>
             )}
@@ -417,7 +418,7 @@ function AccessCard({ data, guest, bride, groom, onClose }) {
         {guest && <p><strong>Kepada Yth. {guest}</strong></p>}
         <img className="jw-qr" src={src} alt="QR" />
         <p className="jw-fine">Tunjukkan QR ini kepada penerima tamu di lokasi acara.</p>
-        <a className="jw-btn-primary" href={src} download="kartu-akses.png" target="_blank" rel="noreferrer">
+        <a className="jw-btn-primary" href={safeUrl(src)} download="kartu-akses.png" target="_blank" rel="noreferrer">
           DOWNLOAD KARTU
         </a>
         <button type="button" className="jw-modal-close" onClick={onClose}>Tutup</button>

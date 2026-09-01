@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, Copy, MapPin, Play, QrCode } from 'lucide-react'
-import { countdownParts, formatLongDate, invitationUrl, copyText } from '../lib/utils'
+import { countdownParts, formatLongDate, invitationUrl, copyText, safeUrl } from '../lib/utils'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 
 export default function BoardingInvitation({ data, guest = '', preview = false }) {
@@ -165,7 +165,7 @@ export default function BoardingInvitation({ data, guest = '', preview = false }
                       <p className="text-sm mt-2">{ev.venue}</p>
                       <p className="text-xs text-slate-500 mt-1">{ev.address}</p>
                       {ev.maps && (
-                        <a href={ev.maps} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-[#0284C7] mt-3 bg-[#E0F2FE] px-3 py-1.5 rounded-full font-bold">
+                        <a href={safeUrl(ev.maps)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-[#0284C7] mt-3 bg-[#E0F2FE] px-3 py-1.5 rounded-full font-bold">
                           <MapPin size={12} /> Open Maps
                         </a>
                       )}

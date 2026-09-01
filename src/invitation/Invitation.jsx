@@ -554,7 +554,7 @@ function Events({ events, isDark, scene, couple }) {
               <p className="addr">{ev.address}</p>
               <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                 {ev.maps && (
-                  <a href={ev.maps} target="_blank" rel="noreferrer" className="maps">
+                  <a href={safeUrl(ev.maps)} target="_blank" rel="noreferrer" className="maps">
                     <MapPin size={13} /> Google Maps
                   </a>
                 )}
@@ -1101,7 +1101,7 @@ function EventsAttari({ events, scene, couple }) {
               <p className="attari-event-addr">{ev.address}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: 'auto', paddingTop: '0.8rem' }}>
                 {ev.maps && (
-                  <a href={ev.maps} target="_blank" rel="noreferrer" className="attari-map-btn">
+                  <a href={safeUrl(ev.maps)} target="_blank" rel="noreferrer" className="attari-map-btn">
                     GOOGLE MAPS
                   </a>
                 )}

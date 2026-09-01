@@ -13,6 +13,7 @@ import {
   invitationUrl,
   pad,
   qrImageUrl,
+  safeUrl,
 } from '../lib/utils'
 
 function Petals() {
@@ -207,7 +208,7 @@ function Couple({ data }) {
                 {item.who.ig && (
                   <a
                     className="at-ig-link"
-                    href={instagramUrl(item.who.ig)}
+                    href={safeUrl(instagramUrl(item.who.ig))}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -277,7 +278,7 @@ function Countdown({ tick, date, data, bride, groom }) {
         ))}
       </div>
       {cal && (
-        <a className="at-btn-outline" href={cal} target="_blank" rel="noreferrer">
+        <a className="at-btn-outline" href={safeUrl(cal)} target="_blank" rel="noreferrer">
           SIMPAN TANGGAL
         </a>
       )}
@@ -301,7 +302,7 @@ function Events({ events }) {
             <p className="at-event-venue">{ev.venue}</p>
             <p className="at-event-addr">{ev.address}</p>
             {ev.maps && (
-              <a href={ev.maps} target="_blank" rel="noreferrer" className="at-map-btn">
+              <a href={safeUrl(ev.maps)} target="_blank" rel="noreferrer" className="at-map-btn">
                 <MapPin size={11} /> GOOGLE MAPS
               </a>
             )}
@@ -342,7 +343,7 @@ function AccessCard({ data, guest, bride, groom, onClose }) {
         {guest && <p><strong>Kepada Yth. {guest}</strong></p>}
         <img className="at-qr" src={src} alt="QR" />
         <p className="at-fine">Tunjukkan QR ini kepada penerima tamu di lokasi acara.</p>
-        <a className="at-btn-primary" href={src} download="kartu-akses.png" target="_blank" rel="noreferrer">
+        <a className="at-btn-primary" href={safeUrl(src)} download="kartu-akses.png" target="_blank" rel="noreferrer">
           DOWNLOAD KARTU
         </a>
         <button type="button" className="at-modal-close" onClick={onClose}>Tutup</button>
