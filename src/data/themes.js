@@ -547,7 +547,7 @@ export function hasTheme(id, customThemes = []) {
 const FORM_BASES = {
   'love-letter': {
     mode: 'love-letter',
-    eventType: 'birthday',
+    eventType: 'love-letter',
     step1Label: 'Untuknya',
     person1Title: 'Data Pasangan / Orang Tersayang',
     person1NickLabel: 'Nama panggilan',
