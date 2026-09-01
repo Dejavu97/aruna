@@ -80,21 +80,22 @@ service cloud.firestore {
       // order & banner) — KECUALI admin_auth: password admin TIDAK BOLEH
       // terbaca klien (login kini diverifikasi via /api/admin-login).
       allow read: if doc != 'admin_auth';
-      // Write klien untuk settings operasional sementara tetap terbuka
-      // (admin password-kustom belum punya jalur serverless utk ini) —
-      // KECUALI admin_auth: overwrite dari klien = pembajakan admin.
-      // Pengetatan P1 lanjutan: pindahkan via serverless.
-      allow write: if doc != 'admin_auth';
+      // DITUTUP (P1 hardening): tulis settings kini lewat /api/admin-settings
+      // (Admin SDK, verifikasi adminKey server-side). admin_auth juga tak
+      // pernah bisa ditulis dari klien (password hanya via /api/admin-login).
+      allow write: if false;
     }
 
     // =========================================================================
     // 6. KODE VOUCHER / PROMO (/vouchers)
     // =========================================================================
     match /vouchers/{code} {
-      // Publik membaca diskon voucher (dipakai form order). Write: sementara
-      // perilaku lama — lihat catatan P1 di section 5.
+      // Publik membaca diskon voucher (dipakai form order).
+      // DITUTUP (P1 hardening): tulis voucher kini lewat /api/admin-settings
+      // (Admin SDK, verifikasi adminKey server-side) — sebelumnya siapa pun
+      // bisa membuat/menghapus kode diskon dari console browser.
       allow read: if true;
-      allow write: if true;
+      allow write: if false;
     }
   }
 }

@@ -72,8 +72,7 @@ export async function fetchSettings() {
 
 export async function savePaymentSettings(settings) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  const docRef = doc(db, 'settings', 'payment')
-  await setDoc(docRef, settings)
+  await adminApiCall({ action: 'setSetting', doc: 'payment', data: settings })
   return { success: true }
 }
 
@@ -90,8 +89,7 @@ export async function fetchDynamicPackages() {
 
 export async function saveDynamicPackages(packagesList) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  const docRef = doc(db, 'settings', 'packages')
-  await setDoc(docRef, { packages: packagesList, updatedAt: Date.now() })
+  await adminApiCall({ action: 'setSetting', doc: 'packages', data: { packages: packagesList } })
   return { success: true }
 }
 
@@ -129,8 +127,7 @@ export async function fetchAdSettings() {
 
 export async function saveAdSettings(adSettings) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  const docRef = doc(db, 'settings', 'ads')
-  await setDoc(docRef, { ...adSettings, updatedAt: Date.now() })
+  await adminApiCall({ action: 'setSetting', doc: 'ads', data: adSettings })
   return { success: true }
 }
 
@@ -193,6 +190,25 @@ export async function changeAdminPassword(newPassword) {
   }
 
   return { success: true }
+}
+
+// ============ Serverless admin writes (settings & vouchers, P1 hardening) ============
+// Tulis lewat /api/admin-settings (Admin SDK, verifikasi adminKey server-side).
+// Klien TIDAK menulis Firestore langsung utk koleksi ini — rules sudah menutup
+// jalur klien; fungsi2 save* di bawah otomatis ikut lewat jalur aman ini.
+async function adminApiCall(body) {
+  const adminKey = getAdminKey()
+  if (!adminKey) throw new Error('Unauthorized')
+  const res = await fetch('/api/admin-settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ adminKey, ...body })
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Operasi admin gagal.')
+  }
+  return data
 }
 
 export async function uploadFile(file) {
@@ -631,9 +647,9 @@ export async function deleteCustomTheme(id) {
 }
 
   
-export async function saveAnnouncement(text) {  
-  if (!getAdminKey()) throw new Error('Unauthorized')  
-  await setDoc(doc(db, 'settings', 'announcement'), { text })  
+export async function saveAnnouncement(text) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  await adminApiCall({ action: 'setSetting', doc: 'announcement', data: { text } })
 }
 
 export async function fetchVouchers() {
@@ -649,17 +665,13 @@ export async function fetchVouchers() {
 
 export async function saveVoucher(code, data) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  const cleanCode = code.trim().toUpperCase()
-  const docRef = doc(db, 'vouchers', cleanCode)
-  await setDoc(docRef, { ...data, code: cleanCode, updatedAt: Date.now() })
+  await adminApiCall({ action: 'setVoucher', code, data })
   return { success: true }
 }
 
 export async function deleteVoucher(code) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  const cleanCode = code.trim().toUpperCase()
-  const docRef = doc(db, 'vouchers', cleanCode)
-  await deleteDoc(docRef)
+  await adminApiCall({ action: 'deleteVoucher', code })
   return { success: true }
 }
 
@@ -689,12 +701,7 @@ export async function fetchWaTemplates() {
 
 export async function saveWaTemplates(templates) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  try {
-    const docRef = doc(db, 'settings', 'wa_templates')
-    await setDoc(docRef, templates)
-  } catch (err) {
-    console.warn('Firestore saveWaTemplates error:', err)
-  }
+  await adminApiCall({ action: 'setSetting', doc: 'wa_templates', data: templates })
   try {
     localStorage.setItem('aruna_wa_templates', JSON.stringify(templates))
   } catch {}
@@ -731,12 +738,7 @@ export async function fetchSiteProfile() {
 
 export async function saveSiteProfile(profile) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  try {
-    const docRef = doc(db, 'settings', 'profile')
-    await setDoc(docRef, { ...profile, updatedAt: Date.now() })
-  } catch (err) {
-    console.warn('Firestore saveSiteProfile error:', err)
-  }
+  await adminApiCall({ action: 'setSetting', doc: 'profile', data: profile })
   try {
     localStorage.setItem('aruna_site_profile', JSON.stringify(profile))
   } catch {}
@@ -769,12 +771,7 @@ export async function fetchSeoSettings() {
 
 export async function saveSeoSettings(seo) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  try {
-    const docRef = doc(db, 'settings', 'seo')
-    await setDoc(docRef, { ...seo, updatedAt: Date.now() })
-  } catch (err) {
-    console.warn('Firestore saveSeoSettings error:', err)
-  }
+  await adminApiCall({ action: 'setSetting', doc: 'seo', data: seo })
   try {
     localStorage.setItem('aruna_seo_settings', JSON.stringify(seo))
   } catch {}
@@ -918,12 +915,7 @@ export async function fetchMaintenanceSettings() {
 
 export async function saveMaintenanceSettings(settings) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  try {
-    const docRef = doc(db, 'settings', 'maintenance')
-    await setDoc(docRef, { ...settings, updatedAt: Date.now() })
-  } catch (err) {
-    console.warn('Firestore saveMaintenanceSettings error:', err)
-  }
+  await adminApiCall({ action: 'setSetting', doc: 'maintenance', data: settings })
   try {
     localStorage.setItem('aruna_maintenance_settings', JSON.stringify(settings))
   } catch {}
