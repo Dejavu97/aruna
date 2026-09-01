@@ -7,7 +7,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { demos, getDemoByTheme, themes } from '../../data/themes'
+import { getDemoByTheme, themes } from '../../data/themes'
 import { formatRupiah, packages as defaultPackages, getPackageById } from '../../data/site'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
 import { invitePath } from '../../lib/nav'
@@ -15,14 +15,11 @@ import { invitePath } from '../../lib/nav'
 /** AdminThemesTab — diekstrak verbatim dari Admin.jsx (Fase 3, perilaku identik). */
 export default function AdminThemesTab({ announcement,
   customThemesList,
-  demoOverrides,
   items,
   mainTab,
   savingAnnouncement,
   themeSubTab,
   setAnnouncement,
-  setEditDemoFormData,
-  setEditDemoModalTheme,
   setSavingAnnouncement,
   setThemeSubTab,
   handleDeleteCustomTheme }) {
@@ -81,8 +78,7 @@ export default function AdminThemesTab({ announcement,
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {themes.map((t) => {
-                const demoData = getDemoByTheme(t.id, demoOverrides) || {}
-                const isCustomized = Boolean(demoOverrides[t.id])
+                const demoData = getDemoByTheme(t.id) || {}
 
                 return (
                   <article key={t.id} className="bg-paper border border-ink/15 rounded-sm p-4 space-y-3 shadow-xs flex flex-col justify-between">
@@ -96,11 +92,6 @@ export default function AdminThemesTab({ announcement,
                         <span className="absolute top-2 left-2 bg-ink/90 text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-semibold">
                           {t.tag || t.eventType}
                         </span>
-                        {isCustomized && (
-                          <span className="absolute top-2 right-2 bg-gold-deep text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-bold shadow-xs">
-                            Foto/Teks Diedit
-                          </span>
-                        )}
                       </div>
 
                       <h3 className="font-display text-lg font-bold text-ink">{t.name}</h3>
@@ -111,29 +102,6 @@ export default function AdminThemesTab({ announcement,
                     </div>
 
                     <div className="pt-3 border-t border-ink/10 flex items-center justify-between gap-2 text-xs uppercase tracking-wider font-semibold">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditDemoModalTheme(t)
-                          setEditDemoFormData({
-                            customerName: demoData.customerName || '',
-                            brideNick: demoData.bride?.nick || '',
-                            brideFull: demoData.bride?.full || '',
-                            bridePhoto: demoData.bride?.photo || '',
-                            groomNick: demoData.groom?.nick || '',
-                            groomFull: demoData.groom?.full || '',
-                            groomPhoto: demoData.groom?.photo || '',
-                            date: demoData.date || '2026-09-18',
-                            quote: demoData.quote || '',
-                            quoteSource: demoData.quoteSource || '',
-                            gallery: demoData.gallery || [],
-                          })
-                        }}
-                        className="bg-gold-deep text-ivory px-3 py-1.5 hover:bg-gold transition-colors inline-flex items-center gap-1 text-[11px]"
-                      >
-                        <Edit size={12} /> Edit Data &amp; Foto
-                      </button>
-
                       <a
                         href={`/tema/${t.id}`}
                         target="_blank"

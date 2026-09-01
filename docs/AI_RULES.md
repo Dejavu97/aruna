@@ -66,9 +66,12 @@ When adding a new event category (e.g. *Khitanan, Sweet 17th, Golden Anniversary
    - `private_keys/{slug}` is write-only upon creation. NEVER add `allow read: if true;` to `firestore.rules`.
 2. **Payment Verification:**
    - Payment status (`'unpaid'` -> `'paid'`) can ONLY be modified by authenticated admins.
-3. **Upload Limits:**
+3. **Admin Writes (serverless-only, sejak 2026-09-01):**
+   - `settings/*` dan `vouchers/*` = `allow write: if false` di rules. Semua tulis lewat `api/admin-settings.js` (verifikasi `adminKey` vs `settings/admin_auth` via Admin SDK). Jangan pernah menuliskannya lewat client SDK.
+   - Login/ganti password admin = `api/admin-login.js` (password disandingkan server; `admin_auth` tak terbaca klien).
+4. **Upload Limits:**
    - Cloudinary uploads must be validated for size (max 15MB) and type (`image/*` / `audio/*`).
-4. **Anti-DoS:**
+5. **Anti-DoS:**
    - Arrays for `wishes` and `rsvps` must remain capped at 500 items per document.
 
 ---

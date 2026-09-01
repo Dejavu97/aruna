@@ -5,6 +5,14 @@
 > **Status:** Locked & Standardized Contract  
 > **Date:** 2026-09-01  
 
+**📚 Suite dokumentasi** (baca ARCHITECTURE_CONTRACT dulu, lalu sesuai kebutuhan):
+- `SYSTEM_MAP.md` — inventaris file, routing, aliran data end-to-end, env, dependency/breaking-change map
+- `DATA_MODEL.md` — field-by-field invitations + inventory form + findings
+- `COMPONENT_CONTRACTS.md` — kontrak per component + invitation type system
+- `THEME_STUDIO_MAP.md` — registry, manifest, peta kustomisasi Studio
+- `DATABASE_SECURITY.md` — koleksi Firestore + security boundary + warnings
+- `AI_RULES.md` — aturan wajib AI agent · `ADDING_THEMES.md`/`THEME_SYSTEM.md` — cara tambah tema
+
 ---
 
 ## 📑 TABLE OF CONTENTS

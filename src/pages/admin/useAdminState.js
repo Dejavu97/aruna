@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { auth } from '../../lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
-import { changeAdminPassword, cloneInvitation, createFullBackupData, defaultMaintenanceSettings, defaultSeoSettings, defaultSiteProfile, defaultWaTemplates, deleteCustomTheme, deleteInvitation, deleteVoucher, fetchAdSettings, fetchAdminInvitations, fetchCustomThemes, fetchDemoOverrides, fetchDynamicPackages, fetchMaintenanceSettings, fetchSeoSettings, fetchSettings, fetchSiteProfile, fetchVouchers, fetchWaTemplates, getAnnouncement, resetDemoOverride, restoreFullBackupData, saveAdSettings, saveAnnouncement, saveDemoOverride, saveDynamicPackages, saveMaintenanceSettings, savePaymentSettings, saveSeoSettings, saveSiteProfile, saveVoucher, saveWaTemplates, setAdminKey, updateInvitation, uploadFile } from '../../lib/api'
+import { changeAdminPassword, cloneInvitation, createFullBackupData, defaultMaintenanceSettings, defaultSeoSettings, defaultSiteProfile, defaultWaTemplates, deleteCustomTheme, deleteInvitation, deleteVoucher, fetchAdSettings, fetchAdminInvitations, fetchCustomThemes, fetchDynamicPackages, fetchMaintenanceSettings, fetchSeoSettings, fetchSettings, fetchSiteProfile, fetchVouchers, fetchWaTemplates, getAnnouncement, restoreFullBackupData, saveAdSettings, saveAnnouncement, saveDynamicPackages, saveMaintenanceSettings, savePaymentSettings, saveSeoSettings, saveSiteProfile, saveVoucher, saveWaTemplates, setAdminKey, updateInvitation, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
 import { formatRupiah, getPackageById, packages as defaultPackages } from '../../data/site'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
@@ -124,10 +124,6 @@ export function useAdminState() {
   const [deletingDemos, setDeletingDemos] = useState(false)
   
   // Theme Demo Overrides Editor State
-  const [demoOverrides, setDemoOverrides] = useState({})
-  const [editDemoModalTheme, setEditDemoModalTheme] = useState(null)
-  const [editDemoFormData, setEditDemoFormData] = useState(null)
-  const [savingDemoOverrideState, setSavingDemoOverrideState] = useState(false)
   const [uploadingDemoPhoto, setUploadingDemoPhoto] = useState(false)
 
   // Instant Demo Generator Modal State
@@ -172,8 +168,7 @@ export function useAdminState() {
         fetchedWaTemplates,
         fetchedProfile,
         fetchedSeo,
-        fetchedMaintenance,
-        fetchedDemoOverrides
+        fetchedMaintenance
       ] = await Promise.all([
         fetchAdminInvitations().catch(() => []),
         getAnnouncement().catch(() => ''),
@@ -186,7 +181,6 @@ export function useAdminState() {
         fetchSiteProfile().catch(() => defaultSiteProfile),
         fetchSeoSettings().catch(() => defaultSeoSettings),
         fetchMaintenanceSettings().catch(() => defaultMaintenanceSettings),
-        fetchDemoOverrides().catch(() => ({})),
       ])
 
       // Merge local custom themes
@@ -209,7 +203,6 @@ export function useAdminState() {
       setItems(fetchedItems || [])
       setAnnouncement(fetchedAnnouncement || '')
       setCustomThemesList(finalCustomThemes)
-      setDemoOverrides(fetchedDemoOverrides || {})
       setVouchersList(fetchedVouchers || [])
       
       if (fetchedPayment && Array.isArray(fetchedPayment.banks)) {
@@ -851,12 +844,9 @@ export function useAdminState() {
     deletingDemos,
     demoGenerating,
     demoModalOpen,
-    demoOverrides,
     demoSlug,
     demoSuccessSlug,
     demoThemeId,
-    editDemoFormData,
-    editDemoModalTheme,
     error,
     exportingBackup,
     filterPackage,
@@ -910,7 +900,6 @@ export function useAdminState() {
     printCardModalItem,
     savingAds,
     savingAnnouncement,
-    savingDemoOverrideState,
     savingMaintenance,
     savingPackages,
     savingPassword,
@@ -941,12 +930,9 @@ export function useAdminState() {
     setDeletingDemos,
     setDemoGenerating,
     setDemoModalOpen,
-    setDemoOverrides,
     setDemoSlug,
     setDemoSuccessSlug,
     setDemoThemeId,
-    setEditDemoFormData,
-    setEditDemoModalTheme,
     setError,
     setExportingBackup,
     setFilterPackage,
@@ -972,7 +958,6 @@ export function useAdminState() {
     setPrintCardModalItem,
     setSavingAds,
     setSavingAnnouncement,
-    setSavingDemoOverrideState,
     setSavingMaintenance,
     setSavingPackages,
     setSavingPassword,
