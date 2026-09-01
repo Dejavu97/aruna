@@ -1,3 +1,4 @@
+import { updateInvitation } from '../../lib/api'
 import { copyText } from '../../lib/utils'
 
 /** ManageDomain — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */

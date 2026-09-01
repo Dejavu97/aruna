@@ -1,10 +1,11 @@
+import { updateInvitation } from '../../lib/api'
 import {
   Camera,
   Check,
   Shield,
   Tag,
 } from 'lucide-react'
-import { copyText } from '../../lib/utils'
+import { copyText, invitationUrl } from '../../lib/utils'
 
 /** ManageRingkas — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageRingkas({ copied,

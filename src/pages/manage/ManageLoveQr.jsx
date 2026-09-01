@@ -1,5 +1,5 @@
 import LoveQRCardGenerator from '../../components/LoveQRCardGenerator'
-import { copyText } from '../../lib/utils'
+import { copyText, invitationUrl } from '../../lib/utils'
 
 /** ManageLoveQr — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageLoveQr({ item  }) {

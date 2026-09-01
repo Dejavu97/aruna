@@ -1,3 +1,4 @@
+import { copyText } from '../../lib/utils'
 import {
   Download,
   Upload

@@ -1,3 +1,4 @@
+import { shareWaLink } from '../../data/site'
 import {
   Bell,
   Copy,
@@ -8,7 +9,7 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react'
-import { copyText } from '../../lib/utils'
+import { copyText, invitationUrl } from '../../lib/utils'
 import Stat from './Stat'
 
 /** ManageTamu — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
