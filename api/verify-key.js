@@ -1,4 +1,5 @@
 import { adminDb } from './_firebase.js';
+import { assertNotLocked, recordFailure, clearFailures } from './_throttle.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -6,6 +7,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    await assertNotLocked(req); // 429 bila IP terkunci
     const { slug, editKey } = req.body
 
     if (!slug || !editKey) {
@@ -16,11 +18,16 @@ export default async function handler(req, res) {
     const secretSnap = await secretRef.get()
     
     if (!secretSnap.exists || secretSnap.data().editKey !== editKey) {
+      await recordFailure(req);
       return res.status(403).json({ error: 'Kunci rahasia salah.' })
     }
 
+    await clearFailures(req);
     return res.status(200).json({ success: true })
   } catch (err) {
+    if (err.status === 429) {
+      return res.status(429).json({ error: err.message })
+    }
     console.error('Verify API Error:', err)
     return res.status(500).json({ error: err.message })
   }

@@ -1,4 +1,5 @@
 import { adminDb } from './_firebase.js';
+import { verifyPassword } from './_auth.js';
 
 // Password bootstrap bawaan — hanya berlaku jika settings/admin_auth BELUM ada.
 const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
@@ -9,7 +10,7 @@ async function isAdminRequest(body) {
     try {
       const authSnap = await adminDb.collection('settings').doc('admin_auth').get();
       const storedPass = authSnap.exists ? authSnap.data()?.password : null;
-      if (storedPass && body.adminKey === storedPass) return true;
+      if (storedPass && verifyPassword(body.adminKey, storedPass)) return true;
       if (!storedPass && BOOTSTRAP_PASSWORDS.includes(body.adminKey)) return true;
     } catch (authErr) {
       console.warn('Admin password check error:', authErr);

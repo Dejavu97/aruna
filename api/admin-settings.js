@@ -1,4 +1,5 @@
 import { adminDb } from './_firebase.js';
+import { verifyPassword, hashPassword } from './_auth.js';
 
 // ============ ADMIN SETTINGS & VOUCHERS (P1 hardening) ============
 // Semua operasi tulis settings/vouchers kini lewat sini dengan verifikasi
@@ -20,7 +21,17 @@ async function readStoredPassword() {
 async function isAdmin(adminKey) {
   if (!adminKey) return false;
   const stored = await readStoredPassword();
-  if (stored) return String(adminKey) === String(stored);
+  if (stored) {
+    if (!verifyPassword(adminKey, stored)) return false;
+    // Migrasi transparan plain → hash
+    if (!stored.startsWith('scrypt$')) {
+      await adminDb.collection('settings').doc('admin_auth').set({
+        password: hashPassword(adminKey),
+        updatedAt: Date.now(),
+      }, { merge: true });
+    }
+    return true;
+  }
   // Bootstrap: belum ada password tersimpan
   return ['aruna2026', 'byaruna2026'].includes(String(adminKey));
 }

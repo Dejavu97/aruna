@@ -1,18 +1,28 @@
 import { adminDb } from './_firebase.js';
+import { verifyPassword, hashPassword } from './_auth.js';
 
 // Admin platform tunggal (sinkron dengan loginAdmin di src/lib/api.js)
 // Password bootstrap bawaan — hanya berlaku jika settings/admin_auth BELUM ada.
 const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
 
 async function isAdminRequest(body) {
-  // Jalur admin password-kustom: bandingkan dengan password tersimpan.
+  // Jalur admin password-kustom: bandingkan hash password tersimpan.
   // (Admin sesi Firebase tidak lewat sini — dia tulis langsung, rules
   // Kasus A/C yang mengizinkan.)
   if (body.adminKey) {
     try {
       const authSnap = await adminDb.collection('settings').doc('admin_auth').get();
       const storedPass = authSnap.exists ? authSnap.data()?.password : null;
-      if (storedPass && body.adminKey === storedPass) return true;
+      if (storedPass && verifyPassword(body.adminKey, storedPass)) {
+        // Migrasi transparan plain → hash
+        if (!storedPass.startsWith('scrypt$')) {
+          await adminDb.collection('settings').doc('admin_auth').set({
+            password: hashPassword(body.adminKey),
+            updatedAt: Date.now(),
+          }, { merge: true });
+        }
+        return true;
+      }
       if (!storedPass && BOOTSTRAP_PASSWORDS.includes(body.adminKey)) return true;
     } catch (authErr) {
       console.warn('Admin password check error:', authErr);
