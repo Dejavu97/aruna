@@ -82,6 +82,10 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
   const [sceneB, setSceneB] = useState('')
   const [useA, setUseA] = useState(true)
   const isDark = ['sage', 'noir', 'batik'].includes(theme.id)
+  // Soft gate pembayaran (lihat DATA_MODEL.md / sistem 'unpaid'):
+  // undangan belum lunas tetap terbuka utk tamu, tapi fitur premium
+  // (QR check-in, Frame foto) disembunyikan + banner status tampil.
+  const isUnpaid = !preview && data.status === 'unpaid'
   const scenes = useMemo(() => sceneMap(data, theme), [data, theme])
   const showEvents = formConfig.showEvents && features.events?.enabled !== false && (data.events || []).length > 0
   const showGift = formConfig.showBanks && ((data.banks || []).length > 0 || data.qris || data.giftAddress)
@@ -222,6 +226,18 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
 
         {open && (
           <main className="inv-main">
+            {isUnpaid && (
+              <div
+                style={{
+                  margin: '1rem auto 0', maxWidth: '42rem', padding: '0.6rem 1rem',
+                  fontSize: '0.72rem', letterSpacing: '0.08em', textAlign: 'center',
+                  borderRadius: '0.35rem', border: '1px solid rgba(180,140,60,0.45)',
+                  background: 'rgba(190,150,70,0.14)', color: 'inherit', opacity: 0.9,
+                }}
+              >
+                ⏳ Konfirmasi pembayaran sedang diproses — fitur eksklusif (QR check-in &amp; Frame Foto) akan aktif setelah undangan dikonfirmasi lunas.
+              </div>
+            )}
             {data.music && (
               <button
                 type="button"
@@ -247,12 +263,12 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
             {showEvents && (
               <Reveal>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
             )}
-            {formConfig.showCheckIn && showEvents && (
+            {formConfig.showCheckIn && showEvents && !isUnpaid && (
               <Reveal><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
             )}
             {formConfig.showDressLive && <Reveal><DressCode data={data} scene={scenes.date} /></Reveal>}
             {formConfig.showDressLive && <Reveal><Live data={data} scene={scenes.story} /></Reveal>}
-            {formConfig.showFrame && (
+            {formConfig.showFrame && !isUnpaid && (
               <Reveal><Frame data={data} guest={guest} couple={couple} onOpen={() => setShowFrameModal(true)} scene={scenes.gallery} /></Reveal>
             )}
             {data.gallery?.length > 0 && (
@@ -630,7 +646,7 @@ function Gallery({ images, onOpen, scene }) {
       <div className="gallery">
         {images.map((src, i) => (
           <button type="button" key={src} onClick={() => onOpen(i)}>
-            <img src={src} alt="" />
+            <img src={src} alt="" loading="lazy" decoding="async" />
           </button>
         ))}
       </div>
@@ -815,7 +831,7 @@ function Gift({ banks, qris, address, wishlist, copied, onCopy, scene }) {
           <ul>
             {items.map((w) => (
               <li key={w.title}>
-                {w.image && <img src={w.image} alt="" />}
+                {w.image && <img src={w.image} alt="" loading="lazy" decoding="async" />}
                 <div>
                   <strong>{w.title}</strong>
                   {w.price && <p>{w.price}</p>}

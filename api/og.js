@@ -113,6 +113,8 @@ export default async function handler(req, res) {
   const tags = [
     `<title>${escapeHtml(title)}</title>`,
     `<meta name="description" content="${escapeHtml(desc)}" />`,
+    // Halaman undangan = per-invite & berisi data pribadi klien → jangan diindeks mesin pencari
+    `<meta name="robots" content="noindex, nofollow" />`,
     `<meta property="og:type" content="website" />`,
     `<meta property="og:url" content="${escapeHtml(`${origin}/u/${req.query.slug}`)}" />`,
     `<meta property="og:title" content="${escapeHtml(title)}" />`,

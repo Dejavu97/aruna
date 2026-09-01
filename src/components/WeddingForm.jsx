@@ -252,7 +252,7 @@ export default function InvitationForm({
         </p>
         <h1 className="mt-2 font-display text-5xl">{theme.name}</h1>
         <p className="mt-3 text-stone">{theme.description}</p>
-        <img src={theme.cover} alt="" className="mt-6 aspect-[3/4] w-full max-w-sm object-cover" />
+        <img src={theme.cover} alt="" loading="lazy" decoding="async" className="mt-6 aspect-[3/4] w-full max-w-sm object-cover" />
         {mode === 'create' && (
           <div className="mt-6 border-t border-ink/10 pt-4">
             <div className="flex items-center justify-between">

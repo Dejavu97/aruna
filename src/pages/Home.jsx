@@ -172,6 +172,8 @@ function Hero() {
             <img
               src={currentHero.cover}
               alt={currentHero.themeTitle}
+              loading="lazy"
+              decoding="async"
               className="h-[400px] w-full object-cover object-center transition-opacity duration-300"
             />
             <div className="bg-ivory/90 p-5 text-center text-ink backdrop-blur-md">
