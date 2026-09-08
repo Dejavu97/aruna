@@ -116,12 +116,41 @@ export const ORNAMENT_ASSETS = {
 
 const ASSET_IDS = Object.keys(ORNAMENT_ASSETS)
 
+/**
+ * Upload custom asset (PNG transparan misal AI-generated kupu/bunga milik user)
+ * sebagai ornamen — kebebasan penuh, tetap data (URL) bukan HTML bebas.
+ */
+const CUSTOM_ASSET = 'custom'
+
 /** Render a single placed ornament via inline style + asset SVG. */
 function OrnamentItem({ o }) {
+  const isCustom = o.asset === CUSTOM_ASSET && o.url
   const asset = ORNAMENT_ASSETS[o.asset]
-  if (!asset) return null
+  if (!isCustom && !asset) return null
   const anim = ORNAMENT_ANIMS[o.anim] || ''
   const transform = `translate(-50%, -50%) rotate(${o.rotate || 0}deg) scale(${o.scale || 1})`
+  if (isCustom) {
+    return (
+      <img
+        src={o.url}
+        alt=""
+        aria-hidden
+        className={`orn-svg${anim ? ` ${anim}` : ''}`}
+        style={{
+          position: 'absolute',
+          left: `${o.x ?? 50}%`,
+          top: `${o.y ?? 50}%`,
+          width: `${64 * (o.scale || 1)}px`,
+          opacity: o.opacity ?? 0.85,
+          zIndex: o.z ?? 2,
+          transform,
+          pointerEvents: 'none',
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
   return (
     <svg
       className={`orn-svg${anim ? ` ${anim}` : ''}`}
@@ -152,20 +181,33 @@ function OrnamentItem({ o }) {
  * @param {string} className  extra class (uses theme scoping if desired)
  * @param {React.ElementType} as  default 'div'
  */
-export default function OrnamentLayer({ ornaments = [], className = '', as: Tag = 'div' }) {
-  const items = (ornaments || []).filter((o) => ASSET_IDS.includes(o.asset))
+export default function OrnamentLayer({ ornaments = [], className = '' }) {
+  const items = (ornaments || []).filter((o) => (o.asset === CUSTOM_ASSET ? !!o.url : ASSET_IDS.includes(o.asset)))
   if (!items.length) return null
   return (
-    <Tag className={`orn-layer${className ? ` ${className}` : ''}`} aria-hidden>
+    <div className={`orn-layer${className ? ` ${className}` : ''}`} aria-hidden>
       {items.map((o, i) => (
         <OrnamentItem key={i} o={o} />
       ))}
-    </Tag>
+    </div>
   )
 }
 
 /** Helper: normalize a raw ornament entry (defaults safe values). */
 export function normalizeOrnament(o = {}) {
+  if (o.asset === CUSTOM_ASSET) {
+    return {
+      asset: CUSTOM_ASSET,
+      url: typeof o.url === 'string' && /^https:\/\//.test(o.url) ? o.url : '',
+      x: typeof o.x === 'number' ? o.x : 50,
+      y: typeof o.y === 'number' ? o.y : 50,
+      scale: typeof o.scale === 'number' ? o.scale : 1,
+      rotate: typeof o.rotate === 'number' ? o.rotate : 0,
+      opacity: typeof o.opacity === 'number' ? o.opacity : 0.85,
+      anim: ORNAMENT_ANIMS[o.anim] !== undefined ? o.anim : 'none',
+      z: typeof o.z === 'number' ? o.z : 2,
+    }
+  }
   return {
     asset: ASSET_IDS.includes(o.asset) ? o.asset : 'butterfly',
     x: typeof o.x === 'number' ? o.x : 50,

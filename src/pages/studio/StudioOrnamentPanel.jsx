@@ -1,4 +1,6 @@
-import { Plus, Trash2, Flower2 } from 'lucide-react'
+import { Plus, Trash2, Flower2, Upload } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { uploadFile } from '../../lib/api'
 import { ORNAMENT_ASSETS, ORNAMENT_ANIMS } from '../../invitation/OrnamentLayer'
 
 /**
@@ -41,9 +43,25 @@ function Slider({ label, value, min, max, step = 1, onChange, suffix = '' }) {
 }
 
 export default function StudioOrnamentPanel({ ornaments = [], setOrnaments }) {
+  const [uploadingIdx, setUploadingIdx] = useState(-1)
+  const fileInputs = useRef({})
   const update = (idx, patch) =>
     setOrnaments(ornaments.map((o, i) => (i === idx ? { ...o, ...patch } : o)))
   const remove = (idx) => setOrnaments(ornaments.filter((_, i) => i !== idx))
+  async function handleCustomUpload(idx, e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingIdx(idx)
+    try {
+      const res = await uploadFile(file)
+      update(idx, { asset: 'custom', url: res.url })
+    } catch (err) {
+      alert(err.message || 'Gagal mengunggah aset.')
+    } finally {
+      setUploadingIdx(-1)
+      e.target.value = ''
+    }
+  }
   const add = () => {
     // sebar posisi default biar ornamen baru nggak numpuk di satu titik
     const spots = [
@@ -111,7 +129,43 @@ export default function StudioOrnamentPanel({ ornaments = [], setOrnaments }) {
                 {a.name}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => fileInputs.current[idx]?.click()}
+              className={`px-1.5 py-1.5 text-[9px] uppercase tracking-wide rounded-xs border transition-colors flex flex-col items-center justify-center gap-0.5 ${
+                o.asset === 'custom'
+                  ? 'border-gold-deep bg-gold/10 font-bold text-ink'
+                  : 'border-dashed border-ink/25 text-stone hover:text-ink'
+              }`}
+              title="Pakai gambar sendiri (PNG/JPG/WebP, disarankan PNG transparan)"
+            >
+              <Upload size={11} />
+              {o.asset === 'custom' ? 'Kustom ✓' : 'Upload'}
+            </button>
+            <input
+              ref={(el) => { fileInputs.current[idx] = el }}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              className="hidden"
+              onChange={(e) => handleCustomUpload(idx, e)}
+            />
           </div>
+          {o.asset === 'custom' && o.url && (
+            <div className="flex items-center gap-2 p-1.5 border border-ink/15 rounded-xs bg-paper">
+              <img src={o.url} alt="Aset kustom" className="w-9 h-9 object-contain" />
+              <div className="flex-1 text-[9px] text-stone leading-tight">
+                Aset kustom terpasang (disarankan PNG transparan). Warna & animasi tetap bisa diatur.
+              </div>
+              <button
+                type="button"
+                onClick={() => update(idx, { asset: 'butterfly', url: undefined })}
+                className="px-1.5 py-1 text-[9px] uppercase tracking-wide text-red-700/70 hover:text-red-700"
+                title="Buang aset kustom, kembali ke SVG bawaan"
+              >
+                Buang
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
             <Slider label="Posisi X" value={o.x ?? 50} min={0} max={100} onChange={(v) => update(idx, { x: v })} suffix="%" />
