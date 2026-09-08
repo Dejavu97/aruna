@@ -74,3 +74,13 @@ Dikonsumsi dua tempat: `Invitation.jsx` (`theme.ornaments || data.ornaments`) da
 posisi/ukuran/rotasi/opasitas + warna + animasi). Layer `z-20`,
 `pointer-events:none` — ornamen tampil DI ATAS kartu; asset pre-vetted (bukan
 HTML bebas), aman utk `custom_themes` publik. Branch: `feat/flex-studio`.
+
+## 7. Animasi Per-Bagian (FlexStudio Fase 1, dalam tab "Gerak & Sentuhan")
+Data: `sectionAnims` di payload tema — `{ [sectionId]: { enter, duration, delay } }`,
+`sectionId` ∈ `_all|hero|greeting|quote|couple|story|countdown|events|gallery|
+rsvp|wishes|gift|closer`; `enter` ∈ preset id di `SectionFX.js` (11 preset:
+fade_up/down/left/right, zoom_in/out, blur_in, rotate_in, flip_x, split_reveal,
+none). Fallback: section tak diatur → `_all` → `fade_up` (default lama).
+Renderer: `Reveal` di `Invitation.jsx` terima `fx`+`sectionAnims`; framer-motion
+`whileInView` (once). UI: `StudioSectionAnimPanel.jsx` (dropdown preset + slider
+durasi 0.2–2s + tunda 0–1.5s per section, tombol reset ke global).

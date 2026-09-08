@@ -4,6 +4,7 @@ import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Calendar, 
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
 import OrnamentLayer from './OrnamentLayer'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
+import { getSectionAnim } from './SectionFX'
 import {
   copyText,
   countdownParts,
@@ -252,32 +253,32 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
             )}
             {data.music && musicOn && <audio src={data.music} autoPlay loop />}
 
-            <Reveal>{theme.layout === 'attari' ? <HeroAttari theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} /> : <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} formConfig={formConfig} />}</Reveal>
-            <Reveal><Greeting theme={theme} text={theme.greeting} scene={scenes.home} /></Reveal>
-            {data.quote && <Reveal><Quote data={data} theme={theme} scene={scenes.story} /></Reveal>}
+            <Reveal fx="hero" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <HeroAttari theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} /> : <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} formConfig={formConfig} />}</Reveal>
+            <Reveal fx="greeting" sectionAnims={theme.sectionAnims}><Greeting theme={theme} text={theme.greeting} scene={scenes.home} /></Reveal>
+            {data.quote && <Reveal fx="quote" sectionAnims={theme.sectionAnims}><Quote data={data} theme={theme} scene={scenes.story} /></Reveal>}
             {showCouple && (
-              <Reveal>{theme.layout === 'attari' ? <CoupleAttari data={data} scene={scenes.couple} /> : <Couple theme={theme} data={data} scene={scenes.couple} formConfig={formConfig} />}</Reveal>
+              <Reveal fx="couple" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <CoupleAttari data={data} scene={scenes.couple} /> : <Couple theme={theme} data={data} scene={scenes.couple} formConfig={formConfig} />}</Reveal>
             )}
-            {data.story?.length > 0 && <Reveal><Story story={data.story} scene={scenes.story} isLoveLetter={isLoveLetter} /></Reveal>}
+            {data.story?.length > 0 && <Reveal fx="story" sectionAnims={theme.sectionAnims}><Story story={data.story} scene={scenes.story} isLoveLetter={isLoveLetter} /></Reveal>}
             {!isLoveLetter && (
-              <Reveal><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
+              <Reveal fx="countdown" sectionAnims={theme.sectionAnims}><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
             )}
             {showEvents && (
-              <Reveal>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
+              <Reveal fx="events" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
             )}
             {formConfig.showCheckIn && showEvents && !isUnpaid && (
-              <Reveal><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
+              <Reveal fx="events" sectionAnims={theme.sectionAnims}><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
             )}
-            {formConfig.showDressLive && <Reveal><DressCode data={data} scene={scenes.date} /></Reveal>}
-            {formConfig.showDressLive && <Reveal><Live data={data} scene={scenes.story} /></Reveal>}
+            {formConfig.showDressLive && <Reveal fx="events" sectionAnims={theme.sectionAnims}><DressCode data={data} scene={scenes.date} /></Reveal>}
+            {formConfig.showDressLive && <Reveal fx="events" sectionAnims={theme.sectionAnims}><Live data={data} scene={scenes.story} /></Reveal>}
             {formConfig.showFrame && !isUnpaid && (
-              <Reveal><Frame data={data} guest={guest} couple={couple} onOpen={() => setShowFrameModal(true)} scene={scenes.gallery} /></Reveal>
+              <Reveal fx="gallery" sectionAnims={theme.sectionAnims}><Frame data={data} guest={guest} couple={couple} onOpen={() => setShowFrameModal(true)} scene={scenes.gallery} /></Reveal>
             )}
             {data.gallery?.length > 0 && (
-              <Reveal><Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} /></Reveal>
+              <Reveal fx="gallery" sectionAnims={theme.sectionAnims}><Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} /></Reveal>
             )}
             {formConfig.showRsvp && (
-              <Reveal><Rsvp
+              <Reveal fx="rsvp" sectionAnims={theme.sectionAnims}><Rsvp
                 slug={data.slug}
                 guest={guest}
                 demo={data.demo}
@@ -286,7 +287,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
                 scene={scenes.wishes}
               /></Reveal>
             )}
-            <Reveal><Wishes
+            <Reveal fx="wishes" sectionAnims={theme.sectionAnims}><Wishes
               slug={data.slug}
               wishes={local.wishes || []}
               guest={guest}
@@ -297,7 +298,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
             /></Reveal>
             <AdSlot slot="rsvp" data={data} theme={theme} />
             {showGift && (
-              <Reveal><Gift
+              <Reveal fx="gift" sectionAnims={theme.sectionAnims}><Gift
                 banks={data.banks || []}
                 qris={data.qris}
                 address={data.giftAddress}
@@ -308,7 +309,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
               /></Reveal>
             )}
             <AdSlot slot="footer" data={data} theme={theme} />
-            <Reveal><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} data={data} /></Reveal>
+            <Reveal fx="closer" sectionAnims={theme.sectionAnims}><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} data={data} /></Reveal>
             {!isLoveLetter && <BottomNav />}
           </main>
         )}
@@ -1027,13 +1028,24 @@ function Corners() {
   )
 }
 
-function Reveal({ children, delay = 0 }) {
+function Reveal({ children, delay = 0, fx, sectionAnims }) {
+  const cfg = fx ? getSectionAnim(sectionAnims, fx) : null
+  const motionProps = cfg
+    ? {
+        initial: cfg.initial || undefined,
+        whileInView: cfg.whileInView || undefined,
+        transition: { ...cfg.transition, delay: cfg.transition.delay + delay },
+        style: cfg.style,
+      }
+    : {
+        initial: { opacity: 0, y: 40 },
+        whileInView: { opacity: 1, y: 0 },
+        transition: { duration: 0.8, delay, ease: 'easeOut' },
+      }
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8, delay, ease: "easeOut" }}
+      {...motionProps}
+      viewport={motionProps.whileInView ? { once: true, margin: '-100px' } : undefined}
     >
       {children}
     </motion.div>

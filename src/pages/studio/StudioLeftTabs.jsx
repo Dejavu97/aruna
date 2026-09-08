@@ -24,6 +24,7 @@ import { eventTypeConfigs, themePresets, photoFilterMap, displayFontOptions, scr
 import { motion, AnimatePresence } from 'framer-motion'
 import { copyText } from '../../lib/utils'
 import StudioOrnamentPanel from './StudioOrnamentPanel'
+import StudioSectionAnimPanel from './StudioSectionAnimPanel'
 
 /** StudioLeftTabs — diekstrak verbatim dari ThemeStudio.jsx (Fase 3b). */
 export default function StudioLeftTabs({ activeEventConfig,
@@ -56,6 +57,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   navigate,
   openingAnimation,
   ornaments,
+  sectionAnims,
   ornamentStyle,
   particleEffect,
   photoColorFilter,
@@ -77,6 +79,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   setMoodPrompt,
   setOpeningAnimation,
   setOrnaments,
+  setSectionAnims,
   setPhotoColorFilter,
   setPresetSubTab,
   setPreviewOpened,
@@ -720,6 +723,7 @@ export default function StudioLeftTabs({ activeEventConfig,
           {/* TAB 6: MOTION, PARTICLES & TOUCH FX */}
           {activeTab === 'motion' && (
             <div className="space-y-6 animate-in fade-in text-xs">
+              <StudioSectionAnimPanel sectionAnims={sectionAnims} setSectionAnims={setSectionAnims} />
               <div className="border-b border-ink/10 pb-3">
                 <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2">
                   <Activity size={16} className="text-gold-deep" /> Gerak Sinematik &amp; Interaksi Sentuh

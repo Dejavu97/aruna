@@ -61,6 +61,7 @@ export default function ThemeStudio() {
         navigate={s.navigate}
         openingAnimation={s.openingAnimation}
         ornaments={s.ornaments}
+        sectionAnims={s.sectionAnims}
         ornamentStyle={s.ornamentStyle}
         particleEffect={s.particleEffect}
         photoColorFilter={s.photoColorFilter}
@@ -82,6 +83,7 @@ export default function ThemeStudio() {
         setMoodPrompt={s.setMoodPrompt}
         setOpeningAnimation={s.setOpeningAnimation}
         setOrnaments={s.setOrnaments}
+        setSectionAnims={s.setSectionAnims}
         setPhotoColorFilter={s.setPhotoColorFilter}
         setPresetSubTab={s.setPresetSubTab}
         setPreviewOpened={s.setPreviewOpened}
