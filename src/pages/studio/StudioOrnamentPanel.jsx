@@ -86,6 +86,10 @@ export default function StudioOrnamentPanel({ ornaments = [], setOrnaments }) {
         <p className="text-[11px] text-stone leading-relaxed">
           Tambahkan hiasan (kupu-kupu, bunga, kilau, dll) bebas di dalam undangan —
           atur posisi, ukuran, rotasi, warna, dan animasinya. Tampil di preview & undangan final.
+          <span className="block mt-1.5 text-[10px] text-gold-deep/90 font-medium">
+            ⬆ Pakai gambar sendiri? Upload gambar/foto <b>tanpa latar belakang</b> (PNG transparan) —
+            yang ada background kotak/putihnya akan tampak menutupi undangan.
+          </span>
         </p>
         <button
           type="button"
@@ -137,7 +141,7 @@ export default function StudioOrnamentPanel({ ornaments = [], setOrnaments }) {
                   ? 'border-gold-deep bg-gold/10 font-bold text-ink'
                   : 'border-dashed border-ink/25 text-stone hover:text-ink'
               }`}
-              title="Pakai gambar sendiri (PNG/JPG/WebP, disarankan PNG transparan)"
+              title="Pakai gambar sendiri — WAJIB gambar/foto TANPA latar belakang (PNG transparan), supaya ornamen menyatu rapi"
             >
               <Upload size={11} />
               {o.asset === 'custom' ? 'Kustom ✓' : 'Upload'}
@@ -154,7 +158,8 @@ export default function StudioOrnamentPanel({ ornaments = [], setOrnaments }) {
             <div className="flex items-center gap-2 p-1.5 border border-ink/15 rounded-xs bg-paper">
               <img src={o.url} alt="Aset kustom" className="w-9 h-9 object-contain" />
               <div className="flex-1 text-[9px] text-stone leading-tight">
-                Aset kustom terpasang (disarankan PNG transparan). Warna & animasi tetap bisa diatur.
+                Aset kustom terpasang. Warna & animasi tetap bisa diatur.
+                (Ideal: PNG tanpa latar belakang — background kotak akan menutupi undangan.)
               </div>
               <button
                 type="button"
