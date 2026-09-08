@@ -12,6 +12,27 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { copyText } from '../../lib/utils'
 import AtmosphereParticles from '../../components/AtmosphereParticles'
 import OrnamentLayer from '../../invitation/OrnamentLayer'
+import { getSectionAnim } from '../../invitation/SectionFX'
+
+/** SectionWrap — bungkus section preview dgn animasi masuk per-section (FlexStudio). */
+function SectionWrap({ id, sectionAnims, animKey, children, className = '' }) {
+  const cfg = getSectionAnim(sectionAnims, id)
+  const active = cfg && cfg.initial && cfg.whileInView
+  if (!active) return <div key={`sec-${id}-${animKey}`} className={className}>{children}</div>
+  return (
+    <motion.div
+      key={`sec-${id}-${animKey}`}
+      className={className}
+      initial={cfg.initial}
+      whileInView={cfg.whileInView}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={cfg.transition}
+      style={cfg.style}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 /** StudioPreview — diekstrak verbatim dari ThemeStudio.jsx (Fase 3b). */
 export default function StudioPreview({ accentSoftColor,
@@ -38,6 +59,7 @@ export default function StudioPreview({ accentSoftColor,
   monogramInitials,
   monogramStyle,
   ornaments,
+  sectionAnims,
   openingAnimation,
   paperBgColor,
   particleEffect,
@@ -283,7 +305,7 @@ export default function StudioPreview({ accentSoftColor,
                   // 1. HERO SECTION
                   if (sec.id === 'hero') {
                     return (
-                      <div key={`sec-${sec.id}-${animKey}`}>
+                      <SectionWrap id="hero" sectionAnims={sectionAnims} animKey={animKey}>
                         <motion.section {...floatingAnimation} className="relative z-10 block text-center pt-2">
                           {monogramStyle !== 'none' && (
                             <div className="mb-3 flex justify-center">
@@ -308,14 +330,14 @@ export default function StudioPreview({ accentSoftColor,
                           </p>
                         </motion.section>
                         {renderSectionDivider(dividerShape)}
-                      </div>
+                      </SectionWrap>
                     )
                   }
 
                   // 2. COUPLE / PROFIL SECTION
                   if (sec.id === 'couple') {
                     return (
-                      <div key={`sec-${sec.id}-${animKey}`}>
+                      <SectionWrap id="couple" sectionAnims={sectionAnims} animKey={animKey}>
                         <section className="relative z-10 space-y-4">
                           <div className="text-center">
                             <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: activeColorPalette.muted }}>
@@ -375,14 +397,14 @@ export default function StudioPreview({ accentSoftColor,
                           )}
                         </section>
                         {renderSectionDivider(dividerShape)}
-                      </div>
+                      </SectionWrap>
                     )
                   }
 
                   // 3. EVENTS
                   if (sec.id === 'events') {
                     return (
-                      <div key={`sec-${sec.id}-${animKey}`}>
+                      <SectionWrap id="events" sectionAnims={sectionAnims} animKey={animKey}>
                         <section className="relative z-10 space-y-3">
                           <div className="text-center">
                             <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: activeColorPalette.muted }}>
@@ -401,14 +423,14 @@ export default function StudioPreview({ accentSoftColor,
                           ))}
                         </section>
                         {renderSectionDivider(dividerShape)}
-                      </div>
+                      </SectionWrap>
                     )
                   }
 
                   // 4. STORY WITH VOICE NOTE
                   if (sec.id === 'story') {
                     return (
-                      <div key={`sec-${sec.id}-${animKey}`}>
+                      <SectionWrap id="story" sectionAnims={sectionAnims} animKey={animKey}>
                         <section className="relative z-10 space-y-4">
                           <div className="text-center">
                             <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: activeColorPalette.muted }}>
@@ -446,14 +468,14 @@ export default function StudioPreview({ accentSoftColor,
                           </div>
                         </section>
                         {renderSectionDivider(dividerShape)}
-                      </div>
+                      </SectionWrap>
                     )
                   }
 
                   // 5. GALLERY
                   if (sec.id === 'gallery') {
                     return (
-                      <div key={`sec-${sec.id}-${animKey}`}>
+                      <SectionWrap id="gallery" sectionAnims={sectionAnims} animKey={animKey}>
                         <section className="relative z-10 space-y-3">
                           <div className="text-center">
                             <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: activeColorPalette.muted }}>
@@ -469,21 +491,23 @@ export default function StudioPreview({ accentSoftColor,
                           </div>
                         </section>
                         {renderSectionDivider(dividerShape)}
-                      </div>
+                      </SectionWrap>
                     )
                   }
 
                   // 6. CLOSER
                   if (sec.id === 'closer') {
                     return (
-                      <footer key={`sec-${sec.id}-${animKey}`} className="relative z-10 text-center pt-4 space-y-2">
+                      <SectionWrap id="closer" sectionAnims={sectionAnims} animKey={animKey} className="relative z-10 text-center pt-4 space-y-2">
+                        <footer className="relative z-10 text-center pt-4 space-y-2">
                         <h3 className="text-2xl italic" style={{ fontFamily: activeScriptFont, color: activeColorPalette.fg }}>
                           {eventType === 'wedding' ? `${previewData.bride.nick} & ${previewData.groom.nick}` : activeEventConfig.heroNames}
                         </h3>
                         <p className="text-[9px] opacity-75 uppercase tracking-widest">
                           Dibuat dengan Aruna · {themeName}
                         </p>
-                      </footer>
+                        </footer>
+                      </SectionWrap>
                     )
                   }
 

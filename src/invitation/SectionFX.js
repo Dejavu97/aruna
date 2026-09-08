@@ -67,10 +67,11 @@ export const SECTION_ENTER_PRESETS = {
 }
 
 /** Framer transition builder (durasi/delay dari config user). */
-export function sectionTransition(cfg = {}) {
+export function sectionTransition(cfg) {
+  const c = cfg || {}
   return {
-    duration: typeof cfg.duration === 'number' ? cfg.duration : 0.8,
-    delay: typeof cfg.delay === 'number' ? cfg.delay : 0,
+    duration: typeof c.duration === 'number' ? c.duration : 0.8,
+    delay: typeof c.delay === 'number' ? c.delay : 0,
     ease: 'easeOut',
   }
 }

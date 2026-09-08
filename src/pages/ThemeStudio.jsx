@@ -124,6 +124,7 @@ export default function ThemeStudio() {
         previewDevice={s.previewDevice}
         previewOpened={s.previewOpened}
         previewScrollRef={s.previewScrollRef}
+        sectionAnims={s.sectionAnims}
         previewThemeMode={s.previewThemeMode}
         renderMonogram={s.renderMonogram}
         renderSectionDivider={s.renderSectionDivider}
