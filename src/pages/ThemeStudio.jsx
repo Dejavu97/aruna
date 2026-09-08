@@ -61,6 +61,7 @@ export default function ThemeStudio() {
         navigate={s.navigate}
         openingAnimation={s.openingAnimation}
         ornaments={s.ornaments}
+        backgroundFx={s.backgroundFx}
         sectionAnims={s.sectionAnims}
         ornamentStyle={s.ornamentStyle}
         particleEffect={s.particleEffect}
@@ -84,6 +85,7 @@ export default function ThemeStudio() {
         setOpeningAnimation={s.setOpeningAnimation}
         setOrnaments={s.setOrnaments}
         setSectionAnims={s.setSectionAnims}
+        setBackgroundFx={s.setBackgroundFx}
         setPhotoColorFilter={s.setPhotoColorFilter}
         setPresetSubTab={s.setPresetSubTab}
         setPreviewOpened={s.setPreviewOpened}
@@ -125,6 +127,7 @@ export default function ThemeStudio() {
         previewOpened={s.previewOpened}
         previewScrollRef={s.previewScrollRef}
         sectionAnims={s.sectionAnims}
+        backgroundFx={s.backgroundFx}
         previewThemeMode={s.previewThemeMode}
         renderMonogram={s.renderMonogram}
         renderSectionDivider={s.renderSectionDivider}

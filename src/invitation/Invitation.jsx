@@ -227,7 +227,13 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
         </AnimatePresence>
 
         {open && (
-          <main className="inv-main">
+          <main
+            className="inv-main"
+            style={theme.backgroundFx?.enabled ? {
+              backgroundImage: `linear-gradient(${theme.backgroundFx.angle ?? 160}deg, ${theme.backgroundFx.color1}, ${theme.backgroundFx.color2})`,
+              backgroundAttachment: 'fixed',
+            } : undefined}
+          >
             <OrnamentLayer ornaments={theme.ornaments || data.ornaments || []} className="inv-orn" />
             {isUnpaid && (
               <div

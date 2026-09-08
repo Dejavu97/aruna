@@ -57,6 +57,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   navigate,
   openingAnimation,
   ornaments,
+  backgroundFx,
   sectionAnims,
   ornamentStyle,
   particleEffect,
@@ -80,6 +81,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   setOpeningAnimation,
   setOrnaments,
   setSectionAnims,
+  setBackgroundFx,
   setPhotoColorFilter,
   setPresetSubTab,
   setPreviewOpened,
@@ -484,6 +486,67 @@ export default function StudioLeftTabs({ activeEventConfig,
                 <p className="text-xs text-stone mt-1">
                   Sesuaikan palet warna mode siang dan mode senja malam (Twilight Dark Luxury).
                 </p>
+              </div>
+
+              {/* FlexStudio: Background Gradient Builder */}
+              <div className="border border-gold/40 p-4 rounded-sm bg-gold/5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs uppercase tracking-wider font-bold text-ink">
+                    Gradasi Latar (Background Gradient)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setBackgroundFx((p) => ({ ...p, enabled: !p.enabled }))}
+                    className={`px-2.5 py-1 text-[10px] uppercase tracking-wider font-bold rounded-xs border transition-colors ${
+                      backgroundFx.enabled
+                        ? 'bg-gold-deep text-ivory border-gold-deep'
+                        : 'border-ink/20 text-stone hover:text-ink'
+                    }`}
+                  >
+                    {backgroundFx.enabled ? 'Aktif ✓' : 'Nonaktif'}
+                  </button>
+                </div>
+                <p className="text-[11px] text-stone leading-relaxed">
+                  Latar undangan gradasi 2 warna bebas (bukan lagi satu warna flat).
+                </p>
+                {backgroundFx.enabled && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className="block">
+                        <span className="text-[10px] uppercase tracking-wider text-stone font-semibold">Warna Atas</span>
+                        <input
+                          type="color" value={backgroundFx.color1 || '#F7F3EC'}
+                          onChange={(e) => setBackgroundFx((p) => ({ ...p, color1: e.target.value }))}
+                          className="w-full h-7 cursor-pointer border border-ink/15 rounded-xs bg-transparent"
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="text-[10px] uppercase tracking-wider text-stone font-semibold">Warna Bawah</span>
+                        <input
+                          type="color" value={backgroundFx.color2 || '#E8DCC8'}
+                          onChange={(e) => setBackgroundFx((p) => ({ ...p, color2: e.target.value }))}
+                          className="w-full h-7 cursor-pointer border border-ink/15 rounded-xs bg-transparent"
+                        />
+                      </label>
+                    </div>
+                    <label className="block">
+                      <span className="text-[10px] uppercase tracking-wider text-stone font-semibold flex justify-between">
+                        <span>Arah Gradasi</span>
+                        <span className="font-mono">{backgroundFx.angle ?? 160}°</span>
+                      </span>
+                      <input
+                        type="range" min={0} max={360} step={5}
+                        value={backgroundFx.angle ?? 160}
+                        onChange={(e) => setBackgroundFx((p) => ({ ...p, angle: Number(e.target.value) }))}
+                        className="w-full accent-gold-deep h-1 cursor-pointer"
+                      />
+                    </label>
+                    <div
+                      className="h-9 rounded-xs border border-ink/15"
+                      style={{ background: `linear-gradient(${backgroundFx.angle ?? 160}deg, ${backgroundFx.color1}, ${backgroundFx.color2})` }}
+                    />
+                  </>
+                )}
               </div>
 
               {/* AI Palette Extractor from Photo */}

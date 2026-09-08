@@ -518,6 +518,7 @@ export function useStudioState() {
     if (td.customAssets) setCustomAssets(td.customAssets)
     if (td.ornaments) setOrnaments(td.ornaments)
     if (td.sectionAnims) setSectionAnims(td.sectionAnims)
+    if (td.backgroundFx) setBackgroundFx(td.backgroundFx)
     setThemeName(tmpl.name)
     setCreatorName(tmpl.creator)
     setAnimKey((k) => k + 1)
@@ -566,6 +567,7 @@ export function useStudioState() {
   // Full Uploaded Custom Assets
   const [ornaments, setOrnaments] = useState([])
   const [sectionAnims, setSectionAnims] = useState({})
+  const [backgroundFx, setBackgroundFx] = useState({ enabled: false, color1: '#F7F3EC', color2: '#E8DCC8', angle: 160 })
   const [customAssets, setCustomAssets] = useState({
     coverImgUrl: '/assets/local/couple_laughing_1.jpg',
     coverImgSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
@@ -1025,6 +1027,7 @@ export function useStudioState() {
         customAssets,
         ornaments,
         sectionAnims,
+        backgroundFx,
         cover: customAssets.coverImgUrl || '/themes/emas-senja.jpg',
         tags: ['komunitas', 'custom', isPublic ? 'publik' : 'privat'],
         popular: false,
@@ -1302,6 +1305,7 @@ accentBorderColor,
     opacities,
     ornaments,
     sectionAnims,
+    backgroundFx,
     openingAnimation,
     ornamentStyle,
     ornamentTransition,
@@ -1354,6 +1358,7 @@ accentBorderColor,
     setOpeningAnimation,
     setOrnaments,
     setSectionAnims,
+    setBackgroundFx,
     setOrnamentStyle,
     setOrnamentTransition,
     setPanelTransition,

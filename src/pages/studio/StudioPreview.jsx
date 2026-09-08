@@ -59,6 +59,7 @@ export default function StudioPreview({ accentSoftColor,
   monogramInitials,
   monogramStyle,
   ornaments,
+  backgroundFx,
   sectionAnims,
   openingAnimation,
   paperBgColor,
@@ -191,8 +192,14 @@ export default function StudioPreview({ accentSoftColor,
             className="w-full h-full overflow-y-auto relative scroll-smooth z-10"
             style={{
               backgroundColor: mainBgColor,
-              backgroundImage: customAssets.bgTextureUrl ? `url(${customAssets.bgTextureUrl})` : 'none',
+              backgroundImage: [
+                backgroundFx?.enabled
+                  ? `linear-gradient(${backgroundFx.angle ?? 160}deg, ${backgroundFx.color1}, ${backgroundFx.color2})`
+                  : null,
+                customAssets.bgTextureUrl ? `url(${customAssets.bgTextureUrl})` : null,
+              ].filter(Boolean).join(', ') || 'none',
               backgroundSize: 'cover',
+              backgroundAttachment: 'fixed',
               color: activeColorPalette.fg,
               fontFamily: activeBodyFont,
               letterSpacing: fonts.letterSpacing || '0.04em',
