@@ -516,6 +516,7 @@ export function useStudioState() {
     if (td.openingAnimation) setOpeningAnimation(td.openingAnimation)
     if (td.layoutStyle) setLayoutStyle(td.layoutStyle)
     if (td.customAssets) setCustomAssets(td.customAssets)
+    if (td.ornaments) setOrnaments(td.ornaments)
     setThemeName(tmpl.name)
     setCreatorName(tmpl.creator)
     setAnimKey((k) => k + 1)
@@ -562,6 +563,7 @@ export function useStudioState() {
   const [panelTransition, setPanelTransition] = useState('staggered_slide')
 
   // Full Uploaded Custom Assets
+  const [ornaments, setOrnaments] = useState([])
   const [customAssets, setCustomAssets] = useState({
     coverImgUrl: '/assets/local/couple_laughing_1.jpg',
     coverImgSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
@@ -1019,6 +1021,7 @@ export function useStudioState() {
         ornamentTransition,
         panelTransition,
         customAssets,
+        ornaments,
         cover: customAssets.coverImgUrl || '/themes/emas-senja.jpg',
         tags: ['komunitas', 'custom', isPublic ? 'publik' : 'privat'],
         popular: false,
@@ -1294,6 +1297,7 @@ accentBorderColor,
     moveSectionUp,
     myAgencyTemplates,
     opacities,
+    ornaments,
     openingAnimation,
     ornamentStyle,
     ornamentTransition,
@@ -1344,6 +1348,7 @@ accentBorderColor,
     setMyAgencyTemplates,
     setOpacities,
     setOpeningAnimation,
+    setOrnaments,
     setOrnamentStyle,
     setOrnamentTransition,
     setPanelTransition,

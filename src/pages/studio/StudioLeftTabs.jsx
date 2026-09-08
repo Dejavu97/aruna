@@ -23,6 +23,7 @@ import {
 import { eventTypeConfigs, themePresets, photoFilterMap, displayFontOptions, scriptFontOptions, bodyFontOptions } from './useStudioState.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import { copyText } from '../../lib/utils'
+import StudioOrnamentPanel from './StudioOrnamentPanel'
 
 /** StudioLeftTabs — diekstrak verbatim dari ThemeStudio.jsx (Fase 3b). */
 export default function StudioLeftTabs({ activeEventConfig,
@@ -54,6 +55,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   myAgencyTemplates,
   navigate,
   openingAnimation,
+  ornaments,
   ornamentStyle,
   particleEffect,
   photoColorFilter,
@@ -74,6 +76,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   setMonogramStyle,
   setMoodPrompt,
   setOpeningAnimation,
+  setOrnaments,
   setPhotoColorFilter,
   setPresetSubTab,
   setPreviewOpened,
@@ -91,6 +94,7 @@ export default function StudioLeftTabs({ activeEventConfig,
             ['typography', 'Tipografi'],
             ['color', 'Warna & Mode'],
             ['photographer', 'Fotografer & Kartu'],
+            ['ornaments', 'Ornamen'],
             ['motion', 'Gerak & Sentuhan'],
             ['uploads', 'Pusat Upload Aset'],
           ].map(([tab, label]) => (
@@ -706,6 +710,11 @@ export default function StudioLeftTabs({ activeEventConfig,
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB: ORNAMEN (FlexStudio) */}
+          {activeTab === 'ornaments' && (
+            <StudioOrnamentPanel ornaments={ornaments} setOrnaments={setOrnaments} />
           )}
 
           {/* TAB 6: MOTION, PARTICLES & TOUCH FX */}

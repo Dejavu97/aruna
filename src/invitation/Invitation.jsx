@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Calendar, Images, Heart, Gift as GiftIcon, MailOpen, Camera } from 'lucide-react'
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
+import OrnamentLayer from './OrnamentLayer'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import {
   copyText,
@@ -226,6 +227,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
 
         {open && (
           <main className="inv-main">
+            <OrnamentLayer ornaments={theme.ornaments || data.ornaments || []} className="inv-orn" />
             {isUnpaid && (
               <div
                 style={{

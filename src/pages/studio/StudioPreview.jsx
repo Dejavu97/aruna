@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import { copyText } from '../../lib/utils'
 import AtmosphereParticles from '../../components/AtmosphereParticles'
+import OrnamentLayer from '../../invitation/OrnamentLayer'
 
 /** StudioPreview — diekstrak verbatim dari ThemeStudio.jsx (Fase 3b). */
 export default function StudioPreview({ accentSoftColor,
@@ -36,6 +37,7 @@ export default function StudioPreview({ accentSoftColor,
   mainBgColor,
   monogramInitials,
   monogramStyle,
+  ornaments,
   openingAnimation,
   paperBgColor,
   particleEffect,
@@ -174,6 +176,8 @@ export default function StudioPreview({ accentSoftColor,
               letterSpacing: fonts.letterSpacing || '0.04em',
             }}
           >
+            {/* FlexStudio: placed ornament layer (di atas background, di bawah konten interaktif) */}
+            <OrnamentLayer ornaments={ornaments} className="studio-orn" />
             {/* COVER SCREEN */}
             <AnimatePresence>
               {!previewOpened && (

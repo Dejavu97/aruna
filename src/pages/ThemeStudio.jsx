@@ -60,6 +60,7 @@ export default function ThemeStudio() {
         myAgencyTemplates={s.myAgencyTemplates}
         navigate={s.navigate}
         openingAnimation={s.openingAnimation}
+        ornaments={s.ornaments}
         ornamentStyle={s.ornamentStyle}
         particleEffect={s.particleEffect}
         photoColorFilter={s.photoColorFilter}
@@ -80,6 +81,7 @@ export default function ThemeStudio() {
         setMonogramStyle={s.setMonogramStyle}
         setMoodPrompt={s.setMoodPrompt}
         setOpeningAnimation={s.setOpeningAnimation}
+        setOrnaments={s.setOrnaments}
         setPhotoColorFilter={s.setPhotoColorFilter}
         setPresetSubTab={s.setPresetSubTab}
         setPreviewOpened={s.setPreviewOpened}
@@ -112,6 +114,7 @@ export default function ThemeStudio() {
         mainBgColor={s.mainBgColor}
         monogramInitials={s.monogramInitials}
         monogramStyle={s.monogramStyle}
+        ornaments={s.ornaments}
         openingAnimation={s.openingAnimation}
         paperBgColor={s.paperBgColor}
         particleEffect={s.particleEffect}
