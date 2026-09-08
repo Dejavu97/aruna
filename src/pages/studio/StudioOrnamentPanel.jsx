@@ -11,18 +11,32 @@ const ASSET_ENTRIES = Object.entries(ORNAMENT_ASSETS)
 const ANIM_ENTRIES = Object.entries(ORNAMENT_ANIMS)
 
 function Slider({ label, value, min, max, step = 1, onChange, suffix = '' }) {
+  const clamp = (v) => Math.min(max, Math.max(min, v))
   return (
-    <label className="block">
-      <span className="text-[10px] uppercase tracking-wider text-stone font-semibold flex justify-between">
+    <div>
+      <span className="text-[10px] uppercase tracking-wider text-stone font-semibold flex justify-between items-center mb-0.5">
         <span>{label}</span>
-        <span className="font-mono">{value}{suffix}</span>
+        <span className="flex items-center gap-1">
+          <input
+            type="number"
+            min={min} max={max} step={step}
+            value={value}
+            onChange={(e) => {
+              const v = Number(e.target.value)
+              if (!Number.isNaN(v)) onChange(clamp(v))
+            }}
+            className="w-14 px-1 py-0.5 text-[10px] font-mono text-right border border-ink/15 rounded-xs bg-paper text-ink"
+            title="Ketik nilai persis di sini"
+          />
+          <span className="font-mono text-stone w-4">{suffix}</span>
+        </span>
       </span>
       <input
         type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full accent-gold-deep h-1.5"
+        className="w-full accent-gold-deep h-1 cursor-pointer"
       />
-    </label>
+    </div>
   )
 }
 
