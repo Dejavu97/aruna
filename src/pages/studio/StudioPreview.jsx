@@ -83,7 +83,7 @@ export default function StudioPreview({ accentSoftColor,
   touchParticles,
   voiceAudioRef  }) {
   return (
-<div className="lg:col-span-6 xl:col-span-7 flex flex-col items-center sticky top-20">
+<div className="lg:col-span-6 xl:col-span-7 flex flex-col items-center order-1 lg:order-2 lg:sticky lg:top-20">
         {/* Device & Daylight/Twilight Switcher Toolbar */}
         <div className="flex items-center justify-between w-full max-w-sm mb-3">
           {/* Day / Night Switcher */}
@@ -132,7 +132,7 @@ export default function StudioPreview({ accentSoftColor,
         {/* Device Frame Simulation */}
         <div
           className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 ${
-            previewDevice === 'mobile' ? 'w-full max-w-[380px] h-[720px]' : 'w-full max-w-[520px] h-[720px]'
+            previewDevice === 'mobile' ? 'w-full max-w-[380px] h-[min(720px,calc(100dvh-220px))]' : 'w-full max-w-[520px] h-[min(720px,calc(100dvh-220px))]'
           }`}
         >
           {/* Audio Engines */}

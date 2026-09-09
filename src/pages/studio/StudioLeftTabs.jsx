@@ -92,9 +92,10 @@ export default function StudioLeftTabs({ activeEventConfig,
   twilightColors,
   uploadingAsset  }) {
   return (
-<div className="lg:col-span-6 xl:col-span-5 bg-paper border border-ink/10 shadow-sm flex flex-col overflow-hidden">
+<div className="lg:col-span-6 xl:col-span-5 bg-paper border border-ink/10 shadow-sm flex flex-col overflow-hidden order-2 lg:order-1">
         {/* Streamlined 7 Core Navigation Tabs */}
-        <div className="flex border-b border-ink/10 overflow-x-auto text-[11px] uppercase tracking-wider font-medium bg-ivory/40">
+        <div className="relative">
+          <div className="flex border-b border-ink/10 overflow-x-auto text-[11px] uppercase tracking-wider font-medium bg-ivory/40 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             ['preset', 'Preset & WO'],
             ['structure', 'Urutan & Pembatas'],
@@ -109,7 +110,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`px-3.5 py-3 whitespace-nowrap border-b-2 transition-colors ${
+              className={`px-3.5 py-3 whitespace-nowrap border-b-2 transition-colors shrink-0 ${
                 activeTab === tab ? 'border-gold-deep text-ink bg-paper font-bold' : 'border-transparent text-stone hover:text-ink'
               }`}
             >
@@ -122,6 +123,9 @@ export default function StudioLeftTabs({ activeEventConfig,
               )}
             </button>
           ))}
+          </div>
+          {/* fade affordance tepi kanan (tab bisa discroll) */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-paper to-transparent" />
         </div>
 
         {/* Tab Content Panels */}

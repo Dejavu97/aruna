@@ -43,61 +43,64 @@ export default function StudioHeader({ colors,
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="relative max-w-full overflow-hidden">
+        <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 -mb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden relative">
           <button
             type="button"
             onClick={() => setPosterModalOpen(true)}
-            className="inline-flex items-center gap-1.5 border border-ink/20 bg-paper px-3 py-2 text-xs uppercase tracking-wider hover:bg-gold/10 hover:border-gold-deep font-semibold shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 border border-ink/20 bg-paper px-3 py-2 text-xs uppercase tracking-wider hover:bg-gold/10 hover:border-gold-deep font-semibold shadow-xs transition-colors shrink-0 whitespace-nowrap"
             title="Buat poster promosi Instagram Story format 9:16"
           >
-            <Camera size={13} className="text-gold-deep" /> Poster Story IG (9:16)
+            <Camera size={13} className="text-gold-deep" /> <span className="hidden sm:inline">Poster Story IG (9:16)</span><span className="sm:hidden">Poster</span>
           </button>
 
           <button
             type="button"
             onClick={() => setProposalModalOpen(true)}
-            className="inline-flex items-center gap-1.5 border border-gold-deep/40 bg-gold/10 text-ink px-3 py-2 text-xs uppercase tracking-wider hover:bg-gold/20 font-semibold shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 border border-gold-deep/40 bg-gold/10 text-ink px-3 py-2 text-xs uppercase tracking-wider hover:bg-gold/20 font-semibold shadow-xs transition-colors shrink-0 whitespace-nowrap"
             title="Kirim link demo tema langsung ke WhatsApp calon pengantin"
           >
-            <Share2 size={13} className="text-gold-deep" /> Link Proposal Klien
+            <Share2 size={13} className="text-gold-deep" /> <span className="hidden sm:inline">Link Proposal Klien</span><span className="sm:hidden">Proposal</span>
           </button>
 
           <button
             type="button"
             onClick={handleSaveAsAgencyPreset}
-            className="inline-flex items-center gap-1.5 border border-ink/20 bg-paper px-3 py-2 text-xs uppercase tracking-wider hover:bg-gold/10 hover:border-gold-deep font-semibold shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 border border-ink/20 bg-paper px-3 py-2 text-xs uppercase tracking-wider hover:bg-gold/10 hover:border-gold-deep font-semibold shadow-xs transition-colors shrink-0 whitespace-nowrap"
             title="Simpan sebagai template khas agency WO Anda"
           >
-            <Bookmark size={13} className="text-gold-deep" /> Simpan Template WO
+            <Bookmark size={13} className="text-gold-deep" /> <span className="hidden sm:inline">Simpan Template WO</span><span className="sm:hidden shrink-0">Template</span>
           </button>
 
           <button
             type="button"
             onClick={handleShuffle}
-            className="inline-flex items-center gap-1.5 border border-ink/20 bg-paper px-3 py-2 text-xs uppercase tracking-wider hover:bg-gold/10 hover:border-gold-deep font-semibold shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 border border-ink/20 bg-paper px-3 py-2 text-xs uppercase tracking-wider hover:bg-gold/10 hover:border-gold-deep font-semibold shadow-xs transition-colors shrink-0 whitespace-nowrap"
             title="Acak kombinasi warna, font, dan animasi secara harmonis"
           >
-            <Shuffle size={13} className="text-gold-deep" /> Acak Inspirasi
+            <Shuffle size={13} className="text-gold-deep" /> <span className="hidden sm:inline">Acak Inspirasi</span><span className="sm:hidden">Acak</span>
           </button>
 
           <button
             type="button"
             onClick={handleSaveTheme}
             disabled={saving}
-            className="inline-flex items-center gap-2 bg-ink text-ivory px-5 py-2 text-xs uppercase tracking-widest hover:bg-gold-deep transition-colors font-medium shadow-sm"
+            className="inline-flex items-center gap-2 bg-ink text-ivory px-5 py-2 text-xs uppercase tracking-widest hover:bg-gold-deep transition-colors font-medium shadow-sm shrink-0 whitespace-nowrap"
           >
             {saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
-            {saving ? 'Menyimpan...' : 'Simpan Tema'}
+            {saving ? 'Menyimpan...' : <><span className="hidden sm:inline">Simpan Tema</span><span className="sm:hidden">Simpan</span></>}
           </button>
           {savedThemeId && (
             <button
               type="button"
               onClick={() => navigate(`/pesan/${savedThemeId}`)}
-              className="inline-flex items-center gap-1.5 bg-gold-deep text-ivory px-4 py-2 text-xs uppercase tracking-widest hover:bg-gold transition-colors font-medium"
+              className="inline-flex items-center gap-1.5 bg-gold-deep text-ivory px-4 py-2 text-xs uppercase tracking-widest hover:bg-gold transition-colors font-medium shrink-0 whitespace-nowrap"
             >
-              <Check size={14} /> Pakai Buat Undangan
+              <Check size={14} /> <span className="hidden sm:inline">Pakai Buat Undangan</span><span className="sm:hidden">Pakai</span>
             </button>
           )}
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-paper to-transparent" />
+        </div>
         </div>
       </div>
     </header>
