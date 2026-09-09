@@ -1,0 +1,35 @@
+/* Custom scrollbar panel studio — GAYA CUSTOM ELEMENT (bukan pseudo native) */
+/* Diverifikasi: Chrome headless tidak merender ::-webkit-scrollbar pseudo pada overflow:auto
+   di beberapa konfigurasi Windows (overlay scrollbar). Jadi indikator scroll pakai elemen custom:
+   .panel-scroll-ind (thumb virtual) + fade bawah. Scrollbar native disembunyikan total. */
+
+.studio-panel-scroll {
+  scrollbar-width: none;           /* Firefox */
+  -ms-overflow-style: none;        /* Edge lama */
+}
+.studio-panel-scroll::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+/* Thumb virtual: diposisikan oleh JS (scroll listener) */
+.panel-scroll-ind {
+  position: absolute;
+  right: 4px;
+  width: 6px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #D4B36A, #B8923D);
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 11;
+}
+.panel-scroll-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  background: linear-gradient(to top, rgba(253, 251, 247, 0.97) 12%, rgba(253, 251, 247, 0.55) 55%, transparent);
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+.panel-scroll-fade.scrolled-end { opacity: 0; }

@@ -25,6 +25,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { copyText } from '../../lib/utils'
 import StudioOrnamentPanel from './StudioOrnamentPanel'
 import StudioSectionAnimPanel from './StudioSectionAnimPanel'
+import StudioScrollArea from './StudioScrollArea'
+import './studio-panel-scroll.css'
 
 /** StudioLeftTabs — diekstrak verbatim dari ThemeStudio.jsx (Fase 3b). */
 export default function StudioLeftTabs({ activeEventConfig,
@@ -128,8 +130,8 @@ export default function StudioLeftTabs({ activeEventConfig,
           <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-paper to-transparent" />
         </div>
 
-        {/* Tab Content Panels */}
-        <div className="p-5 sm:p-6 max-h-[calc(100vh-210px)] overflow-y-auto space-y-6">
+        {/* Tab Content Panels — scroll area custom (thumb virtual + fade bawah) */}
+        <StudioScrollArea className="p-5 sm:p-6 max-h-[calc(100dvh-190px)] lg:max-h-[calc(100vh-210px)] overflow-y-auto space-y-6">
           
           {/* TAB 1: PRESET & AGENCY TEMPLATES */}
           {activeTab === 'preset' && (
@@ -1140,7 +1142,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </button>
             </div>
           )}
-        </div>
+        </StudioScrollArea>
       </div>
   )
 }
