@@ -35,6 +35,7 @@ export default function ThemeStudio() {
         activeTab={s.activeTab}
         applyPreset={s.applyPreset}
         cardStyler={s.cardStyler}
+        cardFx={s.cardFx}
         colors={s.colors}
         customAssets={s.customAssets}
         dividerShape={s.dividerShape}
@@ -73,6 +74,7 @@ export default function ThemeStudio() {
         setAdjustTarget={s.setAdjustTarget}
         setAnimKey={s.setAnimKey}
         setCardStyler={s.setCardStyler}
+        setCardFx={s.setCardFx}
         setColors={s.setColors}
         setDividerShape={s.setDividerShape}
         setEventType={s.setEventType}
@@ -105,6 +107,7 @@ export default function ThemeStudio() {
         animKey={s.animKey}
         audioRef={s.audioRef}
         cardStyler={s.cardStyler}
+        cardFx={s.cardFx}
         colors={s.colors}
         customAssets={s.customAssets}
         dividerShape={s.dividerShape}

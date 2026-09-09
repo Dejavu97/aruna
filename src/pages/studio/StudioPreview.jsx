@@ -45,6 +45,7 @@ export default function StudioPreview({ accentSoftColor,
   animKey,
   audioRef,
   cardStyler,
+  cardFx,
   colors,
   customAssets,
   dividerShape,
@@ -292,15 +293,17 @@ export default function StudioPreview({ accentSoftColor,
               {sections
                 .filter((sec) => sec.visible)
                 .map((sec, secIdx) => {
-                  // Custom Card Styler computed styles
+                  // Custom Card Styler computed styles (+ FlexStudio cardFx free shadow/border)
                   const cardCustomStyle = {
                     backgroundColor: paperBgColor,
-                    borderColor: accentSoftColor,
+                    borderColor: cardFx?.accentBorder || accentSoftColor,
                     borderRadius: `${cardStyler.borderRadius}px`,
                     backdropFilter: `blur(${cardStyler.backdropBlur}px)`,
                     borderWidth: `${cardStyler.borderWidth}px`,
                     boxShadow:
-                      cardStyler.shadowLevel === 'dramatic_3d'
+                      cardFx?.shadowBlur != null
+                        ? `0 ${Math.max(4, Math.round(cardFx.shadowBlur / 3))}px ${cardFx.shadowBlur}px ${cardFx.shadowOpacity != null ? `rgba(0,0,0,${(cardFx.shadowOpacity / 100).toFixed(2)})` : cardFx.shadowColor}`
+                        : cardStyler.shadowLevel === 'dramatic_3d'
                         ? '0 10px 25px -5px rgba(0,0,0,0.3)'
                         : cardStyler.shadowLevel === 'medium'
                         ? '0 6px 15px -3px rgba(0,0,0,0.15)'

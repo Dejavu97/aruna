@@ -31,6 +31,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   activeTab,
   applyPreset,
   cardStyler,
+  cardFx,
   colors,
   customAssets,
   dividerShape,
@@ -69,6 +70,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   setAdjustTarget,
   setAnimKey,
   setCardStyler,
+  setCardFx,
   setColors,
   setDividerShape,
   setEventType,
@@ -714,6 +716,82 @@ export default function StudioLeftTabs({ activeEventConfig,
                       </button>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              {/* 1b. FlexStudio: Bayangan & Garis Tepi Bebas */}
+              <div className="border border-gold/40 p-3.5 rounded-xs bg-gold/5 space-y-3">
+                <label className="block uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
+                  <SlidersHorizontal size={14} className="text-gold-deep" /> 1b. Bayangan &amp; Tepi Kartu Bebas (Fine-Tune):
+                </label>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                  <label className="block">
+                    <span className="text-[10px] uppercase tracking-wider text-stone font-semibold flex justify-between">
+                      <span>Sebar Bayangan</span>
+                      <span className="font-mono">{cardFx.shadowBlur == null ? 'auto' : cardFx.shadowBlur}</span>
+                    </span>
+                    <input
+                      type="range" min={0} max={60} step={2}
+                      value={cardFx.shadowBlur ?? 16}
+                      onChange={(e) => setCardFx((p) => ({ ...p, shadowBlur: Number(e.target.value) }))}
+                      className="w-full accent-gold-deep h-1 cursor-pointer"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-[10px] uppercase tracking-wider text-stone font-semibold flex justify-between">
+                      <span>Kepekatan</span>
+                      <span className="font-mono">{cardFx.shadowOpacity == null ? 'auto' : `${cardFx.shadowOpacity}%`}</span>
+                    </span>
+                    <input
+                      type="range" min={0} max={100} step={5}
+                      value={cardFx.shadowOpacity ?? 25}
+                      onChange={(e) => setCardFx((p) => ({ ...p, shadowOpacity: Number(e.target.value) }))}
+                      className="w-full accent-gold-deep h-1 cursor-pointer"
+                    />
+                  </label>
+                </div>
+                <div className="flex items-end gap-3">
+                  <label className="block">
+                    <span className="text-[10px] uppercase tracking-wider text-stone font-semibold">Warna Bayangan</span>
+                    <input
+                      type="color" value={cardFx.shadowColor || '#1C1917'}
+                      onChange={(e) => setCardFx((p) => ({ ...p, shadowColor: e.target.value }))}
+                      className="w-full h-7 cursor-pointer border border-ink/15 rounded-xs bg-transparent"
+                    />
+                  </label>
+                  <label className="block flex-1">
+                    <span className="text-[10px] uppercase tracking-wider text-stone font-semibold">Warna Garis Tepi</span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color" value={cardFx.accentBorder || '#C8A24B'}
+                        onChange={(e) => setCardFx((p) => ({ ...p, accentBorder: e.target.value }))}
+                        className="w-10 h-7 cursor-pointer border border-ink/15 rounded-xs bg-transparent"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setCardFx((p) => ({ ...p, accentBorder: null }))}
+                        className={`px-2 py-1 text-[9px] uppercase tracking-wide rounded-xs border transition-colors ${
+                          cardFx.accentBorder == null
+                            ? 'border-gold-deep bg-gold/10 font-bold text-ink'
+                            : 'border-ink/20 text-stone hover:text-ink'
+                        }`}
+                      >
+                        Ikut Tema
+                      </button>
+                    </div>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setCardFx((p) => ({ ...p, shadowBlur: null, shadowOpacity: null }))}
+                    className={`px-2 py-1 text-[9px] uppercase tracking-wide rounded-xs border transition-colors ${
+                      cardFx.shadowBlur == null && cardFx.shadowOpacity == null
+                        ? 'border-gold-deep bg-gold/10 font-bold text-ink'
+                        : 'border-ink/20 text-stone hover:text-ink'
+                    }`}
+                    title="Kembalikan bayangan ke preset enum"
+                  >
+                    Bayangan Auto
+                  </button>
                 </div>
               </div>
 

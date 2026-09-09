@@ -429,6 +429,13 @@ export function useStudioState() {
     shadowLevel: 'soft', // 'none' | 'soft' | 'medium' | 'dramatic_3d'
     borderWidth: 1, // 0 | 1 | 2
   })
+  // FlexStudio F1c: free token — shadow & accent border kartu bebas (bukan enum)
+  const [cardFx, setCardFx] = useState({
+    shadowBlur: null, // null = ikut shadowLevel enum; angka 0-60 = bebas
+    shadowOpacity: null, // 0-100 (%)
+    shadowColor: '#1C1917',
+    accentBorder: null, // null = ikut accentSoft; warna hex bebas
+  })
 
   // 9. GUEST SCREEN TOUCH FX & HAPTIC
   const [guestTouchFx, setGuestTouchFx] = useState('sparkle_trail') // 'none' | 'sparkle_trail' | 'petal_burst'
@@ -519,6 +526,7 @@ export function useStudioState() {
     if (td.ornaments) setOrnaments(td.ornaments)
     if (td.sectionAnims) setSectionAnims(td.sectionAnims)
     if (td.backgroundFx) setBackgroundFx(td.backgroundFx)
+    if (td.cardFx) setCardFx((prev) => ({ ...prev, ...td.cardFx }))
     setThemeName(tmpl.name)
     setCreatorName(tmpl.creator)
     setAnimKey((k) => k + 1)
@@ -1028,6 +1036,7 @@ export function useStudioState() {
         ornaments,
         sectionAnims,
         backgroundFx,
+        cardFx,
         cover: customAssets.coverImgUrl || '/themes/emas-senja.jpg',
         tags: ['komunitas', 'custom', isPublic ? 'publik' : 'privat'],
         popular: false,
@@ -1306,6 +1315,7 @@ accentBorderColor,
     ornaments,
     sectionAnims,
     backgroundFx,
+    cardFx,
     openingAnimation,
     ornamentStyle,
     ornamentTransition,
@@ -1359,6 +1369,7 @@ accentBorderColor,
     setOrnaments,
     setSectionAnims,
     setBackgroundFx,
+    setCardFx,
     setOrnamentStyle,
     setOrnamentTransition,
     setPanelTransition,
