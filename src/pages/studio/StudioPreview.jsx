@@ -85,7 +85,7 @@ export default function StudioPreview({ accentSoftColor,
   return (
 <div className="lg:col-span-6 xl:col-span-7 flex flex-col items-center order-1 lg:order-2 lg:sticky lg:top-20">
         {/* Device & Daylight/Twilight Switcher Toolbar */}
-        <div className="flex items-center justify-between w-full max-w-sm mb-3">
+        <div className="flex items-center justify-between w-full max-w-sm mb-3 px-1">
           {/* Day / Night Switcher */}
           <div className="flex items-center gap-1 bg-paper border border-ink/15 p-0.5 rounded-sm">
             <button

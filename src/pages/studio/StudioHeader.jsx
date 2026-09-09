@@ -25,19 +25,19 @@ export default function StudioHeader({ colors,
   return (
 <header className="sticky top-0 z-50 bg-paper border-b border-ink/10 px-4 py-3 sm:px-6 shadow-sm">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <button
             type="button"
             onClick={() => navigate('/tema')}
-            className="inline-flex items-center gap-1.5 border border-ink/20 px-3 py-1.5 text-xs uppercase tracking-wider text-ink hover:bg-ink/5 transition-colors font-medium"
+            className="inline-flex items-center gap-1.5 border border-ink/20 px-2.5 sm:px-3 py-1.5 text-xs uppercase tracking-wider text-ink hover:bg-ink/5 transition-colors font-medium shrink-0 whitespace-nowrap"
           >
-            <ArrowLeft size={14} /> Kembali ke Katalog
+            <ArrowLeft size={14} /> <span className="hidden sm:inline">Kembali ke Katalog</span>
           </button>
-          <span className="text-stone/30">|</span>
-          <div className="flex items-center gap-2">
-            <Crown size={16} className="text-gold-deep" />
-            <h1 className="font-display text-lg font-semibold tracking-wide">Theme Studio 2.0 Pro</h1>
-            <span className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep text-[10px] px-2 py-0.5 font-medium uppercase tracking-wider">
+          <span className="text-stone/30 hidden sm:inline">|</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <Crown size={15} className="text-gold-deep shrink-0" />
+            <h1 className="font-display text-sm sm:text-lg font-semibold tracking-wide truncate min-w-0">Theme Studio 2.0 Pro</h1>
+            <span className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep text-[10px] px-2 py-0.5 font-medium uppercase tracking-wider hidden md:inline shrink-0">
               Infinite Creator
             </span>
           </div>
