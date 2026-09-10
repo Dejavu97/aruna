@@ -578,12 +578,37 @@ export default function StudioPreview({ accentSoftColor,
                   )
                 })}
               {blankCanvas?.enabled && Array.isArray(blankCanvas.blocks) && blankCanvas.blocks.length > 0 && (
-                <div className="border-t-2 border-dashed border-gold-deep/40 pt-4 space-y-2">
-                  <p className="text-[10px] uppercase tracking-wider font-bold text-gold-deep">Blank Canvas — {blankCanvas.blocks.length} blok</p>
+                <div className="border-t-2 border-dashed border-gold-deep/40 pt-5 space-y-3">
+                  <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-gold-deep">Blank Canvas — {blankCanvas.blocks.length} blok custom</p>
                   {blankCanvas.blocks.map((b) => (
-                    <div key={b.id} className="p-3 border text-center" style={cardStyler ? { borderRadius: cardStyler.borderRadius, background: paperBgColor } : undefined}>
-                      <p className="text-[10px] uppercase opacity-60">{b.type}</p>
-                      <p className="text-xs font-semibold">{b.content}</p>
+                    <div key={b.id} className="overflow-hidden border shadow-sm" style={{ borderRadius: cardStyler?.borderRadius ?? 10, background: paperBgColor, borderColor: accentSoftColor }}>
+                      <div className="flex items-center gap-2 px-3 py-2 border-b border-black/5 bg-ink/[0.04]">
+                        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: activeColorPalette.accent }}>{b.type}</span>
+                        <span className="text-[10px] opacity-50 font-mono">{b.id}</span>
+                      </div>
+                      <div className="p-3">
+                        {b.type === 'image' ? (
+                          <img src={b.content} alt="" className="w-full rounded-sm object-cover max-h-52" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                        ) : b.type === 'gallery' ? (
+                          <div className="grid grid-cols-2 gap-2">
+                            {String(b.content).split(',').map((u) => u.trim()).filter(Boolean).slice(0, 6).map((u, i) => (
+                              <img key={i} src={u} alt="" className="aspect-[4/3] w-full object-cover rounded-sm border border-black/10" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                            ))}
+                            {String(b.content).split(',').filter((x) => x.trim()).length === 0 && <p className="col-span-2 text-xs opacity-60">Isi dengan URL dipisah koma</p>}
+                          </div>
+                        ) : b.type === 'divider' ? (
+                          <div className="py-2 flex items-center justify-center"><span className="h-px w-16 bg-current opacity-30" /></div>
+                        ) : b.type === 'map' ? (
+                          <div className="space-y-1 text-left">
+                            <p className="text-xs font-semibold" style={{ color: activeColorPalette.fg }}>{b.content || 'Alamat / link maps'}</p>
+                            <p className="text-[11px] opacity-60">Tampil sebagai peta di undangan jadi.</p>
+                          </div>
+                        ) : b.type === 'countdown' ? (
+                          <p className="text-sm font-bold text-center" style={{ color: activeColorPalette.fg }}>{b.content || 'Menuju hari H'}</p>
+                        ) : (
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words" style={{ color: activeColorPalette.fg }}>{b.content}</p>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
