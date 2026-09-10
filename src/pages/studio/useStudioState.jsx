@@ -329,6 +329,7 @@ export function useStudioState() {
 
   // Streamlined 7 Core Tabs
   const [activeTab, setActiveTab] = useState('preset') // 'preset' | 'structure' | 'typography' | 'color' | 'photographer' | 'motion' | 'uploads'
+  const [selectedSection, setSelectedSection] = useState(null) // id of section selected via preview click
   const [presetSubTab, setPresetSubTab] = useState('official') // 'official' | 'agency'
   const [previewDevice, setPreviewDevice] = useState('mobile') // 'mobile' | 'tablet'
   const [previewOpened, setPreviewOpened] = useState(false)
@@ -1264,6 +1265,7 @@ accentBorderColor,
     activePhotoFilterCss,
     activeScriptFont,
     activeTab,
+    selectedSection,
     adjustTarget,
     animKey,
     applyPreset,
@@ -1342,6 +1344,7 @@ accentBorderColor,
     setColors,
     setCopiedProposal,
     setSections,
+    setSelectedSection,
     setCoupleTransition,
     setCoverStyle,
     setCreatorName,

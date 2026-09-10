@@ -99,9 +99,11 @@ export default function ThemeStudio() {
         setSectionAnims={s.setSectionAnims}
         setBackgroundFx={s.setBackgroundFx}
         setPhotoColorFilter={s.setPhotoColorFilter}
+        selectedSection={s.selectedSection}
         setPresetSubTab={s.setPresetSubTab}
         setPreviewOpened={s.setPreviewOpened}
         setSections={s.setSections}
+        setSelectedSection={s.setSelectedSection}
         setTwilightColors={s.setTwilightColors}
         toggleSectionVisibility={s.toggleSectionVisibility}
         twilightColors={s.twilightColors}
@@ -148,6 +150,9 @@ export default function ThemeStudio() {
         renderMonogram={s.renderMonogram}
         renderSectionDivider={s.renderSectionDivider}
         sections={s.sections}
+        selectedSection={s.selectedSection}
+        setActiveTab={s.setActiveTab}
+        setSelectedSection={s.setSelectedSection}
         setIsPlayingAudio={s.setIsPlayingAudio}
         setPreviewDevice={s.setPreviewDevice}
         setPreviewOpened={s.setPreviewOpened}

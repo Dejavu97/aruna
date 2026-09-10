@@ -28,6 +28,13 @@ import StudioScrollArea from './StudioScrollArea'
 import { Reorder } from 'framer-motion'
 import './studio-panel-scroll.css'
 
+const SECTION_TO_TAB = {
+  hero: 'preset', greeting: 'preset', couple: 'photographer', countdown: 'motion',
+  events: 'structure', story: 'structure', gallery: 'photographer', dresscode: 'structure',
+  live: 'structure', rsvp: 'structure', wishes: 'structure', gift: 'structure',
+  checkin: 'structure', closer: 'preset',
+}
+
 const TAB_GROUPS = [
   { id: 'desain', label: 'Desain', icon: Palette, tabs: ['preset', 'typography', 'color'] },
   { id: 'struktur', label: 'Struktur', icon: Layers, tabs: ['structure'] },
@@ -76,6 +83,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   presetSubTab,
   savedThemeId,
   sections,
+  selectedSection,
   setActiveTab,
   setAdjustTarget,
   setAnimKey,
@@ -367,8 +375,9 @@ export default function StudioLeftTabs({ activeEventConfig,
                     key={sec.id}
                     value={sec}
                     whileDrag={{ scale: 1.02, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', zIndex: 30 }}
+                    onClick={() => setSelectedSection?.(sec.id)}
                     className={`flex items-center justify-between p-3 border rounded-xs transition-colors bg-white cursor-grab active:cursor-grabbing select-none ${
-                      sec.visible ? 'border-ink/20' : 'border-stone-200 opacity-60'
+                      selectedSection === sec.id ? 'border-gold-deep bg-gold/10 ring-1 ring-gold-deep' : sec.visible ? 'border-ink/20' : 'border-stone-200 opacity-60'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">

@@ -35,6 +35,12 @@ function SectionWrap({ id, sectionAnims, animKey, children, className = '' }) {
 }
 
 /** StudioPreview — diekstrak verbatim dari ThemeStudio.jsx (Fase 3b). */
+const SECTION_TO_TAB_PREVIEW = {
+  hero: 'preset', greeting: 'preset', couple: 'photographer', countdown: 'motion',
+  events: 'structure', story: 'structure', gallery: 'photographer', dresscode: 'structure',
+  live: 'structure', rsvp: 'structure', wishes: 'structure', gift: 'structure',
+  checkin: 'structure', closer: 'preset',
+}
 export default function StudioPreview({ accentSoftColor,
   activeBodyFont,
   activeColorPalette,
@@ -73,15 +79,24 @@ export default function StudioPreview({ accentSoftColor,
   renderMonogram,
   renderSectionDivider,
   sections,
+  selectedSection,
+  setActiveTab,
   setIsPlayingAudio,
   setPreviewDevice,
   setPreviewOpened,
   setPreviewThemeMode,
+  setSelectedSection,
   themeName,
   toggleAudio,
   toggleVoiceAudio,
   touchParticles,
   voiceAudioRef  }) {
+  const handleSectionClick = (id, e) => {
+    e?.stopPropagation()
+    setSelectedSection?.(id)
+    const tab = SECTION_TO_TAB_PREVIEW[id]
+    if (tab) setActiveTab?.(tab)
+  }
   return (
 <div className="flex-1 min-w-0 flex flex-col items-center order-1 lg:order-2 lg:sticky lg:top-20">
         {/* Device & Daylight/Twilight Switcher Toolbar */}
@@ -293,6 +308,7 @@ export default function StudioPreview({ accentSoftColor,
               {sections
                 .filter((sec) => sec.visible)
                 .map((sec, secIdx) => {
+                  const isSelected = selectedSection === sec.id
                   // Custom Card Styler computed styles (+ FlexStudio cardFx free shadow/border)
                   const cardCustomStyle = {
                     backgroundColor: paperBgColor,
@@ -315,6 +331,8 @@ export default function StudioPreview({ accentSoftColor,
                   // 1. HERO SECTION
                   if (sec.id === 'hero') {
                     return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">HERO</span>}
                       <SectionWrap id="hero" sectionAnims={sectionAnims} animKey={animKey}>
                         <motion.section {...floatingAnimation} className="relative z-10 block text-center pt-2">
                           {monogramStyle !== 'none' && (
@@ -341,12 +359,15 @@ export default function StudioPreview({ accentSoftColor,
                         </motion.section>
                         {renderSectionDivider(dividerShape)}
                       </SectionWrap>
+                      </div>
                     )
                   }
 
                   // 2. COUPLE / PROFIL SECTION
                   if (sec.id === 'couple') {
                     return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">COUPLE</span>}
                       <SectionWrap id="couple" sectionAnims={sectionAnims} animKey={animKey}>
                         <section className="relative z-10 space-y-4">
                           <div className="text-center">
@@ -408,12 +429,15 @@ export default function StudioPreview({ accentSoftColor,
                         </section>
                         {renderSectionDivider(dividerShape)}
                       </SectionWrap>
+                      </div>
                     )
                   }
 
                   // 3. EVENTS
                   if (sec.id === 'events') {
                     return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">EVENTS</span>}
                       <SectionWrap id="events" sectionAnims={sectionAnims} animKey={animKey}>
                         <section className="relative z-10 space-y-3">
                           <div className="text-center">
@@ -434,12 +458,15 @@ export default function StudioPreview({ accentSoftColor,
                         </section>
                         {renderSectionDivider(dividerShape)}
                       </SectionWrap>
+                      </div>
                     )
                   }
 
                   // 4. STORY WITH VOICE NOTE
                   if (sec.id === 'story') {
                     return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">STORY</span>}
                       <SectionWrap id="story" sectionAnims={sectionAnims} animKey={animKey}>
                         <section className="relative z-10 space-y-4">
                           <div className="text-center">
@@ -479,12 +506,15 @@ export default function StudioPreview({ accentSoftColor,
                         </section>
                         {renderSectionDivider(dividerShape)}
                       </SectionWrap>
+                      </div>
                     )
                   }
 
                   // 5. GALLERY
                   if (sec.id === 'gallery') {
                     return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">GALERI</span>}
                       <SectionWrap id="gallery" sectionAnims={sectionAnims} animKey={animKey}>
                         <section className="relative z-10 space-y-3">
                           <div className="text-center">
@@ -502,12 +532,15 @@ export default function StudioPreview({ accentSoftColor,
                         </section>
                         {renderSectionDivider(dividerShape)}
                       </SectionWrap>
+                      </div>
                     )
                   }
 
                   // 6. CLOSER
                   if (sec.id === 'closer') {
                     return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">CLOSER</span>}
                       <SectionWrap id="closer" sectionAnims={sectionAnims} animKey={animKey} className="relative z-10 text-center pt-4 space-y-2">
                         <footer className="relative z-10 text-center pt-4 space-y-2">
                         <h3 className="text-2xl italic" style={{ fontFamily: activeScriptFont, color: activeColorPalette.fg }}>
@@ -518,10 +551,25 @@ export default function StudioPreview({ accentSoftColor,
                         </p>
                         </footer>
                       </SectionWrap>
+                      </div>
                     )
                   }
 
-                  return null
+                  // FALLBACK: sections lain (greeting, countdown, dresscode, live, rsvp, wishes, gift, checkin)
+                  // tampil sebagai placeholder agar klik-preview konsisten untuk semua 14 section
+                  return (
+                    <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                      {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">{sec.id.toUpperCase()}</span>}
+                      <SectionWrap id={sec.id} sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-1" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{sec.defaultTitle}</p>
+                          <p className="text-xs font-semibold" style={{ color: activeColorPalette.fg }}>{sec.name}</p>
+                          <p className="text-[10px] opacity-60">Konten preview menyusul — klik untuk atur di panel kiri</p>
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                    </div>
+                  )
                 })}
             </div>
           </div>
