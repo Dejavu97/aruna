@@ -23,9 +23,9 @@ export default function StudioHeader({ colors,
   setPosterModalOpen,
   setProposalModalOpen  }) {
   return (
-<header className="sticky top-0 z-50 bg-paper border-b border-ink/10 px-4 py-3 sm:px-6 shadow-sm">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+<header className="sticky top-0 z-50 bg-paper border-b border-ink/10 px-4 py-2.5 sm:px-6 shadow-sm">
+      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={() => navigate('/tema')}
@@ -36,8 +36,8 @@ export default function StudioHeader({ colors,
           <span className="text-stone/30 hidden sm:inline">|</span>
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <Crown size={15} className="text-gold-deep shrink-0" />
-            <h1 className="font-display text-sm sm:text-lg font-semibold tracking-wide truncate min-w-0">Theme Studio 2.0 Pro</h1>
-            <span className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep text-[10px] px-2 py-0.5 font-medium uppercase tracking-wider hidden md:inline shrink-0">
+            <h1 className="font-display text-sm sm:text-lg font-semibold tracking-wide whitespace-nowrap">Theme Studio 2.0 Pro</h1>
+            <span className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep text-[10px] px-2 py-0.5 font-medium uppercase tracking-wider hidden xl:inline shrink-0">
               Infinite Creator
             </span>
           </div>

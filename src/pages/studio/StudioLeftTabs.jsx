@@ -112,7 +112,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`px-3.5 py-3 whitespace-nowrap border-b-2 transition-colors shrink-0 ${
+              className={`px-2.5 sm:px-3 py-2.5 whitespace-nowrap border-b-2 transition-colors shrink-0 text-[10px] sm:text-[11px] ${
                 activeTab === tab ? 'border-gold-deep text-ink bg-paper font-bold' : 'border-transparent text-stone hover:text-ink'
               }`}
             >
