@@ -91,6 +91,7 @@ export default function ThemeStudio() {
         setPhotoColorFilter={s.setPhotoColorFilter}
         setPresetSubTab={s.setPresetSubTab}
         setPreviewOpened={s.setPreviewOpened}
+        setSections={s.setSections}
         setTwilightColors={s.setTwilightColors}
         toggleSectionVisibility={s.toggleSectionVisibility}
         twilightColors={s.twilightColors}

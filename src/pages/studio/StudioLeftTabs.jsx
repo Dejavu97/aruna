@@ -1,11 +1,10 @@
 import {
   Activity,
-  ArrowDown,
-  ArrowUp,
   Bookmark,
   Camera,
   Crown,
   FolderUp,
+  GripVertical,
   Layers,
   Mic,
   Moon,
@@ -26,6 +25,7 @@ import { copyText } from '../../lib/utils'
 import StudioOrnamentPanel from './StudioOrnamentPanel'
 import StudioSectionAnimPanel from './StudioSectionAnimPanel'
 import StudioScrollArea from './StudioScrollArea'
+import { Reorder } from 'framer-motion'
 import './studio-panel-scroll.css'
 
 /** StudioLeftTabs — diekstrak verbatim dari ThemeStudio.jsx (Fase 3b). */
@@ -88,6 +88,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   setBackgroundFx,
   setPhotoColorFilter,
   setPresetSubTab,
+  setSections,
   setPreviewOpened,
   setTwilightColors,
   toggleSectionVisibility,
@@ -332,22 +333,28 @@ export default function StudioLeftTabs({ activeEventConfig,
                 </div>
               </div>
 
-              {/* 2. Reorderable Module List */}
+              {/* 2. Reorderable Module List — Canva-style drag & drop */}
               <div className="space-y-2">
                 <label className="block text-xs uppercase tracking-wider font-bold text-ink">
                   2. Urutan Modul Bagian:
                 </label>
-                {sections.map((sec, idx) => (
-                  <div
+                <Reorder.Group
+                  axis="y"
+                  values={sections}
+                  onReorder={(v) => { setSections(v); setAnimKey((k) => k + 1) }}
+                  className="space-y-2"
+                >
+                {sections.map((sec) => (
+                  <Reorder.Item
                     key={sec.id}
-                    className={`flex items-center justify-between p-3 border rounded-xs transition-colors ${
-                      sec.visible ? 'bg-white border-ink/20' : 'bg-stone-50 border-stone-200 opacity-60'
+                    value={sec}
+                    whileDrag={{ scale: 1.02, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', zIndex: 30 }}
+                    className={`flex items-center justify-between p-3 border rounded-xs transition-colors bg-white cursor-grab active:cursor-grabbing select-none ${
+                      sec.visible ? 'border-ink/20' : 'border-stone-200 opacity-60'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <span className="w-5 text-center text-xs font-mono font-bold text-stone">
-                        {idx + 1}.
-                      </span>
+                      <GripVertical size={14} className="text-stone/60 shrink-0" />
                       <input
                         type="checkbox"
                         checked={sec.visible}
@@ -361,28 +368,12 @@ export default function StudioLeftTabs({ activeEventConfig,
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => moveSectionUp(idx)}
-                        disabled={idx === 0}
-                        className="p-1 border border-ink/20 hover:bg-gold/10 disabled:opacity-30 rounded-xs text-ink"
-                        title="Geser Naik"
-                      >
-                        <ArrowUp size={13} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveSectionDown(idx)}
-                        disabled={idx === sections.length - 1}
-                        className="p-1 border border-ink/20 hover:bg-gold/10 disabled:opacity-30 rounded-xs text-ink"
-                        title="Geser Turun"
-                      >
-                        <ArrowDown size={13} />
-                      </button>
-                    </div>
-                  </div>
+                    <span className="text-[10px] font-mono font-bold text-stone/60 pr-1">
+                      {sections.findIndex((s) => s.id === sec.id) + 1}
+                    </span>
+                  </Reorder.Item>
                 ))}
+                </Reorder.Group>
               </div>
             </div>
           )}
