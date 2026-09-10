@@ -23,8 +23,8 @@ export default function StudioHeader({ colors,
   setPosterModalOpen,
   setProposalModalOpen  }) {
   return (
-<header className="sticky top-0 z-50 bg-paper border-b border-ink/10 px-4 py-2.5 sm:px-6 shadow-sm">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+<header className="sticky top-0 z-50 bg-paper border-b border-ink/10 px-4 lg:px-6 2xl:px-10 py-3 shadow-sm">
+      <div className="w-full max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"

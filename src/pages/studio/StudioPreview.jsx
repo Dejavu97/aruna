@@ -101,9 +101,9 @@ export default function StudioPreview({ accentSoftColor,
     if (tab) setActiveTab?.(tab)
   }
   return (
-<div className="flex-1 min-w-0 flex flex-col items-center order-1 lg:order-2 lg:sticky lg:top-20">
-        {/* Device & Daylight/Twilight Switcher Toolbar */}
-        <div className="flex items-center justify-between w-full max-w-sm mb-3 px-1">
+<div className="flex-1 min-w-0 flex flex-col items-center lg:items-stretch order-1 lg:order-2 lg:sticky lg:top-[84px] lg:self-start w-full">
+        {/* Device & Daylight/Twilight Switcher Toolbar — wider on PC */}
+        <div className="flex items-center justify-between w-full max-w-sm lg:max-w-[560px] xl:max-w-[640px] mx-auto lg:mx-0 mb-4 px-1 lg:px-0">
           {/* Day / Night Switcher */}
           <div className="flex items-center gap-1 bg-paper border border-ink/15 p-0.5 rounded-sm">
             <button
@@ -147,10 +147,12 @@ export default function StudioPreview({ accentSoftColor,
           </div>
         </div>
 
-        {/* Device Frame Simulation */}
+        {/* Device Frame — PC: mobile 520-560px, tablet 860-900px, height fills viewport */}
         <div
-          className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 ${
-            previewDevice === 'mobile' ? 'w-full max-w-[380px] h-[min(720px,calc(100dvh-220px))]' : 'w-full max-w-[520px] h-[min(720px,calc(100dvh-220px))]'
+          className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 mx-auto lg:mx-0 ${
+            previewDevice === 'mobile'
+              ? 'w-full max-w-[410px] lg:max-w-[520px] xl:max-w-[560px] h-[min(760px,calc(100dvh-160px))] lg:h-[calc(100dvh-120px)] lg:min-h-[720px]'
+              : 'w-full max-w-[620px] lg:max-w-[860px] xl:max-w-[900px] h-[min(760px,calc(100dvh-160px))] lg:h-[calc(100dvh-120px)] lg:min-h-[720px]'
           }`}
         >
           {/* Audio Engines */}

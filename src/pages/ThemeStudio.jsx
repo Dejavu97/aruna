@@ -16,11 +16,10 @@ import StudioResizer from './studio/StudioResizer'
  */
 export default function ThemeStudio() {
   const s = useStudioState()
-  const [panelW, setPanelW] = useState(460)
+  const [panelW, setPanelW] = useState(520)
   const handleResizer = useCallback((clientX) => {
-    // panel left edge ≈ 24px padding + we clamp 340..640
-    const leftEdge = 24
-    const w = Math.min(640, Math.max(340, clientX - leftEdge))
+    const leftEdge = 16
+    const w = Math.min(680, Math.max(400, clientX - leftEdge))
     setPanelW(w)
   }, [])
 
@@ -38,7 +37,7 @@ export default function ThemeStudio() {
         setPosterModalOpen={s.setPosterModalOpen}
         setProposalModalOpen={s.setProposalModalOpen}
       />
-      <main className="flex-1 max-w-[1600px] w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-0 lg:gap-0 items-start">
+      <main className="flex-1 w-full max-w-[1920px] mx-auto px-4 lg:px-6 2xl:px-10 py-5 lg:py-7 flex flex-col lg:flex-row gap-5 lg:gap-7 items-stretch">
         <div style={{ ['--panel-w']: panelW + 'px' }} className="w-full lg:w-[var(--panel-w)] lg:shrink-0 order-2 lg:order-1">
         <StudioLeftTabs
         activeEventConfig={s.activeEventConfig}
