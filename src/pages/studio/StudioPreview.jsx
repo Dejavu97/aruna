@@ -83,7 +83,7 @@ export default function StudioPreview({ accentSoftColor,
   touchParticles,
   voiceAudioRef  }) {
   return (
-<div className="lg:col-span-6 xl:col-span-7 flex flex-col items-center order-1 lg:order-2 lg:sticky lg:top-20">
+<div className="flex-1 min-w-0 flex flex-col items-center order-1 lg:order-2 lg:sticky lg:top-20">
         {/* Device & Daylight/Twilight Switcher Toolbar */}
         <div className="flex items-center justify-between w-full max-w-sm mb-3 px-1">
           {/* Day / Night Switcher */}

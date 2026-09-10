@@ -95,7 +95,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   twilightColors,
   uploadingAsset  }) {
   return (
-<div className="lg:col-span-6 xl:col-span-5 bg-paper border border-ink/10 shadow-sm flex flex-col overflow-hidden order-2 lg:order-1">
+<div className="w-full bg-paper border border-ink/10 shadow-sm flex flex-col overflow-hidden shrink-0">
         {/* Streamlined 7 Core Navigation Tabs */}
         <div className="relative">
           <div className="flex border-b border-ink/10 overflow-x-auto text-[11px] uppercase tracking-wider font-medium bg-ivory/40 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
