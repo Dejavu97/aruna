@@ -28,6 +28,14 @@ import StudioScrollArea from './StudioScrollArea'
 import { Reorder } from 'framer-motion'
 import './studio-panel-scroll.css'
 
+const TAB_GROUPS = [
+  { id: 'desain', label: 'Desain', icon: Palette, tabs: ['preset', 'typography', 'color'] },
+  { id: 'struktur', label: 'Struktur', icon: Layers, tabs: ['structure'] },
+  { id: 'media', label: 'Media', icon: Camera, tabs: ['photographer', 'uploads'] },
+  { id: 'hiasan', label: 'Hiasan', icon: Sparkles, tabs: ['ornaments', 'motion'] },
+]
+const TAB_TO_GROUP = Object.fromEntries(TAB_GROUPS.flatMap(g => g.tabs.map(t => [t, g.id])))
+
 /** StudioLeftTabs — diekstrak verbatim dari ThemeStudio.jsx (Fase 3b). */
 export default function StudioLeftTabs({ activeEventConfig,
   activeTab,
@@ -96,39 +104,48 @@ export default function StudioLeftTabs({ activeEventConfig,
   uploadingAsset  }) {
   return (
 <div className="w-full bg-paper border border-ink/10 shadow-sm flex flex-col overflow-hidden shrink-0">
-        {/* Streamlined 7 Core Navigation Tabs */}
-        <div className="relative">
-          <div className="flex border-b border-ink/10 overflow-x-auto text-[11px] uppercase tracking-wider font-medium bg-ivory/40 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {[
-            ['preset', 'Preset & WO'],
-            ['structure', 'Urutan & Pembatas'],
-            ['typography', 'Tipografi'],
-            ['color', 'Warna & Mode'],
-            ['photographer', 'Fotografer & Kartu'],
-            ['ornaments', 'Ornamen'],
-            ['motion', 'Gerak & Sentuhan'],
-            ['uploads', 'Pusat Upload Aset'],
-          ].map(([tab, label]) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTab(tab)}
-              className={`px-2.5 sm:px-3 py-2.5 whitespace-nowrap border-b-2 transition-colors shrink-0 text-[10px] sm:text-[11px] ${
-                activeTab === tab ? 'border-gold-deep text-ink bg-paper font-bold' : 'border-transparent text-stone hover:text-ink'
-              }`}
-            >
-              {tab === 'uploads' ? (
-                <span className="inline-flex items-center gap-1 text-gold-deep font-bold">
-                  <FolderUp size={13} /> {label}
-                </span>
-              ) : (
-                label
-              )}
-            </button>
-          ))}
+        {/* Grouped Navigation — 4 groups instead of 8 flat tabs */}
+        <div className="border-b border-ink/10 bg-ivory/40">
+          <div className="flex items-center gap-1 p-1.5">
+            {TAB_GROUPS.map((g) => {
+              const Icon = g.icon
+              const active = TAB_TO_GROUP[activeTab] === g.id
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => setActiveTab(g.tabs[0])}
+                  className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xs text-[11px] uppercase tracking-wider font-semibold transition-colors ${
+                    active ? 'bg-ink text-ivory shadow-sm' : 'text-stone hover:bg-white hover:text-ink'
+                  }`}
+                >
+                  <Icon size={13} /> {g.label}
+                </button>
+              )
+            })}
           </div>
-          {/* fade affordance tepi kanan (tab bisa discroll) */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-paper to-transparent" />
+          {/* Sub-tabs pills for active group */}
+          {(() => {
+            const grp = TAB_GROUPS.find(g => TAB_TO_GROUP[activeTab] === g.id)
+            if (!grp || grp.tabs.length <= 1) return null
+            const labels = { preset: 'Preset WO', typography: 'Tipografi', color: 'Warna', photographer: 'Fotografer', uploads: 'Upload', ornaments: 'Ornamen', motion: 'Gerak' }
+            return (
+              <div className="flex items-center gap-1.5 px-2 pb-2">
+                {grp.tabs.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setActiveTab(t)}
+                    className={`px-3 py-1 rounded-full text-[10px] font-semibold tracking-wide transition-colors ${
+                      activeTab === t ? 'bg-gold-deep text-white' : 'bg-white border border-ink/15 text-stone hover:border-gold-deep/40'
+                    }`}
+                  >
+                    {labels[t] || t}
+                  </button>
+                ))}
+              </div>
+            )
+          })()}
         </div>
 
         {/* Tab Content Panels — scroll area custom (thumb virtual + fade bawah) */}
@@ -303,31 +320,32 @@ export default function StudioLeftTabs({ activeEventConfig,
                 </p>
               </div>
 
-              {/* 1. Custom Section Divider Shapes */}
+              {/* 1. Custom Section Divider Shapes — visual preview */}
               <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-2.5">
                 <label className="block text-xs uppercase tracking-wider font-bold text-ink">
-                  1. Bentuk Garis Pembatas Antar-Bagian (Section Divider):
+                  1. Bentuk Garis Pembatas Antar-Bagian:
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    ['arch', 'Royal Arch (Kubah)'],
-                    ['wave', 'Smooth Wave (Ombak)'],
-                    ['crown', 'Royal Crown (Mahkota)'],
-                    ['slant', 'Diagonal Slant (Miring)'],
-                    ['botanical', 'Flora Botanical'],
-                    ['line', 'Garis Tipis Minimalis'],
-                  ].map(([dVal, dLabel]) => (
+                    ['arch', 'Kubah', () => (<svg width="64" height="18" viewBox="0 0 64 18" fill="none"><path d="M2 16 Q32 2 62 16" stroke="currentColor" strokeWidth="1.4" fill="none"/></svg>)],
+                    ['wave', 'Ombak', () => (<svg width="64" height="14" viewBox="0 0 64 14" fill="none"><path d="M0 7 Q16 1 32 7 T64 7" stroke="currentColor" strokeWidth="1.4" fill="none"/></svg>)],
+                    ['crown', 'Mahkota', () => (<span className="inline-flex items-center gap-1"><span className="w-5 h-px bg-current"/><Crown size={10}/><span className="w-5 h-px bg-current"/></span>)],
+                    ['slant', 'Miring', () => (<svg width="64" height="10" viewBox="0 0 64 10" fill="none"><line x1="0" y1="10" x2="64" y2="0" stroke="currentColor" strokeWidth="1.2"/></svg>)],
+                    ['botanical', 'Flora', () => (<span className="inline-flex items-center gap-1 text-[8px] tracking-widest"><Sparkles size={8}/> FLORA <Sparkles size={8}/></span>)],
+                    ['line', 'Minimalis', () => (<span className="w-10 h-px bg-current"/>)],
+                  ].map(([dVal, dLabel, Preview]) => (
                     <button
                       key={dVal}
                       type="button"
                       onClick={() => setDividerShape(dVal)}
-                      className={`p-2 border text-center rounded-xs text-[10px] font-semibold transition-colors ${
+                      className={`flex flex-col items-center justify-center gap-1.5 p-2.5 border rounded-xs transition-colors min-h-[56px] ${
                         dividerShape === dVal
-                          ? 'border-gold-deep bg-gold/10 font-bold text-ink shadow-xs'
-                          : 'border-ink/20 bg-white text-stone'
+                          ? 'border-gold-deep bg-gold/10 text-gold-deep shadow-xs'
+                          : 'border-ink/15 bg-white text-stone hover:border-ink/30 hover:text-ink'
                       }`}
                     >
-                      {dLabel}
+                      <span className="flex items-center justify-center h-5">{Preview()}</span>
+                      <span className="text-[9px] font-semibold leading-none">{dLabel}</span>
                     </button>
                   ))}
                 </div>
