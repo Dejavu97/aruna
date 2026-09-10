@@ -3,6 +3,7 @@ import {
   Bookmark,
   Camera,
   Crown,
+  FileCode,
   FolderUp,
   GripVertical,
   Layers,
@@ -24,6 +25,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { copyText } from '../../lib/utils'
 import StudioOrnamentPanel from './StudioOrnamentPanel'
 import StudioSectionAnimPanel from './StudioSectionAnimPanel'
+import StudioAdvancedPanel from './StudioAdvancedPanel'
+import StudioCanvasComposer from './StudioCanvasComposer'
 import StudioScrollArea from './StudioScrollArea'
 import { Reorder } from 'framer-motion'
 import './studio-panel-scroll.css'
@@ -40,6 +43,7 @@ const TAB_GROUPS = [
   { id: 'struktur', label: 'Struktur', icon: Layers, tabs: ['structure'] },
   { id: 'media', label: 'Media', icon: Camera, tabs: ['photographer', 'uploads'] },
   { id: 'hiasan', label: 'Hiasan', icon: Sparkles, tabs: ['ornaments', 'motion'] },
+  { id: 'lanjutan', label: 'Lanjutan', icon: FileCode, tabs: ['advanced', 'canvas'] },
 ]
 const TAB_TO_GROUP = Object.fromEntries(TAB_GROUPS.flatMap(g => g.tabs.map(t => [t, g.id])))
 
@@ -102,6 +106,12 @@ export default function StudioLeftTabs({ activeEventConfig,
   setOrnaments,
   setSectionAnims,
   setBackgroundFx,
+  baseLayout,
+  blankCanvas,
+  customCss,
+  setBaseLayout,
+  setBlankCanvas,
+  setCustomCss,
   setPhotoColorFilter,
   setPresetSubTab,
   setSections,
@@ -136,7 +146,7 @@ export default function StudioLeftTabs({ activeEventConfig,
           {(() => {
             const grp = TAB_GROUPS.find(g => TAB_TO_GROUP[activeTab] === g.id)
             if (!grp || grp.tabs.length <= 1) return null
-            const labels = { preset: 'Preset WO', typography: 'Tipografi', color: 'Warna', photographer: 'Fotografer', uploads: 'Upload', ornaments: 'Ornamen', motion: 'Gerak' }
+            const labels = { preset: 'Preset WO', typography: 'Tipografi', color: 'Warna', photographer: 'Fotografer', uploads: 'Upload', ornaments: 'Ornamen', motion: 'Gerak', advanced: 'CSS/Lanjutan', canvas: 'Canvas' }
             return (
               <div className="flex items-center gap-1.5 px-2 pb-2">
                 {grp.tabs.map((t) => (
@@ -988,7 +998,6 @@ export default function StudioLeftTabs({ activeEventConfig,
             </div>
           )}
 
-          {/* TAB 7: COMPREHENSIVE UPLOAD HUB */}
           {activeTab === 'uploads' && (
             <div className="space-y-6 animate-in fade-in text-xs">
               <div className="border-b border-ink/10 pb-3">
@@ -1141,6 +1150,25 @@ export default function StudioLeftTabs({ activeEventConfig,
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'advanced' && (
+            <div className="space-y-6 animate-in fade-in text-xs">
+              <div className="border-b border-ink/10 pb-3">
+                <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2"><FileCode size={16} className="text-gold-deep" /> Advanced: buka isolated + CSS kustom</h3>
+                <p className="text-xs text-stone mt-1">Pilih layout dasar apapun (termasuk tema isolated) & inject CSS tambahan (disanitasi).</p>
+              </div>
+              <StudioAdvancedPanel customCss={customCss} setCustomCss={setCustomCss} baseLayout={baseLayout} setBaseLayout={setBaseLayout} />
+            </div>
+          )}
+          {activeTab === 'canvas' && (
+            <div className="space-y-6 animate-in fade-in text-xs">
+              <div className="border-b border-ink/10 pb-3">
+                <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2"><Layers size={16} className="text-gold-deep" /> Blank Canvas Composer</h3>
+                <p className="text-xs text-stone mt-1">Susun layout dari nol dengan blok (drag urutan, hapus, tambah).</p>
+              </div>
+              <StudioCanvasComposer blankCanvas={blankCanvas} setBlankCanvas={setBlankCanvas} />
             </div>
           )}
 

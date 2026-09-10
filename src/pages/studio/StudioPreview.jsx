@@ -90,7 +90,10 @@ export default function StudioPreview({ accentSoftColor,
   toggleAudio,
   toggleVoiceAudio,
   touchParticles,
-  voiceAudioRef  }) {
+  voiceAudioRef,
+  customCss,
+  blankCanvas,
+  baseLayout  }) {
   const handleSectionClick = (id, e) => {
     e?.stopPropagation()
     setSelectedSection?.(id)
@@ -221,6 +224,9 @@ export default function StudioPreview({ accentSoftColor,
               letterSpacing: fonts.letterSpacing || '0.04em',
             }}
           >
+            {/* FlexStudio Fase2/3: custom CSS sanitized + blankCanvas */}
+            {customCss ? <style dangerouslySetInnerHTML={{ __html: customCss }} /> : null}
+            {baseLayout && baseLayout !== 'classic' ? <div className="mx-2 mt-2 text-[10px] font-mono bg-ink/80 text-ivory px-2 py-1 rounded-sm">layout: {baseLayout} {blankCanvas?.enabled ? '· canvas ON' : ''}</div> : null}
             {/* FlexStudio: placed ornament layer (di atas background, di bawah konten interaktif) */}
             <OrnamentLayer ornaments={ornaments} className="studio-orn" />
             {/* COVER SCREEN */}
@@ -571,6 +577,17 @@ export default function StudioPreview({ accentSoftColor,
                     </div>
                   )
                 })}
+              {blankCanvas?.enabled && Array.isArray(blankCanvas.blocks) && blankCanvas.blocks.length > 0 && (
+                <div className="border-t-2 border-dashed border-gold-deep/40 pt-4 space-y-2">
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-gold-deep">Blank Canvas — {blankCanvas.blocks.length} blok</p>
+                  {blankCanvas.blocks.map((b) => (
+                    <div key={b.id} className="p-3 border text-center" style={cardStyler ? { borderRadius: cardStyler.borderRadius, background: paperBgColor } : undefined}>
+                      <p className="text-[10px] uppercase opacity-60">{b.type}</p>
+                      <p className="text-xs font-semibold">{b.content}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

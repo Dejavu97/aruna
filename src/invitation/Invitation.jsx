@@ -234,6 +234,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
               backgroundAttachment: 'fixed',
             } : undefined}
           >
+            {theme.customCss ? <style dangerouslySetInnerHTML={{ __html: theme.customCss }} /> : null}
             <OrnamentLayer ornaments={theme.ornaments || data.ornaments || []} className="inv-orn" />
             {isUnpaid && (
               <div
@@ -316,6 +317,16 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
             )}
             <AdSlot slot="footer" data={data} theme={theme} />
             <Reveal fx="closer" sectionAnims={theme.sectionAnims}><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} data={data} /></Reveal>
+            {theme.blankCanvas?.enabled && Array.isArray(theme.blankCanvas.blocks) && theme.blankCanvas.blocks.length > 0 && (
+              <section className="pad space-y-3">
+                {theme.blankCanvas.blocks.map((b) => (
+                  <div key={b.id} className="glass-panel p-4 text-center">
+                    <p className="text-[11px] uppercase tracking-wider opacity-60">{b.type}</p>
+                    <p className="text-sm mt-1">{b.content}</p>
+                  </div>
+                ))}
+              </section>
+            )}
             {!isLoveLetter && <BottomNav />}
           </main>
         )}

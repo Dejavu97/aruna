@@ -14,6 +14,7 @@ import AtmosphereParticles from '../../components/AtmosphereParticles'
 import ImageAdjustModal from '../../components/ImageAdjustModal'
 import { createCustomTheme, fetchCustomTheme, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
+import { sanitizeCustomCss } from '../../lib/sanitizeCss'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Universal Event Types Configuration
@@ -528,6 +529,9 @@ export function useStudioState() {
     if (td.sectionAnims) setSectionAnims(td.sectionAnims)
     if (td.backgroundFx) setBackgroundFx(td.backgroundFx)
     if (td.cardFx) setCardFx((prev) => ({ ...prev, ...td.cardFx }))
+    if (td.customCss != null) setCustomCss(td.customCss)
+    if (td.layout) setBaseLayout(td.layout)
+    if (td.blankCanvas) setBlankCanvas(td.blankCanvas)
     setThemeName(tmpl.name)
     setCreatorName(tmpl.creator)
     setAnimKey((k) => k + 1)
@@ -577,6 +581,9 @@ export function useStudioState() {
   const [ornaments, setOrnaments] = useState([])
   const [sectionAnims, setSectionAnims] = useState({})
   const [backgroundFx, setBackgroundFx] = useState({ enabled: false, color1: '#F7F3EC', color2: '#E8DCC8', angle: 160 })
+  const [customCss, setCustomCss] = useState('')
+  const [baseLayout, setBaseLayout] = useState('classic')
+  const [blankCanvas, setBlankCanvas] = useState({ enabled: false, blocks: [] })
   const [customAssets, setCustomAssets] = useState({
     coverImgUrl: '/assets/local/couple_laughing_1.jpg',
     coverImgSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
@@ -1038,6 +1045,9 @@ export function useStudioState() {
         sectionAnims,
         backgroundFx,
         cardFx,
+        customCss: sanitizeCustomCss(customCss),
+        layout: baseLayout,
+        blankCanvas: blankCanvas.enabled ? blankCanvas : null,
         cover: customAssets.coverImgUrl || '/themes/emas-senja.jpg',
         tags: ['komunitas', 'custom', isPublic ? 'publik' : 'privat'],
         popular: false,
@@ -1318,6 +1328,8 @@ accentBorderColor,
     sectionAnims,
     backgroundFx,
     cardFx,
+    baseLayout,
+    blankCanvas,
     openingAnimation,
     ornamentStyle,
     ornamentTransition,
@@ -1373,7 +1385,10 @@ accentBorderColor,
     setOrnaments,
     setSectionAnims,
     setBackgroundFx,
+    setBlankCanvas,
     setCardFx,
+    setBaseLayout,
+    setCustomCss,
     setOrnamentStyle,
     setOrnamentTransition,
     setPanelTransition,

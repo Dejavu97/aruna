@@ -44,10 +44,13 @@ export default function ThemeStudio() {
         activeEventConfig={s.activeEventConfig}
         activeTab={s.activeTab}
         applyPreset={s.applyPreset}
+        baseLayout={s.baseLayout}
+        blankCanvas={s.blankCanvas}
         cardStyler={s.cardStyler}
         cardFx={s.cardFx}
         colors={s.colors}
         customAssets={s.customAssets}
+        customCss={s.customCss}
         dividerShape={s.dividerShape}
         error={s.error}
         eventType={s.eventType}
@@ -98,6 +101,9 @@ export default function ThemeStudio() {
         setOrnaments={s.setOrnaments}
         setSectionAnims={s.setSectionAnims}
         setBackgroundFx={s.setBackgroundFx}
+        setBaseLayout={s.setBaseLayout}
+        setBlankCanvas={s.setBlankCanvas}
+        setCustomCss={s.setCustomCss}
         setPhotoColorFilter={s.setPhotoColorFilter}
         selectedSection={s.selectedSection}
         setPresetSubTab={s.setPresetSubTab}
@@ -146,6 +152,9 @@ export default function ThemeStudio() {
         previewScrollRef={s.previewScrollRef}
         sectionAnims={s.sectionAnims}
         backgroundFx={s.backgroundFx}
+        blankCanvas={s.blankCanvas}
+        customCss={s.customCss}
+        baseLayout={s.baseLayout}
         previewThemeMode={s.previewThemeMode}
         renderMonogram={s.renderMonogram}
         renderSectionDivider={s.renderSectionDivider}
