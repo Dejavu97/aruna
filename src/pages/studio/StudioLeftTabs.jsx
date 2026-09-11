@@ -121,8 +121,8 @@ export default function StudioLeftTabs({ activeEventConfig,
   twilightColors,
   uploadingAsset  }) {
   return (
-<div className="w-full bg-paper border border-ink/10 shadow-sm flex flex-col overflow-hidden shrink-0">
-        {/* Grouped Navigation — 4 groups instead of 8 flat tabs */}
+<div className="w-full bg-white border border-ink/10 shadow-sm rounded-sm flex flex-col overflow-hidden shrink-0">
+        {/* Grouped Navigation — rapi: 5 grup, aktif jelas, sub-tab underline */}
         <div className="border-b border-ink/10 bg-ivory/40">
           <div className="flex items-center gap-1 p-1.5">
             {TAB_GROUPS.map((g) => {
@@ -133,8 +133,8 @@ export default function StudioLeftTabs({ activeEventConfig,
                   key={g.id}
                   type="button"
                   onClick={() => setActiveTab(g.tabs[0])}
-                  className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xs text-[11px] uppercase tracking-wider font-semibold transition-colors ${
-                    active ? 'bg-ink text-ivory shadow-sm' : 'text-stone hover:bg-white hover:text-ink'
+                  className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-sm text-[11px] uppercase tracking-wider font-semibold transition-colors ${
+                    active ? 'bg-ink text-ivory shadow-sm' : 'text-stone hover:bg-white hover:text-ink border border-transparent hover:border-ink/10'
                   }`}
                 >
                   <Icon size={13} /> {g.label}
@@ -142,20 +142,20 @@ export default function StudioLeftTabs({ activeEventConfig,
               )
             })}
           </div>
-          {/* Sub-tabs pills for active group */}
+          {/* Sub-tabs — underline rapi, bukan pill bertumpuk */}
           {(() => {
             const grp = TAB_GROUPS.find(g => TAB_TO_GROUP[activeTab] === g.id)
             if (!grp || grp.tabs.length <= 1) return null
             const labels = { preset: 'Preset WO', typography: 'Tipografi', color: 'Warna', photographer: 'Fotografer', uploads: 'Upload', ornaments: 'Ornamen', motion: 'Gerak', advanced: 'CSS/Lanjutan', canvas: 'Canvas' }
             return (
-              <div className="flex items-center gap-1.5 px-2 pb-2">
+              <div className="flex items-center gap-4 px-3 pb-0 border-t border-ink/5 mt-1">
                 {grp.tabs.map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setActiveTab(t)}
-                    className={`px-3 py-1 rounded-full text-[10px] font-semibold tracking-wide transition-colors ${
-                      activeTab === t ? 'bg-gold-deep text-white' : 'bg-white border border-ink/15 text-stone hover:border-gold-deep/40'
+                    className={`py-2.5 text-[11px] font-semibold tracking-wide border-b-2 -mb-px transition-colors ${
+                      activeTab === t ? 'border-gold-deep text-ink' : 'border-transparent text-stone hover:text-ink hover:border-ink/20'
                     }`}
                   >
                     {labels[t] || t}
@@ -166,8 +166,8 @@ export default function StudioLeftTabs({ activeEventConfig,
           })()}
         </div>
 
-        {/* Tab Content Panels — scroll area custom (thumb virtual + fade bawah) */}
-        <StudioScrollArea className="p-5 sm:p-6 max-h-[calc(100dvh-190px)] lg:max-h-[calc(100vh-210px)] overflow-y-auto space-y-6">
+        {/* Tab Content Panels — rapi: padding konsisten, kartu putih, jarak lega */}
+        <StudioScrollArea className="p-4 sm:p-5 max-h-[calc(100dvh-190px)] lg:max-h-[calc(100vh-210px)] overflow-y-auto space-y-5 bg-[#FCFCF9]">
           
           {/* TAB 1: PRESET & AGENCY TEMPLATES */}
           {activeTab === 'preset' && (
@@ -339,7 +339,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* 1. Custom Section Divider Shapes — visual preview */}
-              <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-2.5">
+              <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-2.5">
                 <label className="block text-xs uppercase tracking-wider font-bold text-ink">
                   1. Bentuk Garis Pembatas Antar-Bagian:
                 </label>
@@ -439,7 +439,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* Display Font */}
-              <div className="space-y-2 border border-ink/15 p-3.5 rounded-xs bg-ivory/30">
+              <div className="space-y-2 border border-ink/10 rounded-sm bg-white p-4">
                 <label className="block uppercase tracking-wider font-bold text-ink">
                   1. Font Judul Utama &amp; Section Title (Display):
                 </label>
@@ -463,7 +463,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* Script Font */}
-              <div className="space-y-2 border border-ink/15 p-3.5 rounded-xs bg-ivory/30">
+              <div className="space-y-2 border border-ink/10 rounded-sm bg-white p-4">
                 <label className="block uppercase tracking-wider font-bold text-ink">
                   2. Font Kaligrafi Nama Mempelai &amp; Quote (Script):
                 </label>
@@ -487,7 +487,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* Body Font */}
-              <div className="space-y-2 border border-ink/15 p-3.5 rounded-xs bg-ivory/30">
+              <div className="space-y-2 border border-ink/10 rounded-sm bg-white p-4">
                 <label className="block uppercase tracking-wider font-bold text-ink">
                   3. Font Teks Isi, Paragraf, &amp; Keterangan (Body):
                 </label>
@@ -622,7 +622,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                     ['accent', 'Aksen Emas / Gold'],
                     ['accentSoft', 'Garis Pemisah'],
                   ].map(([key, label]) => (
-                    <div key={key} className="border border-ink/15 p-2.5 rounded-xs bg-ivory/30 space-y-1.5">
+                    <div key={key} className="border border-ink/10 rounded-sm bg-white p-3 space-y-1.5">
                       <div className="flex justify-between items-center">
                         <label className="font-bold text-ink uppercase tracking-wider text-[9px]">{label}:</label>
                         <span className="font-mono text-[10px] text-stone">{colors[key]}</span>
@@ -660,7 +660,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                     ['accent', 'Aksen Emas Berpendar'],
                     ['accentSoft', 'Garis Malam'],
                   ].map(([key, label]) => (
-                    <div key={key} className="border border-ink/15 p-2.5 rounded-xs bg-ivory/30 space-y-1.5">
+                    <div key={key} className="border border-ink/10 rounded-sm bg-white p-3 space-y-1.5">
                       <div className="flex justify-between items-center">
                         <label className="font-bold text-ink uppercase tracking-wider text-[9px]">{label}:</label>
                         <span className="font-mono text-[10px] text-stone">{twilightColors[key]}</span>
@@ -699,7 +699,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* 1. Card Glassmorphism & Radius Styler */}
-              <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-3">
+              <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-3">
                 <label className="block uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
                   <SlidersHorizontal size={14} className="text-gold-deep" /> 1. Kelengkungan Sudut &amp; Efek Kaca Kartu:
                 </label>
@@ -830,7 +830,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* 2. Photo Color Grading Filters */}
-              <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-3">
+              <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-3">
                 <label className="block uppercase tracking-wider font-bold text-ink">
                   2. Filter Warna Sinematik (Color Grading Presets):
                 </label>
@@ -854,7 +854,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* 3. Monogram Crest Generator */}
-              <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-3">
+              <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-3">
                 <label className="block uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
                   <Crown size={14} className="text-gold-deep" /> 3. Monogram Inisial Pengantin:
                 </label>
@@ -909,7 +909,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* 1. Guest Screen Touch FX */}
-              <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-3">
+              <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-3">
                 <label className="block uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
                   <Sparkles size={14} className="text-gold-deep" /> 1. Efek Sentuhan Jari Tamu (Guest Touch FX):
                 </label>
@@ -936,7 +936,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* 2. Living Floating Bobbing */}
-              <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-3">
+              <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-3">
                 <label className="block uppercase tracking-wider font-bold text-ink">
                   2. Efek Mengambang Hidup (Living Floating Bobbing):
                 </label>
@@ -966,7 +966,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* 3. Opener Style */}
-              <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-3">
+              <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-3">
                 <label className="block uppercase tracking-wider font-bold text-ink">
                   3. Gaya Tombol Pembuka Sampul Depan:
                 </label>
@@ -1011,7 +1011,7 @@ export default function StudioLeftTabs({ activeEventConfig,
 
               <div className="space-y-3">
                 {/* 1. Cover Photo */}
-                <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-2">
+                <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-bold text-ink">1. Foto Sampul Depan (Cover Photo)</p>
@@ -1052,7 +1052,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                 </div>
 
                 {/* 2. Bride Photo */}
-                <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-2">
+                <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-bold text-ink">2. Foto Mempelai Wanita (Bride Portrait)</p>
@@ -1071,7 +1071,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                 </div>
 
                 {/* 3. Groom Photo */}
-                <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-2">
+                <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-bold text-ink">3. Foto Mempelai Pria (Groom Portrait)</p>
@@ -1090,7 +1090,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                 </div>
 
                 {/* 4. Couple Frame */}
-                <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-2">
+                <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-bold text-ink">4. Bingkai Foto Pengantin (PNG Transparan)</p>
@@ -1109,7 +1109,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                 </div>
 
                 {/* 5. Custom Music MP3 */}
-                <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-2">
+                <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-bold text-ink flex items-center gap-1">
@@ -1130,7 +1130,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                 </div>
 
                 {/* 6. Voice Story MP3 */}
-                <div className="border border-ink/15 p-3.5 rounded-xs bg-ivory/30 space-y-2">
+                <div className="border border-ink/10 rounded-sm bg-white p-4 space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-bold text-ink flex items-center gap-1">

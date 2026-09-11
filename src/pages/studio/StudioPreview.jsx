@@ -101,9 +101,9 @@ export default function StudioPreview({ accentSoftColor,
     if (tab) setActiveTab?.(tab)
   }
   return (
-<div className="flex-1 min-w-0 flex flex-col items-center lg:items-stretch order-1 lg:order-2 lg:sticky lg:top-[84px] lg:self-start w-full">
-        {/* Device & Daylight/Twilight Switcher Toolbar — wider on PC */}
-        <div className="flex items-center justify-between w-full max-w-sm lg:max-w-[560px] xl:max-w-[640px] mx-auto lg:mx-0 mb-4 px-1 lg:px-0">
+<div className="flex-1 min-w-0 flex flex-col items-center order-1 lg:order-2 lg:sticky lg:top-20">
+        {/* Device & Daylight/Twilight Switcher Toolbar */}
+        <div className="flex items-center justify-between w-full max-w-[380px] mb-3 px-1">
           {/* Day / Night Switcher */}
           <div className="flex items-center gap-1 bg-paper border border-ink/15 p-0.5 rounded-sm">
             <button
