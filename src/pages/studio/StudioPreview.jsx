@@ -103,7 +103,7 @@ export default function StudioPreview({ accentSoftColor,
   return (
 <div className="flex-1 min-w-0 flex flex-col items-center order-2 lg:sticky lg:top-20 lg:h-[calc(100dvh-120px)] lg:min-h-[720px]">
         {/* Device & Daylight/Twilight Switcher Toolbar */}
-        <div className="flex items-center justify-between w-full max-w-[410px] mb-3 px-1">
+        <div className="flex items-center justify-between w-full max-w-[360px] mb-3 px-1">
           {/* Day / Night Switcher */}
           <div className="flex items-center gap-1 bg-paper border border-ink/15 p-0.5 rounded-sm">
             <button
@@ -147,12 +147,12 @@ export default function StudioPreview({ accentSoftColor,
           </div>
         </div>
 
-        {/* Device Frame — PC: mobile 520-560px, tablet 860-900px, height fills viewport */}
+        {/* Device Frame — PC ramping: mobile 360-400px, tablet 600-680px */}
         <div
-          className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 mx-auto lg:mx-0 ${
+          className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 mx-auto lg:mx-0 lg:my-auto ${
             previewDevice === 'mobile'
-              ? 'w-full max-w-[410px] lg:max-w-[520px] xl:max-w-[560px] h-[min(760px,calc(100dvh-160px))] lg:h-[calc(100dvh-120px)] lg:min-h-[720px]'
-              : 'w-full max-w-[620px] lg:max-w-[860px] xl:max-w-[900px] h-[min(760px,calc(100dvh-160px))] lg:h-[calc(100dvh-120px)] lg:min-h-[720px]'
+              ? 'w-full max-w-[360px] lg:max-w-[380px] xl:max-w-[400px] h-[min(640px,calc(100dvh-220px))] lg:h-[min(680px,calc(100dvh-180px))] lg:min-h-[600px]'
+              : 'w-full max-w-[600px] lg:max-w-[640px] xl:max-w-[680px] h-[min(640px,calc(100dvh-220px))] lg:h-[min(680px,calc(100dvh-180px))] lg:min-h-[600px]'
           }`}
         >
           {/* Audio Engines */}
