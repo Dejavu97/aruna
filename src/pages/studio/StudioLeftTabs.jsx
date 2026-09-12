@@ -149,13 +149,13 @@ export default function StudioLeftTabs({ activeEventConfig,
             if (!grp || grp.tabs.length <= 1) return null
             const labels = { preset: 'Preset WO', typography: 'Tipografi', color: 'Warna', photographer: 'Fotografer', uploads: 'Upload', ornaments: 'Ornamen', motion: 'Gerak', advanced: 'CSS/Lanjutan', canvas: 'Canvas' }
             return (
-              <div className="flex items-center gap-4 px-3 border-b border-ink/10">
+              <div className="flex items-center gap-3 px-4 border-b border-ink/10">
                 {grp.tabs.map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setActiveTab(t)}
-                    className={`py-2.5 text-[11px] font-semibold tracking-wide border-b-2 -mb-px transition-colors ${
+                    className={`py-2 text-[10px] font-semibold uppercase tracking-wide border-b-2 -mb-px transition-colors ${
                       activeTab === t ? 'border-gold-deep text-ink' : 'border-transparent text-stone hover:text-ink hover:border-ink/20'
                     }`}
                   >
@@ -256,21 +256,23 @@ export default function StudioLeftTabs({ activeEventConfig,
                     </form>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="space-y-2 pt-2">
                     {themePresets.map((p) => (
                       <button
                         key={p.name}
                         type="button"
                         onClick={() => applyPreset(p)}
-                        className="border border-ink/15 p-3 text-left hover:border-gold-deep transition-all rounded-sm bg-ivory/30 group"
+                        className="w-full border border-ink/10 p-3 text-left hover:border-gold-deep transition-all rounded-sm bg-white group flex items-center gap-3"
                       >
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <span className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ background: p.colors.bg }} />
-                          <span className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ background: p.colors.accent }} />
-                          <span className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ background: p.colors.cover }} />
+                        <div className="flex items-center gap-1 shrink-0">
+                          <span className="w-4 h-4 rounded-full border border-black/10" style={{ background: p.colors.bg }} />
+                          <span className="w-4 h-4 rounded-full border border-black/10" style={{ background: p.colors.accent }} />
+                          <span className="w-4 h-4 rounded-full border border-black/10" style={{ background: p.colors.cover }} />
                         </div>
-                        <p className="text-xs font-semibold group-hover:text-gold-deep transition-colors">{p.name}</p>
-                        <p className="text-[10px] text-stone mt-0.5">{p.ornamentStyle} · {p.particleEffect}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold group-hover:text-gold-deep transition-colors truncate">{p.name}</p>
+                          <p className="text-[10px] text-stone mt-0.5 truncate">{p.ornamentStyle} · {p.particleEffect}</p>
+                        </div>
                       </button>
                     ))}
                   </div>

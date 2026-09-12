@@ -151,8 +151,8 @@ export default function StudioPreview({ accentSoftColor,
         <div
           className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 mx-auto lg:mx-0 lg:my-auto ${
             previewDevice === 'mobile'
-              ? 'w-full max-w-[360px] lg:max-w-[380px] xl:max-w-[400px] h-[min(640px,calc(100dvh-220px))] lg:h-[min(680px,calc(100dvh-180px))] lg:min-h-[600px]'
-              : 'w-full max-w-[600px] lg:max-w-[640px] xl:max-w-[680px] h-[min(640px,calc(100dvh-220px))] lg:h-[min(680px,calc(100dvh-180px))] lg:min-h-[600px]'
+              ? 'w-full max-w-[360px] lg:max-w-[380px] xl:max-w-[400px] h-[min(640px,calc(100dvh-220px))] lg:h-[min(680px,calc(100dvh-180px))] lg:min-h-[480px]'
+              : 'w-full max-w-[600px] lg:max-w-[640px] xl:max-w-[680px] h-[min(640px,calc(100dvh-220px))] lg:h-[min(680px,calc(100dvh-180px))] lg:min-h-[480px]'
           }`}
         >
           {/* Audio Engines */}
