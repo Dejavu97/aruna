@@ -39,8 +39,8 @@ export default function StudioCanvasComposer({ blankCanvas, setBlankCanvas }) {
   const DraftIcon = draftMeta.icon
 
   return (
-    <div className="space-y-4">
-      <div className="border border-ink/10 bg-ivory/30 p-3.5 rounded-sm space-y-2.5">
+    <div className="space-y-5">
+      <div className="border border-ink/10 bg-white p-4 rounded-sm space-y-2.5">
         <label className="flex items-center gap-2.5 text-xs font-bold tracking-wide text-ink">
           <span className="relative inline-flex h-5 w-9 items-center rounded-full bg-ink/10 p-0.5">
             <input type="checkbox" checked={!!blankCanvas?.enabled} onChange={(e) => toggle(e.target.checked)} className="peer sr-only" />

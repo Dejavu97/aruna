@@ -73,7 +73,7 @@ export default function StudioAdvancedPanel({ customCss, setCustomCss, baseLayou
       </div>
 
       {/* custom css */}
-      <div className="space-y-2.5 border border-ink/10 bg-ivory/30 p-3.5 rounded-sm">
+      <div className="space-y-2.5 border border-ink/10 bg-white p-4 rounded-sm">
         <div className="flex items-center justify-between">
           <label className="text-[11px] font-bold uppercase tracking-wider text-ink">Custom CSS (sanitized)</label>
           <span className="text-[10px] font-mono tabular-nums text-stone">{sanitized.length} / 10.000</span>

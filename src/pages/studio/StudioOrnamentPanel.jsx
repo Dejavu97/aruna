@@ -79,7 +79,7 @@ export default function StudioOrnamentPanel({ ornaments = [], setOrnaments }) {
 
   return (
     <div className="space-y-5 animate-in fade-in">
-      <div className="border border-gold/40 p-4 rounded-sm bg-gold/5 space-y-2">
+      <div className="border border-ink/10 p-4 rounded-sm bg-white space-y-2">
         <label className="text-xs uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
           <Flower2 size={14} className="text-gold-deep" /> Ornamen Dalam Undangan
         </label>
@@ -105,7 +105,7 @@ export default function StudioOrnamentPanel({ ornaments = [], setOrnaments }) {
       )}
 
       {ornaments.map((o, idx) => (
-        <div key={idx} className="border border-ink/15 rounded-sm p-3.5 space-y-3 bg-ivory/30">
+        <div key={idx} className="border border-ink/10 rounded-sm p-4 space-y-3 bg-white">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-ink">
               #{idx + 1} · {ORNAMENT_ASSETS[o.asset]?.name || o.asset}

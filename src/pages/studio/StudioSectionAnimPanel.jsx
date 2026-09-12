@@ -21,7 +21,7 @@ function SectionRow({ sectionId, sectionLabel, cfg, onChange }) {
       ...patch,
     })
   return (
-    <div className="border border-ink/15 rounded-sm p-3 bg-ivory/30 space-y-2">
+    <div className="border border-ink/10 rounded-sm p-4 bg-white space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-bold text-ink">{sectionLabel}</span>
         {cfg && (
@@ -87,7 +87,7 @@ export default function StudioSectionAnimPanel({ sectionAnims = {}, setSectionAn
 
   return (
     <div className="space-y-5 animate-in fade-in">
-      <div className="border border-gold/40 p-4 rounded-sm bg-gold/5 space-y-2">
+      <div className="border border-ink/10 p-4 rounded-sm bg-white space-y-2">
         <label className="text-xs uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
           <Activity size={14} className="text-gold-deep" /> Animasi Per-Bagian
         </label>

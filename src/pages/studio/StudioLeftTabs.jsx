@@ -171,9 +171,9 @@ export default function StudioLeftTabs({ activeEventConfig,
           
           {/* TAB 1: PRESET & AGENCY TEMPLATES */}
           {activeTab === 'preset' && (
-            <div className="space-y-6 animate-in fade-in">
+            <div className="space-y-5 animate-in fade-in">
               {/* 1. Universal Event Type Selector */}
-              <div className="border border-gold/40 p-4 rounded-sm bg-gold/5 space-y-3">
+              <div className="border border-ink/10 p-4 rounded-sm bg-white space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
                     <Sparkles size={14} className="text-gold-deep" /> Pilih Kategori Jenis Acara:
@@ -183,7 +183,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   {Object.values(eventTypeConfigs).map((ev) => {
                     const IconComponent = ev.icon
                     return (
@@ -228,9 +228,9 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {presetSubTab === 'official' ? (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {/* AI Concept Generator */}
-                  <div className="bg-gold/10 border border-gold-deep/30 p-4 rounded-sm space-y-2.5">
+                  <div className="border border-ink/10 bg-white p-4 rounded-sm space-y-2.5">
                     <div className="flex items-center gap-1.5">
                       <Wand2 size={15} className="text-gold-deep" />
                       <p className="text-xs uppercase tracking-wider font-bold text-ink">Smart Concept Generator</p>
@@ -249,7 +249,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                       <button
                         type="submit"
                         disabled={generatingMood || !moodPrompt.trim()}
-                        className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1"
+                        className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-wider font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1 rounded-xs"
                       >
                         <Sparkles size={12} /> {generatingMood ? 'Meracik...' : 'Buat'}
                       </button>
@@ -328,7 +328,7 @@ export default function StudioLeftTabs({ activeEventConfig,
 
           {/* TAB 2: STRUCTURE & SECTION DIVIDERS */}
           {activeTab === 'structure' && (
-            <div className="space-y-6 animate-in fade-in">
+            <div className="space-y-5 animate-in fade-in">
               <div className="border-b border-ink/10 pb-3">
                 <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2">
                   <Layers size={16} className="text-gold-deep" /> Urutan Bagian &amp; Bentuk Pembatas
@@ -343,7 +343,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                 <label className="block text-xs uppercase tracking-wider font-bold text-ink">
                   1. Bentuk Garis Pembatas Antar-Bagian:
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2.5">
                   {[
                     ['arch', 'Kubah', () => (<svg width="64" height="18" viewBox="0 0 64 18" fill="none"><path d="M2 16 Q32 2 62 16" stroke="currentColor" strokeWidth="1.4" fill="none"/></svg>)],
                     ['wave', 'Ombak', () => (<svg width="64" height="14" viewBox="0 0 64 14" fill="none"><path d="M0 7 Q16 1 32 7 T64 7" stroke="currentColor" strokeWidth="1.4" fill="none"/></svg>)],
@@ -417,7 +417,7 @@ export default function StudioLeftTabs({ activeEventConfig,
 
           {/* TAB 3: TYPOGRAPHY */}
           {activeTab === 'typography' && (
-            <div className="space-y-6 animate-in fade-in text-xs">
+            <div className="space-y-5 animate-in fade-in text-xs">
               <div className="border-b border-ink/10 pb-3 flex justify-between items-center">
                 <div>
                   <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2">
@@ -514,7 +514,7 @@ export default function StudioLeftTabs({ activeEventConfig,
 
           {/* TAB 4: COLOR & DAY/TWILIGHT MODE */}
           {activeTab === 'color' && (
-            <div className="space-y-6 animate-in fade-in text-xs">
+            <div className="space-y-5 animate-in fade-in text-xs">
               <div className="border-b border-ink/10 pb-3">
                 <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2">
                   <Palette size={16} className="text-gold-deep" /> Palet Warna &amp; Mode Suasana
@@ -525,7 +525,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* FlexStudio: Background Gradient Builder */}
-              <div className="border border-gold/40 p-4 rounded-sm bg-gold/5 space-y-3">
+              <div className="border border-ink/10 p-4 rounded-sm bg-white space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs uppercase tracking-wider font-bold text-ink">
                     Gradasi Latar (Background Gradient)
@@ -586,7 +586,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* AI Palette Extractor from Photo */}
-              <div className="bg-gold/10 border border-gold-deep/30 p-4 rounded-sm space-y-2">
+              <div className="border border-ink/10 bg-white p-4 rounded-sm space-y-2">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-1.5">
                     <Sparkles size={14} className="text-gold-deep" />
@@ -688,7 +688,7 @@ export default function StudioLeftTabs({ activeEventConfig,
 
           {/* TAB 5: PHOTOGRAPHER & CARD GLASSMORPHISM STYLER */}
           {activeTab === 'photographer' && (
-            <div className="space-y-6 animate-in fade-in text-xs">
+            <div className="space-y-5 animate-in fade-in text-xs">
               <div className="border-b border-ink/10 pb-3">
                 <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2">
                   <Camera size={16} className="text-gold-deep" /> Fotografer &amp; Desain Kartu
@@ -754,7 +754,7 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
 
               {/* 1b. FlexStudio: Bayangan & Garis Tepi Bebas */}
-              <div className="border border-gold/40 p-3.5 rounded-xs bg-gold/5 space-y-3">
+              <div className="border border-ink/10 p-4 rounded-sm bg-white space-y-3">
                 <label className="block uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
                   <SlidersHorizontal size={14} className="text-gold-deep" /> 1b. Bayangan &amp; Tepi Kartu Bebas (Fine-Tune):
                 </label>
@@ -897,7 +897,7 @@ export default function StudioLeftTabs({ activeEventConfig,
 
           {/* TAB 6: MOTION, PARTICLES & TOUCH FX */}
           {activeTab === 'motion' && (
-            <div className="space-y-6 animate-in fade-in text-xs">
+            <div className="space-y-5 animate-in fade-in text-xs">
               <StudioSectionAnimPanel sectionAnims={sectionAnims} setSectionAnims={setSectionAnims} />
               <div className="border-b border-ink/10 pb-3">
                 <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2">
@@ -913,7 +913,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                 <label className="block uppercase tracking-wider font-bold text-ink flex items-center gap-1.5">
                   <Sparkles size={14} className="text-gold-deep" /> 1. Efek Sentuhan Jari Tamu (Guest Touch FX):
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2.5">
                   {[
                     ['sparkle_trail', 'Gold Sparkle Trail (Debu Emas)'],
                     ['petal_burst', 'Petal Burst (Kelopak Mawar)'],
@@ -999,7 +999,7 @@ export default function StudioLeftTabs({ activeEventConfig,
           )}
 
           {activeTab === 'uploads' && (
-            <div className="space-y-6 animate-in fade-in text-xs">
+            <div className="space-y-5 animate-in fade-in text-xs">
               <div className="border-b border-ink/10 pb-3">
                 <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2">
                   <FolderUp size={16} className="text-gold-deep" /> Pusat Upload Aset &amp; Media Lengkap
@@ -1154,7 +1154,7 @@ export default function StudioLeftTabs({ activeEventConfig,
           )}
 
           {activeTab === 'advanced' && (
-            <div className="space-y-6 animate-in fade-in text-xs">
+            <div className="space-y-5 animate-in fade-in text-xs">
               <div className="border-b border-ink/10 pb-3">
                 <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2"><FileCode size={16} className="text-gold-deep" /> Advanced: buka isolated + CSS kustom</h3>
                 <p className="text-xs text-stone mt-1">Pilih layout dasar apapun (termasuk tema isolated) & inject CSS tambahan (disanitasi).</p>
@@ -1163,7 +1163,7 @@ export default function StudioLeftTabs({ activeEventConfig,
             </div>
           )}
           {activeTab === 'canvas' && (
-            <div className="space-y-6 animate-in fade-in text-xs">
+            <div className="space-y-5 animate-in fade-in text-xs">
               <div className="border-b border-ink/10 pb-3">
                 <h3 className="font-display text-sm uppercase tracking-wider font-bold text-ink flex items-center gap-2"><Layers size={16} className="text-gold-deep" /> Blank Canvas Composer</h3>
                 <p className="text-xs text-stone mt-1">Susun layout dari nol dengan blok (drag urutan, hapus, tambah).</p>
