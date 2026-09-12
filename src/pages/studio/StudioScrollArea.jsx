@@ -46,11 +46,11 @@ export default function StudioScrollArea({ children, className = '' }) {
   }, [])
 
   return (
-    <div className="relative">
+    <div className="relative flex-1 min-h-0 flex flex-col">
       <div
         ref={ref}
         onScroll={update}
-        className={`studio-panel-scroll ${className}`}
+        className={`studio-panel-scroll flex-1 min-h-0 ${className}`}
       >
         {children}
       </div>

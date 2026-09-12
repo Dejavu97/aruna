@@ -121,7 +121,7 @@ export default function StudioLeftTabs({ activeEventConfig,
   twilightColors,
   uploadingAsset  }) {
   return (
-<div className="w-full bg-white border border-ink/10 shadow-sm rounded-sm flex flex-col lg:flex-row overflow-hidden shrink-0">
+<div className="w-full bg-white border border-ink/10 shadow-sm rounded-sm flex flex-col lg:flex-row overflow-hidden lg:flex-1 lg:min-h-0">
         {/* Canva-style icon rail — vertikal 60px di PC, horizontal scroll di HP */}
         <div className="flex flex-row lg:flex-col items-stretch gap-1 p-1.5 border-b lg:border-b-0 lg:border-r border-ink/10 bg-ivory/40 shrink-0 lg:w-[60px] overflow-x-auto">
           {TAB_GROUPS.map((g) => {
@@ -167,7 +167,7 @@ export default function StudioLeftTabs({ activeEventConfig,
           })()}
 
         {/* Tab Content Panels — rapi: padding konsisten, kartu putih, jarak lega */}
-        <StudioScrollArea className="p-4 sm:p-5 max-h-[calc(100dvh-190px)] lg:max-h-[calc(100vh-210px)] overflow-y-auto space-y-5 bg-[#FCFCF9]">
+        <StudioScrollArea className="p-4 sm:p-5 max-h-[calc(100dvh-190px)] lg:max-h-none overflow-y-auto space-y-5 bg-[#FCFCF9]">
           
           {/* TAB 1: PRESET & AGENCY TEMPLATES */}
           {activeTab === 'preset' && (

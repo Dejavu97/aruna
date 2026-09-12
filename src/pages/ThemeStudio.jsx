@@ -37,8 +37,8 @@ export default function ThemeStudio() {
         setPosterModalOpen={s.setPosterModalOpen}
         setProposalModalOpen={s.setProposalModalOpen}
       />
-      <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 lg:px-6 py-5 flex flex-col lg:flex-row gap-5 lg:gap-6 items-start">
-        <div style={{ ['--panel-w']: panelW + 'px' }} className="w-full lg:w-[var(--panel-w)] lg:shrink-0 order-1">
+      <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 lg:px-6 py-5 flex flex-col lg:flex-row gap-5 lg:gap-6 items-stretch">
+        <div style={{ ['--panel-w']: panelW + 'px' }} className="w-full lg:w-[var(--panel-w)] lg:shrink-0 order-1 lg:sticky lg:top-20 lg:h-[calc(100dvh-120px)] lg:min-h-[720px] lg:flex lg:flex-col lg:min-h-0">
         <StudioLeftTabs
         activeEventConfig={s.activeEventConfig}
         activeTab={s.activeTab}
