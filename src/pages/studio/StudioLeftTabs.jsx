@@ -121,11 +121,10 @@ export default function StudioLeftTabs({ activeEventConfig,
   twilightColors,
   uploadingAsset  }) {
   return (
-<div className="w-full bg-white border border-ink/10 shadow-sm rounded-sm flex flex-col overflow-hidden shrink-0">
-        {/* Grouped Navigation — rapi: 5 grup, aktif jelas, sub-tab underline */}
-        <div className="border-b border-ink/10 bg-ivory/40">
-          <div className="flex items-center gap-1 p-1.5">
-            {TAB_GROUPS.map((g) => {
+<div className="w-full bg-white border border-ink/10 shadow-sm rounded-sm flex flex-col lg:flex-row overflow-hidden shrink-0">
+        {/* Canva-style icon rail — vertikal 60px di PC, horizontal scroll di HP */}
+        <div className="flex flex-row lg:flex-col items-stretch gap-1 p-1.5 border-b lg:border-b-0 lg:border-r border-ink/10 bg-ivory/40 shrink-0 lg:w-[60px] overflow-x-auto">
+          {TAB_GROUPS.map((g) => {
               const Icon = g.icon
               const active = TAB_TO_GROUP[activeTab] === g.id
               return (
@@ -133,22 +132,24 @@ export default function StudioLeftTabs({ activeEventConfig,
                   key={g.id}
                   type="button"
                   onClick={() => setActiveTab(g.tabs[0])}
-                  className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-sm text-[11px] uppercase tracking-wider font-semibold transition-colors ${
-                    active ? 'bg-ink text-ivory shadow-sm' : 'text-stone hover:bg-white hover:text-ink border border-transparent hover:border-ink/10'
+                  title={g.label}
+                  className={`flex-1 lg:flex-none inline-flex lg:flex flex-row lg:flex-col items-center justify-center gap-1.5 lg:gap-1 lg:w-full px-2 py-2 rounded-sm text-[9px] uppercase tracking-wide font-semibold transition-colors ${
+                    active ? 'bg-ink text-ivory shadow-sm' : 'text-stone hover:bg-white hover:text-ink'
                   }`}
                 >
-                  <Icon size={13} /> {g.label}
+                  <Icon size={16} /> <span className="hidden sm:inline leading-none">{g.label}</span>
                 </button>
               )
             })}
-          </div>
+        </div>
+        <div className="flex-1 min-w-0 flex flex-col min-h-0">
           {/* Sub-tabs — underline rapi, bukan pill bertumpuk */}
           {(() => {
             const grp = TAB_GROUPS.find(g => TAB_TO_GROUP[activeTab] === g.id)
             if (!grp || grp.tabs.length <= 1) return null
             const labels = { preset: 'Preset WO', typography: 'Tipografi', color: 'Warna', photographer: 'Fotografer', uploads: 'Upload', ornaments: 'Ornamen', motion: 'Gerak', advanced: 'CSS/Lanjutan', canvas: 'Canvas' }
             return (
-              <div className="flex items-center gap-4 px-3 pb-0 border-t border-ink/5 mt-1">
+              <div className="flex items-center gap-4 px-3 border-b border-ink/10">
                 {grp.tabs.map((t) => (
                   <button
                     key={t}
@@ -164,7 +165,6 @@ export default function StudioLeftTabs({ activeEventConfig,
               </div>
             )
           })()}
-        </div>
 
         {/* Tab Content Panels — rapi: padding konsisten, kartu putih, jarak lega */}
         <StudioScrollArea className="p-4 sm:p-5 max-h-[calc(100dvh-190px)] lg:max-h-[calc(100vh-210px)] overflow-y-auto space-y-5 bg-[#FCFCF9]">
@@ -183,7 +183,7 @@ export default function StudioLeftTabs({ activeEventConfig,
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-2 gap-2.5">
                   {Object.values(eventTypeConfigs).map((ev) => {
                     const IconComponent = ev.icon
                     return (
@@ -1189,6 +1189,7 @@ export default function StudioLeftTabs({ activeEventConfig,
             </div>
           )}
         </StudioScrollArea>
+        </div>
       </div>
   )
 }
