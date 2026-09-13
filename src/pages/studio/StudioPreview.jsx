@@ -381,10 +381,11 @@ export default function StudioPreview({ accentSoftColor,
 
                     <button
                       type="button"
+                      data-cover-toggle
                       onClick={() => {
-                        setPreviewOpened(true)
-                        if (customAssets.customMusicUrl && audioRef.current && !isPlayingAudio) {
-                          audioRef.current.play().then(() => setIsPlayingAudio(true)).catch(() => {})
+                        setPreviewOpened?.(true)
+                        if (customAssets.customMusicUrl && audioRef?.current && !isPlayingAudio) {
+                          audioRef.current.play().then(() => setIsPlayingAudio?.(true)).catch(() => {})
                         }
                       }}
                       className="mx-auto w-16 h-16 rounded-full border-2 border-gold flex flex-col items-center justify-center bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 shadow-2xl hover:scale-105 active:scale-95 transition-transform group cursor-pointer"
@@ -404,7 +405,8 @@ export default function StudioPreview({ accentSoftColor,
                 </span>
                 <button
                   type="button"
-                  onClick={() => setPreviewOpened(false)}
+                  data-cover-toggle
+                  onClick={() => setPreviewOpened?.(false)}
                   className="text-[10px] underline font-medium"
                   style={{ color: activeColorPalette.accent }}
                 >

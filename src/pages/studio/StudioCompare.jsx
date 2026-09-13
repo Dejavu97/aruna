@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { SplitSquareHorizontal, X } from 'lucide-react'
 import StudioPreview from './StudioPreview'
 import { derivePreviewProps } from './derivePreview.jsx'
@@ -5,10 +6,13 @@ import { derivePreviewProps } from './derivePreview.jsx'
 /**
  * StudioCompare — mode banding A/B.
  * 2 frame: slot A (kiri) vs slot B (kanan). HP = tab A/B, PC = sebelahan.
- * Frame read-only visual: klik di dalam dimatikan, tombol Pilih = restore ke live.
+ * Tiap frame punya status sampul sendiri (buka/tutup bisa dicek per varian).
+ * Tombol lain di dalam undangan tetap mati; scroll + tombol sampul hidup.
  */
 function CompareFrame({ label, snap, liveStatic, onPick, onEdit }) {
   const derived = snap ? derivePreviewProps(snap, liveStatic.previewData) : null
+  // Status sampul per frame — buka/tutup bisa dicek per varian.
+  const [opened, setOpened] = useState(false)
   return (
     <div className="flex-1 min-w-0 flex flex-col">
       <div className="flex items-center justify-between mb-2 px-1 flex-wrap gap-1.5">
@@ -38,16 +42,16 @@ function CompareFrame({ label, snap, liveStatic, onPick, onEdit }) {
         </div>
       </div>
       {snap ? (
-        <div className="relative select-none [&_button]:pointer-events-none [&_audio]:hidden">
+        <div className="relative select-none [&_button]:pointer-events-none [&_[data-cover-toggle]]:pointer-events-auto [&_audio]:hidden">
           <StudioPreview
             {...liveStatic}
             {...derived}
             staticFrame
-            previewOpened
+            previewOpened={opened}
             selectedSection={null}
             setSelectedSection={undefined}
             setActiveTab={undefined}
-            setPreviewOpened={() => {}}
+            setPreviewOpened={setOpened}
             handlePreviewTouchInteraction={undefined}
             themeName={snap.themeName || ''}
           />
