@@ -122,6 +122,9 @@ export default function StudioPreview({ accentSoftColor,
     if (!selectedSection) return
     const i = visibleSecs.findIndex((sec) => sec.id === selectedSection)
     if (i >= 0) setFocusIdx(i)
+    // Ikut scroll ke section-nya di dalam frame (klik dari panel kiri).
+    const el = previewScrollRef.current?.querySelector?.(`[data-sec="${selectedSection}"]`)
+    el?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
   }, [selectedSection, visibleSecs])
   useEffect(() => {
     setFocusIdx((prev) => Math.min(prev, Math.max(visibleSecs.length - 1, 0)))
@@ -131,6 +134,9 @@ export default function StudioPreview({ accentSoftColor,
     const next = (focusIdx + dir + visibleSecs.length) % visibleSecs.length
     setFocusIdx(next)
     setSelectedSection?.(visibleSecs[next].id)
+    // Scroll di dalam frame (kayak kanvas Canva) — halaman luar tidak ikut gerak.
+    const el = previewScrollRef.current?.querySelector?.(`[data-sec="${visibleSecs[next].id}"]`)
+    el?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
   }
   return (
 <div className="flex-1 min-w-0 flex flex-col items-center lg:sticky lg:top-20 lg:h-[calc(100dvh-120px)] lg:min-h-[560px]">
@@ -298,12 +304,12 @@ export default function StudioPreview({ accentSoftColor,
             </motion.div>
           ))}
 
-          {/* Static Content Container — live: 1 section fokus, diam tanpa scroll.
-              Frame banding (staticFrame): semua section + scroll sendiri. */}
+          {/* Static Content Container — scroll di DALAM frame (kayak kanvas Canva).
+              Halaman luar tidak ikut gerak: overscroll-contain. */}
           <div
             ref={previewScrollRef}
             onClick={staticFrame ? undefined : handlePreviewTouchInteraction}
-            className={`w-full h-full relative z-10 ${staticFrame ? 'overflow-y-auto scroll-smooth' : 'overflow-hidden'}`}
+            className="w-full h-full relative z-10 overflow-y-auto overscroll-contain scroll-smooth"
             style={{
               backgroundColor: mainBgColor,
               backgroundImage: [
@@ -407,7 +413,7 @@ export default function StudioPreview({ accentSoftColor,
               </div>
 
               {sections
-                .filter((sec) => sec.visible && (staticFrame || sec.id === focusId))
+                .filter((sec) => sec.visible)
                 .map((sec, secIdx) => {
                   const isSelected = selectedSection === sec.id
                   // Custom Card Styler computed styles (+ FlexStudio cardFx free shadow/border)
