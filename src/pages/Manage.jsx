@@ -91,14 +91,23 @@ export default function Manage() {
   }
 
   if (error && !item) {
+    // Bedakan 3 sebab agar tidak tebak-tebakan: slug tidak ada vs kunci salah vs terkunci.
+    const isLock = /terlalu banyak|menit/i.test(error)
+    const isKey = /kunci rahasia/i.test(error)
     return (
       <div className="bg-ivory">
         <SiteNav />
         <section className="mx-auto max-w-lg px-5 py-16 text-center">
           <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Dashboard</p>
-          <h1 className="mt-2 font-display text-4xl">Undangan tidak ditemukan</h1>
+          <h1 className="mt-2 font-display text-4xl">
+            {isLock ? 'Terlalu banyak percobaan' : isKey ? 'Kode akses salah' : 'Undangan tidak ditemukan'}
+          </h1>
           <p className="mt-4 text-sm leading-relaxed text-stone">
-            Data <strong>{slug}</strong> tidak ada di server. Buat undangan baru dari katalog.
+            {isLock
+              ? 'IP ini dikunci sementara 15 menit setelah 5x salah. Tunggu, lalu coba sekali dengan tautan lengkap dari halaman Berhasil.'
+              : isKey
+                ? <>Kode untuk <strong>{slug}</strong> tidak cocok. Kode terikat ke 1 undangan — pastikan slug di URL sama dengan saat pesan, atau pakai <strong>Salin Tautan Lengkap Dashboard</strong> dari halaman Berhasil.</>
+                : <>Data <strong>{slug}</strong> tidak ada di server. Buat undangan baru dari katalog.</>}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3 text-xs uppercase tracking-[0.16em]">
             <Link to="/tema" className="bg-ink px-4 py-3 text-ivory">

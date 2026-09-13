@@ -126,7 +126,8 @@ export default function InvitationForm({
       ? [{ id: 'acara', label: 'Acara' }]
       : []),
     ...(hasPelengkap ? [{ id: 'pelengkap', label: formConfig.pelengkapLabel || 'Pelengkap' }] : []),
-    { id: 'pemesan', label: mode === 'create' ? 'Bayar' : 'Pemesan' },
+    { id: 'pemesan', label: mode === 'create' ? 'Data Diri' : 'Pemesan' },
+    ...(mode === 'create' ? [{ id: 'review', label: 'Review' }] : []),
   ]
 
   useEffect(() => {
@@ -797,6 +798,51 @@ export default function InvitationForm({
             )}
           </div>
         )}
+
+        {/* STEP: REVIEW / KONFIRMASI (create only) */}
+        {steps[step]?.id === 'review' && (() => {
+          const pkgList = getPackagesByEventType(formConfig.eventType)
+          const pkg = pkgList.find((p) => p.id === form.packageId) || pkgList[0]
+          const couple = formConfig.showPerson2
+            ? `${form.bride.nick || '-'} & ${form.groom.nick || '-'}`
+            : (form.bride.nick || '-')
+          return (
+            <div className="grid gap-5">
+              <div className="border border-ink/10 bg-ivory/50 p-4">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-stone font-semibold">Cek terakhir sebelum dibuat</p>
+                <p className="mt-1 text-sm text-stone leading-relaxed">
+                  Order langsung jadi saat klik <strong>Buat undangan</strong>. Periksa dulu — masih bisa kembali ubah.
+                </p>
+              </div>
+              <div className="grid gap-3 text-sm">
+                <div className="flex items-start justify-between gap-3 border-b border-ink/10 pb-3">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wider text-stone font-semibold">Mempelai / Tokoh</p>
+                    <p className="font-display text-xl text-ink">{couple}</p>
+                    <p className="text-xs text-stone mt-0.5">Tanggal: {form.date || '—'} · Tema: {theme.name} · Tautan: /u/{slug || 'nama-acara'}</p>
+                  </div>
+                  <button type="button" onClick={() => setStep(0)} className="text-xs underline shrink-0">Ubah</button>
+                </div>
+                <div className="flex items-start justify-between gap-3 border-b border-ink/10 pb-3">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wider text-stone font-semibold">Paket</p>
+                    <p className="font-display text-xl text-ink">{pkg?.name || form.packageId} — {pkg?.price === 0 ? 'Rp 0 (Gratis)' : formatRupiah(pkg?.price || 0)}</p>
+                    {form.voucher && <p className="text-xs text-stone mt-0.5">Voucher: {form.voucher}</p>}
+                  </div>
+                  <button type="button" onClick={() => setStep(steps.findIndex((s) => s.id === 'pemesan'))} className="text-xs underline shrink-0">Ubah</button>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wider text-stone font-semibold">Data diri pemesan</p>
+                    <p className="text-ink">{form.customerName || '—'}</p>
+                    <p className="text-xs text-stone mt-0.5">{form.customerWhatsapp || '—'}{form.customerNote ? ` · "${form.customerNote}"` : ''}</p>
+                  </div>
+                  <button type="button" onClick={() => setStep(steps.findIndex((s) => s.id === 'pemesan'))} className="text-xs underline shrink-0">Ubah</button>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
 
         {error && <p className="mt-6 text-sm text-red-800">{error}</p>}
 
