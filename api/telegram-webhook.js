@@ -269,9 +269,16 @@ async function cmdMaintenance(chatId, arg) {
 
 async function handleCallback(query) {
   const chatId = query.message?.chat?.id;
+  const messageId = query.message?.message_id;
   const data = String(query.data || '');
   await tg('answerCallbackQuery', { callback_query_id: query.id }).catch(() => {});
   if (!chatId || !adminIds().includes(String(chatId))) return;
+  // Hapus tombol inline begitu diklik — cegah double-eksekusi / tombol nyangkut
+  if (messageId) {
+    await tg('editMessageReplyMarkup', {
+      chat_id: chatId, message_id: messageId, reply_markup: { inline_keyboard: [] },
+    }).catch(() => {});
+  }
   if (data === 'cancel') return send(chatId, `Dibatalkan.`);
   if (data.startsWith('lunas:')) {
     const slug = data.slice(6);
