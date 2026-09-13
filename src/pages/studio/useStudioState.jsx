@@ -1329,10 +1329,20 @@ export function useStudioState() {
   const { undo, redo, canUndo, canRedo } = history
 
   // Mode banding A/B: 2 slot snapshot (memory only), pilih = restore ke live.
+  // Jepret = silent capture (preview live TETAP tampil agar bisa lanjut edit).
   const [compare, setCompare] = useState({ active: false, slotA: null, slotB: null })
   function captureSlot(which) {
     const snap = snapshotVisual(visualLiveRef.current)
-    setCompare((prev) => ({ ...prev, active: true, [which === 'A' ? 'slotA' : 'slotB']: snap }))
+    setCompare((prev) => ({ ...prev, [which === 'A' ? 'slotA' : 'slotB']: snap }))
+  }
+  function openCompare() {
+    setCompare((prev) => ({ ...prev, active: true }))
+  }
+  function editSlot(which) {
+    // Muat varian ke live agar bisa diedit dengan preview kelihatan, lalu tutup.
+    const snap = which === 'A' ? compare.slotA : compare.slotB
+    if (snap) restoreVisual(snap)
+    setCompare((prev) => ({ ...prev, active: false }))
   }
   function pickSlot(which) {
     const snap = which === 'A' ? compare.slotA : compare.slotB
@@ -1510,6 +1520,8 @@ accentBorderColor,
     canRedo,
     compare,
     captureSlot,
+    openCompare,
+    editSlot,
     pickSlot,
     closeCompare,
   }

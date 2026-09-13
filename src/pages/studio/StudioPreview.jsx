@@ -55,6 +55,7 @@ export default function StudioPreview({ accentSoftColor,
   canRedo,
   compare,
   captureSlot,
+  openCompare,
   closeCompare,
   undo,
   redo,
@@ -156,16 +157,16 @@ export default function StudioPreview({ accentSoftColor,
           </div>
         </div>
 
-        {/* Banding A/B — jepret varian */}
+        {/* Banding A/B — jepret varian (silent, preview tetap live) */}
         {!staticFrame && captureSlot && (
-          <div className="flex items-center gap-1.5 w-full max-w-[360px] mb-3 px-1">
+          <div className="flex items-center gap-1.5 w-full max-w-[360px] mb-3 px-1 flex-wrap">
             <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-stone shrink-0">
               <GitCompare size={12} className="text-gold-deep" /> Banding
             </span>
             <button
               type="button"
               onClick={() => captureSlot('A')}
-              title="Jepret tampilan saat ini sebagai varian A"
+              title="Jepret tampilan saat ini sebagai varian A (preview tetap tampil)"
               className={`px-2 py-1 text-[10px] uppercase tracking-wider font-semibold rounded-xs border transition-colors ${compare?.slotA ? 'bg-ink text-ivory border-ink' : 'border-ink/15 text-stone hover:text-ink'}`}
             >
               {compare?.slotA ? 'A ✓' : 'Jepret A'}
@@ -173,11 +174,21 @@ export default function StudioPreview({ accentSoftColor,
             <button
               type="button"
               onClick={() => captureSlot('B')}
-              title="Jepret tampilan saat ini sebagai varian B"
+              title="Jepret tampilan saat ini sebagai varian B (preview tetap tampil)"
               className={`px-2 py-1 text-[10px] uppercase tracking-wider font-semibold rounded-xs border transition-colors ${compare?.slotB ? 'bg-ink text-ivory border-ink' : 'border-ink/15 text-stone hover:text-ink'}`}
             >
               {compare?.slotB ? 'B ✓' : 'Jepret B'}
             </button>
+            {(compare?.slotA || compare?.slotB) && openCompare && (
+              <button
+                type="button"
+                onClick={openCompare}
+                title="Buka layar perbandingan A / B"
+                className="px-2 py-1 text-[10px] uppercase tracking-wider font-semibold rounded-xs bg-gold-deep text-ivory hover:bg-gold transition-colors"
+              >
+                Lihat
+              </button>
+            )}
           </div>
         )}
 

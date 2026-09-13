@@ -167,6 +167,7 @@ export default function ThemeStudio() {
               slotB={s.compare.slotB}
               liveStatic={compareLiveStatic}
               pickSlot={s.pickSlot}
+              editSlot={s.editSlot}
               captureSlot={s.captureSlot}
               onClose={s.closeCompare}
             />
@@ -227,6 +228,7 @@ export default function ThemeStudio() {
         touchParticles={s.touchParticles}
         voiceAudioRef={s.voiceAudioRef}
         captureSlot={s.captureSlot}
+        openCompare={s.openCompare}
         compare={s.compare}
         closeCompare={s.closeCompare}
       />
