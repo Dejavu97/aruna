@@ -31,8 +31,8 @@ export default function StudioHeader({ canRedo,
   const [menuOpen, setMenuOpen] = useState(false)
   const secondary = 'flex w-full items-center gap-2 px-3 py-2 text-xs uppercase tracking-wider font-semibold text-ink hover:bg-gold/10 transition-colors text-left'
   return (
-<header className="sticky top-0 z-50 bg-paper border-b border-ink/10 px-4 lg:px-6 py-2 shadow-sm">
-      <div className="w-full max-w-[1440px] mx-auto flex items-center justify-between gap-3">
+<header className="bg-paper border-b border-ink/10 px-4 lg:px-6 py-2 shadow-sm">
+      <div className="w-full max-w-[1200px] mx-auto flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <button
             type="button"

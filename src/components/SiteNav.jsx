@@ -19,7 +19,7 @@ export default function SiteNav() {
   return (
     <header className="sticky top-0 z-30 border-b border-ink/10 bg-ivory/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-        <Link to="/" className="flex items-center gap-0.5 leading-none select-none">
+        <Link to="/" className="flex items-baseline gap-1 leading-none select-none">
           <span style={{ fontFamily: "'Great Vibes', 'Dancing Script', cursive", fontSize: '1.75rem', color: '#B08D57', lineHeight: 1 }}>by</span>
           <span style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontSize: '1.4rem', fontWeight: 600, color: '#1A1714', letterSpacing: '0.04em', lineHeight: 1 }}>aruna</span>
         </Link>

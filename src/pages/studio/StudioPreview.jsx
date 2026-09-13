@@ -1,4 +1,6 @@
 import {
+  ChevronLeft,
+  ChevronRight,
   Disc,
   GitCompare,
   Moon,
@@ -9,6 +11,7 @@ import {
   Sun,
   Tablet
 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { copyText } from '../../lib/utils'
 import AtmosphereParticles from '../../components/AtmosphereParticles'
@@ -110,8 +113,27 @@ export default function StudioPreview({ accentSoftColor,
     const tab = SECTION_TO_TAB_PREVIEW[id]
     if (tab) setActiveTab?.(tab)
   }
+  // Preview statik: tampil 1 section fokus, pindah via ‹ › (PC diam tanpa scroll).
+  const visibleSecs = useMemo(() => sections.filter((sec) => sec.visible), [sections])
+  const [focusIdx, setFocusIdx] = useState(0)
+  const focusSec = visibleSecs[Math.min(focusIdx, Math.max(visibleSecs.length - 1, 0))]
+  const focusId = focusSec?.id
+  useEffect(() => {
+    if (!selectedSection) return
+    const i = visibleSecs.findIndex((sec) => sec.id === selectedSection)
+    if (i >= 0) setFocusIdx(i)
+  }, [selectedSection, visibleSecs])
+  useEffect(() => {
+    setFocusIdx((prev) => Math.min(prev, Math.max(visibleSecs.length - 1, 0)))
+  }, [visibleSecs.length])
+  const goFocus = (dir) => {
+    if (!visibleSecs.length) return
+    const next = (focusIdx + dir + visibleSecs.length) % visibleSecs.length
+    setFocusIdx(next)
+    setSelectedSection?.(visibleSecs[next].id)
+  }
   return (
-<div className="flex-1 min-w-0 flex flex-col items-center order-2 lg:sticky lg:top-20 lg:h-[calc(100dvh-120px)] lg:min-h-[720px]">
+<div className="flex-1 min-w-0 flex flex-col items-center lg:sticky lg:top-20 lg:h-[calc(100dvh-120px)] lg:min-h-[560px]">
         {/* Device & Daylight/Twilight Switcher Toolbar */}
         <div className="flex items-center justify-between w-full max-w-[360px] mb-3 px-1">
           {/* Day / Night Switcher */}
@@ -192,6 +214,31 @@ export default function StudioPreview({ accentSoftColor,
           </div>
         )}
 
+        {/* Navigasi section ‹ › — preview statik, 1 fokus tampil */}
+        {!staticFrame && visibleSecs.length > 1 && (
+          <div className="flex items-center justify-between w-full max-w-[360px] mb-2 px-1">
+            <button
+              type="button"
+              onClick={() => goFocus(-1)}
+              aria-label="Section sebelumnya"
+              className="p-1.5 border border-ink/15 rounded-xs text-stone hover:text-ink hover:border-gold-deep transition-colors"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <span className="text-[10px] uppercase tracking-widest font-semibold text-stone truncate px-2">
+              {focusSec?.name || focusId} · {focusIdx + 1}/{visibleSecs.length}
+            </span>
+            <button
+              type="button"
+              onClick={() => goFocus(1)}
+              aria-label="Section berikutnya"
+              className="p-1.5 border border-ink/15 rounded-xs text-stone hover:text-ink hover:border-gold-deep transition-colors"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
+
         {/* Device Frame — PC ramping: mobile 360-400px, tablet 600-680px */}
         <div
           className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 mx-auto lg:mx-0 lg:my-auto ${
@@ -231,7 +278,7 @@ export default function StudioPreview({ accentSoftColor,
           </div>
 
           {/* Atmosphere Particles Layer */}
-          <AtmosphereParticles effect={particleEffect} accentColor={activeColorPalette.accent} />
+          <AtmosphereParticles effect={particleEffect} accentColor={activeColorPalette.accent} contained />
 
           {/* Guest Touch FX Particles */}
           {touchParticles.map((p) => (
@@ -251,11 +298,12 @@ export default function StudioPreview({ accentSoftColor,
             </motion.div>
           ))}
 
-          {/* Interactive Scroll Container with Touch Listener */}
+          {/* Static Content Container — live: 1 section fokus, diam tanpa scroll.
+              Frame banding (staticFrame): semua section + scroll sendiri. */}
           <div
             ref={previewScrollRef}
             onClick={staticFrame ? undefined : handlePreviewTouchInteraction}
-            className="w-full h-full overflow-y-auto relative scroll-smooth z-10"
+            className={`w-full h-full relative z-10 ${staticFrame ? 'overflow-y-auto scroll-smooth' : 'overflow-hidden'}`}
             style={{
               backgroundColor: mainBgColor,
               backgroundImage: [
@@ -312,7 +360,7 @@ export default function StudioPreview({ accentSoftColor,
                       {activeEventConfig.coverTitle}
                     </p>
                     <h2
-                      className="text-4xl italic my-3"
+                      className="text-2xl italic my-2"
                       style={{ fontFamily: activeScriptFont }}
                     >
                       {eventType === 'wedding' ? `${previewData.bride.nick} & ${previewData.groom.nick}` : activeEventConfig.heroNames}
@@ -343,7 +391,7 @@ export default function StudioPreview({ accentSoftColor,
             </AnimatePresence>
 
             {/* DYNAMIC SECTION RENDERING WITH SECTION DIVIDERS & CARD STYLER */}
-            <div className="p-5 space-y-8 pt-10 pb-20">
+            <div className="p-4 space-y-5 pt-6 pb-8">
               <div className="flex justify-between items-center pb-2 border-b border-black/10">
                 <span className="text-[10px] uppercase tracking-wider" style={{ color: activeColorPalette.muted }}>
                   Kategori: {activeEventConfig.name.split(' & ')[0]} ({previewThemeMode.toUpperCase()})
@@ -359,7 +407,7 @@ export default function StudioPreview({ accentSoftColor,
               </div>
 
               {sections
-                .filter((sec) => sec.visible)
+                .filter((sec) => sec.visible && (staticFrame || sec.id === focusId))
                 .map((sec, secIdx) => {
                   const isSelected = selectedSection === sec.id
                   // Custom Card Styler computed styles (+ FlexStudio cardFx free shadow/border)
@@ -398,7 +446,7 @@ export default function StudioPreview({ accentSoftColor,
                             {activeEventConfig.headerBadge}
                           </p>
                           <h2
-                            className="text-4xl italic my-2"
+                            className="text-2xl italic my-1.5"
                             style={{ fontFamily: activeScriptFont, color: activeColorPalette.fg }}
                           >
                             {eventType === 'wedding' ? `${previewData.bride.nick} & ${previewData.groom.nick}` : activeEventConfig.heroNames}
@@ -441,7 +489,7 @@ export default function StudioPreview({ accentSoftColor,
                                     style={{ filter: activePhotoFilterCss }}
                                   />
                                 </div>
-                                <h3 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
+                                <h3 className="text-sm font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
                                   {previewData.bride.nick}
                                 </h3>
                                 <p className="text-[9px] text-stone mt-1">{previewData.bride.parents}</p>
@@ -457,7 +505,7 @@ export default function StudioPreview({ accentSoftColor,
                                     style={{ filter: activePhotoFilterCss }}
                                   />
                                 </div>
-                                <h3 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
+                                <h3 className="text-sm font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
                                   {previewData.groom.nick}
                                 </h3>
                                 <p className="text-[9px] text-stone mt-1">{previewData.groom.parents}</p>
@@ -473,7 +521,7 @@ export default function StudioPreview({ accentSoftColor,
                                   style={{ filter: activePhotoFilterCss }}
                                 />
                               </div>
-                              <h3 className="text-lg font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
+                              <h3 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
                                 {activeEventConfig.heroNames}
                               </h3>
                               <p className="text-[10px] text-stone mt-1">{activeEventConfig.personTitle}</p>
@@ -500,7 +548,7 @@ export default function StudioPreview({ accentSoftColor,
                           </div>
                           {previewData.events.map((ev, i) => (
                             <div key={i} className="p-4 border text-center space-y-2" style={cardCustomStyle}>
-                              <h4 className="text-base font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
+                              <h4 className="text-sm font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>
                                 {i === 0 ? activeEventConfig.eventTitle1 : activeEventConfig.eventTitle2}
                               </h4>
                               <p className="text-xs font-semibold" style={{ color: activeColorPalette.accent }}>{ev.time}</p>
@@ -596,7 +644,7 @@ export default function StudioPreview({ accentSoftColor,
                         {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">CLOSER</span>}
                       <SectionWrap id="closer" sectionAnims={sectionAnims} animKey={animKey} className="relative z-10 text-center pt-4 space-y-2">
                         <footer className="relative z-10 text-center pt-4 space-y-2">
-                        <h3 className="text-2xl italic" style={{ fontFamily: activeScriptFont, color: activeColorPalette.fg }}>
+                        <h3 className="text-xl italic" style={{ fontFamily: activeScriptFont, color: activeColorPalette.fg }}>
                           {eventType === 'wedding' ? `${previewData.bride.nick} & ${previewData.groom.nick}` : activeEventConfig.heroNames}
                         </h3>
                         <p className="text-[9px] opacity-75 uppercase tracking-widest">

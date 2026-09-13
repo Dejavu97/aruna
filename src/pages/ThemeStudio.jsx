@@ -1,13 +1,12 @@
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStudioState } from './studio/useStudioState.jsx'
 import StudioCompare from './studio/StudioCompare'
 import StudioHeader from './studio/StudioHeader'
 import StudioLeftTabs from './studio/StudioLeftTabs'
 import StudioPreview from './studio/StudioPreview'
 import StudioModals from './studio/StudioModals'
-import StudioResizer from './studio/StudioResizer'
 
 /**
  * Theme Studio 2.0 Pro — thin orchestrator (Fase 3b refactor).
@@ -17,12 +16,8 @@ import StudioResizer from './studio/StudioResizer'
  */
 export default function ThemeStudio() {
   const s = useStudioState()
-  const [panelW, setPanelW] = useState(420)
-  const handleResizer = useCallback((clientX) => {
-    const leftEdge = 24
-    const w = Math.min(500, Math.max(380, clientX - leftEdge))
-    setPanelW(w)
-  }, [])
+  // HP: 1 layar 1 fokus — 'edit' (panel penuh) atau 'lihat' (preview statik penuh).
+  const [mobileView, setMobileView] = useState('edit')
 
   // Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y — skip saat ketik di input.
   useEffect(() => {
@@ -44,7 +39,7 @@ export default function ThemeStudio() {
     previewDevice: s.previewDevice,
     animKey: s.animKey,
     touchParticles: [],
-    selectedSection: null,
+    selectedSection: s.selectedSection,
     isPlayingAudio: false,
     isPlayingVoice: false,
     previewScrollRef: undefined,
@@ -81,8 +76,25 @@ export default function ThemeStudio() {
         setProposalModalOpen={s.setProposalModalOpen}
         undo={s.undo}
       />
-      <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 lg:px-6 py-5 flex flex-col lg:flex-row gap-5 lg:gap-6 items-stretch">
-        <div style={{ ['--panel-w']: panelW + 'px' }} className="w-full lg:w-[var(--panel-w)] lg:shrink-0 order-1 lg:sticky lg:top-20 lg:h-[calc(100dvh-120px)] lg:min-h-[720px] lg:flex lg:flex-col lg:min-h-0">
+      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 lg:px-6 py-4 flex flex-col lg:flex-row gap-4 lg:gap-5 items-stretch">
+        {/* Toggle HP: Edit / Lihat — 1 layar 1 fokus */}
+        <div className="lg:hidden order-1 grid grid-cols-2 gap-1.5 bg-white border border-ink/10 rounded-sm p-1.5">
+          <button
+            type="button"
+            onClick={() => setMobileView('edit')}
+            className={`py-2 text-[11px] uppercase tracking-widest font-bold rounded-xs transition-colors ${mobileView === 'edit' ? 'bg-ink text-ivory' : 'text-stone'}`}
+          >
+            ✎ Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileView('lihat')}
+            className={`py-2 text-[11px] uppercase tracking-widest font-bold rounded-xs transition-colors ${mobileView === 'lihat' ? 'bg-ink text-ivory' : 'text-stone'}`}
+          >
+            👁 Lihat Hasil
+          </button>
+        </div>
+        <div className={`${mobileView === 'edit' ? '' : 'hidden'} lg:block w-full lg:w-[400px] lg:shrink-0 order-2 lg:order-1 lg:sticky lg:top-20 lg:h-[calc(100dvh-120px)] lg:min-h-[560px] lg:flex lg:flex-col lg:min-h-0`}>
         <StudioLeftTabs
         activeEventConfig={s.activeEventConfig}
         activeTab={s.activeTab}
@@ -159,9 +171,8 @@ export default function ThemeStudio() {
         uploadingAsset={s.uploadingAsset}
       />
         </div>
-        <StudioResizer onResize={handleResizer} />
         {s.compare.active ? (
-          <div className="flex-1 min-w-0 order-2">
+          <div className={`${mobileView === 'edit' ? 'hidden' : ''} lg:block flex-1 min-w-0 order-3 lg:order-2`}>
             <StudioCompare
               slotA={s.compare.slotA}
               slotB={s.compare.slotB}
@@ -173,6 +184,7 @@ export default function ThemeStudio() {
             />
           </div>
         ) : (
+        <div className={`${mobileView === 'edit' ? 'hidden' : ''} lg:block lg:flex-1 lg:min-w-0 order-3 lg:order-2`}>
         <StudioPreview
         accentSoftColor={s.accentSoftColor}
         activeBodyFont={s.activeBodyFont}
@@ -232,6 +244,7 @@ export default function ThemeStudio() {
         compare={s.compare}
         closeCompare={s.closeCompare}
       />
+        </div>
         )}
       </main>
       <StudioModals
