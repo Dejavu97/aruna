@@ -13,7 +13,8 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { copyText } from '../../lib/utils'
+import { copyText, countdownParts, formatLongDate, formatTime, pad, parseColors, qrImageUrl, invitationUrl } from '../../lib/utils'
+import { getFormMode } from '../../data/themes'
 import AtmosphereParticles from '../../components/AtmosphereParticles'
 import OrnamentLayer from '../../invitation/OrnamentLayer'
 import { getSectionAnim } from '../../invitation/SectionFX'
@@ -113,7 +114,10 @@ export default function StudioPreview({ accentSoftColor,
     const tab = SECTION_TO_TAB_PREVIEW[id]
     if (tab) setActiveTab?.(tab)
   }
-  // Preview statik: tampil 1 section fokus, pindah via ‹ › (PC diam tanpa scroll).
+  // Foto preview: upload user (customAssets) menang; bila kosong, ikut foto dummy
+  // per eventType agar nama & wajah konsisten saat ganti tipe acara.
+  const bridePhotoSrc = customAssets.bridePhotoUrl || previewData.bride.photo || ''
+  const groomPhotoSrc = customAssets.groomPhotoUrl || previewData.groom?.photo || ''
   const visibleSecs = useMemo(() => sections.filter((sec) => sec.visible), [sections])
   const [focusIdx, setFocusIdx] = useState(0)
   const focusSec = visibleSecs[Math.min(focusIdx, Math.max(visibleSecs.length - 1, 0))]
@@ -500,8 +504,9 @@ export default function StudioPreview({ accentSoftColor,
                               <motion.div {...floatingAnimation} className="p-3 text-center border" style={cardCustomStyle}>
                                 <div className="aspect-[3/4] relative mb-2.5 overflow-hidden rounded-full border-2 border-gold">
                                   <img
-                                    src={customAssets.bridePhotoUrl}
+                                    src={bridePhotoSrc}
                                     alt="Bride"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
                                     className="w-full h-full object-cover"
                                     style={{ filter: activePhotoFilterCss }}
                                   />
@@ -516,8 +521,9 @@ export default function StudioPreview({ accentSoftColor,
                               <motion.div {...floatingAnimation} className="p-3 text-center border" style={cardCustomStyle}>
                                 <div className="aspect-[3/4] relative mb-2.5 overflow-hidden rounded-full border-2 border-gold">
                                   <img
-                                    src={customAssets.groomPhotoUrl}
+                                    src={groomPhotoSrc}
                                     alt="Groom"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
                                     className="w-full h-full object-cover"
                                     style={{ filter: activePhotoFilterCss }}
                                   />
@@ -532,8 +538,9 @@ export default function StudioPreview({ accentSoftColor,
                             <motion.div {...floatingAnimation} className="p-4 text-center border max-w-xs mx-auto" style={cardCustomStyle}>
                               <div className="w-24 h-24 mx-auto relative mb-3 overflow-hidden rounded-full border-2 border-gold">
                                 <img
-                                  src={customAssets.bridePhotoUrl}
+                                  src={bridePhotoSrc}
                                   alt="Tokoh Utama"
+                                  onError={(e) => { e.currentTarget.style.display = 'none' }}
                                   className="w-full h-full object-cover"
                                   style={{ filter: activePhotoFilterCss }}
                                 />
@@ -617,7 +624,7 @@ export default function StudioPreview({ accentSoftColor,
                               <div key={i} className="space-y-0.5">
                                 <span className="text-[10px] font-bold font-mono" style={{ color: activeColorPalette.accent }}>{st.year}</span>
                                 <h5 className="font-bold text-xs" style={{ fontFamily: activeDisplayFont }}>{st.title}</h5>
-                                <p className="text-[10px] opacity-80">{st.desc}</p>
+                                <p className="text-[10px] opacity-80">{st.body || st.text}</p>
                               </div>
                             ))}
                           </div>
@@ -673,8 +680,263 @@ export default function StudioPreview({ accentSoftColor,
                     )
                   }
 
-                  // FALLBACK: sections lain (greeting, countdown, dresscode, live, rsvp, wishes, gift, checkin)
-                  // tampil sebagai placeholder agar klik-preview konsisten untuk semua 14 section
+                  // 7. GREETING — quote/ayat real dari data form (guard sama: Invitation hanya render Quote bila data.quote ada)
+                  if (sec.id === 'greeting') {
+                    return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">GREETING</span>}
+                      <SectionWrap id="greeting" sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-1.5" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{sec.defaultTitle}</p>
+                          {previewData.quote ? (
+                            <>
+                              <p className="text-xs italic leading-relaxed" style={{ color: activeColorPalette.fg }}>“{previewData.quote}”</p>
+                              {previewData.quoteSource && <p className="text-[10px] font-semibold" style={{ color: activeColorPalette.accent }}>— {previewData.quoteSource}</p>}
+                            </>
+                          ) : (
+                            <p className="text-[10px] opacity-60">Quote kosong di data — isi di form pemesan</p>
+                          )}
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                      </div>
+                    )
+                  }
+
+                  // 8. COUNTDOWN — hitung mundur real dari previewData.date (+ jam acara pertama)
+                  if (sec.id === 'countdown') {
+                    const tick = countdownParts(previewData.date, previewData.events?.[0]?.time || '09:00')
+                    const cells = tick ? [[tick.d, 'Hari'], [tick.h, 'Jam'], [tick.m, 'Menit'], [tick.s, 'Detik']] : []
+                    return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">COUNTDOWN</span>}
+                      <SectionWrap id="countdown" sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-2" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{tick?.done ? 'Telah berlangsung' : 'Save the date'}</p>
+                          <p className="text-sm font-bold" style={{ fontFamily: activeDisplayFont, color: activeColorPalette.fg }}>{formatLongDate(previewData.date) || 'Tanggal menyusul'}</p>
+                          {tick && (
+                            <div className="grid grid-cols-4 gap-1.5">
+                              {cells.map(([n, label]) => (
+                                <div key={label} className="py-1.5 rounded-xs" style={{ background: accentSoftColor }}>
+                                  <p className="text-base font-bold" style={{ color: activeColorPalette.fg }}>{pad(n)}</p>
+                                  <p className="text-[8px] uppercase tracking-widest opacity-70">{label}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                      </div>
+                    )
+                  }
+
+                  // 9. DRESSCODE — swatches real dari previewData.dressColors + dressNote
+                  // (guard ganda: flag form showDressLive + data kosong, sama dgn Invitation)
+                  if (sec.id === 'dresscode') {
+                    const dcForm = getFormMode({ id: 'studio-preview', layout: 'classic', eventType })
+                    const dcColors = parseColors(previewData.dressColors)
+                    const dcEmpty = !dcForm.showDressLive || (!dcColors.length && !previewData.dressNote)
+                    return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">DRESSCODE</span>}
+                      <SectionWrap id="dresscode" sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-2" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{sec.defaultTitle}</p>
+                          {dcEmpty ? (
+                            <p className="text-[10px] opacity-60">Dresscode kosong / nonaktif untuk tipe acara ini — undangan jadi menyembunyikan section ini</p>
+                          ) : (
+                            <>
+                              {previewData.dressNote && <p className="text-xs leading-relaxed" style={{ color: activeColorPalette.fg }}>{previewData.dressNote}</p>}
+                              {dcColors.length > 0 && (
+                                <div className="flex items-center justify-center gap-1.5">
+                                  {dcColors.map((c) => (
+                                    <span key={c} title={c} className="w-6 h-6 rounded-full border border-black/15" style={{ background: c }} />
+                                  ))}
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                      </div>
+                    )
+                  }
+
+                  // 10. LIVE — real dari previewData.liveUrl (+ tanggal/jam/catatan;
+                  // guard ganda: flag form showDressLive + liveUrl, sama dgn Invitation)
+                  if (sec.id === 'live') {
+                    const liveForm = getFormMode({ id: 'studio-preview', layout: 'classic', eventType })
+                    return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">LIVE</span>}
+                      <SectionWrap id="live" sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-1.5" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{sec.defaultTitle}</p>
+                          {liveForm.showDressLive && previewData.liveUrl ? (
+                            <>
+                              {(previewData.liveDate || previewData.liveTime) && (
+                                <p className="text-xs font-semibold" style={{ color: activeColorPalette.fg }}>
+                                  {previewData.liveDate ? formatLongDate(previewData.liveDate) : ''} {previewData.liveTime ? formatTime(previewData.liveTime) : ''}
+                                </p>
+                              )}
+                              {previewData.liveNote && <p className="text-[11px] opacity-80">{previewData.liveNote}</p>}
+                              <span className="inline-block px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-xs text-white" style={{ background: activeColorPalette.accent }}>Join live</span>
+                            </>
+                          ) : (
+                            <p className="text-[10px] opacity-60">liveUrl kosong / nonaktif untuk tipe acara ini — undangan jadi menyembunyikan section ini</p>
+                          )}
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                      </div>
+                    )
+                  }
+
+                  // 11. RSVP — form real (nama + status hadir/tidak/ragu + tamu 1–10 + catatan), terkunci seperti mode preview Invitation
+                  if (sec.id === 'rsvp') {
+                    return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">RSVP</span>}
+                      <SectionWrap id="rsvp" sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-2" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>Konfirmasi Kehadiran (RSVP)</p>
+                          <div className="text-left space-y-1.5">
+                            <p className="text-[10px] font-semibold opacity-70">Nama</p>
+                            <div className="px-2 py-1.5 text-xs border border-black/10 rounded-xs opacity-60">Nama tamu undangan</div>
+                            <p className="text-[10px] font-semibold opacity-70">Status kehadiran</p>
+                            <div className="flex gap-1.5">
+                              {['hadir', 'tidak', 'ragu'].map((st) => (
+                                <span key={st} className={`flex-1 text-center px-1 py-1 text-[10px] font-bold uppercase rounded-xs border ${st === 'hadir' ? 'text-white border-transparent' : 'opacity-60 border-black/15'}`} style={st === 'hadir' ? { background: activeColorPalette.accent } : undefined}>{st}</span>
+                              ))}
+                            </div>
+                            <div className="flex gap-1.5">
+                              <div className="flex-1"><p className="text-[10px] font-semibold opacity-70">Jumlah tamu (1–10)</p><div className="px-2 py-1.5 text-xs border border-black/10 rounded-xs opacity-60">2 orang</div></div>
+                            </div>
+                            <p className="text-[10px] font-semibold opacity-70">Catatan (opsional)</p>
+                            <div className="px-2 py-1.5 text-xs border border-black/10 rounded-xs opacity-60">Tulis catatan…</div>
+                          </div>
+                          <button type="button" disabled className="w-full py-2 text-[10px] font-bold uppercase tracking-widest rounded-xs opacity-70 cursor-not-allowed text-white" style={{ background: activeColorPalette.accent }}>
+                            Preview — ucapan & RSVP aktif setelah dipesan
+                          </button>
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                      </div>
+                    )
+                  }
+
+                  // 12. WISHES — daftar ucapan real (w.name/w.message + balasan) + form terkunci preview
+                  if (sec.id === 'wishes') {
+                    return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">WISHES</span>}
+                      <SectionWrap id="wishes" sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-2" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{sec.defaultTitle}</p>
+                          <div className="text-left space-y-1.5">
+                            <div className="px-2 py-1.5 text-xs border border-black/10 rounded-xs opacity-60">Nama</div>
+                            <div className="px-2 py-1.5 text-xs border border-black/10 rounded-xs opacity-60">Tulis ucapan & doa restu…</div>
+                          </div>
+                          <button type="button" disabled className="w-full py-2 text-[10px] font-bold uppercase tracking-widest rounded-xs opacity-70 cursor-not-allowed text-white" style={{ background: activeColorPalette.accent }}>
+                            Preview — ucapan aktif setelah dipesan
+                          </button>
+                          <ul className="text-left space-y-1.5 pt-1">
+                            {previewData.wishes.map((w) => (
+                              <li key={w.id} className="px-2.5 py-2 rounded-xs border border-black/10" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                                <p className="text-[11px] font-bold" style={{ color: activeColorPalette.fg }}>{w.name}</p>
+                                <p className="text-[11px] opacity-80">{w.message}</p>
+                                {w.reply && <p className="text-[10px] mt-1 pl-2 border-l-2" style={{ borderColor: activeColorPalette.accent }}><span className="font-bold" style={{ color: activeColorPalette.accent }}>Balasan: </span>{w.reply}</p>}
+                              </li>
+                            ))}
+                            {previewData.wishes.length === 0 && <li className="text-[10px] opacity-60 text-center">Belum ada ucapan di data dummy</li>}
+                          </ul>
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                      </div>
+                    )
+                  }
+
+                  // 13. GIFT — amplop digital real (banks + qris + alamat + wishlist bertitle;
+                  // guard ganda: flag form showBanks + data kosong, sama dgn Invitation)
+                  if (sec.id === 'gift') {
+                    const giftForm = getFormMode({ id: 'studio-preview', layout: 'classic', eventType })
+                    const giftItems = (previewData.wishlist || []).filter((w) => w.title)
+                    const giftEmpty = !giftForm.showBanks || (!(previewData.banks || []).length && !previewData.qris && !previewData.giftAddress && !giftItems.length)
+                    return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">GIFT</span>}
+                      <SectionWrap id="gift" sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-2" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{sec.defaultTitle}</p>
+                          {giftEmpty ? (
+                            <p className="text-[10px] opacity-60">Data gift kosong / nonaktif untuk tipe acara ini — undangan jadi menyembunyikan section ini</p>
+                          ) : (
+                            <>
+                              {(previewData.banks || []).filter((b) => b.bank && b.number).map((b) => (
+                                <div key={`${b.bank}-${b.number}`} className="p-2.5 border border-black/10 rounded-xs text-center space-y-0.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: activeColorPalette.accent }}>{b.bank}</p>
+                                  <p className="text-xs font-bold" style={{ color: activeColorPalette.fg }}>{b.number}</p>
+                                  <p className="text-[10px] opacity-70">{b.name}</p>
+                                  <button type="button" onClick={(e) => { e.stopPropagation(); copyText(b.number) }} className="mt-1 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded-xs border border-black/15 opacity-80">Salin</button>
+                                </div>
+                              ))}
+                              {previewData.qris && (
+                                <div className="p-2.5 border border-black/10 rounded-xs" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                                  <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: activeColorPalette.accent }}>QRIS</p>
+                                  <img src={previewData.qris} alt="QRIS" className="w-28 h-28 mx-auto object-contain" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                                </div>
+                              )}
+                              {previewData.giftAddress && (
+                                <div className="p-2.5 border border-black/10 rounded-xs" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: activeColorPalette.accent }}>Alamat kado</p>
+                                  <p className="text-[11px] opacity-80">{previewData.giftAddress}</p>
+                                </div>
+                              )}
+                              {giftItems.map((w) => (
+                                <div key={w.title} className="p-2.5 border border-black/10 rounded-xs text-left" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                                  <p className="text-[11px] font-bold" style={{ color: activeColorPalette.fg }}>{w.title}</p>
+                                  {w.price && <p className="text-[10px] opacity-70">{w.price}</p>}
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                      </div>
+                    )
+                  }
+
+                  // 14. CHECKIN — QR real dari slug (tampil bila showCheckIn && ada acara, ikut guard Invitation)
+                  if (sec.id === 'checkin') {
+                    const showCheckin = getFormMode({ id: 'studio-preview', layout: 'classic', eventType }).showCheckIn && (previewData.events || []).length > 0
+                    return (
+                      <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
+                        {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">CHECKIN</span>}
+                      <SectionWrap id="checkin" sectionAnims={sectionAnims} animKey={animKey}>
+                        <section className="relative z-10 p-4 border text-center space-y-1.5" style={cardCustomStyle}>
+                          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{sec.defaultTitle}</p>
+                          {showCheckin ? (
+                            <>
+                              <p className="text-xs font-bold" style={{ color: activeColorPalette.fg }}>Kartu akses</p>
+                              <p className="text-[10px] opacity-70">Tunjukkan QR ini kepada penerima tamu di lokasi acara.</p>
+                              <img className="w-28 h-28 mx-auto" src={qrImageUrl(invitationUrl(previewData.slug, ''))} alt="QR check-in" loading="lazy" />
+                              <p className="text-[9px] font-mono opacity-50 break-all">/u/{previewData.slug}</p>
+                            </>
+                          ) : (
+                            <p className="text-[10px] opacity-60">Check-in nonaktif untuk tipe acara ini / tanpa jadwal — undangan jadi menyembunyikannya</p>
+                          )}
+                        </section>
+                        {renderSectionDivider(dividerShape)}
+                      </SectionWrap>
+                      </div>
+                    )
+                  }
+
+                  // FALLBACK: id section tak dikenal — bukan placeholder generik untuk section bawaan
                   return (
                     <div onClick={(e) => handleSectionClick(sec.id, e)} key={sec.id} data-sec={sec.id} className={`relative rounded-sm transition-all cursor-pointer ${isSelected ? 'ring-2 ring-gold-deep ring-offset-1' : 'hover:ring-1 hover:ring-gold-deep/30'}`}>
                       {isSelected && <span className="absolute -top-2 -right-2 z-20 bg-gold-deep text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider">{sec.id.toUpperCase()}</span>}
@@ -682,7 +944,7 @@ export default function StudioPreview({ accentSoftColor,
                         <section className="relative z-10 p-4 border text-center space-y-1" style={cardCustomStyle}>
                           <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: activeColorPalette.muted }}>{sec.defaultTitle}</p>
                           <p className="text-xs font-semibold" style={{ color: activeColorPalette.fg }}>{sec.name}</p>
-                          <p className="text-[10px] opacity-60">Konten preview menyusul — klik untuk atur di panel kiri</p>
+                          <p className="text-[10px] opacity-60">Blok kustom — atur di panel kiri</p>
                         </section>
                         {renderSectionDivider(dividerShape)}
                       </SectionWrap>

@@ -14,6 +14,7 @@ import AtmosphereParticles from '../../components/AtmosphereParticles'
 import ImageAdjustModal from '../../components/ImageAdjustModal'
 import { createCustomTheme, fetchCustomTheme, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
+import { getDummyWeddingData } from '../../data/dummyData'
 import { sanitizeCustomCss } from '../../lib/sanitizeCss'
 import { useStudioHistory, snapshotVisual } from './useStudioHistory.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -598,9 +599,11 @@ export function useStudioState() {
     customLottieUrl: '',
     coupleFrameUrl: '',
     coupleFrameSettings: { scale: 1.15, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
-    bridePhotoUrl: '/assets/local/teenager_birthday.jpg',
+    // Foto mempelai: default kosong agar preview memakai foto dummy per eventType
+    // (fallback bridePhotoSrc/groomPhotoSrc di StudioPreview); user upload bila mau foto sendiri.
+    bridePhotoUrl: '',
     bridePhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
-    groomPhotoUrl: '/assets/local/groom_suit.jpg',
+    groomPhotoUrl: '',
     groomPhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     customMusicUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=piano-moment-9835.mp3',
     customMusicTitle: 'A Thousand Years (Piano Instrumental)',
@@ -1081,53 +1084,74 @@ export function useStudioState() {
     return `rgba(${r}, ${g}, ${b}, ${a})`
   }
 
-  // Complete Preview Data
-  const previewData = {
-    bride: {
-      nick: 'Sarah',
-      full: 'dr. Siti Sarah, Sp.A',
-      parents: 'Putri pertama dari Bapak H. Ahmad Subardjo & Ibu Hj. Nurul Hidayati',
-    },
-    groom: {
-      nick: 'Budi',
-      full: 'dr. Budi Santoso, Sp.OT',
-      parents: 'Putra kedua dari Bapak Ir. Joko Wahyudi & Ibu Hj. Sri Rahayu',
-    },
-    quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.',
-    story: [
-      { year: '2022', title: 'Pertemuan Pertama', desc: 'Awal mula kami bertemu di Rumah Sakit Siloam saat masa residensi spesialis.' },
-      { year: '2024', title: 'Momen Lamaran', desc: 'Di hadapan kedua keluarga besar, kami mengikat janji untuk melangkah bersama.' },
-      { year: '2026', title: 'Menuju Pelaminan', desc: 'Bismillah, kami menyatukan langkah dalam ikatan suci pernikahan.' },
-    ],
-    events: [
-      {
-        title: 'Akad Nikah',
-        time: '08:00 - 10:00 WIB',
-        venue: 'Masjid Agung Al-Azhar',
-        address: 'Jl. Sisingamangaraja No. 1, Kebayoran Baru, Jakarta Selatan',
+  // Preview Data — derive dari dummy kontrak form per eventType (single source:
+  // src/data/dummyData.js), bukan objek statis wedding-only. Story/banks/events/
+  // gallery/wishes mengikuti shape form asli; field yang tak ada di dummy
+  // non-wedding diisi default aman agar guard Invitation ter-preview.
+  // Normalisasi: story body (Invitation baca s.body||s.text), wishes message+id.
+  const previewData = useMemo(() => {
+    const seedByEvent = {
+      wedding: 'adat-jawa',
+      birthday: 'birthday-sweet17',
+      graduation: 'graduation-wisuda',
+      aqiqah: 'aqiqah-bayi',
+      corporate: 'corporate-gala',
+    }
+    const base = getDummyWeddingData(seedByEvent[eventType] || 'adat-jawa')
+    const story = (base.story || []).map((s) => ({
+      year: s.year || '',
+      title: s.title || '',
+      body: s.body || s.text || '',
+    }))
+    const wishes = (base.wishes || [
+      { id: 'w_1', name: 'Keluarga Besar Subardjo', message: 'Selamat! Semoga menjadi keluarga yang sakinah mawaddah warahmah.' },
+      { id: 'w_2', name: 'Andi & Rina', message: 'Semoga lancar sampai hari H ya.' },
+    ]).map((w, i) => ({
+      id: w.id || `w_${i + 1}`,
+      name: w.name || 'Tamu Undangan',
+      message: w.message ?? w.msg ?? '',
+    }))
+    return {
+      ...base,
+      bride: {
+        nick: base.bride?.nick || activeEventConfig.heroNames,
+        full: base.bride?.full || '',
+        parents: base.bride?.parents || '',
+        photo: base.bride?.photo || '',
+        ig: base.bride?.ig || '',
       },
-      {
-        title: 'Resepsi Pernikahan',
-        time: '11:00 - 14:00 WIB',
-        venue: 'Grand Ballroom Hotel Mulia',
-        address: 'Jl. Asia Afrika No. 8, Senayan, Jakarta Pusat',
+      groom: {
+        nick: base.groom?.nick || '',
+        full: base.groom?.full || '',
+        parents: base.groom?.parents || '',
+        photo: base.groom?.photo || '',
+        ig: base.groom?.ig || '',
       },
-    ],
-    gallery: [
-      '/assets/local/couple_laughing_1.jpg',
-      '/assets/local/attari_cover.jpg',
-      '/assets/local/couple_garden.jpg',
-      '/assets/local/couple_classical.jpg',
-    ],
-    wishes: [
-      { name: 'dr. Hendra Pratama', msg: 'Selamat Sarah dan Budi! Semoga menjadi keluarga yang sakinah mawaddah warahmah.' },
-      { name: 'Keluarga Besar Subardjo', msg: 'Semoga lancar sampai hari H ya anak-anakku.' },
-    ],
-    banks: [
-      { bank: 'BCA', name: 'Siti Sarah', number: '5420198821' },
-      { bank: 'Mandiri', name: 'Budi Santoso', number: '1370019283741' },
-    ],
-  }
+      date: base.date || new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10),
+      slug: base.slug || 'studio-preview',
+      quote: base.quote ?? activeEventConfig.quote,
+      quoteSource: base.quoteSource ?? activeEventConfig.quoteSource,
+      story,
+      events: base.events || [],
+      gallery: (base.gallery?.length ? base.gallery : [
+        '/assets/local/couple_laughing_1.jpg',
+        '/assets/local/attari_cover.jpg',
+        '/assets/local/couple_garden.jpg',
+        '/assets/local/couple_classical.jpg',
+      ]),
+      wishes,
+      banks: base.banks || [],
+      qris: base.qris || '',
+      wishlist: base.wishlist || [],
+      dressColors: base.dressColors ?? '#C9A36A,#F4EFE6,#2A241C',
+      dressNote: base.dressNote ?? '',
+      liveUrl: base.liveUrl ?? '',
+      liveDate: base.liveDate ?? base.date ?? '',
+      liveTime: base.liveTime ?? '09:00',
+      liveNote: base.liveNote ?? '',
+      giftAddress: base.giftAddress ?? '',
+    }
+  }, [eventType, activeEventConfig.heroNames, activeEventConfig.quote, activeEventConfig.quoteSource])
 
   // Active Fonts
   const activeDisplayFont = fonts.customFontName
