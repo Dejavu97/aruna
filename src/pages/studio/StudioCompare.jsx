@@ -38,7 +38,7 @@ function CompareFrame({ label, snap, liveStatic, onPick, onEdit }) {
         </div>
       </div>
       {snap ? (
-        <div className="pointer-events-none select-none [&_button]:pointer-events-none [&_audio]:hidden">
+        <div className="relative select-none [&_button]:pointer-events-none [&_audio]:hidden">
           <StudioPreview
             {...liveStatic}
             {...derived}
@@ -47,7 +47,8 @@ function CompareFrame({ label, snap, liveStatic, onPick, onEdit }) {
             selectedSection={null}
             setSelectedSection={undefined}
             setActiveTab={undefined}
-            setPreviewOpened={undefined}
+            setPreviewOpened={() => {}}
+            handlePreviewTouchInteraction={undefined}
             themeName={snap.themeName || ''}
           />
         </div>
