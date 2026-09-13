@@ -6,22 +6,28 @@ import {
   Check,
   Crown,
   Ellipsis,
+  Redo2,
   RefreshCw,
   Save,
   Share2,
-  Shuffle
+  Shuffle,
+  Undo2
 } from 'lucide-react'
 
 /** StudioHeader — ramping 1 baris: judul kiri, 3 primer kanan + dropdown ⋯. */
-export default function StudioHeader({ colors,
+export default function StudioHeader({ canRedo,
+  canUndo,
+  colors,
   handleSaveAsAgencyPreset,
   handleSaveTheme,
   handleShuffle,
   navigate,
+  redo,
   savedThemeId,
   saving,
   setPosterModalOpen,
-  setProposalModalOpen  }) {
+  setProposalModalOpen,
+  undo  }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const secondary = 'flex w-full items-center gap-2 px-3 py-2 text-xs uppercase tracking-wider font-semibold text-ink hover:bg-gold/10 transition-colors text-left'
   return (
@@ -43,6 +49,26 @@ export default function StudioHeader({ colors,
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={undo}
+            disabled={!canUndo}
+            className="inline-flex items-center border border-ink/20 bg-paper px-2.5 py-2 text-xs hover:bg-gold/10 hover:border-gold-deep transition-colors disabled:opacity-35 disabled:hover:bg-paper disabled:hover:border-ink/20"
+            title="Urungkan (Ctrl+Z)"
+            aria-label="Urungkan"
+          >
+            <Undo2 size={14} className={canUndo ? 'text-gold-deep' : 'text-stone'} />
+          </button>
+          <button
+            type="button"
+            onClick={redo}
+            disabled={!canRedo}
+            className="inline-flex items-center border border-ink/20 bg-paper px-2.5 py-2 text-xs hover:bg-gold/10 hover:border-gold-deep transition-colors disabled:opacity-35 disabled:hover:bg-paper disabled:hover:border-ink/20"
+            title="Ulangi (Ctrl+Shift+Z)"
+            aria-label="Ulangi"
+          >
+            <Redo2 size={14} className={canRedo ? 'text-gold-deep' : 'text-stone'} />
+          </button>
           <button
             type="button"
             onClick={handleShuffle}

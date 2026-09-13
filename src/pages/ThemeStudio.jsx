@@ -1,7 +1,8 @@
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useStudioState } from './studio/useStudioState.jsx'
+import StudioCompare from './studio/StudioCompare'
 import StudioHeader from './studio/StudioHeader'
 import StudioLeftTabs from './studio/StudioLeftTabs'
 import StudioPreview from './studio/StudioPreview'
@@ -23,19 +24,62 @@ export default function ThemeStudio() {
     setPanelW(w)
   }, [])
 
+  // Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y — skip saat ketik di input.
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!e.ctrlKey && !e.metaKey) return
+      const tag = (e.target?.tagName || '').toLowerCase()
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target?.isContentEditable) return
+      const k = e.key.toLowerCase()
+      if (k === 'z' && !e.shiftKey) { e.preventDefault(); s.undo() }
+      else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); s.redo() }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [s.undo, s.redo])
+
+  // Props non-visual untuk frame banding (visual datang dari snapshot via derive).
+  const compareLiveStatic = {
+    previewData: s.previewData,
+    previewDevice: s.previewDevice,
+    animKey: s.animKey,
+    touchParticles: [],
+    selectedSection: null,
+    isPlayingAudio: false,
+    isPlayingVoice: false,
+    previewScrollRef: undefined,
+    audioRef: undefined,
+    voiceAudioRef: undefined,
+    handlePreviewTouchInteraction: undefined,
+    handleVoiceEnded: undefined,
+    toggleAudio: undefined,
+    toggleVoiceAudio: undefined,
+    setIsPlayingAudio: undefined,
+    setPreviewDevice: undefined,
+    setPreviewOpened: undefined,
+    setPreviewThemeMode: undefined,
+    setSelectedSection: undefined,
+    setActiveTab: undefined,
+    themeName: '',
+  }
+
   return (
     <div className="min-h-screen bg-[#F8F7F4] text-ink flex flex-col font-body">
       <SiteNav />
       <StudioHeader
+        canRedo={s.canRedo}
+        canUndo={s.canUndo}
         colors={s.colors}
         handleSaveAsAgencyPreset={s.handleSaveAsAgencyPreset}
         handleSaveTheme={s.handleSaveTheme}
         handleShuffle={s.handleShuffle}
         navigate={s.navigate}
+        redo={s.redo}
         savedThemeId={s.savedThemeId}
         saving={s.saving}
         setPosterModalOpen={s.setPosterModalOpen}
         setProposalModalOpen={s.setProposalModalOpen}
+        undo={s.undo}
       />
       <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 lg:px-6 py-5 flex flex-col lg:flex-row gap-5 lg:gap-6 items-stretch">
         <div style={{ ['--panel-w']: panelW + 'px' }} className="w-full lg:w-[var(--panel-w)] lg:shrink-0 order-1 lg:sticky lg:top-20 lg:h-[calc(100dvh-120px)] lg:min-h-[720px] lg:flex lg:flex-col lg:min-h-0">
@@ -116,6 +160,18 @@ export default function ThemeStudio() {
       />
         </div>
         <StudioResizer onResize={handleResizer} />
+        {s.compare.active ? (
+          <div className="flex-1 min-w-0 order-2">
+            <StudioCompare
+              slotA={s.compare.slotA}
+              slotB={s.compare.slotB}
+              liveStatic={compareLiveStatic}
+              pickSlot={s.pickSlot}
+              captureSlot={s.captureSlot}
+              onClose={s.closeCompare}
+            />
+          </div>
+        ) : (
         <StudioPreview
         accentSoftColor={s.accentSoftColor}
         activeBodyFont={s.activeBodyFont}
@@ -170,7 +226,11 @@ export default function ThemeStudio() {
         toggleVoiceAudio={s.toggleVoiceAudio}
         touchParticles={s.touchParticles}
         voiceAudioRef={s.voiceAudioRef}
+        captureSlot={s.captureSlot}
+        compare={s.compare}
+        closeCompare={s.closeCompare}
       />
+        )}
       </main>
       <StudioModals
         activeColorPalette={s.activeColorPalette}

@@ -1,5 +1,6 @@
 import {
   Disc,
+  GitCompare,
   Moon,
   Pause,
   Play,
@@ -50,6 +51,14 @@ export default function StudioPreview({ accentSoftColor,
   activeScriptFont,
   animKey,
   audioRef,
+  canUndo,
+  canRedo,
+  compare,
+  captureSlot,
+  closeCompare,
+  undo,
+  redo,
+  staticFrame,
   cardStyler,
   cardFx,
   colors,
@@ -147,6 +156,31 @@ export default function StudioPreview({ accentSoftColor,
           </div>
         </div>
 
+        {/* Banding A/B — jepret varian */}
+        {!staticFrame && captureSlot && (
+          <div className="flex items-center gap-1.5 w-full max-w-[360px] mb-3 px-1">
+            <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-stone shrink-0">
+              <GitCompare size={12} className="text-gold-deep" /> Banding
+            </span>
+            <button
+              type="button"
+              onClick={() => captureSlot('A')}
+              title="Jepret tampilan saat ini sebagai varian A"
+              className={`px-2 py-1 text-[10px] uppercase tracking-wider font-semibold rounded-xs border transition-colors ${compare?.slotA ? 'bg-ink text-ivory border-ink' : 'border-ink/15 text-stone hover:text-ink'}`}
+            >
+              {compare?.slotA ? 'A ✓' : 'Jepret A'}
+            </button>
+            <button
+              type="button"
+              onClick={() => captureSlot('B')}
+              title="Jepret tampilan saat ini sebagai varian B"
+              className={`px-2 py-1 text-[10px] uppercase tracking-wider font-semibold rounded-xs border transition-colors ${compare?.slotB ? 'bg-ink text-ivory border-ink' : 'border-ink/15 text-stone hover:text-ink'}`}
+            >
+              {compare?.slotB ? 'B ✓' : 'Jepret B'}
+            </button>
+          </div>
+        )}
+
         {/* Device Frame — PC ramping: mobile 360-400px, tablet 600-680px */}
         <div
           className={`relative overflow-hidden bg-black shadow-2xl border-[10px] border-[#222222] rounded-[44px] transition-all duration-300 mx-auto lg:mx-0 lg:my-auto ${
@@ -155,12 +189,12 @@ export default function StudioPreview({ accentSoftColor,
               : 'w-full max-w-[600px] lg:max-w-[640px] xl:max-w-[680px] h-[min(640px,calc(100dvh-220px))] lg:h-[min(680px,calc(100dvh-180px))] lg:min-h-[480px]'
           }`}
         >
-          {/* Audio Engines */}
-          {customAssets.customMusicUrl && (
+          {/* Audio Engines (skip di frame banding statis) */}
+          {!staticFrame && customAssets.customMusicUrl && (
             <audio ref={audioRef} src={customAssets.customMusicUrl} loop preload="auto" />
           )}
 
-          {customAssets.voiceStoryUrl && (
+          {!staticFrame && customAssets.voiceStoryUrl && (
             <audio
               ref={voiceAudioRef}
               src={customAssets.voiceStoryUrl}
@@ -170,7 +204,7 @@ export default function StudioPreview({ accentSoftColor,
           )}
 
           {/* Floating Music Disc */}
-          {customAssets.customMusicUrl && (
+          {!staticFrame && customAssets.customMusicUrl && (
             <button
               type="button"
               onClick={toggleAudio}
@@ -209,7 +243,7 @@ export default function StudioPreview({ accentSoftColor,
           {/* Interactive Scroll Container with Touch Listener */}
           <div
             ref={previewScrollRef}
-            onClick={handlePreviewTouchInteraction}
+            onClick={staticFrame ? undefined : handlePreviewTouchInteraction}
             className="w-full h-full overflow-y-auto relative scroll-smooth z-10"
             style={{
               backgroundColor: mainBgColor,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Sparkles, Palette, Type, Layout, Image as ImageIcon, Music, 
@@ -15,6 +15,7 @@ import ImageAdjustModal from '../../components/ImageAdjustModal'
 import { createCustomTheme, fetchCustomTheme, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
 import { sanitizeCustomCss } from '../../lib/sanitizeCss'
+import { useStudioHistory, snapshotVisual } from './useStudioHistory.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Universal Event Types Configuration
@@ -1265,6 +1266,83 @@ export function useStudioState() {
 
   const proposalLinkUrl = `${window.location.origin}/studio?from=${starterId || 'custom'}`
 
+  // Undo/redo + banding A/B (FlexStudio): state visual terpusat untuk snapshot.
+  const visualState = useMemo(() => ({
+    colors, opacities, fonts, sections, monogramStyle, monogramInitials,
+    dresscodeSettings, wishesStyle, livingMotion, photoColorFilter, galleryLayout,
+    dividerShape, cardStyler, cardFx, guestTouchFx, twilightColors, coverStyle,
+    openingAnimation, ornamentStyle, layoutStyle, particleEffect, coupleTransition,
+    ornamentTransition, panelTransition, ornaments, sectionAnims, backgroundFx,
+    customCss, baseLayout, blankCanvas, customAssets, eventType,
+    themeName, previewThemeMode,
+  }), [colors, opacities, fonts, sections, monogramStyle, monogramInitials,
+    dresscodeSettings, wishesStyle, livingMotion, photoColorFilter, galleryLayout,
+    dividerShape, cardStyler, cardFx, guestTouchFx, twilightColors, coverStyle,
+    openingAnimation, ornamentStyle, layoutStyle, particleEffect, coupleTransition,
+    ornamentTransition, panelTransition, ornaments, sectionAnims, backgroundFx,
+    customCss, baseLayout, blankCanvas, customAssets, eventType,
+    themeName, previewThemeMode])
+
+  const visualLiveRef = useRef(visualState)
+  visualLiveRef.current = visualState
+
+  const restoreVisual = useCallback((snap) => {
+    if (!snap) return
+    if (snap.colors) setColors(snap.colors)
+    if (snap.opacities) setOpacities(snap.opacities)
+    if (snap.fonts) setFonts(snap.fonts)
+    if (snap.sections) setSections(snap.sections)
+    if (snap.monogramStyle) setMonogramStyle(snap.monogramStyle)
+    if (snap.monogramInitials != null) setMonogramInitials(snap.monogramInitials)
+    if (snap.dresscodeSettings) setDresscodeSettings(snap.dresscodeSettings)
+    if (snap.wishesStyle) setWishesStyle(snap.wishesStyle)
+    if (snap.livingMotion) setLivingMotion(snap.livingMotion)
+    if (snap.photoColorFilter) setPhotoColorFilter(snap.photoColorFilter)
+    if (snap.galleryLayout) setGalleryLayout(snap.galleryLayout)
+    if (snap.dividerShape) setDividerShape(snap.dividerShape)
+    if (snap.cardStyler) setCardStyler(snap.cardStyler)
+    if (snap.cardFx) setCardFx(snap.cardFx)
+    if (snap.guestTouchFx) setGuestTouchFx(snap.guestTouchFx)
+    if (snap.twilightColors) setTwilightColors(snap.twilightColors)
+    if (snap.coverStyle) setCoverStyle(snap.coverStyle)
+    if (snap.openingAnimation) setOpeningAnimation(snap.openingAnimation)
+    if (snap.ornamentStyle) setOrnamentStyle(snap.ornamentStyle)
+    if (snap.layoutStyle) setLayoutStyle(snap.layoutStyle)
+    if (snap.particleEffect) setParticleEffect(snap.particleEffect)
+    if (snap.coupleTransition) setCoupleTransition(snap.coupleTransition)
+    if (snap.ornamentTransition) setOrnamentTransition(snap.ornamentTransition)
+    if (snap.panelTransition) setPanelTransition(snap.panelTransition)
+    if (snap.ornaments) setOrnaments(snap.ornaments)
+    if (snap.sectionAnims) setSectionAnims(snap.sectionAnims)
+    if (snap.backgroundFx) setBackgroundFx(snap.backgroundFx)
+    if (snap.customCss != null) setCustomCss(snap.customCss)
+    if (snap.baseLayout) setBaseLayout(snap.baseLayout)
+    if (snap.blankCanvas) setBlankCanvas(snap.blankCanvas)
+    if (snap.customAssets) setCustomAssets(snap.customAssets)
+    if (snap.eventType) setEventType(snap.eventType)
+    if (snap.themeName != null) setThemeName(snap.themeName)
+    if (snap.previewThemeMode) setPreviewThemeMode(snap.previewThemeMode)
+    setAnimKey((k) => k + 1)
+  }, [])
+
+  const history = useStudioHistory(visualState, restoreVisual)
+  const { undo, redo, canUndo, canRedo } = history
+
+  // Mode banding A/B: 2 slot snapshot (memory only), pilih = restore ke live.
+  const [compare, setCompare] = useState({ active: false, slotA: null, slotB: null })
+  function captureSlot(which) {
+    const snap = snapshotVisual(visualLiveRef.current)
+    setCompare((prev) => ({ ...prev, active: true, [which === 'A' ? 'slotA' : 'slotB']: snap }))
+  }
+  function pickSlot(which) {
+    const snap = which === 'A' ? compare.slotA : compare.slotB
+    if (snap) restoreVisual(snap)
+    setCompare({ active: false, slotA: null, slotB: null })
+  }
+  function closeCompare() {
+    setCompare({ active: false, slotA: null, slotB: null })
+  }
+
 
   return {
 accentBorderColor,
@@ -1426,5 +1504,13 @@ accentBorderColor,
     previewScrollRef,
     audioRef,
     voiceAudioRef,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    compare,
+    captureSlot,
+    pickSlot,
+    closeCompare,
   }
 }
