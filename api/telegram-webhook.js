@@ -137,7 +137,8 @@ const HELP =
   `/kwitansi &lt;kode&gt; — teks kwitansi siap forward\n` +
   `/voucher — list · /voucher buat KODE diskon · /voucher hapus KODE\n` +
   `/umum &lt;teks&gt; — pasang pengumuman · /umum_off — cabut\n` +
-  `/maintenance on|off — mode pemeliharaan`;
+  `/maintenance on|off — mode pemeliharaan\n` +
+  `/admin — link panel admin web`;
 
 async function cmdStats(chatId) {
   const [items, packages] = await Promise.all([recentInvitations(500), getPackages()]);
@@ -314,6 +315,7 @@ async function handleMessage(msg) {
       case '/umum': return cmdUmum(chatId, arg, false);
       case '/umum_off': return cmdUmum(chatId, '', true);
       case '/maintenance': return cmdMaintenance(chatId, arg);
+      case '/admin': return send(chatId, `🛠 Panel admin web:\n\n<a href="${baseUrl()}/admin">${baseUrl()}/admin</a>`);
       default: return send(chatId, `Perintah tidak dikenal.\n\n${HELP}`);
     }
   } catch (err) {
