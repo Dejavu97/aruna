@@ -123,18 +123,26 @@ export default function StudioPreview({ accentSoftColor,
     const i = visibleSecs.findIndex((sec) => sec.id === selectedSection)
     if (i >= 0) setFocusIdx(i)
     // Ikut scroll ke section-nya di dalam frame (klik dari panel kiri).
+    // Sampul tertutup = scroll dikunci, lewati.
+    if (!previewOpened) return
     const el = previewScrollRef.current?.querySelector?.(`[data-sec="${selectedSection}"]`)
     el?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
-  }, [selectedSection, visibleSecs])
+  }, [selectedSection, visibleSecs, previewOpened])
   useEffect(() => {
     setFocusIdx((prev) => Math.min(prev, Math.max(visibleSecs.length - 1, 0)))
   }, [visibleSecs.length])
+  // Sampul ditutup = kunci scroll + balik ke atas (isi tidak bisa diintip).
+  useEffect(() => {
+    if (!previewOpened) previewScrollRef?.current?.scrollTo?.({ top: 0 })
+  }, [previewOpened])
   const goFocus = (dir) => {
     if (!visibleSecs.length) return
     const next = (focusIdx + dir + visibleSecs.length) % visibleSecs.length
     setFocusIdx(next)
     setSelectedSection?.(visibleSecs[next].id)
     // Scroll di dalam frame (kayak kanvas Canva) — halaman luar tidak ikut gerak.
+    // Sampul tertutup = scroll dikunci, lewati.
+    if (!previewOpened) return
     const el = previewScrollRef.current?.querySelector?.(`[data-sec="${visibleSecs[next].id}"]`)
     el?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
   }
@@ -305,11 +313,12 @@ export default function StudioPreview({ accentSoftColor,
           ))}
 
           {/* Static Content Container — scroll di DALAM frame (kayak kanvas Canva).
-              Halaman luar tidak ikut gerak: overscroll-contain. */}
+              Halaman luar tidak ikut gerak: overscroll-contain.
+              Sampul tertutup = scroll dikunci + balik ke atas (isi tidak bisa diintip). */}
           <div
             ref={previewScrollRef}
             onClick={staticFrame ? undefined : handlePreviewTouchInteraction}
-            className="w-full h-full relative z-10 overflow-y-auto overscroll-contain scroll-smooth"
+            className={`w-full h-full relative z-10 scroll-smooth ${previewOpened ? 'overflow-y-auto overscroll-contain' : 'overflow-hidden'}`}
             style={{
               backgroundColor: mainBgColor,
               backgroundImage: [
