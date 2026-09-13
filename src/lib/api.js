@@ -317,8 +317,12 @@ export async function fetchInvitation(slug, editKey) {
         body: JSON.stringify({ slug, editKey })
       })
       if (res.status === 403) throw new Error('Kunci rahasia salah.')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `Verifikasi gagal (${res.status}).`)
+      }
     } catch (err) {
-      if (err.message === 'Kunci rahasia salah.') throw err
+      if (err.message === 'Kunci rahasia salah.' || /Terlalu banyak|Verifikasi gagal/.test(err.message)) throw err
       // Function tidak terjangkau (offline/dev) → fallback cek klien,
       // perilaku sama seperti sebelum adopt (tidak lebih longgar dari rules).
       console.warn('verify-key unreachable, fallback client check:', err)

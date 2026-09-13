@@ -208,6 +208,14 @@ export default function InvitationForm({
       setStep(pemesanIdx >= 0 ? pemesanIdx : steps.length - 1)
       return
     }
+    // Kunci pengaman: order hanya boleh dibuat dari step Review.
+    // Mencegah submit akidental (mis. tombol Enter di kolom input) yang langsung
+    // menciptakan order dan lompat ke /berhasil tanpa lewat Review.
+    if (mode === 'create' && steps[step]?.id !== 'review') {
+      const reviewIdx = steps.findIndex((s) => s.id === 'review')
+      setStep(reviewIdx >= 0 ? reviewIdx : steps.length - 1)
+      return
+    }
     const payload = {
       ...form,
       ownerUid: user?.uid || form.ownerUid || '',
