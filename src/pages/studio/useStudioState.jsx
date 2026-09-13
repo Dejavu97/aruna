@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Sparkles, Palette, Type, Layout, Image as ImageIcon, Music, 
@@ -14,6 +14,9 @@ import AtmosphereParticles from '../../components/AtmosphereParticles'
 import ImageAdjustModal from '../../components/ImageAdjustModal'
 import { createCustomTheme, fetchCustomTheme, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
+import { getDummyWeddingData } from '../../data/dummyData'
+import { sanitizeCustomCss } from '../../lib/sanitizeCss'
+import { useStudioHistory, snapshotVisual } from './useStudioHistory.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Universal Event Types Configuration
@@ -329,6 +332,7 @@ export function useStudioState() {
 
   // Streamlined 7 Core Tabs
   const [activeTab, setActiveTab] = useState('preset') // 'preset' | 'structure' | 'typography' | 'color' | 'photographer' | 'motion' | 'uploads'
+  const [selectedSection, setSelectedSection] = useState(null) // id of section selected via preview click
   const [presetSubTab, setPresetSubTab] = useState('official') // 'official' | 'agency'
   const [previewDevice, setPreviewDevice] = useState('mobile') // 'mobile' | 'tablet'
   const [previewOpened, setPreviewOpened] = useState(false)
@@ -429,6 +433,13 @@ export function useStudioState() {
     shadowLevel: 'soft', // 'none' | 'soft' | 'medium' | 'dramatic_3d'
     borderWidth: 1, // 0 | 1 | 2
   })
+  // FlexStudio F1c: free token — shadow & accent border kartu bebas (bukan enum)
+  const [cardFx, setCardFx] = useState({
+    shadowBlur: null, // null = ikut shadowLevel enum; angka 0-60 = bebas
+    shadowOpacity: null, // 0-100 (%)
+    shadowColor: '#1C1917',
+    accentBorder: null, // null = ikut accentSoft; warna hex bebas
+  })
 
   // 9. GUEST SCREEN TOUCH FX & HAPTIC
   const [guestTouchFx, setGuestTouchFx] = useState('sparkle_trail') // 'none' | 'sparkle_trail' | 'petal_burst'
@@ -516,6 +527,13 @@ export function useStudioState() {
     if (td.openingAnimation) setOpeningAnimation(td.openingAnimation)
     if (td.layoutStyle) setLayoutStyle(td.layoutStyle)
     if (td.customAssets) setCustomAssets(td.customAssets)
+    if (td.ornaments) setOrnaments(td.ornaments)
+    if (td.sectionAnims) setSectionAnims(td.sectionAnims)
+    if (td.backgroundFx) setBackgroundFx(td.backgroundFx)
+    if (td.cardFx) setCardFx((prev) => ({ ...prev, ...td.cardFx }))
+    if (td.customCss != null) setCustomCss(td.customCss)
+    if (td.layout) setBaseLayout(td.layout)
+    if (td.blankCanvas) setBlankCanvas(td.blankCanvas)
     setThemeName(tmpl.name)
     setCreatorName(tmpl.creator)
     setAnimKey((k) => k + 1)
@@ -562,6 +580,12 @@ export function useStudioState() {
   const [panelTransition, setPanelTransition] = useState('staggered_slide')
 
   // Full Uploaded Custom Assets
+  const [ornaments, setOrnaments] = useState([])
+  const [sectionAnims, setSectionAnims] = useState({})
+  const [backgroundFx, setBackgroundFx] = useState({ enabled: false, color1: '#F7F3EC', color2: '#E8DCC8', angle: 160 })
+  const [customCss, setCustomCss] = useState('')
+  const [baseLayout, setBaseLayout] = useState('classic')
+  const [blankCanvas, setBlankCanvas] = useState({ enabled: false, blocks: [] })
   const [customAssets, setCustomAssets] = useState({
     coverImgUrl: '/assets/local/couple_laughing_1.jpg',
     coverImgSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
@@ -575,9 +599,11 @@ export function useStudioState() {
     customLottieUrl: '',
     coupleFrameUrl: '',
     coupleFrameSettings: { scale: 1.15, posX: 0, posY: 0, fit: 'contain', brightness: 100, blur: 0 },
-    bridePhotoUrl: '/assets/local/teenager_birthday.jpg',
+    // Foto mempelai: default kosong agar preview memakai foto dummy per eventType
+    // (fallback bridePhotoSrc/groomPhotoSrc di StudioPreview); user upload bila mau foto sendiri.
+    bridePhotoUrl: '',
     bridePhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
-    groomPhotoUrl: '/assets/local/groom_suit.jpg',
+    groomPhotoUrl: '',
     groomPhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     customMusicUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=piano-moment-9835.mp3',
     customMusicTitle: 'A Thousand Years (Piano Instrumental)',
@@ -1019,6 +1045,13 @@ export function useStudioState() {
         ornamentTransition,
         panelTransition,
         customAssets,
+        ornaments,
+        sectionAnims,
+        backgroundFx,
+        cardFx,
+        customCss: sanitizeCustomCss(customCss),
+        layout: baseLayout,
+        blankCanvas: blankCanvas.enabled ? blankCanvas : null,
         cover: customAssets.coverImgUrl || '/themes/emas-senja.jpg',
         tags: ['komunitas', 'custom', isPublic ? 'publik' : 'privat'],
         popular: false,
@@ -1051,53 +1084,74 @@ export function useStudioState() {
     return `rgba(${r}, ${g}, ${b}, ${a})`
   }
 
-  // Complete Preview Data
-  const previewData = {
-    bride: {
-      nick: 'Sarah',
-      full: 'dr. Siti Sarah, Sp.A',
-      parents: 'Putri pertama dari Bapak H. Ahmad Subardjo & Ibu Hj. Nurul Hidayati',
-    },
-    groom: {
-      nick: 'Budi',
-      full: 'dr. Budi Santoso, Sp.OT',
-      parents: 'Putra kedua dari Bapak Ir. Joko Wahyudi & Ibu Hj. Sri Rahayu',
-    },
-    quote: 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.',
-    story: [
-      { year: '2022', title: 'Pertemuan Pertama', desc: 'Awal mula kami bertemu di Rumah Sakit Siloam saat masa residensi spesialis.' },
-      { year: '2024', title: 'Momen Lamaran', desc: 'Di hadapan kedua keluarga besar, kami mengikat janji untuk melangkah bersama.' },
-      { year: '2026', title: 'Menuju Pelaminan', desc: 'Bismillah, kami menyatukan langkah dalam ikatan suci pernikahan.' },
-    ],
-    events: [
-      {
-        title: 'Akad Nikah',
-        time: '08:00 - 10:00 WIB',
-        venue: 'Masjid Agung Al-Azhar',
-        address: 'Jl. Sisingamangaraja No. 1, Kebayoran Baru, Jakarta Selatan',
+  // Preview Data — derive dari dummy kontrak form per eventType (single source:
+  // src/data/dummyData.js), bukan objek statis wedding-only. Story/banks/events/
+  // gallery/wishes mengikuti shape form asli; field yang tak ada di dummy
+  // non-wedding diisi default aman agar guard Invitation ter-preview.
+  // Normalisasi: story body (Invitation baca s.body||s.text), wishes message+id.
+  const previewData = useMemo(() => {
+    const seedByEvent = {
+      wedding: 'adat-jawa',
+      birthday: 'birthday-sweet17',
+      graduation: 'graduation-wisuda',
+      aqiqah: 'aqiqah-bayi',
+      corporate: 'corporate-gala',
+    }
+    const base = getDummyWeddingData(seedByEvent[eventType] || 'adat-jawa')
+    const story = (base.story || []).map((s) => ({
+      year: s.year || '',
+      title: s.title || '',
+      body: s.body || s.text || '',
+    }))
+    const wishes = (base.wishes || [
+      { id: 'w_1', name: 'Keluarga Besar Subardjo', message: 'Selamat! Semoga menjadi keluarga yang sakinah mawaddah warahmah.' },
+      { id: 'w_2', name: 'Andi & Rina', message: 'Semoga lancar sampai hari H ya.' },
+    ]).map((w, i) => ({
+      id: w.id || `w_${i + 1}`,
+      name: w.name || 'Tamu Undangan',
+      message: w.message ?? w.msg ?? '',
+    }))
+    return {
+      ...base,
+      bride: {
+        nick: base.bride?.nick || activeEventConfig.heroNames,
+        full: base.bride?.full || '',
+        parents: base.bride?.parents || '',
+        photo: base.bride?.photo || '',
+        ig: base.bride?.ig || '',
       },
-      {
-        title: 'Resepsi Pernikahan',
-        time: '11:00 - 14:00 WIB',
-        venue: 'Grand Ballroom Hotel Mulia',
-        address: 'Jl. Asia Afrika No. 8, Senayan, Jakarta Pusat',
+      groom: {
+        nick: base.groom?.nick || '',
+        full: base.groom?.full || '',
+        parents: base.groom?.parents || '',
+        photo: base.groom?.photo || '',
+        ig: base.groom?.ig || '',
       },
-    ],
-    gallery: [
-      '/assets/local/couple_laughing_1.jpg',
-      '/assets/local/attari_cover.jpg',
-      '/assets/local/couple_garden.jpg',
-      '/assets/local/couple_classical.jpg',
-    ],
-    wishes: [
-      { name: 'dr. Hendra Pratama', msg: 'Selamat Sarah dan Budi! Semoga menjadi keluarga yang sakinah mawaddah warahmah.' },
-      { name: 'Keluarga Besar Subardjo', msg: 'Semoga lancar sampai hari H ya anak-anakku.' },
-    ],
-    banks: [
-      { bank: 'BCA', name: 'Siti Sarah', number: '5420198821' },
-      { bank: 'Mandiri', name: 'Budi Santoso', number: '1370019283741' },
-    ],
-  }
+      date: base.date || new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10),
+      slug: base.slug || 'studio-preview',
+      quote: base.quote ?? activeEventConfig.quote,
+      quoteSource: base.quoteSource ?? activeEventConfig.quoteSource,
+      story,
+      events: base.events || [],
+      gallery: (base.gallery?.length ? base.gallery : [
+        '/assets/local/couple_laughing_1.jpg',
+        '/assets/local/attari_cover.jpg',
+        '/assets/local/couple_garden.jpg',
+        '/assets/local/couple_classical.jpg',
+      ]),
+      wishes,
+      banks: base.banks || [],
+      qris: base.qris || '',
+      wishlist: base.wishlist || [],
+      dressColors: base.dressColors ?? '#C9A36A,#F4EFE6,#2A241C',
+      dressNote: base.dressNote ?? '',
+      liveUrl: base.liveUrl ?? '',
+      liveDate: base.liveDate ?? base.date ?? '',
+      liveTime: base.liveTime ?? '09:00',
+      liveNote: base.liveNote ?? '',
+      giftAddress: base.giftAddress ?? '',
+    }
+  }, [eventType, activeEventConfig.heroNames, activeEventConfig.quote, activeEventConfig.quoteSource])
 
   // Active Fonts
   const activeDisplayFont = fonts.customFontName
@@ -1236,6 +1290,93 @@ export function useStudioState() {
 
   const proposalLinkUrl = `${window.location.origin}/studio?from=${starterId || 'custom'}`
 
+  // Undo/redo + banding A/B (FlexStudio): state visual terpusat untuk snapshot.
+  const visualState = useMemo(() => ({
+    colors, opacities, fonts, sections, monogramStyle, monogramInitials,
+    dresscodeSettings, wishesStyle, livingMotion, photoColorFilter, galleryLayout,
+    dividerShape, cardStyler, cardFx, guestTouchFx, twilightColors, coverStyle,
+    openingAnimation, ornamentStyle, layoutStyle, particleEffect, coupleTransition,
+    ornamentTransition, panelTransition, ornaments, sectionAnims, backgroundFx,
+    customCss, baseLayout, blankCanvas, customAssets, eventType,
+    themeName, previewThemeMode,
+  }), [colors, opacities, fonts, sections, monogramStyle, monogramInitials,
+    dresscodeSettings, wishesStyle, livingMotion, photoColorFilter, galleryLayout,
+    dividerShape, cardStyler, cardFx, guestTouchFx, twilightColors, coverStyle,
+    openingAnimation, ornamentStyle, layoutStyle, particleEffect, coupleTransition,
+    ornamentTransition, panelTransition, ornaments, sectionAnims, backgroundFx,
+    customCss, baseLayout, blankCanvas, customAssets, eventType,
+    themeName, previewThemeMode])
+
+  const visualLiveRef = useRef(visualState)
+  visualLiveRef.current = visualState
+
+  const restoreVisual = useCallback((snap) => {
+    if (!snap) return
+    if (snap.colors) setColors(snap.colors)
+    if (snap.opacities) setOpacities(snap.opacities)
+    if (snap.fonts) setFonts(snap.fonts)
+    if (snap.sections) setSections(snap.sections)
+    if (snap.monogramStyle) setMonogramStyle(snap.monogramStyle)
+    if (snap.monogramInitials != null) setMonogramInitials(snap.monogramInitials)
+    if (snap.dresscodeSettings) setDresscodeSettings(snap.dresscodeSettings)
+    if (snap.wishesStyle) setWishesStyle(snap.wishesStyle)
+    if (snap.livingMotion) setLivingMotion(snap.livingMotion)
+    if (snap.photoColorFilter) setPhotoColorFilter(snap.photoColorFilter)
+    if (snap.galleryLayout) setGalleryLayout(snap.galleryLayout)
+    if (snap.dividerShape) setDividerShape(snap.dividerShape)
+    if (snap.cardStyler) setCardStyler(snap.cardStyler)
+    if (snap.cardFx) setCardFx(snap.cardFx)
+    if (snap.guestTouchFx) setGuestTouchFx(snap.guestTouchFx)
+    if (snap.twilightColors) setTwilightColors(snap.twilightColors)
+    if (snap.coverStyle) setCoverStyle(snap.coverStyle)
+    if (snap.openingAnimation) setOpeningAnimation(snap.openingAnimation)
+    if (snap.ornamentStyle) setOrnamentStyle(snap.ornamentStyle)
+    if (snap.layoutStyle) setLayoutStyle(snap.layoutStyle)
+    if (snap.particleEffect) setParticleEffect(snap.particleEffect)
+    if (snap.coupleTransition) setCoupleTransition(snap.coupleTransition)
+    if (snap.ornamentTransition) setOrnamentTransition(snap.ornamentTransition)
+    if (snap.panelTransition) setPanelTransition(snap.panelTransition)
+    if (snap.ornaments) setOrnaments(snap.ornaments)
+    if (snap.sectionAnims) setSectionAnims(snap.sectionAnims)
+    if (snap.backgroundFx) setBackgroundFx(snap.backgroundFx)
+    if (snap.customCss != null) setCustomCss(snap.customCss)
+    if (snap.baseLayout) setBaseLayout(snap.baseLayout)
+    if (snap.blankCanvas) setBlankCanvas(snap.blankCanvas)
+    if (snap.customAssets) setCustomAssets(snap.customAssets)
+    if (snap.eventType) setEventType(snap.eventType)
+    if (snap.themeName != null) setThemeName(snap.themeName)
+    if (snap.previewThemeMode) setPreviewThemeMode(snap.previewThemeMode)
+    setAnimKey((k) => k + 1)
+  }, [])
+
+  const history = useStudioHistory(visualState, restoreVisual)
+  const { undo, redo, canUndo, canRedo } = history
+
+  // Mode banding A/B: 2 slot snapshot (memory only), pilih = restore ke live.
+  // Jepret = silent capture (preview live TETAP tampil agar bisa lanjut edit).
+  const [compare, setCompare] = useState({ active: false, slotA: null, slotB: null })
+  function captureSlot(which) {
+    const snap = snapshotVisual(visualLiveRef.current)
+    setCompare((prev) => ({ ...prev, [which === 'A' ? 'slotA' : 'slotB']: snap }))
+  }
+  function openCompare() {
+    setCompare((prev) => ({ ...prev, active: true }))
+  }
+  function editSlot(which) {
+    // Muat varian ke live agar bisa diedit dengan preview kelihatan, lalu tutup.
+    const snap = which === 'A' ? compare.slotA : compare.slotB
+    if (snap) restoreVisual(snap)
+    setCompare((prev) => ({ ...prev, active: false }))
+  }
+  function pickSlot(which) {
+    const snap = which === 'A' ? compare.slotA : compare.slotB
+    if (snap) restoreVisual(snap)
+    setCompare({ active: false, slotA: null, slotB: null })
+  }
+  function closeCompare() {
+    setCompare({ active: false, slotA: null, slotB: null })
+  }
+
 
   return {
 accentBorderColor,
@@ -1246,6 +1387,7 @@ accentBorderColor,
     activePhotoFilterCss,
     activeScriptFont,
     activeTab,
+    selectedSection,
     adjustTarget,
     animKey,
     applyPreset,
@@ -1294,6 +1436,12 @@ accentBorderColor,
     moveSectionUp,
     myAgencyTemplates,
     opacities,
+    ornaments,
+    sectionAnims,
+    backgroundFx,
+    cardFx,
+    baseLayout,
+    blankCanvas,
     openingAnimation,
     ornamentStyle,
     ornamentTransition,
@@ -1319,6 +1467,8 @@ accentBorderColor,
     setCardStyler,
     setColors,
     setCopiedProposal,
+    setSections,
+    setSelectedSection,
     setCoupleTransition,
     setCoverStyle,
     setCreatorName,
@@ -1344,6 +1494,13 @@ accentBorderColor,
     setMyAgencyTemplates,
     setOpacities,
     setOpeningAnimation,
+    setOrnaments,
+    setSectionAnims,
+    setBackgroundFx,
+    setBlankCanvas,
+    setCardFx,
+    setBaseLayout,
+    setCustomCss,
     setOrnamentStyle,
     setOrnamentTransition,
     setPanelTransition,
@@ -1381,5 +1538,15 @@ accentBorderColor,
     previewScrollRef,
     audioRef,
     voiceAudioRef,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    compare,
+    captureSlot,
+    openCompare,
+    editSlot,
+    pickSlot,
+    closeCompare,
   }
 }

@@ -61,3 +61,26 @@ Validasi: minim `themeName` wajib; sisanya dipilih dari enum preset (UI) — bel
 - Studio menulis `custom_themes` client-direct (publik by design) — jangan taruh data sensitif di payload.
 - `preview` flag menjaga tema kustom tak menulis RSVP/wishes saat preview.
 - Poster/proposal export di Studio = canvas client-side (`exportingPoster`), tidak tersimpan.
+
+## 6. Ornamen Dalam Undangan (FlexStudio Fase 1, tab "Ornamen")
+Tab ke-6 studio. Data: `ornaments[]` di payload tema (`custom_themes`) — tiap entry
+`{asset, x, y, scale, rotate, opacity, color, anim, z}`; x/y = persen terhadap
+kontainer undangan (overlay global di `inv-main`/preview body, bukan per-section).
+Renderer: `src/invitation/OrnamentLayer.jsx` (8 asset SVG pre-vetted inline,
+colorizable via `currentColor`: kupu, bunga, daun, swirl, sparkle, hati, garland,
+bintang) + `OrnamentLayer.css` (6 animasi ambient, `prefers-reduced-motion` override).
+Dikonsumsi dua tempat: `Invitation.jsx` (`theme.ornaments || data.ornaments`) dan
+`StudioPreview.jsx`. UI editor: `StudioOrnamentPanel.jsx` (asset picker + slider
+posisi/ukuran/rotasi/opasitas + warna + animasi). Layer `z-20`,
+`pointer-events:none` — ornamen tampil DI ATAS kartu; asset pre-vetted (bukan
+HTML bebas), aman utk `custom_themes` publik. Branch: `feat/flex-studio`.
+
+## 7. Animasi Per-Bagian (FlexStudio Fase 1, dalam tab "Gerak & Sentuhan")
+Data: `sectionAnims` di payload tema — `{ [sectionId]: { enter, duration, delay } }`,
+`sectionId` ∈ `_all|hero|greeting|quote|couple|story|countdown|events|gallery|
+rsvp|wishes|gift|closer`; `enter` ∈ preset id di `SectionFX.js` (11 preset:
+fade_up/down/left/right, zoom_in/out, blur_in, rotate_in, flip_x, split_reveal,
+none). Fallback: section tak diatur → `_all` → `fade_up` (default lama).
+Renderer: `Reveal` di `Invitation.jsx` terima `fx`+`sectionAnims`; framer-motion
+`whileInView` (once). UI: `StudioSectionAnimPanel.jsx` (dropdown preset + slider
+durasi 0.2–2s + tunda 0–1.5s per section, tombol reset ke global).

@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Calendar, Images, Heart, Gift as GiftIcon, MailOpen, Camera } from 'lucide-react'
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
+import OrnamentLayer from './OrnamentLayer'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
+import { getSectionAnim } from './SectionFX'
 import {
   copyText,
   countdownParts,
@@ -225,7 +227,15 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
         </AnimatePresence>
 
         {open && (
-          <main className="inv-main">
+          <main
+            className="inv-main"
+            style={theme.backgroundFx?.enabled ? {
+              backgroundImage: `linear-gradient(${theme.backgroundFx.angle ?? 160}deg, ${theme.backgroundFx.color1}, ${theme.backgroundFx.color2})`,
+              backgroundAttachment: 'fixed',
+            } : undefined}
+          >
+            {theme.customCss ? <style dangerouslySetInnerHTML={{ __html: theme.customCss }} /> : null}
+            <OrnamentLayer ornaments={theme.ornaments || data.ornaments || []} className="inv-orn" />
             {isUnpaid && (
               <div
                 style={{
@@ -250,32 +260,32 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
             )}
             {data.music && musicOn && <audio src={data.music} autoPlay loop />}
 
-            <Reveal>{theme.layout === 'attari' ? <HeroAttari theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} /> : <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} formConfig={formConfig} />}</Reveal>
-            <Reveal><Greeting theme={theme} text={theme.greeting} scene={scenes.home} /></Reveal>
-            {data.quote && <Reveal><Quote data={data} theme={theme} scene={scenes.story} /></Reveal>}
+            <Reveal fx="hero" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <HeroAttari theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} /> : <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} formConfig={formConfig} />}</Reveal>
+            <Reveal fx="greeting" sectionAnims={theme.sectionAnims}><Greeting theme={theme} text={theme.greeting} scene={scenes.home} /></Reveal>
+            {data.quote && <Reveal fx="quote" sectionAnims={theme.sectionAnims}><Quote data={data} theme={theme} scene={scenes.story} /></Reveal>}
             {showCouple && (
-              <Reveal>{theme.layout === 'attari' ? <CoupleAttari data={data} scene={scenes.couple} /> : <Couple theme={theme} data={data} scene={scenes.couple} formConfig={formConfig} />}</Reveal>
+              <Reveal fx="couple" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <CoupleAttari data={data} scene={scenes.couple} /> : <Couple theme={theme} data={data} scene={scenes.couple} formConfig={formConfig} />}</Reveal>
             )}
-            {data.story?.length > 0 && <Reveal><Story story={data.story} scene={scenes.story} isLoveLetter={isLoveLetter} /></Reveal>}
+            {data.story?.length > 0 && <Reveal fx="story" sectionAnims={theme.sectionAnims}><Story story={data.story} scene={scenes.story} isLoveLetter={isLoveLetter} /></Reveal>}
             {!isLoveLetter && (
-              <Reveal><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
+              <Reveal fx="countdown" sectionAnims={theme.sectionAnims}><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
             )}
             {showEvents && (
-              <Reveal>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
+              <Reveal fx="events" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
             )}
             {formConfig.showCheckIn && showEvents && !isUnpaid && (
-              <Reveal><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
+              <Reveal fx="events" sectionAnims={theme.sectionAnims}><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>
             )}
-            {formConfig.showDressLive && <Reveal><DressCode data={data} scene={scenes.date} /></Reveal>}
-            {formConfig.showDressLive && <Reveal><Live data={data} scene={scenes.story} /></Reveal>}
+            {formConfig.showDressLive && <Reveal fx="events" sectionAnims={theme.sectionAnims}><DressCode data={data} scene={scenes.date} /></Reveal>}
+            {formConfig.showDressLive && <Reveal fx="events" sectionAnims={theme.sectionAnims}><Live data={data} scene={scenes.story} /></Reveal>}
             {formConfig.showFrame && !isUnpaid && (
-              <Reveal><Frame data={data} guest={guest} couple={couple} onOpen={() => setShowFrameModal(true)} scene={scenes.gallery} /></Reveal>
+              <Reveal fx="gallery" sectionAnims={theme.sectionAnims}><Frame data={data} guest={guest} couple={couple} onOpen={() => setShowFrameModal(true)} scene={scenes.gallery} /></Reveal>
             )}
             {data.gallery?.length > 0 && (
-              <Reveal><Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} /></Reveal>
+              <Reveal fx="gallery" sectionAnims={theme.sectionAnims}><Gallery images={data.gallery} onOpen={setLightbox} scene={scenes.gallery} /></Reveal>
             )}
             {formConfig.showRsvp && (
-              <Reveal><Rsvp
+              <Reveal fx="rsvp" sectionAnims={theme.sectionAnims}><Rsvp
                 slug={data.slug}
                 guest={guest}
                 demo={data.demo}
@@ -284,7 +294,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
                 scene={scenes.wishes}
               /></Reveal>
             )}
-            <Reveal><Wishes
+            <Reveal fx="wishes" sectionAnims={theme.sectionAnims}><Wishes
               slug={data.slug}
               wishes={local.wishes || []}
               guest={guest}
@@ -295,7 +305,7 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
             /></Reveal>
             <AdSlot slot="rsvp" data={data} theme={theme} />
             {showGift && (
-              <Reveal><Gift
+              <Reveal fx="gift" sectionAnims={theme.sectionAnims}><Gift
                 banks={data.banks || []}
                 qris={data.qris}
                 address={data.giftAddress}
@@ -306,7 +316,44 @@ function StandardInvitation({ data, guest = '', preview = false, theme }) {
               /></Reveal>
             )}
             <AdSlot slot="footer" data={data} theme={theme} />
-            <Reveal><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} data={data} /></Reveal>
+            <Reveal fx="closer" sectionAnims={theme.sectionAnims}><Closer couple={couple} theme={theme} hashtag={data.hashtag} scene={scenes.home} data={data} /></Reveal>
+            {theme.blankCanvas?.enabled && Array.isArray(theme.blankCanvas.blocks) && theme.blankCanvas.blocks.length > 0 && (
+              <section className="pad space-y-4">
+                <p className="text-center text-[10px] uppercase tracking-[0.2em] opacity-50">Blank Canvas — {theme.blankCanvas.blocks.length} blok custom</p>
+                {theme.blankCanvas.blocks.map((b) => (
+                  <div key={b.id} className="glass-panel overflow-hidden">
+                    <div className="flex items-center gap-2 px-4 py-2 border-b border-black/5 bg-black/[0.03] text-[10px] font-bold uppercase tracking-wider opacity-60">
+                      <span>{b.type}</span>
+                      <span className="font-mono opacity-40">{b.id}</span>
+                    </div>
+                    <div className="p-4">
+                      {b.type === 'image' ? (
+                        <img src={b.content} alt="" className="w-full rounded-sm object-cover max-h-80" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                      ) : b.type === 'gallery' ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          {String(b.content).split(',').map((u) => u.trim()).filter(Boolean).slice(0, 8).map((u, i) => (
+                            <img key={i} src={u} alt="" className="aspect-[4/3] w-full object-cover rounded-sm border border-black/10" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                          ))}
+                        </div>
+                      ) : b.type === 'divider' ? (
+                        <div className="py-3 flex items-center justify-center"><span className="h-px w-20 bg-current opacity-25" /></div>
+                      ) : b.type === 'map' ? (
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold">{b.content || 'Alamat / link maps'}</p>
+                          {b.content && /^https?:\/\//i.test(b.content) && (
+                            <a href={b.content} target="_blank" rel="noreferrer" className="text-xs underline opacity-70 break-all">{b.content}</a>
+                          )}
+                        </div>
+                      ) : b.type === 'countdown' ? (
+                        <p className="text-base font-bold text-center">{b.content || 'Menuju hari H'}</p>
+                      ) : (
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{b.content}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </section>
+            )}
             {!isLoveLetter && <BottomNav />}
           </main>
         )}
@@ -1025,13 +1072,24 @@ function Corners() {
   )
 }
 
-function Reveal({ children, delay = 0 }) {
+function Reveal({ children, delay = 0, fx, sectionAnims }) {
+  const cfg = fx ? getSectionAnim(sectionAnims, fx) : null
+  const motionProps = cfg
+    ? {
+        initial: cfg.initial || undefined,
+        whileInView: cfg.whileInView || undefined,
+        transition: { ...cfg.transition, delay: cfg.transition.delay + delay },
+        style: cfg.style,
+      }
+    : {
+        initial: { opacity: 0, y: 40 },
+        whileInView: { opacity: 1, y: 0 },
+        transition: { duration: 0.8, delay, ease: 'easeOut' },
+      }
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8, delay, ease: "easeOut" }}
+      {...motionProps}
+      viewport={motionProps.whileInView ? { once: true, margin: '-100px' } : undefined}
     >
       {children}
     </motion.div>

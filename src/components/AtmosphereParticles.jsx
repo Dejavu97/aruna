@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-export default function AtmosphereParticles({ effect = 'none', accentColor = '#c5a059' }) {
+export default function AtmosphereParticles({ effect = 'none', accentColor = '#c5a059', contained = false }) {
   const canvasRef = useRef(null)
 
   useEffect(() => {
@@ -9,13 +9,19 @@ export default function AtmosphereParticles({ effect = 'none', accentColor = '#c
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let animationFrameId
-    let width = (canvas.width = window.innerWidth)
-    let height = (canvas.height = window.innerHeight)
+    const parent = contained ? canvas.parentElement : null
+    let width = (canvas.width = contained && parent ? parent.clientWidth || window.innerWidth : window.innerWidth)
+    let height = (canvas.height = contained && parent ? parent.clientHeight || window.innerHeight : window.innerHeight)
 
     const handleResize = () => {
       if (!canvas) return
-      width = canvas.width = window.innerWidth
-      height = canvas.height = window.innerHeight
+      if (contained && parent) {
+        width = canvas.width = parent.clientWidth || window.innerWidth
+        height = canvas.height = parent.clientHeight || window.innerHeight
+      } else {
+        width = canvas.width = window.innerWidth
+        height = canvas.height = window.innerHeight
+      }
     }
     window.addEventListener('resize', handleResize)
 
@@ -127,14 +133,16 @@ export default function AtmosphereParticles({ effect = 'none', accentColor = '#c
       window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(animationFrameId)
     }
-  }, [effect, accentColor])
+  }, [effect, accentColor, contained])
 
   if (!effect || effect === 'none') return null
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-40 h-full w-full"
+      className={contained
+        ? 'pointer-events-none absolute inset-0 z-30 h-full w-full'
+        : 'pointer-events-none fixed inset-0 z-40 h-full w-full'}
       style={{ mixBlendMode: effect === 'gold_dust' || effect === 'bokeh' ? 'screen' : 'normal' }}
     />
   )
