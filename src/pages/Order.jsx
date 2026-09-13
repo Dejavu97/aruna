@@ -55,6 +55,14 @@ export default function Order() {
     try {
       const created = await createInvitation(payload)
       rememberEditKey(created.slug, created.editKey)
+      // Notif order baru → Telegram admin (fire-and-forget, gagal kirim ≠ gagalkan order)
+      try {
+        fetch('/api/notify-telegram', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug: created.slug }),
+        }).catch(() => {})
+      } catch {}
       localStorage.removeItem(`aruna.draft.${activeThemeId}`)
       navigate(`/berhasil/${created.slug}?key=${encodeURIComponent(created.editKey)}`)
     } catch (err) {
