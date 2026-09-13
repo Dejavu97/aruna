@@ -96,6 +96,10 @@ async function recentInvitations(limit = 300) {
 function matchQuery(list, q) {
   const needle = String(q || '').trim().toLowerCase();
   if (!needle) return [];
+  // Kode/slug persis diutamakan — cocok untuk callback tombol (tanpa tebak-tebakan)
+  const exact = list.find((it) =>
+    String(it.orderCode || '').toLowerCase() === needle || String(it.slug || '').toLowerCase() === needle);
+  if (exact) return [exact];
   return list.filter((it) => {
     const hay = [it.orderCode, it.slug, it.customerName, it.customerWhatsapp, it.customDomain,
       it.bride?.nick, it.bride?.full, it.groom?.nick, it.groom?.full]
@@ -158,24 +162,39 @@ async function cmdStats(chatId) {
 
 async function cmdBelum(chatId) {
   const [items, packages] = await Promise.all([recentInvitations(300), getPackages()]);
-  const list = items.filter((it) => it.status !== 'paid').slice(0, 10);
+  const total = items.filter((it) => it.status !== 'paid').length;
+  const list = items.filter((it) => it.status !== 'paid').slice(0, 8);
   if (!list.length) return send(chatId, `✅ Tidak ada order belum bayar.`);
-  const lines = list.map((it) => {
+  // Satu kartu per order (maks 8) — tombol terikat slug spesifik, tanpa ketik kode
+  for (const it of list) {
     const p = packOf(packages, it.packageId);
-    return `• <b>${escapeHtml(it.orderCode || it.slug)}</b> — ${escapeHtml(coupleOf(it))} — ${escapeHtml(p.name)} ${rupiah(p.price)}\n  /lunas ${escapeHtml(it.orderCode || it.slug)}`;
-  });
-  const more = items.filter((it) => it.status !== 'paid').length - list.length;
-  await send(chatId, `<b>⏳ Belum bayar (${items.filter((i) => i.status !== 'paid').length})</b>\n\n${lines.join('\n')}${more > 0 ? `\n\n…+${more} lagi, persempit via /cari` : ''}`);
+    await send(chatId,
+      `⏳ <b>${escapeHtml(it.orderCode || it.slug)}</b> — ${escapeHtml(coupleOf(it))}\n${escapeHtml(p.name)} · ${rupiah(p.price)} · ${escapeHtml(it.customerName || '-')} (${escapeHtml(it.customerWhatsapp || '-')})`,
+      { reply_markup: { inline_keyboard: [[
+        { text: '✅ Lunas', callback_data: `ask:${it.slug}` },
+        { text: '💬 Tagih', callback_data: `tagih:${it.slug}` },
+        { text: '🔍 Detail', callback_data: `detail:${it.slug}` },
+      ]] } });
+  }
+  const more = total - list.length;
+  if (more > 0) await send(chatId, `…+${more} lagi, persempit via /cari`);
 }
 
 async function cmdCari(chatId, arg) {
   if (!arg) return send(chatId, `Pakai: /cari &lt;nama/WA/kode/slug&gt;`);
-  const items = await recentInvitations(300);
-  const found = matchQuery(items, arg).slice(0, 10);
+  const [items, packages] = await Promise.all([recentInvitations(300), getPackages()]);
+  const found = matchQuery(items, arg).slice(0, 5);
   if (!found.length) return send(chatId, `🔍 Tidak ketemu untuk “${escapeHtml(arg)}”.`);
-  const lines = found.map((it) =>
-    `• <b>${escapeHtml(it.orderCode || it.slug)}</b> [${it.status === 'paid' ? 'LUNAS' : 'BELUM'}] ${escapeHtml(coupleOf(it))}\n  ${escapeHtml(it.customerName || '-')} (${escapeHtml(it.customerWhatsapp || '-')}) · <a href="${baseUrl()}/u/${it.slug}">${escapeHtml(it.slug)}</a>`);
-  await send(chatId, `<b>🔍 Hasil (${found.length})</b>\n\n${lines.join('\n')}`);
+  for (const it of found) {
+    const p = packOf(packages, it.packageId);
+    await send(chatId,
+      `${it.status === 'paid' ? '✅' : '⏳'} <b>${escapeHtml(it.orderCode || it.slug)}</b> — ${escapeHtml(coupleOf(it))}\n${escapeHtml(p.name)} · ${rupiah(p.price)} · ${escapeHtml(it.customerName || '-')} (${escapeHtml(it.customerWhatsapp || '-')}) · <a href="${baseUrl()}/u/${it.slug}">${escapeHtml(it.slug)}</a>`,
+      { reply_markup: { inline_keyboard: [[
+        ...(it.status === 'paid' ? [] : [{ text: '✅ Lunas', callback_data: `ask:${it.slug}` }]),
+        { text: '💬 Tagih', callback_data: `tagih:${it.slug}` },
+        { text: '🧾 Kwitansi', callback_data: `kwit:${it.slug}` },
+      ]] } });
+  }
 }
 
 async function cmdLunas(chatId, arg) {
@@ -280,6 +299,38 @@ async function handleCallback(query) {
     }).catch(() => {});
   }
   if (data === 'cancel') return send(chatId, `Dibatalkan.`);
+  // Aksi langsung dari kartu /belum & /cari — slug sudah pasti, tanpa ketik kode
+  if (data.startsWith('ask:') || data.startsWith('tagih:') || data.startsWith('kwit:') || data.startsWith('detail:')) {
+    const [kind, slug] = data.split(':');
+    const snap = await adminDb.collection('invitations').doc(slug).get();
+    if (!snap.exists) return send(chatId, `🔍 Order tidak ketemu.`);
+    const inv = { slug, ...snap.data() };
+    const packages = await getPackages();
+    const p = packOf(packages, inv.packageId);
+    if (kind === 'ask') {
+      if (inv.status === 'paid') return send(chatId, `✅ ${escapeHtml(inv.orderCode || slug)} sudah LUNAS.`);
+      return send(chatId,
+        `Tandai <b>LUNAS</b>?\n\n• ${escapeHtml(inv.orderCode || slug)} — ${escapeHtml(coupleOf(inv))}\n• ${escapeHtml(p.name)} — ${rupiah(p.price)}\n• ${escapeHtml(inv.customerName || '-')} (${escapeHtml(inv.customerWhatsapp || '-')})`,
+        { reply_markup: { inline_keyboard: [[
+          { text: '✅ Ya, tandai LUNAS', callback_data: `lunas:${slug}` },
+          { text: 'Batal', callback_data: 'cancel' },
+        ]] } });
+    }
+    if (kind === 'detail') {
+      const hadir = (inv.rsvps || []).filter((r) => r.status === 'hadir').reduce((n, r) => n + Number(r.guests || 1), 0);
+      return send(chatId,
+        `${inv.status === 'paid' ? '✅' : '⏳'} <b>${escapeHtml(inv.orderCode || slug)}</b> [${inv.status === 'paid' ? 'LUNAS' : 'BELUM'}]\n${escapeHtml(coupleOf(inv))} · ${escapeHtml(p.name)} ${rupiah(p.price)}\nPemesan: ${escapeHtml(inv.customerName || '-')} (${escapeHtml(inv.customerWhatsapp || '-')})\nRSVP: ${inv.rsvps?.length || 0} (${hadir} hadir) · Ucapan: ${inv.wishes?.length || 0} · Views: ${inv.views || 0}\nTgl acara: ${escapeHtml(inv.date || '-')}\n\n🔗 <a href="${baseUrl()}/u/${slug}">Undangan</a> · 🛠 <a href="${baseUrl()}/admin">Admin</a>`);
+    }
+    const type = kind === 'kwit' ? 'kwitansi' : 'tagihan';
+    const text = await buildWaText(type, inv, packages);
+    let extra = '';
+    if (type === 'tagihan') {
+      const pay = await getPayment();
+      const banks = pay?.banks || (pay?.bank ? [pay.bank] : []);
+      extra = `\n\n<b>Rekening:</b>\n${escapeHtml(banks.map((b) => `${b.bank} ${b.number} a.n. ${b.name}`).join('\n') || '-')}`;
+    }
+    return send(chatId, `<b>${type === 'kwitansi' ? '🧾 Teks kwitansi' : '💬 Teks tagihan'} — forward ke customer:</b>\n\n${escapeHtml(text)}${extra}`);
+  }
   if (data.startsWith('lunas:')) {
     const slug = data.slice(6);
     const ref = adminDb.collection('invitations').doc(slug);
