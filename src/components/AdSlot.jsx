@@ -24,8 +24,11 @@ export default function AdSlot({
   }, [])
 
   // 1. Validasi Apakah Akun Memerlukan Iklan (Free User) atau Bebas Iklan (Paid User)
-  const isPaid = data.status === 'paid' && data.packageId !== 'gratis'
-  const isAdFree = data.adFree === true || isPaid
+  // Catatan: pemanggil (Success.jsx) bisa mengirim data=null sebelum Firestore
+  // terbaca; default param tidak nangkep null eksplisit, jadi guard di sini.
+  const ad = data || {}
+  const isPaid = ad.status === 'paid' && ad.packageId !== 'gratis'
+  const isAdFree = ad.adFree === true || isPaid
 
   // Jika ini halaman undangan dan akun berbayar/lunas -> JANGAN TAMPILKAN IKLAN
   if (['footer', 'rsvp', 'sticky-bottom'].includes(slot) && isAdFree) return null
