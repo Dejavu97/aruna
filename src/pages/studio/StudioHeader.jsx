@@ -32,8 +32,8 @@ export default function StudioHeader({ canRedo,
   const secondary = 'flex w-full items-center gap-2 px-3 py-2 text-xs uppercase tracking-wider font-semibold text-ink hover:bg-gold/10 transition-colors text-left'
   return (
 <header className="bg-paper border-b border-ink/10 px-4 lg:px-6 py-2 shadow-sm">
-      <div className="w-full max-w-[1200px] mx-auto flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="w-full max-w-[1200px] mx-auto flex items-center justify-between gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <button
             type="button"
             onClick={() => navigate('/tema')}
@@ -44,11 +44,11 @@ export default function StudioHeader({ canRedo,
           <span className="text-stone/30 hidden sm:inline">|</span>
           <div className="flex items-center gap-1.5 min-w-0">
             <Crown size={15} className="text-gold-deep shrink-0" />
-            <h1 className="font-display text-sm sm:text-base font-semibold tracking-wide whitespace-nowrap">Theme Studio 2.0 Pro</h1>
+            <h1 className="font-display text-[13px] sm:text-base font-semibold tracking-wide whitespace-nowrap">Theme Studio 2.0 Pro</h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={undo}
@@ -113,10 +113,12 @@ export default function StudioHeader({ canRedo,
             type="button"
             onClick={handleSaveTheme}
             disabled={saving}
-            className="inline-flex items-center gap-2 bg-ink text-ivory px-4 sm:px-5 py-2 text-xs uppercase tracking-widest hover:bg-gold-deep transition-colors font-medium shadow-sm whitespace-nowrap"
+            className="inline-flex items-center gap-2 bg-ink text-ivory px-3 sm:px-5 py-2 text-xs uppercase tracking-widest hover:bg-gold-deep transition-colors font-medium shadow-sm whitespace-nowrap"
+            title="Simpan tema"
+            aria-label="Simpan tema"
           >
             {saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
-            {saving ? 'Menyimpan...' : <><span className="hidden sm:inline">Simpan Tema</span><span className="sm:hidden">Simpan</span></>}
+            {saving ? 'Menyimpan...' : <><span className="hidden sm:inline">Simpan Tema</span></>}
           </button>
           {savedThemeId && (
             <button

@@ -11,7 +11,7 @@ Aturan: mobile-only via breakpoint (`sm:` = 640px). Desktop 1366px wajib identik
 | A | Home category capsule | PASS 2026-09-14 | `67d335b` |
 | B | Home hero badge tracking | PASS 2026-09-14 | lihat batch-b |
 | C | Katalog grid HP 1/baris | PASS 2026-09-14 | lihat batch-c |
-| D | Studio header 390 | OPEN (temuan terkonfirmasi, belum perbaiki) | — |
+| D | Studio header 320/390 | PASS 2026-09-14 | lihat batch-d |
 
 ## Breakpoint pakai
 
