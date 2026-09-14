@@ -882,8 +882,8 @@ function Gift({ banks, qris, address, wishlist, copied, onCopy, scene }) {
                 <div>
                   <strong>{w.title}</strong>
                   {w.price && <p>{w.price}</p>}
-                  {w.url && (
-                    <a href={w.url} target="_blank" rel="noreferrer">
+                  {safeUrl(w.url) && (
+                    <a href={safeUrl(w.url)} target="_blank" rel="noreferrer">
                       Lihat
                     </a>
                   )}

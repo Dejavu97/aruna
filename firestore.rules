@@ -68,7 +68,11 @@ service cloud.firestore {
     match /custom_themes/{id} {
       allow read: if true;
       allow create: if true;
-      allow update: if true;
+      // Update dikunci: edit = tulis dokumen ID baru (clone), bukan timpa
+      // milik orang. Anon tidak boleh update (sebelumnya: true = siapa pun
+      // bisa timpa tema orang via console bermodal ID katalog publik).
+      // Admin login (request.auth) tetap boleh update/restore.
+      allow update: if request.auth != null;
       allow delete: if request.auth != null;
     }
 
