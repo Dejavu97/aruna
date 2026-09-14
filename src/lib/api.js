@@ -164,8 +164,8 @@ export async function loginAdmin(password) {
 export async function changeAdminPassword(newPassword) {
   if (!getAdminKey()) throw new Error('Unauthorized')
   const cleanPass = newPassword.trim()
-  if (!cleanPass || cleanPass.length < 4) {
-    throw new Error('Kata sandi baru minimal 4 karakter.')
+  if (!cleanPass || cleanPass.length < 8) {
+    throw new Error('Kata sandi baru minimal 8 karakter.')
   }
 
   try {
