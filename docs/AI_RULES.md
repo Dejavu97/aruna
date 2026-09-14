@@ -70,9 +70,10 @@ When adding a new event category (e.g. *Khitanan, Sweet 17th, Golden Anniversary
    - `settings/*` dan `vouchers/*` = `allow write: if false` di rules. Semua tulis lewat `api/admin-settings.js` (verifikasi `adminKey` vs `settings/admin_auth` via Admin SDK). Jangan pernah menuliskannya lewat client SDK.
    - Login/ganti password admin = `api/admin-login.js` (password disandingkan server; `admin_auth` tak terbaca klien).
 4. **Upload Limits:**
-   - Cloudinary uploads must be validated for size (max 15MB) and type (`image/*` / `audio/*`).
+   - Cloudinary uploads must be validated for size (max 8MB, sejak 2026-09-14) and type (hanya gambar png/jpg/gif/webp/svg & audio mp3/wav/ogg — `uploadFile` di `src/lib/api.js` menolak sisanya sebelum keluar jaringan). Lapis utama = pengaturan preset `arunawedd` di panel Cloudinary (folder `aruna_uploads`).
 5. **Anti-DoS:**
    - Arrays for `wishes` and `rsvps` must remain capped at 500 items per document.
+   - Tulis RSVP/ucapan tamu WAJIB lewat `api/guestbook.js` (throttle 1 kirim/20 dtk, 20/jam per IP+slug, sejak 2026-09-14) — jangan kembalikan tulis langsung sebagai jalur utama.
 
 ---
 

@@ -4,6 +4,18 @@ Dokumen ini mencatat seluruh rincian pembaruan, evolusi fitur, dan penguatan sis
 
 ---
 
+## Patch Keamanan 2026-09-14 (sisi pelanggan)
+
+* **Link wishlist disaring:** `w.url` di `Invitation.jsx` wajib lewat `safeUrl()` — sebelumnya render mentah (stored XSS).
+* **Tema studio dikunci silang:** `custom_themes` create tetap publik, update/delete butuh login Google. Edit publik = simpan ID baru, bukan timpa milik orang.
+* **Anti-iframe:** `vercel.json` kirim `frame-ancestors 'self'`, `X-Frame-Options SAMEORIGIN`, `Referrer-Policy`, `nosniff`.
+* **Buku tamu anti-banjir:** endpoint baru `api/guestbook.js` — 1 kirim/20 detik, maks 20/jam per IP+slug. `addRsvp`/`addWish` lewat sini dulu, fallback tulis langsung bila API mati.
+* **Upload dijaga:** `uploadFile` tolak non-gambar/audio & >8MB. Preset Cloudinary `arunawedd` → folder `aruna_uploads` (diset manual di panel Cloudinary).
+* **Kode order acak:** `AR`+8 char (`crypto.randomUUID`), sebelumnya 4 digit. Order lama tetap valid.
+* **Dokumen sinkron:** `DATABASE_SECURITY.md`, `SYSTEM_MAP.md`, `DATA_MODEL.md`, `AI_RULES.md`, `WORKFLOW.md`, `THEME_STUDIO_MAP.md` v1.1.
+
+---
+
 ## Rincian Pembaruan Sistem (Versi 2.5 - Creator & Studio Pro Edition)
 
 ### 1. Theme Studio 2.0 Pro Suite (Studio Desain Interaktif)

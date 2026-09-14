@@ -8,14 +8,14 @@ Dokumen ini menjelaskan bagaimana siklus hidup sebuah undangan terbentuk, mulai 
 - Pelanggan membuka katalog di halaman `/tema` atau mendesain tema sendiri di `/studio`.
 - Pelanggan memilih tema dan mengisi formulir (Data Mempelai, Tanggal, Lokasi, WhatsApp, Tautan URL yang diinginkan).
 - Saat menekan tombol **"Pesan & Bayar"**, sistem memanggil fungsi `createInvitation()` di `api.js`.
-- Sistem menghasilkan **Edit Key** (Kunci Rahasia) dan **Kode Order** (contoh: `AR1024`).
+- Sistem menghasilkan **Edit Key** (Kunci Rahasia) dan **Kode Order** (contoh: `AR3F9KQ2P1` — 8 char acak sejak 2026-09-14).
 - Data tersimpan di database Firebase Firestore dengan status `unpaid` (Belum Lunas).
 - Pelanggan diarahkan ke halaman invoice/sukses yang menampilkan rincian rekening transfer & tombol konfirmasi WhatsApp.
 
 ---
 
 ## 2. Pengelolaan Operasional Admin (`/admin`)
-- Admin login ke panel `/admin` menggunakan kredensial Firebase Auth terenkripsi.
+- Admin login ke panel `/admin` memakai password admin (verifikasi server via `api/admin-login.js`, tersimpan hash di `settings/admin_auth`).
 - **Konfirmasi Pembayaran:** Admin memverifikasi bukti transfer dan menekan tombol **"✓ Tandai Lunas"** untuk mengaktifkan status pesanan menjadi `paid`.
 - **Kirim Link Dashboard:** Admin menekan tombol **"Chat WA"** untuk mengirimkan tautan dashboard kelola kepada pengantin secara otomatis.
 - **Admin Super Bypass:** Admin memiliki hak akses langsung untuk mengecek dashboard kelola (`/kelola/:slug`) dan formulir revisi (`/edit/:slug`) kapan saja tanpa perlu memasukkan kunci edit manual.

@@ -31,6 +31,7 @@ Field yang dipakai sistem (aktual):
 ## 4. Theme Studio — Peta Kustomisasi User (aktual, useStudioState.jsx)
 
 Penyimpanan: Firestore `custom_themes/{id}` via `createCustomTheme` (id `ct_`+random, `createdAt`), cache + daftar lokal `localStorage aruna_custom_themes` & blacklist hapus `aruna_deleted_custom_themes`.
+Aturan tulis (sejak 2026-09-14): create publik, update/delete butuh login Google — edit publik = simpan ID baru (clone), bukan timpa ID lama.
 
 | Group | Variabel (state) | Type / allowed | Default | Afeksi |
 |---|---|---|---|---|
