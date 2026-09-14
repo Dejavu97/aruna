@@ -1,6 +1,7 @@
 # SYSTEM_MAP.md — Peta Arsitektur & Dependency Aruna Undangan
 
-> **Versi:** 1.0 · **Tanggal:** 2026-09-01 · **Status:** Berdasarkan source aktual, bukan asumsi
+> **Versi:** 1.1 · **Tanggal:** 2026-09-14 · **Status:** Berdasarkan source aktual, bukan asumsi
+> Perubahan 2026-09-14: endpoint `api/guestbook.js` + `_auth.js` di inventaris; header anti-iframe `vercel.json`; tamu via guestbook API dulu.
 > **Dokumen pendamping:** `ARCHITECTURE_CONTRACT.md` (kontrak resmi), `DATA_MODEL.md` (field-by-field), `DATABASE_SECURITY.md` (koleksi & security), `COMPONENT_CONTRACTS.md` (kontrak component), `THEME_STUDIO_MAP.md` (tema & studio), `AI_RULES.md` (aturan AI agent)
 
 ---
@@ -27,7 +28,7 @@ Tidak ada state management eksternal (Context + local state). Tidak ada Express 
 ### Entry & Routing
 - `index.html` — shell HTML; saat `/u/:slug` di-transform `api/og.js` (OG injection)
 - `src/main.jsx`, `src/App.jsx` — lazy route master (15 route, lihat tabel Route di bawah)
-- `vercel.json` — rewrite `/u/:slug*` → `api/og`, sisanya → `/index.html`; config fungsi og.js
+- `vercel.json` — rewrite `/u/:slug*` → `api/og`, sisanya → `/index.html`; config fungsi og.js; header anti-iframe (`frame-ancestors 'self'`, `X-Frame-Options SAMEORIGIN`, `Referrer-Policy`, `nosniff`) sejak 2026-09-14
 
 ### Pages (`src/pages/`)
 - Publik: `Home`, `Themes`, `ThemePreview`, `Inspiration`, `Order` (+`/pesan/:themeId`), `Success`, `InvitationPage` (`/u/:slug`), `CustomDomainPage`, `NotFound`
@@ -52,7 +53,7 @@ Tidak ada state management eksternal (Context + local state). Tidak ada Express 
 - `data/themes.js` — katalog tema (37 id entri) + `FORM_BASES` (6 eventType) + `getFormMode` + `getThemeFeatures` + `FEATURE_SETS`
 - `data/site.js` — paket harga (`eventPackages`, `getPackagesByEventType`), konten situs
 - `data/dummyData.js` — data demo/preview
-- `lib/api.js` — ~1050 baris: SEMUA akses Firestore client + helper admin (`getAdminKey`, `adminApiCall`, `loginAdmin`, `changeAdminPassword`) + upload Cloudinary + backup/restore
+- `lib/api.js` — ~1100 baris: SEMUA akses Firestore client + helper admin (`getAdminKey`, `adminApiCall`, `loginAdmin`, `changeAdminPassword`) + upload Cloudinary (guard tipe+ukuran sejak 2026-09-14) + backup/restore; RSVP/ucapan via `api/guestbook.js` dulu (fallback client)
 - `lib/firebase.js` — init client SDK (config inline, publik by design)
 - `lib/upload.js` — kompresi gambar (canvas) sebelum Cloudinary
 - `lib/utils.js` — `formatLongDate`, `formatTime`, `safeUrl`, `countdownParts`, `copyText`, dll
@@ -66,13 +67,17 @@ Tidak ada state management eksternal (Context + local state). Tidak ada Express 
 | File | Fungsi | Auth |
 |---|---|---|
 | `_firebase.js` | init firebase-admin dari `FIREBASE_SERVICE_ACCOUNT` | — |
+| `_auth.js` | helper throttle per-IP + hash/scrypt password (dipakai verify-key, admin-login) | — |
 | `og.js` | `GET /u/:slug` — baca undangan, inject OG tags ke `dist/index.html` (preview WA/IG) | publik |
 | `verify-key.js` | verifikasi `editKey` (brankas `private_keys`) | publik (butuh editKey) |
+| `guestbook.js` (2026-09-14) | tulis RSVP/ucapan tamu via Admin SDK; throttle 1 kirim/20 dtk, 20/jam per IP+slug (koleksi `guestbook_throttle`) | publik (tamu anonim) |
 | `update-invitation.js` | update undangan via editKey/adminKey; satu-satunya jalur `status: 'paid'` | editKey/adminKey |
 | `delete-invitation.js` | hapus undangan | adminKey |
 | `admin-login.js` | login password admin + ganti password (`settings/admin_auth`) | password |
 | `admin-settings.js` | tulis `settings/*` (non-admin_auth) + `vouchers/*` | adminKey |
 | `add-domain.js` / `remove-domain.js` | custom domain | adminKey/editKey |
+| `notify-telegram.js` | notif order baru ke admin Telegram (fire-and-forget, dedupe 1x/slug) | internal |
+| `telegram-webhook.js` | bot admin Telegram (stats/belum/cari/lunas/tagih/kwitansi/voucher/umum/maintenance) | secret header + allowlist chat ID |
 
 ### Aset (`public/`)
 - `public/themes/` — cover & aset tema (kejora/, jawa-biru/, koran/, kelinci/, covers/, dll)

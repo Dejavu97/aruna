@@ -1,6 +1,7 @@
 # DATABASE_SECURITY.md — Kontrak Database & Security Boundary
 
-> **Versi:** 1.0 · **Tanggal:** 2026-09-01 · **Status:** Berdasarkan `firestore.rules` (deploy 2026-09-01) + `api/*.js` + `src/lib/api.js`
+> **Versi:** 1.1 · **Tanggal:** 2026-09-14 · **Status:** Berdasarkan `firestore.rules` (deploy 2026-09-14) + `api/*.js` + `src/lib/api.js`
+> Perubahan 2026-09-14: `custom_themes` update dikunci ke login Google; endpoint baru `api/guestbook.js` (throttle RSVP/ucapan); `uploadFile` guard tipe+ukuran; `orderCode` 8 char acak; header anti-iframe di `vercel.json`.
 > **Dokumen pendamping:** `SYSTEM_MAP.md` (arsitektur), `DATA_MODEL.md` (isi dokumen invitations)
 
 ---
@@ -26,9 +27,10 @@
 - 🔒 **TIDAK BOLEH**: menambah `allow read` ke sini demi fitur tema/klien mana pun.
 
 ### `custom_themes/{id}` — tema kustom Theme Studio
-- **Read/create/update: publik — BY DESIGN** (fitur `/studio` publik tanpa login). Delete butuh login Google.
+- **Read/create: publik — BY DESIGN** (fitur `/studio` publik tanpa login). **Update/delete: butuh login Google** (`request.auth != null`, deploy 2026-09-14) — sebelumnya `update: true` = siapa pun bisa timpa tema orang via console bermodal ID katalog publik.
+- Edit publik = tulis dokumen ID baru (clone), bukan timpa ID lama. Restore backup admin tetap jalan (admin login).
 - Producer: `createCustomTheme()` client; consumer: `resolveTheme`/`themeRegistry` + katalog studio.
-- ⚠ WARNING: karena write publik, dokumen besar/datalar bisa dibuat siapa pun (belum ada validasi ukuran/struktur server-side). Dampak terbatas ke katalog tema kustom — tidak menyentuh undangan.
+- ⚠ WARNING: karena create publik, dokumen junk bisa dibuat siapa pun (belum ada validasi ukuran/struktur server-side). Dampak terbatas ke katalog tema kustom — tidak menyentuh undangan.
 - ⚠ NOTE: delete dari UI memakai daftar hitam lokal `aruna_deleted_custom_themes` (localStorage) karena klien umum tak punya akses delete — dokumen bisa tetap ada di Firestore.
 
 ### `settings/{doc}` — konfigurasi platform
@@ -64,10 +66,14 @@
 | `admin-login.js` | password / adminKey+newPassword | `admin_auth` |
 | `admin-settings.js` | adminKey | `admin_auth`; `admin_auth` ditolak sebagai target tulis |
 | `add-domain.js` / `remove-domain.js` | slug+editKey | brankas |
+| `guestbook.js` (2026-09-14) | — (tamu anonim) | throttle 1 kirim/20 dtk, maks 20/jam per IP+slug; tulis via Admin SDK |
+| `notify-telegram.js` | — (fire-and-forget dari Order.jsx) | validasi slug + dedupe 1x/slug + recency 30 mnt |
+| `telegram-webhook.js` | header secret Telegram + allowlist chat ID | `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_ADMIN_IDS` |
 
 ### Storage & upload
-- Tidak memakai Firebase Storage. Upload = Cloudinary **unsigned preset** `'arunawedd'` (cloud `a6luorsr`), langsung dari browser (`uploadFile` di api.js). Kompresi client di `lib/upload.js` (≤1600px, JPEG q0.84).
-- ⚠ Unsigned preset = siapa pun dengan nama preset bisa upload. Mitigasi ada di pengaturan Cloudinary (limit ukuran/turning), bukan di kode. Kode memvalidasi tipe di UI level saja.
+- Tidak memakai Firebase Storage. Upload = Cloudinary **unsigned preset** `'arunawedd'` (cloud `a6luorsr`, folder `aruna_uploads`), langsung dari browser (`uploadFile` di api.js). Kompresi client di `lib/upload.js` (≤1600px, JPEG q0.84).
+- Guard kode (2026-09-14): hanya gambar (png/jpg/gif/webp/svg) & audio (mp3/wav/ogg), maks 8MB — ditolak sebelum keluar jaringan. Lapis utama tetap pengaturan preset di panel Cloudinary (unsigned = siapa pun dengan nama preset bisa upload langsung, lewati guard kode).
+- Koleksi throttle: `guestbook_throttle/{ip|slug}` (lastAt, count, windowStart) — proteksi flood buku tamu, bukan data bisnis.
 
 ### Environment & secrets
 - `FIREBASE_SERVICE_ACCOUNT` — Vercel env (serverless only). Jangan pernah di-import ke client bundle.
@@ -81,8 +87,8 @@ ManageDomain → `addDomain(domain, slug, editKey)` → `api/add-domain.js` (ver
 
 1. `firestore.rules`: `private_keys` read=false; `settings` write=false; `vouchers` write=false; update `invitations` dibatasi diff-keys utk anonim; `status:'paid'` hanya via serverless admin.
 2. Verifikasi kunci/password SELALU server-side di `api/*.js` — jangan pernah memindahkan compare ke browser atau membaca `admin_auth`/`private_keys` dari klien.
-3. `safeUrl()` di `src/lib/utils.js` wajib untuk semua `<a href>` eksternal (blok `javascript:`).
-4. Kapasitas & sanitasi: rsvps/wishes ≤500 item, name ≤100, message ≤500 (`addRsvp`/`addWish`).
+3. `safeUrl()` di `src/lib/utils.js` wajib untuk semua `<a href>` dari database (blok `javascript:`) — 2026-09-14: wishlist `w.url` (Invitation.jsx) ikut dibungkus; sebelumnya render mentah = stored XSS.
+4. Kapasitas & sanitasi: rsvps/wishes ≤500 item, name ≤100, message ≤500 (`api/guestbook.js` + fallback `addRsvp`/`addWish`). Throttle server: 1 kirim/20 dtk, 20/jam per IP+slug (koleksi `guestbook_throttle`).
 5. `adminKey` bukan session — jangan pernah dipakai sebagai pengganti auth Google utk akses dokumen milik user lain via client SDK.
 6. Upload preset Cloudinary: jangan ubah ke signed tanpa rencana (butuh server signing); jangan hardcode secret Cloudinary di client.
 

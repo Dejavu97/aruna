@@ -1,6 +1,7 @@
 # DATA_MODEL.md — Peta Data & Form Aruna Undangan
 
-> **Versi:** 1.0 · **Tanggal:** 2026-09-01 · **Status:** Berdasarkan source aktual
+> **Versi:** 1.1 · **Tanggal:** 2026-09-14 · **Status:** Berdasarkan source aktual
+> Perubahan 2026-09-14: `orderCode` = `AR`+8 char acak (`crypto.randomUUID`, sebelumnya 4 digit); interaksi tamu via `api/guestbook.js` dulu (throttle server, fallback client).
 > **File diinspeksi:** `src/components/WeddingForm.jsx`, `src/lib/api.js`, `src/data/themes.js` (FORM_BASES, getFormMode), `src/invitation/Invitation.jsx`, `src/pages/studio/useStudioState.jsx`, `src/pages/manage/*`, `src/data/dummyData.js`
 > Konvensi: value di sini = yang benar-benar ditulis/dibaca kode, bukan keinginan. `UNKNOWN` = tak dapat dipastikan dari source.
 
@@ -17,7 +18,7 @@ Sumber struktur: `blankInvitation()` (WeddingForm.jsx:20-66) + merge `submit()` 
 | `themeId` | string | prop `themeId` form | id tema statis atau `ct_*` custom |
 | `eventType` | string | `formConfig.eventType` | ⚠ lihat Finding F1 |
 | `formMode` | string | `formConfig.mode` | `wedding/birthday/graduation/aqiqah/corporate/love-letter` |
-| `orderCode` | string | server-generate `AR`+4digit (api.js `createInvitation`) | ditulis saat create |
+| `orderCode` | string | server-generate `AR`+8 char acak (`crypto.randomUUID`, sejak 2026-09-14; sebelumnya 4 digit) | ditulis saat create |
 | `status` | `'unpaid' \| 'paid'` | default `'unpaid'`; `'paid'` HANYA via `api/update-invitation.js` (adminKey) | anti-tampering |
 | `ownerUid`, `customerEmail` | string | Google login pemesan (submit) | boleh kosong (anon) |
 | `customerName`, `customerWhatsapp`, `customerNote` | string | form step 4 | required utk create |
@@ -66,8 +67,9 @@ Sumber struktur: `blankInvitation()` (WeddingForm.jsx:20-66) + merge `submit()` 
 ### 1.5 Interaksi tamu (ditulis lewat API berbatas)
 | Field | Type | Producer | Limit (api.js) |
 |---|---|---|---|
-| `rsvps[]` | `{id,name,status:('hadir'|'tidak'|'ragu'),guests:1-10,note≤500,createdAt}` | `addRsvp` — anonim diizinkan rules (diff-keys only) | 500 item; name≤100 |
-| `wishes[]` | `{id,name,message≤500,createdAt}` | `addWish` | 500 item; name≤100 |
+| `rsvps[]` | `{id,name,status:('hadir'|'tidak'|'ragu'),guests:1-10,note≤500,createdAt}` | `addRsvp` → `api/guestbook.js` dulu (throttle 1/20 dtk, 20/jam per IP+slug; fallback client, rules diff-keys) | 500 item; name≤100 |
+| `wishes[]` | `{id,name,message≤500,createdAt}` | `addWish` → `api/guestbook.js` dulu (throttle sama; fallback client) | 500 item; name≤100 |
+| `wishlist[]` | `{title,price,image,url}` | hanya jika `showWishlist && features.wishlist`; render link via `safeUrl(w.url)` (sejak 2026-09-14, sebelumnya mentah = stored XSS) | — |
 | `guests[]` | string[] nama tamu (whitelist) | Manage → updateInvitation (editKey) | — |
 | `checkIns[]` | UNKNOWN — ditulis via ManageCheckIn; bentuk persisnya belum diaudit baris-per-baris | | |
 
