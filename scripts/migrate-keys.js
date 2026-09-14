@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import path from 'path';
 
 async function migrate() {
   console.log('Starting migration...');

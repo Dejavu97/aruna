@@ -7,7 +7,7 @@ import { copyText, invitationUrl } from '../lib/utils'
 import { formatRupiah, getPackageById, waLink } from '../data/site'
 import AdSlot from '../components/AdSlot'
 import LoveQRCardGenerator from '../components/LoveQRCardGenerator'
-import { CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, AlertTriangle } from 'lucide-react'
 
 export default function Success() {
   const { slug } = useParams()

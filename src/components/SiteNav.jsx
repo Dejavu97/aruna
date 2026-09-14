@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Menu, X, User } from 'lucide-react'
-import { site, waLink } from '../data/site'
+import { Menu, X } from 'lucide-react'
+import { waLink } from '../data/site'
 import { useAuth } from '../context/AuthContext'
 
 const links = [
