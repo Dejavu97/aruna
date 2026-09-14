@@ -1,6 +1,35 @@
 import { Link } from 'react-router-dom'
 
-export default function ThemeCard({ theme }) {
+export default function ThemeCard({ theme, compact = false }) {
+  if (compact) {
+    const to = theme.collection === 'community' ? `/studio/${theme.id}` : `/tema/${theme.id}`
+    return (
+      <Link to={to} className="group block overflow-hidden bg-paper border border-ink/10">
+        <div className="aspect-[3/4] overflow-hidden bg-ink/5 relative">
+          <img
+            src={theme.cover}
+            alt={theme.name}
+            loading="lazy"
+            className={`h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${theme.coverPosition || 'object-center'}`}
+          />
+          {theme.collection === 'community' ? (
+            <span className="absolute left-2 top-2 bg-teal-800 text-ivory px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] font-semibold">
+              Komunitas
+            </span>
+          ) : theme.collection === 'premium' ? (
+            <span className="absolute left-2 top-2 bg-gold-deep text-ivory px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] font-semibold">
+              Premium
+            </span>
+          ) : theme.popular ? (
+            <span className="absolute left-2 top-2 bg-ink/80 px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] text-ivory">
+              Populer
+            </span>
+          ) : null}
+        </div>
+        <p className="truncate px-2 py-2 text-xs font-semibold text-ink">{theme.name}</p>
+      </Link>
+    )
+  }
   return (
     <article className="group flex flex-col">
       <Link to={`/tema/${theme.id}`} className="block relative overflow-hidden">
