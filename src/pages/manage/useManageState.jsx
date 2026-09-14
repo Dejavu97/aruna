@@ -479,6 +479,8 @@ export function useManageState() {
   const couple = item ? `${item.bride?.nick || ''} & ${item.groom?.nick || ''}` : slug
 
   return {
+    backHref,
+    backLabel,
     checkInFilter,
     checkInMap,
     checkInSearch,
@@ -490,16 +492,19 @@ export function useManageState() {
     customDomain,
     customWatermarkText,
     customWatermarkUrl,
+    editKey,
     error,
     exportCheckInCSV,
     exportGuestsCSV,
     filteredCheckInGuests,
     filteredGuests,
+    from,
     globalAnnouncement,
     guestSearch,
     guests,
     guestsWithCheckIn,
     guestsWithRsvp,
+    isAdmin,
     hadirCount,
     handleFileUpload,
     handleQrScanned,
