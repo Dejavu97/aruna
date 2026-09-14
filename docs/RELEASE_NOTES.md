@@ -4,15 +4,6 @@ Dokumen ini mencatat seluruh rincian pembaruan, evolusi fitur, dan penguatan sis
 
 ---
 
-## Katalog Grid HP 2026-09-14
-
-* **Grid 2 kolom default:** kartu compact (cover + nama + badge) tanpa deskripsi/tombol ganda. Ketuk = ke detail. 1 layar muat 4-6 tema.
-* **Toggle Grid/Detail** di header hasil, berlaku semua koleksi. Detail = kartu penuh lama.
-* File: `ThemeCard.jsx` (prop `compact`), `Themes.jsx` (state `view` + grid `grid-cols-2`).
-* Validasi: lint 0 error, build hijau, screenshot lokal grid + detail ok.
-
----
-
 ## Stage 8 Controlled Cleanup 2026-09-14 (audit Bagian 7 → batch kecil)
 
 * **8A komentar:** alias permanen `jawa-biru` + 4 pinjam layout (sweet-seventeen, graduation-honors, aqiqah-al-fatih, corporate-gala) didokumentasikan agar tidak dihapus dikira duplikat.

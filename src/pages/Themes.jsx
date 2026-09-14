@@ -62,7 +62,6 @@ export default function Themes() {
   const [eventTab, setEventTab] = useState(initialCategory === 'semua' ? 'pernikahan' : initialCategory)
   const [subFilter, setSubFilter] = useState('semua')
   const [customThemes, setCustomThemes] = useState([])
-  const [view, setView] = useState('grid') // 'grid' = kotak 2 kolom (HP hemat scroll), 'detail' = kartu penuh lama
 
   // Wedding Vibe Matcher Quiz State
   const [quizOpen, setQuizOpen] = useState(false)
@@ -360,7 +359,7 @@ export default function Themes() {
         </div>
 
         {/* ACTIVE CATEGORY HEADER & RESULT COUNT */}
-        <div className="mt-8 flex flex-wrap justify-between items-center gap-3 border-b border-ink/10 pb-4">
+        <div className="mt-8 flex justify-between items-center border-b border-ink/10 pb-4">
           <div>
             <h2 className="text-2xl font-display font-semibold text-ink capitalize">
               {eventTab === 'pernikahan' && 'Katalog Undangan Pernikahan'}
@@ -393,23 +392,6 @@ export default function Themes() {
               <Palette size={13} /> Racik Desain di Studio
             </Link>
           )}
-          <div className="flex items-center gap-2 border-l border-ink/10 pl-3 ml-1">
-            <span className="text-[10px] uppercase tracking-widest text-stone font-semibold">Tampilan:</span>
-            <button
-              type="button"
-              onClick={() => setView('grid')}
-              className={`px-3 py-1.5 text-xs uppercase tracking-[0.14em] rounded-xs transition-colors ${view === 'grid' ? 'bg-ink text-ivory font-bold' : 'bg-white border border-ink/15 text-stone hover:border-ink/40 hover:text-ink'}`}
-            >
-              Grid
-            </button>
-            <button
-              type="button"
-              onClick={() => setView('detail')}
-              className={`px-3 py-1.5 text-xs uppercase tracking-[0.14em] rounded-xs transition-colors ${view === 'detail' ? 'bg-ink text-ivory font-bold' : 'bg-white border border-ink/15 text-stone hover:border-ink/40 hover:text-ink'}`}
-            >
-              Detail
-            </button>
-          </div>
         </div>
 
         {/* THEMES GRID & COLLECTION SECTIONS */}
@@ -425,9 +407,9 @@ export default function Themes() {
                 <p className="text-xs uppercase tracking-widest text-stone mb-6">
                   Tema hasil rancangan desainer di Aruna Theme Studio.
                 </p>
-                <div className={`grid gap-4 ${view === 'grid' ? 'grid-cols-2 lg:grid-cols-3' : 'gap-6 sm:grid-cols-2 lg:grid-cols-3'}`}>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {communityList.map((t) => (
-                    <ThemeCard key={t.id} theme={t} compact={view === 'grid'} />
+                    <ThemeCard key={t.id} theme={t} />
                   ))}
                 </div>
               </div>
@@ -440,9 +422,9 @@ export default function Themes() {
                 <p className="text-xs uppercase tracking-widest text-stone mb-6">
                   Desain eksklusif dengan animasi khusus &amp; layout unik.
                 </p>
-                <div className={`grid gap-4 ${view === 'grid' ? 'grid-cols-2 lg:grid-cols-3' : 'gap-6 sm:grid-cols-2 lg:grid-cols-3'}`}>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {premiumList.map((t) => (
-                    <ThemeCard key={t.id} theme={t} compact={view === 'grid'} />
+                    <ThemeCard key={t.id} theme={t} />
                   ))}
                 </div>
               </div>
@@ -457,21 +439,19 @@ export default function Themes() {
                 <p className="text-xs uppercase tracking-widest text-stone/70 mb-6">
                   Tema warisan standar Aruna.
                 </p>
-                <div className={`grid gap-4 ${view === 'grid' ? 'grid-cols-2 lg:grid-cols-3' : 'gap-6 sm:grid-cols-2 lg:grid-cols-3'}`}>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {classicList.map((t) => (
-                    <ThemeCard key={t.id} theme={t} compact={view === 'grid'} />
+                    <ThemeCard key={t.id} theme={t} />
                   ))}
                 </div>
               </div>
             )}
           </div>
         ) : list.length > 0 ? (
-          <div>
-            <div className={`mt-0 grid gap-4 ${view === 'grid' ? 'grid-cols-2 lg:grid-cols-3' : 'gap-6 sm:grid-cols-2 lg:grid-cols-3'}`}>
-              {list.map((t) => (
-                <ThemeCard key={t.id} theme={t} compact={view === 'grid'} />
-              ))}
-            </div>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {list.map((t) => (
+              <ThemeCard key={t.id} theme={t} />
+            ))}
           </div>
         ) : (
           <div className="mt-12 text-center py-16 border border-dashed border-ink/15 p-8 rounded-sm bg-white/50">
