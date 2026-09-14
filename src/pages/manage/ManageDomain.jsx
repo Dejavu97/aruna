@@ -3,11 +3,13 @@ import { copyText } from '../../lib/utils'
 
 /** ManageDomain — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageDomain({ customDomain,
+  editKey,
   error,
   item,
   setCustomDomain,
   setError,
   setItem,
+  slug,
   text  }) {
   return (
 

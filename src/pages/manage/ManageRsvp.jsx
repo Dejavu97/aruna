@@ -3,6 +3,7 @@ import { copyText } from '../../lib/utils'
 /** ManageRsvp — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageRsvp({ guests,
   item,
+  slug,
   text  }) {
   return (
 

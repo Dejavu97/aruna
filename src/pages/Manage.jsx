@@ -318,6 +318,7 @@ export default function Manage() {
           {tab === 'love_qr' && (
             <ManageLoveQr
             item={item}
+            slug={slug}
             />
           )}
           {tab === 'ringkas' && (
@@ -325,6 +326,7 @@ export default function Manage() {
             copied={copied}
             customWatermarkText={customWatermarkText}
             customWatermarkUrl={customWatermarkUrl}
+            editKey={editKey}
             guests={guests}
             handleSaveWatermark={handleSaveWatermark}
             item={item}
@@ -335,6 +337,7 @@ export default function Manage() {
             setItem={setItem}
             setShowStoryModal={setShowStoryModal}
             setWatermarkMode={setWatermarkMode}
+            slug={slug}
             stats={stats}
             tab={tab}
             text={text}
@@ -345,6 +348,7 @@ export default function Manage() {
             <ManageRsvp
             guests={guests}
             item={item}
+            slug={slug}
             text={text}
             />
           )}
@@ -382,11 +386,13 @@ export default function Manage() {
           {tab === 'domain' && (
             <ManageDomain
             customDomain={customDomain}
+            editKey={editKey}
             error={error}
             item={item}
             setCustomDomain={setCustomDomain}
             setError={setError}
             setItem={setItem}
+            slug={slug}
             text={text}
             />
           )}
@@ -418,6 +424,7 @@ export default function Manage() {
             setText={setText}
             setWaReminderTemplate={setWaReminderTemplate}
             setWaTemplate={setWaTemplate}
+            slug={slug}
             statusFilter={statusFilter}
             text={text}
             tidakCount={tidakCount}
