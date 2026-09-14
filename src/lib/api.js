@@ -254,6 +254,7 @@ export async function createInvitation(payload) {
     orderCode,
     status: 'unpaid',
     createdAt: Date.now(),
+    schemaVersion: 1, // Stage 8 Batch 3: penanda skema dokumen (aditif, tanpa migrasi)
     rsvps: [],
     wishes: [],
     guests: []
@@ -297,6 +298,7 @@ export async function cloneInvitation(sourceSlug, newSlug) {
     orderCode,
     status: 'unpaid',
     createdAt: Date.now(),
+    schemaVersion: 1, // Stage 8 Batch 3: samakan penanda skema pada hasil clone
     views: 0,
     rsvps: [],
     wishes: [],
