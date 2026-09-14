@@ -365,7 +365,7 @@ export const themes = [
     description: 'Tema pesta perayaan ulang tahun ke-17 yang ceria, modis, dan mewah dengan aksen mawar emas dan kilau lampu pesta.',
     cover: '/assets/local/teenager_party_dress.jpg',
     coverPosition: 'object-center',
-    layout: 'attari',
+    layout: 'attari', // PINJAM komponen AttariInvitation (ubah komponen = 2 tema ikut berubah)
     opener: 'The Sweet 17th Celebration of',
     fonts: {
       display: '"Playfair Display", serif',
@@ -392,7 +392,7 @@ export const themes = [
     description: 'Tema perayaan kelulusan dan wisuda bernuansa royal navy dan emas berwibawa, menghormati perjuangan meraih gelar.',
     cover: '/assets/local/graduate_toga.jpg',
     coverPosition: 'object-center',
-    layout: 'wedding-gazette',
+    layout: 'wedding-gazette', // PINJAM komponen ThemeWeddingGazette (ubah komponen = 2 tema ikut berubah)
     opener: 'Graduation Ceremony & Celebration of',
     fonts: {
       display: '"Cinzel", serif',
@@ -419,7 +419,7 @@ export const themes = [
     description: 'Tema tasyakuran kelahiran dan aqiqah buah hati dengan warna sage pastel dan kaligrafi doa keberkahan yang tenang.',
     cover: '/assets/local/baby_sleeping.jpg',
     coverPosition: 'object-center',
-    layout: 'garden',
+    layout: 'garden', // PINJAM layout garden (ubah render garden = tema ini ikut berubah)
     opener: 'Tasyakuran Kelahiran & Aqiqah',
     fonts: {
       display: '"Cormorant Garamond", serif',
@@ -446,7 +446,7 @@ export const themes = [
     description: 'Undangan resmi korporat untuk perayaan tahunan, seminar teknologi, dan peluncuran produk dengan kartu akses VIP.',
     cover: '/assets/local/corporate_executive.jpg',
     coverPosition: 'object-center',
-    layout: 'wedding-gazette',
+    layout: 'wedding-gazette', // PINJAM komponen ThemeWeddingGazette (ubah komponen = 2 tema ikut berubah)
     opener: 'Official Invitation to Annual Gala Dinner',
     fonts: {
       display: '"Syne", sans-serif',

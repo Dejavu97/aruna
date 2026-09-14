@@ -51,7 +51,8 @@ registerThemeComponent('art-jawa-biru', ThemeArtJawaBiru)
 registerThemeComponent('attari', AttariInvitation)
 registerThemeComponent('boarding', BoardingInvitation)
 registerThemeComponent('wedding-gazette', ThemeWeddingGazette)
-// Alias legacy slug lama 'jawa-biru'
+// Alias permanen slug lama 'jawa-biru' → komponen sama dengan 'art-jawa-biru'.
+// JANGAN hapus dikira duplikat: undangan lama ber-slug jawa-biru masih memakainya.
 registerThemeComponent('jawa-biru', ThemeArtJawaBiru)
 
 export default function Invitation({ data, guest = '', preview = false }) {
