@@ -407,7 +407,7 @@ export default function Themes() {
                 <p className="text-xs uppercase tracking-widest text-stone mb-6">
                   Tema hasil rancangan desainer di Aruna Theme Studio.
                 </p>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                   {communityList.map((t) => (
                     <ThemeCard key={t.id} theme={t} />
                   ))}
@@ -422,7 +422,7 @@ export default function Themes() {
                 <p className="text-xs uppercase tracking-widest text-stone mb-6">
                   Desain eksklusif dengan animasi khusus &amp; layout unik.
                 </p>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                   {premiumList.map((t) => (
                     <ThemeCard key={t.id} theme={t} />
                   ))}
@@ -439,7 +439,7 @@ export default function Themes() {
                 <p className="text-xs uppercase tracking-widest text-stone/70 mb-6">
                   Tema warisan standar Aruna.
                 </p>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                   {classicList.map((t) => (
                     <ThemeCard key={t.id} theme={t} />
                   ))}
@@ -448,7 +448,7 @@ export default function Themes() {
             )}
           </div>
         ) : list.length > 0 ? (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {list.map((t) => (
               <ThemeCard key={t.id} theme={t} />
             ))}

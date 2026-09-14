@@ -12,9 +12,9 @@ export default function ThemeCard({ theme }) {
             className={`h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${theme.coverPosition || 'object-center'}`}
           />
         </div>
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-5 text-ivory translate-y-2 opacity-90 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-3 text-ivory translate-y-2 opacity-90 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 sm:p-5">
           <p className="text-[10px] uppercase tracking-[0.25em] text-ivory/80">{theme.tag}</p>
-          <h3 className="mt-1 font-display text-3xl">{theme.name}</h3>
+          <h3 className="mt-1 font-display text-xl sm:text-3xl">{theme.name}</h3>
         </div>
         {theme.collection === 'community' ? (
           <span className="absolute left-4 top-4 bg-teal-800 text-ivory px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold shadow-md backdrop-blur-md">
