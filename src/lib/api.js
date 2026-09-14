@@ -212,6 +212,16 @@ async function adminApiCall(body) {
 }
 
 export async function uploadFile(file) {
+  // Batas kode (lapis pertama; lapis utama tetap di panel preset Cloudinary):
+  // hanya gambar & audio, maks 8MB. Menolak executable/video/blob aneh
+  // sebelum keluar ke jaringan — cegah bakar kuota via console.
+  const okType = /^(image\/(png|jpe?g|gif|webp|svg\+xml)|audio\/(mpeg|mp3|wav|ogg|x-wav))$/i;
+  if (!okType.test(file?.type || '')) {
+    throw new Error('Tipe file tidak didukung (hanya gambar & audio).');
+  }
+  if ((file?.size || 0) > 8 * 1024 * 1024) {
+    throw new Error('Ukuran file terlalu besar (maksimal 8MB).');
+  }
   const formData = new FormData()
   formData.append('file', file)
   formData.append('upload_preset', 'arunawedd')
@@ -231,7 +241,9 @@ export async function uploadFile(file) {
 
 export async function createInvitation(payload) {
   const editKey = generateKey()
-  const orderCode = 'AR' + Math.floor(1000 + Math.random() * 9000)
+  // Kode order 8 char acak (36^8 ≈ 2,8 triliun) — 4 digit lama (~9000 ruang)
+  // mudah ditebak/brute-force. Bukan kunci auth, tapi jangan murahan.
+  const orderCode = 'AR' + crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
   const docRef = doc(db, 'invitations', payload.slug)
   const docSnap = await getDoc(docRef)
   if (docSnap.exists()) {
@@ -277,7 +289,7 @@ export async function cloneInvitation(sourceSlug, newSlug) {
 
   const sourceData = sourceSnap.data()
   const editKey = generateKey()
-  const orderCode = 'AR' + Math.floor(1000 + Math.random() * 9000)
+  const orderCode = 'AR' + crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
 
   const clonedData = {
     ...sourceData,
@@ -452,6 +464,23 @@ export async function deleteInvitation(slug) {
 }
 
 export async function addRsvp(slug, payload) {
+  // Jalur utama: server throttle (20 detik/kirim, 20/jam per IP+slug).
+  // Bila API down (dev/offline), fallback tulis langsung — rules Kasus B
+  // tetap membatasi field & cap 500 entri.
+  try {
+    const res = await fetch('/api/guestbook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, kind: 'rsvp', ...payload }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.success) return { success: true };
+    if (res.status === 429 || data.error) throw new Error(data.error || 'Gagal mengirim RSVP.');
+  } catch (err) {
+    if (/Tunggu|Batas|maksimal|tidak ditemukan/i.test(err.message)) throw err;
+    console.warn('guestbook API fallback:', err);
+  }
+
   const cleanName = String(payload?.name || '').trim().slice(0, 100)
   if (!cleanName) throw new Error('Nama wajib diisi.')
 
@@ -480,6 +509,21 @@ export async function addRsvp(slug, payload) {
 }
 
 export async function addWish(slug, payload) {
+  // Jalur utama: server throttle — sama seperti addRsvp di atas.
+  try {
+    const res = await fetch('/api/guestbook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, kind: 'wish', ...payload }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.success) return { success: true };
+    if (res.status === 429 || data.error) throw new Error(data.error || 'Gagal mengirim ucapan.');
+  } catch (err) {
+    if (/Tunggu|Batas|maksimal|tidak ditemukan|wajib diisi/i.test(err.message)) throw err;
+    console.warn('guestbook API fallback:', err);
+  }
+
   const cleanName = String(payload?.name || '').trim().slice(0, 100)
   const cleanMsg = String(payload?.message || payload?.text || '').trim().slice(0, 500)
   if (!cleanName || !cleanMsg) throw new Error('Nama dan ucapan doa wajib diisi.')
