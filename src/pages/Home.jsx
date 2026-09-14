@@ -119,7 +119,7 @@ function Hero() {
     <section className="relative overflow-hidden">
       <div className="relative mx-auto max-w-6xl px-5 pt-16 pb-10">
         {/* Clean Interactive Category Capsule Bar */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex flex-wrap items-center gap-1.5 pb-2 sm:flex-nowrap sm:overflow-x-auto sm:scrollbar-none">
           <span className="text-[10px] uppercase tracking-widest text-stone/80 font-semibold mr-2 shrink-0">
             Kategori Acara:
           </span>
