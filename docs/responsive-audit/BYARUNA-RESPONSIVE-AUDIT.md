@@ -9,7 +9,7 @@ Aturan: mobile-only via breakpoint (`sm:` = 640px). Desktop 1366px wajib identik
 | Batch | Scope | Status | Commit |
 |---|---|---|---|
 | A | Home category capsule | PASS 2026-09-14 | `67d335b` |
-| B | Home hero badge tracking | OPEN (temuan terkonfirmasi, belum perbaiki) | — |
+| B | Home hero badge tracking | PASS 2026-09-14 | lihat batch-b |
 | C | Katalog grid HP 1/baris | OPEN (temuan terkonfirmasi, belum perbaiki) | — |
 | D | Studio header 390 | OPEN (temuan terkonfirmasi, belum perbaiki) | — |
 

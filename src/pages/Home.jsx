@@ -142,7 +142,7 @@ function Hero() {
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-24 md:pb-32 text-ink md:grid-cols-[1.2fr_0.8fr]">
         <div className="animate-in fade-in transition-all duration-300">
-          <p className="text-xs uppercase tracking-[0.32em] text-gold-deep font-semibold">
+          <p className="text-xs uppercase tracking-[0.18em] break-words text-gold-deep font-semibold sm:tracking-[0.32em]">
             {currentHero.badge}
           </p>
           <h1 className="mt-4 font-display text-4xl leading-[1.05] sm:text-5xl md:text-6xl min-h-[120px] md:min-h-[160px]">
