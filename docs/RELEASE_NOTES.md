@@ -4,6 +4,18 @@ Dokumen ini mencatat seluruh rincian pembaruan, evolusi fitur, dan penguatan sis
 
 ---
 
+## Stage 8 Controlled Cleanup 2026-09-14 (audit Bagian 7 → batch kecil)
+
+* **8A komentar:** alias permanen `jawa-biru` + 4 pinjam layout (sweet-seventeen, graduation-honors, aqiqah-al-fatih, corporate-gala) didokumentasikan agar tidak dihapus dikira duplikat.
+* **8B warn fallback:** `Invitation.jsx` tulis 1 `console.warn` per themeId tak dikenal, render tetap sama (anti-spam via Set).
+* **8D password:** min klien 4 → 8 char, samakan server `api/admin-login.js`.
+* **8E title:** `memory-capsule`/`love-letter` tampil "Kartu Ucapan", bukan "Undangan Pernikahan".
+* **8C schemaVersion:** field aditif `schemaVersion: 1` di create + clone invitation, tanpa migrasi.
+* **8F import mati:** 6 import dihapus di 4 file kecil (Success, SiteNav, themeRegistry, migrate-keys). Warning 360 → 354.
+* Validasi: lint 0 error, build hijau, smoke Playwright home/katalog/studio + order 5 PASS.
+
+---
+
 ## Patch Keamanan 2026-09-14 (sisi pelanggan)
 
 * **Link wishlist disaring:** `w.url` di `Invitation.jsx` wajib lewat `safeUrl()` — sebelumnya render mentah (stored XSS).
