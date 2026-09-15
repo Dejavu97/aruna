@@ -4,7 +4,7 @@ import { Lock, Shield } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import InvitationForm, { blankInvitation } from '../components/WeddingForm'
-import { fetchInvitation, fetchCustomThemes, getAdminKey, getEditKey, rememberEditKey, updateInvitation } from '../lib/api'
+import { fetchInvitation, fetchCustomThemes, getAdminKey, getEditKey, updateInvitation } from '../lib/api'
 import { isEventEditLocked, formatLongDate } from '../lib/utils'
 
 export default function Edit() {
@@ -38,7 +38,6 @@ export default function Edit() {
         const data = await fetchInvitation(slug, key)
         if (live) {
           setItem(data)
-          if (data.editKey) rememberEditKey(slug, data.editKey)
         }
       } catch (err) {
         if (live) {

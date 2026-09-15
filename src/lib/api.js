@@ -360,7 +360,7 @@ export async function fetchAdminInvitations() {
     return {
       slug: d.id,
       ...data,
-      editKey: data.editKey || getEditKey(d.id) || '',
+      editKey: getEditKey(d.id) || '',
     }
   })
 }
