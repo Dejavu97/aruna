@@ -5,7 +5,7 @@ import {
   Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet,
   Sliders, Shield, Globe, Lock, Play, Pause, ChevronRight, Copy, MapPin, Calendar, Heart, Gift, Users, CalendarDays, Images, Video, Film, Trash2, Edit3, Wand2, RotateCcw, Disc, Layers,
   ArrowUp, ArrowDown, EyeOff, GripVertical, Activity, Flame, Wind, Shuffle, Maximize2, FileCode, CheckCircle2, SlidersHorizontal, Camera, Bookmark, Plus,
-  Mic, Volume2, Share2, MessageCircle, Crown, Shirt, HelpCircle, FolderUp, Sun, Moon, Download, CornerDownRight, Sparkle,
+  Mic, Volume2, Share2, MessageCircle, Shirt, HelpCircle, FolderUp, Sun, Moon, Download, CornerDownRight,
   UserCheck
 } from 'lucide-react'
 import SiteNav from '../../components/SiteNav'
@@ -14,9 +14,10 @@ import AtmosphereParticles from '../../components/AtmosphereParticles'
 import ImageAdjustModal from '../../components/ImageAdjustModal'
 import { createCustomTheme, fetchCustomTheme, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
-import { getDummyWeddingData } from '../../data/dummyData'
 import { sanitizeCustomCss } from '../../lib/sanitizeCss'
 import { useStudioHistory, snapshotVisual } from './useStudioHistory.jsx'
+import { renderMonogram as renderMonogramPure, renderSectionDivider as renderSectionDividerPure } from './StudioRenderHelpers.jsx'
+import { getStudioPreviewData } from './studioPreviewData.js'
 import { eventTypeConfigs, themePresets, photoFilterMap, displayFontOptions, scriptFontOptions, bodyFontOptions, initialSectionList } from './studioConfig.js'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -793,74 +794,14 @@ export function useStudioState() {
     return `rgba(${r}, ${g}, ${b}, ${a})`
   }
 
-  // Preview Data — derive dari dummy kontrak form per eventType (single source:
-  // src/data/dummyData.js), bukan objek statis wedding-only. Story/banks/events/
-  // gallery/wishes mengikuti shape form asli; field yang tak ada di dummy
-  // non-wedding diisi default aman agar guard Invitation ter-preview.
-  // Normalisasi: story body (Invitation baca s.body||s.text), wishes message+id.
-  const previewData = useMemo(() => {
-    const seedByEvent = {
-      wedding: 'adat-jawa',
-      birthday: 'birthday-sweet17',
-      graduation: 'graduation-wisuda',
-      aqiqah: 'aqiqah-bayi',
-      corporate: 'corporate-gala',
-    }
-    const base = getDummyWeddingData(seedByEvent[eventType] || 'adat-jawa')
-    const story = (base.story || []).map((s) => ({
-      year: s.year || '',
-      title: s.title || '',
-      body: s.body || s.text || '',
-    }))
-    const wishes = (base.wishes || [
-      { id: 'w_1', name: 'Keluarga Besar Subardjo', message: 'Selamat! Semoga menjadi keluarga yang sakinah mawaddah warahmah.' },
-      { id: 'w_2', name: 'Andi & Rina', message: 'Semoga lancar sampai hari H ya.' },
-    ]).map((w, i) => ({
-      id: w.id || `w_${i + 1}`,
-      name: w.name || 'Tamu Undangan',
-      message: w.message ?? w.msg ?? '',
-    }))
-    return {
-      ...base,
-      bride: {
-        nick: base.bride?.nick || activeEventConfig.heroNames,
-        full: base.bride?.full || '',
-        parents: base.bride?.parents || '',
-        photo: base.bride?.photo || '',
-        ig: base.bride?.ig || '',
-      },
-      groom: {
-        nick: base.groom?.nick || '',
-        full: base.groom?.full || '',
-        parents: base.groom?.parents || '',
-        photo: base.groom?.photo || '',
-        ig: base.groom?.ig || '',
-      },
-      date: base.date || new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10),
-      slug: base.slug || 'studio-preview',
-      quote: base.quote ?? activeEventConfig.quote,
-      quoteSource: base.quoteSource ?? activeEventConfig.quoteSource,
-      story,
-      events: base.events || [],
-      gallery: (base.gallery?.length ? base.gallery : [
-        '/assets/local/couple_laughing_1.jpg',
-        '/assets/local/attari_cover.jpg',
-        '/assets/local/couple_garden.jpg',
-        '/assets/local/couple_classical.jpg',
-      ]),
-      wishes,
-      banks: base.banks || [],
-      qris: base.qris || '',
-      wishlist: base.wishlist || [],
-      dressColors: base.dressColors ?? '#C9A36A,#F4EFE6,#2A241C',
-      dressNote: base.dressNote ?? '',
-      liveUrl: base.liveUrl ?? '',
-      liveDate: base.liveDate ?? base.date ?? '',
-      liveTime: base.liveTime ?? '09:00',
-      liveNote: base.liveNote ?? '',
-      giftAddress: base.giftAddress ?? '',
-    }
-  }, [eventType, activeEventConfig.heroNames, activeEventConfig.quote, activeEventConfig.quoteSource])
+  // Preview Data — derive murni via studioPreviewData.js (Stage 10A2);
+  // useMemo dipertahankan sebagai thin wrapper agar lifecycle tetap di hook.
+  const previewData = useMemo(() => getStudioPreviewData(
+    eventType,
+    activeEventConfig.heroNames,
+    activeEventConfig.quote,
+    activeEventConfig.quoteSource,
+  ), [eventType, activeEventConfig.heroNames, activeEventConfig.quote, activeEventConfig.quoteSource])
 
   // Active Fonts
   const activeDisplayFont = fonts.customFontName
@@ -903,98 +844,15 @@ export function useStudioState() {
 
   const activePhotoFilterCss = photoFilterMap[photoColorFilter]?.css || 'none'
 
-  // Monogram Luxury Crest Renderer
+  // Monogram Luxury Crest Renderer — thin wrapper (Stage 10A2) agar signature
+  // lama tetap identik; implementasi murni di StudioRenderHelpers.jsx.
   function renderMonogram(style, initials, color = colors.accent) {
-    if (style === 'royal_laurel') {
-      return (
-        <div className="relative inline-flex items-center justify-center p-3 border-2 rounded-full shadow-xs" style={{ borderColor: color }}>
-          <span className="text-xl font-display font-bold italic tracking-widest px-2" style={{ color, fontFamily: activeDisplayFont }}>
-            {initials}
-          </span>
-        </div>
-      )
-    }
-    if (style === 'diamond_floral') {
-      return (
-        <div className="relative inline-flex items-center justify-center w-14 h-14 border-2 rotate-45 my-2" style={{ borderColor: color }}>
-          <span className="text-base font-display font-bold -rotate-45" style={{ color, fontFamily: activeDisplayFont }}>
-            {initials}
-          </span>
-        </div>
-      )
-    }
-    if (style === 'victorian_crest') {
-      return (
-        <div className="relative inline-flex flex-col items-center justify-center p-2.5 border-t-2 border-b-2" style={{ borderColor: color }}>
-          <span className="text-[8px] uppercase tracking-[0.3em] font-semibold" style={{ color }}>MONOGRAM</span>
-          <span className="text-xl font-display italic font-bold my-0.5" style={{ color, fontFamily: activeScriptFont }}>
-            {initials}
-          </span>
-        </div>
-      )
-    }
-    if (style === 'minimal_hex') {
-      return (
-        <div className="relative inline-flex items-center justify-center px-4 py-1.5 border" style={{ borderColor: color }}>
-          <span className="text-xs uppercase tracking-[0.25em] font-mono font-bold" style={{ color }}>
-            {initials}
-          </span>
-        </div>
-      )
-    }
-    return null
+    return renderMonogramPure(style, initials, color, activeDisplayFont, activeScriptFont)
   }
 
-  // Section Divider Renderer
+  // Section Divider Renderer — thin wrapper (Stage 10A2).
   function renderSectionDivider(shape) {
-    if (shape === 'arch') {
-      return (
-        <div className="w-full flex justify-center my-3 opacity-70">
-          <svg width="120" height="20" viewBox="0 0 120 20" fill="none">
-            <path d="M0 20 Q60 0 120 20" stroke={accentBorderColor} strokeWidth="1.5" fill="none" />
-          </svg>
-        </div>
-      )
-    }
-    if (shape === 'wave') {
-      return (
-        <div className="w-full flex justify-center my-3 opacity-70">
-          <svg width="140" height="16" viewBox="0 0 140 16" fill="none">
-            <path d="M0 8 Q35 0 70 8 T140 8" stroke={accentBorderColor} strokeWidth="1.5" fill="none" />
-          </svg>
-        </div>
-      )
-    }
-    if (shape === 'crown') {
-      return (
-        <div className="w-full flex items-center justify-center gap-2 my-3 opacity-80">
-          <div className="w-12 h-[1px]" style={{ background: accentBorderColor }} />
-          <Crown size={12} style={{ color: activeColorPalette.accent }} />
-          <div className="w-12 h-[1px]" style={{ background: accentBorderColor }} />
-        </div>
-      )
-    }
-    if (shape === 'slant') {
-      return (
-        <div className="w-full flex justify-center my-3 opacity-70">
-          <svg width="160" height="12" viewBox="0 0 160 12" fill="none">
-            <line x1="0" y1="12" x2="160" y2="0" stroke={accentBorderColor} strokeWidth="1.2" />
-          </svg>
-        </div>
-      )
-    }
-    if (shape === 'botanical') {
-      return (
-        <div className="w-full flex items-center justify-center gap-2 my-3 opacity-80">
-          <div className="w-10 h-[1px]" style={{ background: accentBorderColor }} />
-          <Sparkle size={10} style={{ color: activeColorPalette.accent }} />
-          <span className="text-[9px] uppercase tracking-widest" style={{ color: activeColorPalette.accent }}>FLORA</span>
-          <Sparkle size={10} style={{ color: activeColorPalette.accent }} />
-          <div className="w-10 h-[1px]" style={{ background: accentBorderColor }} />
-        </div>
-      )
-    }
-    return <div className="w-12 h-[1.5px] mx-auto my-4" style={{ background: accentBorderColor }} />
+    return renderSectionDividerPure(shape, accentBorderColor, activeColorPalette.accent)
   }
 
   const proposalLinkUrl = `${window.location.origin}/studio?from=${starterId || 'custom'}`
