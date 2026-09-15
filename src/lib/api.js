@@ -1,5 +1,5 @@
 import { db, auth } from './firebase'
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy, where, limit } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy, where } from 'firebase/firestore'
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
 
 const ADMIN_KEY = 'aruna.adminKey'
@@ -1000,42 +1000,5 @@ export async function fetchUserInvitations(uid, email) {
   }
 }
 
-export async function fetchPublicTestimonials() {
-  try {
-    const q = query(collection(db, 'testimonials'), orderBy('createdAt', 'desc'), limit(15))
-    const snap = await getDocs(q)
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
-  } catch (err) {
-    console.warn('fetchPublicTestimonials error:', err)
-    try {
-      const local = localStorage.getItem('aruna_public_testimonials')
-      if (local) return JSON.parse(local)
-    } catch {}
-    return []
-  }
-}
-
-export async function submitPublicTestimonial(data) {
-  const item = {
-    ...data,
-    stars: Number(data.stars) || 5,
-    createdAt: Date.now(),
-  }
-
-  try {
-    const docRef = doc(collection(db, 'testimonials'))
-    await setDoc(docRef, item)
-    item.id = docRef.id
-  } catch (err) {
-    console.warn('submitPublicTestimonial error:', err)
-    item.id = 'local_' + Date.now()
-  }
-
-  try {
-    const local = JSON.parse(localStorage.getItem('aruna_public_testimonials') || '[]')
-    localStorage.setItem('aruna_public_testimonials', JSON.stringify([item, ...local]))
-  } catch {}
-
-  return item
-}
+export { fetchPublicTestimonials, submitPublicTestimonial } from './api-testimonials'
 
