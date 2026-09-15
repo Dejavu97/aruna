@@ -20,7 +20,7 @@ import {
   Upload,
   Wand2,
 } from 'lucide-react'
-import { eventTypeConfigs, themePresets, photoFilterMap, displayFontOptions, scriptFontOptions, bodyFontOptions } from './useStudioState.jsx'
+import { eventTypeConfigs, themePresets, photoFilterMap, displayFontOptions, scriptFontOptions, bodyFontOptions } from './studioConfig.js'
 import { motion, AnimatePresence } from 'framer-motion'
 import { copyText } from '../../lib/utils'
 import StudioOrnamentPanel from './StudioOrnamentPanel'

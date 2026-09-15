@@ -1,5 +1,5 @@
 import { Crown, Sparkle } from 'lucide-react'
-import { eventTypeConfigs, photoFilterMap } from './useStudioState.jsx'
+import { eventTypeConfigs, photoFilterMap } from './studioConfig.js'
 
 /** Derive full StudioPreview props dari snapshot visual (untuk frame banding A/B). */
 export function hexToRgba(hex, alphaPercent = 100) {
