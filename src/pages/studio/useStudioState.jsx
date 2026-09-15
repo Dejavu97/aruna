@@ -12,9 +12,9 @@ import SiteNav from '../../components/SiteNav'
 import SiteFooter from '../../components/SiteFooter'
 import AtmosphereParticles from '../../components/AtmosphereParticles'
 import ImageAdjustModal from '../../components/ImageAdjustModal'
-import { createCustomTheme, fetchCustomTheme } from '../../lib/api'
+import { fetchCustomTheme } from '../../lib/api'
+import { useStudioSave } from './useStudioSave.js'
 import { themes } from '../../data/themes'
-import { sanitizeCustomCss } from '../../lib/sanitizeCss'
 import { useStudioHistory, snapshotVisual } from './useStudioHistory.jsx'
 import { useStudioAssets } from './useStudioAssets.js'
 import { renderMonogram as renderMonogramPure, renderSectionDivider as renderSectionDividerPure } from './StudioRenderHelpers.jsx'
@@ -616,75 +616,48 @@ export function useStudioState() {
     img.src = customAssets.coverImgUrl || previewData.gallery[0]
   }
 
-  async function handleSaveTheme() {
-    if (!themeName.trim()) {
-      setError('Harap masukkan nama tema Anda.')
-      return
-    }
-    setSaving(true)
-    setError('')
-    try {
-      const themePayload = {
-        name: themeName,
-        creator: creatorName.trim() ? creatorName : 'Komunitas ByAruna',
-        description: themeDesc,
-        collection: 'community',
-        isPublic,
-        sections,
-        colors,
-        twilightColors,
-        opacities,
-        fonts: {
-          ...fonts,
-          display: fonts.customGoogleFontDisplay?.trim() ? `"${fonts.customGoogleFontDisplay.trim()}", serif` : fonts.display,
-          script: fonts.customGoogleFontScript?.trim() ? `"${fonts.customGoogleFontScript.trim()}", cursive` : fonts.script,
-          body: fonts.customGoogleFontBody?.trim() ? `"${fonts.customGoogleFontBody.trim()}", sans-serif` : fonts.body,
-        },
-        monogramStyle,
-        monogramInitials,
-        dresscodeSettings,
-        wishesStyle,
-        dividerShape,
-        cardStyler,
-        guestTouchFx,
-        livingMotion,
-        photoColorFilter,
-        galleryLayout,
-        coverStyle,
-        openingAnimation,
-        ornamentStyle,
-        layoutStyle,
-        particleEffect,
-        coupleTransition,
-        ornamentTransition,
-        panelTransition,
-        customAssets,
-        ornaments,
-        sectionAnims,
-        backgroundFx,
-        cardFx,
-        customCss: sanitizeCustomCss(customCss),
-        layout: baseLayout,
-        blankCanvas: blankCanvas.enabled ? blankCanvas : null,
-        cover: customAssets.coverImgUrl || '/themes/emas-senja.jpg',
-        tags: ['komunitas', 'custom', isPublic ? 'publik' : 'privat'],
-        popular: false,
-      }
-
-      const res = await createCustomTheme(themePayload)
-      setSavedThemeId(res.id)
-
-      try {
-        const savedList = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')
-        const updatedList = [res, ...savedList.filter((item) => item.id !== res.id)]
-        localStorage.setItem('aruna_custom_themes', JSON.stringify(updatedList))
-      } catch {}
-    } catch (err) {
-      setError(err.message || 'Gagal menyimpan tema.')
-    } finally {
-      setSaving(false)
-    }
-  }
+  // Save Studio (Stage 10A4) — payload + API milik useStudioSave;
+  // thin wrapper agar return contract identik. Agency preset tetap di hook ini.
+  const { handleSaveTheme } = useStudioSave({
+    themeName,
+    creatorName,
+    themeDesc,
+    isPublic,
+    sections,
+    colors,
+    twilightColors,
+    opacities,
+    fonts,
+    monogramStyle,
+    monogramInitials,
+    dresscodeSettings,
+    wishesStyle,
+    dividerShape,
+    cardStyler,
+    guestTouchFx,
+    livingMotion,
+    photoColorFilter,
+    galleryLayout,
+    coverStyle,
+    openingAnimation,
+    ornamentStyle,
+    layoutStyle,
+    particleEffect,
+    coupleTransition,
+    ornamentTransition,
+    panelTransition,
+    customAssets,
+    ornaments,
+    sectionAnims,
+    backgroundFx,
+    cardFx,
+    customCss,
+    baseLayout,
+    blankCanvas,
+    setError,
+    setSaving,
+    setSavedThemeId,
+  })
 
   // Convert Hex to RGBA
   function hexToRgba(hex, alphaPercent = 100) {
