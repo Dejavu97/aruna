@@ -111,6 +111,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
     }, 2500)
   }
 
+  const locked = data.demo || preview
   const handleRsvpSubmit = async (e) => {
     e.preventDefault()
     if (!rsvpState.name.trim()) return
@@ -142,7 +143,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
       if (!data.demo && !preview && data.slug) {
         await addWish(data.slug, newWish)
       }
-      setWishes([newWish, ...wishes])
+      setWishes((prev) => [newWish, ...prev])
       setWishState({ name: guest || '', message: '', status: 'Hadir' })
       setWishSuccess(true)
       setTimeout(() => setWishSuccess(false), 4000)
@@ -756,7 +757,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                   </div>
                 </div>
 
-                <button type="submit" disabled={submittingRsvp} className="gz-submit-btn">
+                <button type="submit" disabled={submittingRsvp || locked} className="gz-submit-btn">
                   {submittingRsvp ? 'MENGIRIM TELEGRAM...' : 'KIRIM KONFIRMASI RSVP'}
                 </button>
               </form>
@@ -795,7 +796,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
                   />
                 </div>
 
-                <button type="submit" disabled={submittingWish} className="gz-submit-btn">
+                <button type="submit" disabled={submittingWish || locked} className="gz-submit-btn">
                   <Send size={13} className="inline mr-1" /> {submittingWish ? 'MEMPROSES...' : 'KIRIM DOA RESTU'}
                 </button>
               </form>

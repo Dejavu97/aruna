@@ -77,13 +77,13 @@ export default function ThemeModernEditorialLetter({ data, guest = '', preview =
         name: replyName || 'Dari orang tersayang',
         message: replyText.trim(),
       })
-      setWishes([
+      setWishes((prev) => [
         {
           name: replyName || 'Dari orang tersayang',
           message: replyText.trim(),
           createdAt: Date.now(),
         },
-        ...wishes,
+        ...prev,
       ])
       setReplySent(true)
       setReplyText('')

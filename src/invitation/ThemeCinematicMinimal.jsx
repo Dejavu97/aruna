@@ -58,7 +58,7 @@ export default function ThemeCinematicMinimal({ data, guest = '', preview = fals
     if (!wishForm.name.trim() || !wishForm.message.trim() || preview || data.demo) return
     try {
       await addWish(data.slug, wishForm)
-      setWishesList([{ name: wishForm.name, message: wishForm.message, createdAt: Date.now() }, ...wishesList])
+      setWishesList((prev) => [{ name: wishForm.name, message: wishForm.message, createdAt: Date.now() }, ...prev])
       setWishSent(true)
       setWishForm({ name: guest || '', message: '' })
     } catch (err) {}

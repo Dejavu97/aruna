@@ -292,6 +292,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
     }, 2200)
   }
 
+  const locked = data.demo || preview
   const handleRsvpSubmit = async (e) => {
     e.preventDefault()
     if (!rsvpState.name.trim()) return
@@ -323,7 +324,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
     }
     try {
       if (!data.demo && !preview && data.slug) await addWish(data.slug, newWish)
-      setWishes([newWish, ...wishes])
+      setWishes((prev) => [newWish, ...prev])
       setWishState({ name: guest || '', message: '', status: 'Hadir' })
       setWishSuccess(true)
       setToast('Doa restu telah sampai')
@@ -718,7 +719,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
                       </select>
                     </div>
                   </div>
-                  <button type="submit" className="rb-submit" disabled={submittingRsvp}>
+                  <button type="submit" className="rb-submit" disabled={submittingRsvp || locked}>
                     {submittingRsvp ? 'Mengirim…' : 'Kirim konfirmasi'}
                   </button>
                 </form>
@@ -752,7 +753,7 @@ export default function ThemeRoyalBunny({ data, guest = '', preview = false, the
                       placeholder="Tuliskan doa restu untuk kedua mempelai"
                     />
                   </div>
-                  <button type="submit" className="rb-submit" disabled={submittingWish}>
+                  <button type="submit" className="rb-submit" disabled={submittingWish || locked}>
                     <Send size={13} /> {submittingWish ? 'Mengirim…' : 'Kirim doa restu'}
                   </button>
                 </form>
