@@ -85,6 +85,23 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
   const [musicOn, setMusicOn] = useState(false)
   const audioRef = useRef(null)
 
+  const playMusic = useCallback((el) => {
+    if (!el) {
+      setMusicOn(false)
+      return
+    }
+    const syncPlaybackState = () => {
+      if (audioRef.current === el) setMusicOn(!el.paused)
+    }
+    try {
+      Promise.resolve(el.play()).then(syncPlaybackState).catch(() => {
+        if (audioRef.current === el) setMusicOn(false)
+      })
+    } catch {
+      if (audioRef.current === el) setMusicOn(false)
+    }
+  }, [])
+
   const [copiedBank, setCopiedBank] = useState('')
   const [rsvpSent, setRsvpSent] = useState(false)
   const [rsvpForm, setRsvpForm] = useState({ name: guest || '', status: 'hadir', guests: 1, note: '' })
@@ -136,13 +153,13 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
 
   /* A — moon gate flythrough: warp 1.4s lalu buka */
   const openInvite = useCallback(() => {
+    if (data.music) playMusic(audioRef.current)
     setWarping(true)
     setTimeout(() => {
       setOpen(true)
-      if (data.music) setMusicOn(true)
       window.scrollTo({ top: 0 })
     }, 1400)
-  }, [data.music])
+  }, [data.music, playMusic])
 
   /* C — orrery galeri: drag untuk memutar */
   const [orrAngle, setOrrAngle] = useState(0)
@@ -317,12 +334,15 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
   const jumpTo = (s) => document.getElementById(`kj-sec-${s}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   const toggleMusic = () => {
-    const next = !musicOn
-    setMusicOn(next)
     const el = audioRef.current
-    if (el) {
-      if (next) el.play().catch(() => {})
-      else el.pause()
+    if (!el) {
+      setMusicOn(false)
+      return
+    }
+    if (el.paused) playMusic(el)
+    else {
+      el.pause()
+      setMusicOn(false)
     }
   }
 
