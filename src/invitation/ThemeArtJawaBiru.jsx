@@ -4,7 +4,7 @@ import {
   Heart, MapPin, Calendar, Clock, Music, Pause, Play, 
   Copy, Check, Send, ChevronRight, User, Users, MessageSquare, Home, Sparkles, Camera
 } from 'lucide-react'
-import { copyText, googleCalendarUrl, wazeUrl, safeUrl } from '../lib/utils'
+import { copyText, googleCalendarUrl, wazeUrl, safeUrl, instagramUrl } from '../lib/utils'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import Watermark from '../components/Watermark'
 import './ThemeArtJawaBiru.css'
