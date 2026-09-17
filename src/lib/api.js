@@ -2,6 +2,7 @@ import { db, auth } from './firebase'
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy, where } from 'firebase/firestore'
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { fetchCustomThemes, fetchCustomTheme, createCustomTheme, deleteCustomTheme } from './api-custom-themes'
+import { defaultSiteProfile, fetchSiteProfile } from './api-site-profile'
 
 const ADMIN_KEY = 'aruna.adminKey'
 const EDIT_KEYS = 'aruna.editKeys'
@@ -630,33 +631,7 @@ export async function saveWaTemplates(templates) {
   return { success: true }
 }
 
-export const defaultSiteProfile = {
-  name: 'ByAruna',
-  tagline: 'Undangan digital yang terasa seperti kertas mahal.',
-  description: 'ByAruna membuat undangan pernikahan digital yang siap disebar lewat WhatsApp. Pilih tema, isi data, dapatkan tautan dalam hitungan menit.',
-  whatsapp: '0851-5744-0439',
-  instagram: 'byaruna.my.id',
-  tiktok: 'byaruna.my.id',
-  email: 'halo@byaruna.my.id',
-  copyright: 'Undangan digital untuk hari yang tidak diulang.'
-}
-
-export async function fetchSiteProfile() {
-  try {
-    const docRef = doc(db, 'settings', 'profile')
-    const snap = await getDoc(docRef)
-    if (snap.exists()) {
-      return { ...defaultSiteProfile, ...snap.data() }
-    }
-  } catch (err) {
-    console.warn('Firestore fetchSiteProfile error:', err)
-  }
-  try {
-    const local = localStorage.getItem('aruna_site_profile')
-    if (local) return { ...defaultSiteProfile, ...JSON.parse(local) }
-  } catch {}
-  return defaultSiteProfile
-}
+export { defaultSiteProfile, fetchSiteProfile }
 
 export async function saveSiteProfile(profile) {
   if (!getAdminKey()) throw new Error('Unauthorized')
