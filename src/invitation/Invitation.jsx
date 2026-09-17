@@ -8,9 +8,10 @@ const warnedFallbackThemes = new Set()
 
 export default function Invitation({ data, guest = '', preview = false }) {
   const theme = getTheme(data.themeId)
-  // Dispatch: registry by layout → by id (kompatibilitas tema kustom yang
-  // menyalin id tema) → by themeId legacy. Tanpa kunci = StandardInvitation.
+  // Dispatch: raw registered alias hanya didahulukan saat getTheme fallback;
+  // tema normal tetap layout → id → raw themeId. Tanpa kunci = StandardInvitation.
   const Isolated =
+    (theme.id !== data?.themeId && getThemeComponent(data?.themeId)) ||
     getThemeComponent(theme.layout) ||
     getThemeComponent(theme.id) ||
     getThemeComponent(data?.themeId)
