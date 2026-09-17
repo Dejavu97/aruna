@@ -1,6 +1,7 @@
 import { db, auth } from './firebase'
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy, where } from 'firebase/firestore'
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { fetchCustomThemes, fetchCustomTheme, createCustomTheme, deleteCustomTheme } from './api-custom-themes'
 
 const ADMIN_KEY = 'aruna.adminKey'
 const EDIT_KEYS = 'aruna.editKeys'
@@ -565,7 +566,7 @@ export async function getAnnouncement() {
   return ''
 }
 
-export { fetchCustomThemes, fetchCustomTheme, createCustomTheme, deleteCustomTheme } from './api-custom-themes'
+export { fetchCustomThemes, fetchCustomTheme, createCustomTheme, deleteCustomTheme }
 
   
 export async function saveAnnouncement(text) {
