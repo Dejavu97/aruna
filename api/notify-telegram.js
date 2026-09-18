@@ -1,4 +1,5 @@
 import { adminDb } from './_firebase.js';
+import { getMergedInvitation } from './_invitation-lifecycle.js';
 
 // ============ NOTIFIKASI ORDER BARU → TELEGRAM ADMIN ============
 // Dipanggil fire-and-forget dari Order.jsx setelah createInvitation sukses.
@@ -60,11 +61,10 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, deduped: true });
     }
 
-    const snap = await adminDb.collection('invitations').doc(cleanSlug).get();
-    if (!snap.exists) {
+    const inv = await getMergedInvitation(adminDb, cleanSlug);
+    if (!inv) {
       return res.status(404).json({ error: 'Undangan tidak ditemukan.' });
     }
-    const inv = snap.data() || {};
 
     // Bypass recency hanya bila secret cocok (untuk test manual server-side)
     const masterSecret = process.env.NOTIFY_SECRET;

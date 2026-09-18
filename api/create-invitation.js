@@ -1,0 +1,117 @@
+import { randomUUID } from 'node:crypto'
+import { adminAuth, adminDb } from './_firebase.js'
+import { verifyAdminCredentials } from './_auth.js'
+import {
+  buildCreationRecords,
+  createInvitationRecords,
+  generateEditKey,
+  getMergedInvitation,
+  sanitizeInvitationSlug,
+} from './_invitation-lifecycle.js'
+
+const MAX_PAYLOAD_BYTES = 800_000
+
+function generateOrderCode() {
+  return 'AR' + randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
+}
+
+function validatePayload(payload, { requireCustomer = true } = {}) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw Object.assign(new Error('Payload undangan tidak valid.'), { status: 400 })
+  }
+  if (Buffer.byteLength(JSON.stringify(payload), 'utf8') > MAX_PAYLOAD_BYTES) {
+    throw Object.assign(new Error('Payload undangan terlalu besar.'), { status: 413 })
+  }
+  if (!payload.themeId || !payload.bride?.nick || !payload.date) {
+    throw Object.assign(new Error('Tema, nama utama, dan tanggal wajib diisi.'), { status: 400 })
+  }
+  if (requireCustomer && (!payload.customerName || !payload.customerWhatsapp)) {
+    throw Object.assign(new Error('Nama dan WhatsApp pemesan wajib diisi.'), { status: 400 })
+  }
+}
+
+async function resolveCreationPayload(body) {
+  if (!['clone', 'restore'].includes(body.action)) return body.payload
+
+  if (!(await verifyAdminCredentials(body))) {
+    throw Object.assign(new Error('Tidak diizinkan.'), { status: 403 })
+  }
+  if (body.action === 'restore') return body.payload
+
+  const sourceSlug = sanitizeInvitationSlug(body.sourceSlug)
+  if (!sourceSlug) throw Object.assign(new Error('Undangan sumber wajib diisi.'), { status: 400 })
+  const source = await getMergedInvitation(adminDb, sourceSlug)
+  if (!source) throw Object.assign(new Error('Undangan sumber tidak ditemukan.'), { status: 404 })
+
+  return {
+    ...source,
+    slug: body.newSlug,
+    guests: [],
+    customDomain: '',
+  }
+}
+
+async function resolveOwner(body, payload) {
+  if (['clone', 'restore'].includes(body.action)) {
+    return {
+      ownerUid: String(payload.ownerUid || ''),
+      customerEmail: String(payload.customerEmail || ''),
+    }
+  }
+  if (!body.idToken) return { ownerUid: '', customerEmail: '' }
+  try {
+    const token = await adminAuth.verifyIdToken(String(body.idToken))
+    return {
+      ownerUid: token.uid || '',
+      customerEmail: token.email || '',
+    }
+  } catch {
+    throw Object.assign(new Error('Sesi pengguna tidak valid.'), { status: 401 })
+  }
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  try {
+    const body = req.body || {}
+    const payload = await resolveCreationPayload(body)
+    validatePayload(payload, { requireCustomer: !['clone', 'restore'].includes(body.action) })
+    const owner = await resolveOwner(body, payload)
+
+    const rawSlug = body.action === 'clone' ? body.newSlug : payload.slug
+    const slug = sanitizeInvitationSlug(rawSlug)
+    if (!slug || slug.length < 2) {
+      return res.status(400).json({ error: 'Tautan (slug) tidak valid.' })
+    }
+
+    const isRestore = body.action === 'restore'
+    const editKey = isRestore && body.editKey ? String(body.editKey) : generateEditKey()
+    const orderCode = isRestore && payload.orderCode ? String(payload.orderCode) : generateOrderCode()
+    const records = buildCreationRecords(payload, {
+      slug,
+      editKey,
+      orderCode,
+      ownerUid: owner.ownerUid,
+      customerEmail: owner.customerEmail,
+      now: Date.now(),
+    })
+    // Restore adalah jalur admin-terautentikasi; normal create/clone tetap unpaid.
+    if (isRestore && payload.status === 'paid') records.publicData.status = 'paid'
+    await createInvitationRecords(adminDb, slug, records)
+
+    return res.status(201).json({
+      success: true,
+      slug,
+      editKey,
+      orderCode,
+      status: records.publicData.status,
+    })
+  } catch (err) {
+    const status = Number(err.status) || (/sudah dipakai/i.test(err.message) ? 409 : 500)
+    if (status >= 500) console.error('Create Invitation API Error:', err)
+    return res.status(status).json({ error: err.message || 'Gagal membuat undangan.' })
+  }
+}

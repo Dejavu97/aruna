@@ -9,46 +9,57 @@ service cloud.firestore {
       // Tamu publik & pengantin bebas membuka undangan
       allow read: if true;
 
-      // Siapa pun boleh membuat pesanan baru (harus 'unpaid') — tidak berubah
-      allow create: if request.resource.data.status == 'unpaid'
-                    || request.auth != null;
+      // Creation selalu melalui /api/create-invitation agar public data,
+      // private metadata, dan edit key dibuat atomik oleh Admin SDK.
+      allow create: if false;
 
-      // Pembaruan undangan — DITULIS ULANG (sebelumnya: siapa pun bisa menulis
-      // field apa pun asal status tidak berubah).
+      // Semua client update wajib mempertahankan status pembayaran dan tidak
+      // boleh menulis metadata private/order ke dokumen publik.
       allow update: if
-        // Kasus A: login Google pemilik/admin tercatat di dokumen (tetap)
-        (request.auth != null && (resource.data.ownerUid == request.auth.uid || request.auth.token.email == resource.data.customerEmail))
-        // Kasus C: admin platform (email yang sama dengan loginAdmin)
-        || (request.auth != null && request.auth.token.email == 'admin@byaruna.my.id')
-        // Kasus B: anonim hanya boleh menambah RSVP/wishes/views (alur tamu)
-        || (
-          request.resource.data.diff(resource.data).affectedKeys()
+        request.resource.data.status == resource.data.status
+        && request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'customerWhatsapp',
+          'customerEmail',
+          'customerNote',
+          'orderCode',
+          'voucher',
+          'guests',
+          'checkIns',
+          'waTemplate',
+          'waReminderTemplate',
+          'ownerUid',
+          'adFree',
+          'whiteLabel',
+          'hideWatermark',
+          'paymentStatus',
+          'paidAt',
+          'isPaid'
+        ]) == false
+        && (
+          // Owner Google hanya dapat mengubah dokumennya sendiri.
+          (request.auth != null && resource.data.ownerUid == request.auth.uid)
+          // Admin Google tetap boleh mengedit konten, tetapi status hanya lewat API.
+          || (request.auth != null && request.auth.token.email == 'admin@byaruna.my.id')
+          // Guestbook/views dipertahankan untuk batch terpisah Stage 12 berikutnya.
+          || request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['rsvps', 'wishes', 'views'])
-          && request.resource.data.status == resource.data.status
         );
-      // Alur pelanggan & admin (foto, musik, banks, guests, balas ucapan,
-      // tandai paid) TIDAK lewat sini — lewat /api/update-invitation dan
-      // /api/delete-invitation (Admin SDK, sudah adopted).
 
-      // DILINDUNGI (sebelumnya: akun Google APA PUN bisa menghapus): hanya
-      // pemilik atau email admin tercatat di dokumen.
-      allow delete: if request.auth != null && (
-        resource.data.ownerUid == request.auth.uid
-        || request.auth.token.email == resource.data.customerEmail
-      );
+      // Delete lifecycle selalu melalui /api/delete-invitation agar public,
+      // private metadata, dan key terhapus dalam satu atomic batch.
+      allow delete: if false;
     }
 
     // =========================================================================
     // 2. BRANKAS KUNCI RAHASIA (/private_keys)
     // =========================================================================
     match /private_keys/{slug} {
-      // DITUTUP (sebelumnya: akun Google apa pun bisa membaca seluruh editKey
-      // klien). Verifikasi kunci kini lewat /api/verify-key (Admin SDK).
-      allow read: if false;
-      // Dibuat saat pesanan baru selesai dibuat (tidak berubah)
-      allow create: if true;
-      // Tidak ada alur sah yang mengubah brankas dari klien
-      allow update, delete: if false;
+      allow read, write: if false;
+    }
+
+    // Metadata order/customer hanya dibaca dan ditulis serverless Admin SDK.
+    match /invitation_private/{slug} {
+      allow read, write: if false;
     }
 
     // =========================================================================

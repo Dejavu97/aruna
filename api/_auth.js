@@ -1,5 +1,8 @@
 import crypto from 'crypto';
-import { adminDb } from './_firebase.js';
+import { adminAuth, adminDb } from './_firebase.js';
+
+const ADMIN_EMAIL = 'admin@byaruna.my.id';
+const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
 
 // ============ SHARED AUTH HELPERS (admin-login, admin-settings, update-invitation, delete-invitation, verify-key) ============
 
@@ -74,4 +77,28 @@ export function verifyPassword(plain, stored) {
   }
   // Legacy: dokumen lama masih menyimpan plain-text (pra-migrasi).
   return stored === plain;
+}
+
+/** Verify existing Firebase-admin or custom-password credentials. */
+export async function verifyAdminCredentials(body = {}) {
+  if (body.idToken) {
+    try {
+      const token = await adminAuth.verifyIdToken(String(body.idToken));
+      if (token.email === ADMIN_EMAIL) return true;
+    } catch {}
+  }
+
+  if (!body.adminKey) return false;
+  const authSnap = await adminDb.collection('settings').doc('admin_auth').get();
+  const storedPass = authSnap.exists ? authSnap.data()?.password : null;
+  if (storedPass && verifyPassword(body.adminKey, storedPass)) {
+    if (!storedPass.startsWith('scrypt$')) {
+      await adminDb.collection('settings').doc('admin_auth').set({
+        password: hashPassword(body.adminKey),
+        updatedAt: Date.now(),
+      }, { merge: true });
+    }
+    return true;
+  }
+  return !storedPass && BOOTSTRAP_PASSWORDS.includes(String(body.adminKey));
 }

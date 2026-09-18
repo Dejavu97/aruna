@@ -1,36 +1,7 @@
 import { adminDb } from './_firebase.js';
-import { verifyPassword, hashPassword } from './_auth.js';
-
-// Admin platform tunggal (sinkron dengan loginAdmin di src/lib/api.js)
-// Password bootstrap bawaan — hanya berlaku jika settings/admin_auth BELUM ada.
-const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
-
-async function isAdminRequest(body) {
-  // Jalur admin password-kustom: bandingkan hash password tersimpan.
-  // (Admin sesi Firebase tidak lewat sini — dia tulis langsung, rules
-  // Kasus A/C yang mengizinkan.)
-  if (body.adminKey) {
-    try {
-      const authSnap = await adminDb.collection('settings').doc('admin_auth').get();
-      const storedPass = authSnap.exists ? authSnap.data()?.password : null;
-      if (storedPass && verifyPassword(body.adminKey, storedPass)) {
-        // Migrasi transparan plain → hash
-        if (!storedPass.startsWith('scrypt$')) {
-          await adminDb.collection('settings').doc('admin_auth').set({
-            password: hashPassword(body.adminKey),
-            updatedAt: Date.now(),
-          }, { merge: true });
-        }
-        return true;
-      }
-      if (!storedPass && BOOTSTRAP_PASSWORDS.includes(body.adminKey)) return true;
-    } catch (authErr) {
-      console.warn('Admin password check error:', authErr);
-    }
-  }
-
-  return false;
-}
+import { verifyAdminCredentials } from './_auth.js';
+import { FieldValue } from 'firebase-admin/firestore';
+import { partitionInvitationUpdate } from './_invitation-lifecycle.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -44,7 +15,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Slug and valid payload are required' })
     }
 
-    const isAdmin = await isAdminRequest(req.body)
+    const isAdmin = await verifyAdminCredentials(req.body)
     let isAuthorized = isAdmin
 
     // Otorisasi pelanggan via editKey (brankas private_keys, dibaca Admin SDK)
@@ -60,24 +31,26 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Akses ditolak: Kunci rahasia (editKey/adminKey) tidak valid.' })
     }
 
-    // Sanitasi payload: Pelanggan non-admin DILARANG memanipulasi status pembayaran atau slug
-    const safePayload = { ...payload }
-    delete safePayload.slug
-    delete safePayload.orderCode
-    delete safePayload.createdAt
+    const { publicPayload, privatePayload } = partitionInvitationUpdate(payload, isAdmin)
 
-    if (!isAdmin) {
-      // Hanya admin yang berhak mengubah status pembayaran menjadi 'paid'
-      delete safePayload.status
-      delete safePayload.ownerUid
+    // Satu batch menjaga public/private update konsisten. Delete sentinel
+    // membersihkan field private legacy saat dokumen lama pertama kali diedit.
+    const docRef = adminDb.collection('invitations').doc(slug)
+    const privateRef = adminDb.collection('invitation_private').doc(slug)
+    const publicUpdate = {
+      ...publicPayload,
+      updatedAt: Date.now(),
+    }
+    for (const field of Object.keys(privatePayload)) {
+      publicUpdate[field] = FieldValue.delete()
     }
 
-    // Update data undangan
-    const docRef = adminDb.collection('invitations').doc(slug)
-    await docRef.update({
-      ...safePayload,
-      updatedAt: Date.now()
-    })
+    const batch = adminDb.batch()
+    batch.update(docRef, publicUpdate)
+    if (Object.keys(privatePayload).length > 0) {
+      batch.set(privateRef, privatePayload, { merge: true })
+    }
+    await batch.commit()
 
     return res.status(200).json({ success: true })
   } catch (err) {

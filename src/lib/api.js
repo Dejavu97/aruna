@@ -1,5 +1,5 @@
 import { db, auth } from './firebase'
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, arrayUnion, query, orderBy, where } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, arrayUnion, query, where } from 'firebase/firestore'
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { fetchCustomThemes, fetchCustomTheme, createCustomTheme, deleteCustomTheme } from './api-custom-themes'
 import { defaultSiteProfile, fetchSiteProfile } from './api-site-profile'
@@ -218,79 +218,40 @@ async function adminApiCall(body) {
 export { uploadFile } from './api-uploads'
 
 export async function createInvitation(payload) {
-  const editKey = generateKey()
-  // Kode order 8 char acak (36^8 ≈ 2,8 triliun) — 4 digit lama (~9000 ruang)
-  // mudah ditebak/brute-force. Bukan kunci auth, tapi jangan murahan.
-  const orderCode = 'AR' + crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
-  const docRef = doc(db, 'invitations', payload.slug)
-  const docSnap = await getDoc(docRef)
-  if (docSnap.exists()) {
-    throw new Error('Tautan (slug) sudah dipakai orang lain. Silakan pilih tautan lain.')
+  let idToken = ''
+  if (auth.currentUser) {
+    try { idToken = await auth.currentUser.getIdToken() } catch {}
   }
-  const data = {
-    ...payload,
-    orderCode,
-    status: 'unpaid',
-    createdAt: Date.now(),
-    schemaVersion: 1, // Stage 8 Batch 3: penanda skema dokumen (aditif, tanpa migrasi)
-    rsvps: [],
-    wishes: [],
-    guests: []
+  const res = await fetch('/api/create-invitation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ payload, idToken }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Gagal membuat undangan.')
   }
-  await setDoc(docRef, data)
-  
-  // Selalu simpan editKey ke brankas rahasia, baik admin maupun pelanggan
-  const secretRef = doc(db, 'private_keys', payload.slug)
-  await setDoc(secretRef, { editKey })
-  
-  return { ...data, editKey } // Kembalikan editKey ke UI agar bisa disave di localStorage
+  return data
 }
 
 export async function cloneInvitation(sourceSlug, newSlug) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  
-  const cleanNewSlug = newSlug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-')
-  if (!cleanNewSlug) throw new Error('Tautan baru tidak boleh kosong.')
-
-  // Check if target slug exists
-  const targetDocRef = doc(db, 'invitations', cleanNewSlug)
-  const targetSnap = await getDoc(targetDocRef)
-  if (targetSnap.exists()) {
-    throw new Error(`Tautan /u/${cleanNewSlug} sudah ada di database. Silakan gunakan nama tautan lain.`)
+  const creds = await getAdminCredentials()
+  const res = await fetch('/api/create-invitation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'clone',
+      sourceSlug,
+      newSlug,
+      ...creds,
+    }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Gagal menduplikasi undangan.')
   }
-
-  // Fetch source invitation
-  const sourceDocRef = doc(db, 'invitations', sourceSlug)
-  const sourceSnap = await getDoc(sourceDocRef)
-  if (!sourceSnap.exists()) {
-    throw new Error('Undangan sumber tidak ditemukan.')
-  }
-
-  const sourceData = sourceSnap.data()
-  const editKey = generateKey()
-  const orderCode = 'AR' + crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
-
-  const clonedData = {
-    ...sourceData,
-    slug: cleanNewSlug,
-    orderCode,
-    status: 'unpaid',
-    createdAt: Date.now(),
-    schemaVersion: 1, // Stage 8 Batch 3: samakan penanda skema pada hasil clone
-    views: 0,
-    rsvps: [],
-    wishes: [],
-    guests: [],
-    customDomain: '', // Reset custom domain on clone
-  }
-
-  await setDoc(targetDocRef, clonedData)
-
-  // Save edit key to private_keys collection
-  const secretRef = doc(db, 'private_keys', cleanNewSlug)
-  await setDoc(secretRef, { editKey })
-
-  return { ...clonedData, editKey }
+  return data
 }
 
 export async function fetchInvitation(slug, editKey) {
@@ -298,49 +259,33 @@ export async function fetchInvitation(slug, editKey) {
   const docSnap = await getDoc(docRef)
   if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
 
-  // Adopted (Fase 1e): akses edit pelanggan diverifikasi lewat serverless
-  // verify-key (Firebase Admin membaca brankas private_keys yang tertutup
-  // untuk klien). Sebelumnya kunci dipercaya mentah-mentah di sisi klien.
+  let privateData = {}
   if (editKey && editKey !== 'admin-bypass' && !getAdminKey()) {
-    try {
-      const res = await fetch('/api/verify-key', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, editKey })
-      })
-      if (res.status === 403) throw new Error('Kunci rahasia salah.')
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || `Verifikasi gagal (${res.status}).`)
-      }
-    } catch (err) {
-      if (err.message === 'Kunci rahasia salah.' || /Terlalu banyak|Verifikasi gagal/.test(err.message)) throw err
-      // Function tidak terjangkau (offline/dev) → fallback cek klien,
-      // perilaku sama seperti sebelum adopt (tidak lebih longgar dari rules).
-      console.warn('verify-key unreachable, fallback client check:', err)
-      const secretRef = doc(db, 'private_keys', slug)
-      const secretSnap = await getDoc(secretRef)
-      if (secretSnap.exists() && secretSnap.data().editKey !== editKey) {
-        throw new Error('Kunci rahasia salah.')
-      }
-    }
+    const res = await fetch('/api/verify-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, editKey })
+    })
+    const data = await res.json().catch(() => ({}))
+    if (res.status === 403) throw new Error('Kunci rahasia salah.')
+    if (!res.ok) throw new Error(data.error || `Verifikasi gagal (${res.status}).`)
+    privateData = data.privateData || {}
   }
 
-  return docSnap.data()
+  return { ...docSnap.data(), ...privateData }
 }
 
 export async function fetchAdminInvitations() {
   if (!getAdminKey()) throw new Error('Unauthorized')
-  const q = query(collection(db, 'invitations'), orderBy('createdAt', 'desc'))
-  const snap = await getDocs(q)
-  return snap.docs.map(d => {
-    const data = d.data()
-    return {
-      slug: d.id,
-      ...data,
-      editKey: getEditKey(d.id) || '',
-    }
+  const creds = await getAdminCredentials()
+  const res = await fetch('/api/admin-invitations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(creds),
   })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) throw new Error(data.error || 'Gagal memuat undangan admin.')
+  return data.invitations
 }
 
 // Kredensial admin untuk serverless: ID token (sesi Firebase email admin)
@@ -356,42 +301,17 @@ async function getAdminCredentials() {
 }
 
 export async function updateInvitation(slug, payload, editKey) {
-  // 1. Admin dengan sesi Firebase: tulis langsung (rules Kasus A/C mengizinkan)
-  if (auth.currentUser && getAdminKey()) {
-    try {
-      const docRef = doc(db, 'invitations', slug)
-      await updateDoc(docRef, payload)
-      return { success: true }
-    } catch (e) {
-      console.warn('Admin direct update note:', e)
-    }
+  const creds = await getAdminCredentials()
+  const res = await fetch('/api/update-invitation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, editKey, payload, ...creds })
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Gagal memperbarui undangan.')
   }
-
-  // 2. Jalur serverless (Admin SDK) — admin password-kustom & pelanggan editKey
-  try {
-    const creds = await getAdminCredentials()
-    const res = await fetch('/api/update-invitation', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, editKey, payload, ...creds })
-    })
-    if (res.ok) {
-      const data = await res.json()
-      if (data.success) return { success: true }
-    }
-  } catch (apiErr) {
-    console.warn('Update API backend note:', apiErr)
-  }
-
-  // 3. Fallback langsung ke Firestore Client
-  try {
-    const docRef = doc(db, 'invitations', slug)
-    await updateDoc(docRef, payload)
-    return { success: true }
-  } catch (clientErr) {
-    console.error('Firestore client update error:', clientErr)
-    throw clientErr
-  }
+  return { success: true }
 }
 
 export async function setInvitationStatus(slug, status) {
@@ -403,43 +323,16 @@ export async function setInvitationStatus(slug, status) {
 
 export async function deleteInvitation(slug) {
   if (!getAdminKey()) throw new Error('Unauthorized')
-
-  let deleted = false
-
-  // 1. Jalur Utama Serverless API (Firebase Admin SDK - Menghapus tanpa terhambat aturan permissions)
-  try {
-    const creds = await getAdminCredentials()
-    const res = await fetch('/api/delete-invitation', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, ...creds })
-    })
-    if (res.ok) {
-      const data = await res.json()
-      if (data.success) deleted = true
-    }
-  } catch (apiErr) {
-    console.warn('Backend delete API notice:', apiErr)
+  const creds = await getAdminCredentials()
+  const res = await fetch('/api/delete-invitation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, ...creds })
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Gagal menghapus undangan.')
   }
-
-  // 2. Jalur Firestore Client SDK
-  try {
-    const docRef = doc(db, 'invitations', slug)
-    await deleteDoc(docRef)
-    deleted = true
-  } catch (clientErr) {
-    if (!deleted) {
-      console.error('Firestore client delete error:', clientErr)
-      throw new Error(`Gagal menghapus undangan dari database: ${clientErr.message}`)
-    }
-  }
-
-  // 3. Bersihkan brankas private_keys
-  try {
-    const secretRef = doc(db, 'private_keys', slug)
-    await deleteDoc(secretRef)
-  } catch {}
-
   return { success: true }
 }
 
@@ -688,13 +581,27 @@ export async function restoreFullBackupData(backupJson) {
   const { data } = backupJson
   const results = { invitationsCount: 0, themesCount: 0, vouchersCount: 0 }
 
-  // 1. Restore Invitations
+  // 1. Restore Invitations melalui boundary server-side yang sama agar
+  // public/private/key tetap atomik dan editKey backup tetap berlaku.
   if (Array.isArray(data.invitations)) {
+    const creds = await getAdminCredentials()
     for (const inv of data.invitations) {
       if (inv.slug) {
         try {
-          const docRef = doc(db, 'invitations', inv.slug)
-          await setDoc(docRef, inv)
+          const res = await fetch('/api/create-invitation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'restore',
+              payload: inv,
+              editKey: inv.editKey,
+              ...creds,
+            }),
+          })
+          const restored = await res.json().catch(() => ({}))
+          if (!res.ok || !restored.success) {
+            throw new Error(restored.error || 'Restore undangan gagal.')
+          }
           results.invitationsCount++
         } catch (e) {
           console.warn('Error restoring invitation:', inv.slug, e)

@@ -1,4 +1,5 @@
 import { adminDb } from './_firebase.js';
+import { getMergedInvitation, listMergedInvitations } from './_invitation-lifecycle.js';
 
 // ============ BOT ADMIN TELEGRAM VIA WEBHOOK (Vercel serverless) ============
 // Telegram → POST https://<domain>/api/telegram-webhook → baca/tulis Firestore
@@ -90,8 +91,7 @@ async function getEditKey(slug) {
   }
 }
 async function recentInvitations(limit = 300) {
-  const snap = await adminDb.collection('invitations').orderBy('createdAt', 'desc').limit(limit).get();
-  return snap.docs.map((d) => ({ slug: d.id, ...d.data() }));
+  return listMergedInvitations(adminDb, { limit });
 }
 function matchQuery(list, q) {
   const needle = String(q || '').trim().toLowerCase();
@@ -302,9 +302,8 @@ async function handleCallback(query) {
   // Aksi langsung dari kartu /belum & /cari — slug sudah pasti, tanpa ketik kode
   if (data.startsWith('ask:') || data.startsWith('tagih:') || data.startsWith('kwit:') || data.startsWith('detail:')) {
     const [kind, slug] = data.split(':');
-    const snap = await adminDb.collection('invitations').doc(slug).get();
-    if (!snap.exists) return send(chatId, `🔍 Order tidak ketemu.`);
-    const inv = { slug, ...snap.data() };
+    const inv = await getMergedInvitation(adminDb, slug);
+    if (!inv) return send(chatId, `🔍 Order tidak ketemu.`);
     const packages = await getPackages();
     const p = packOf(packages, inv.packageId);
     if (kind === 'ask') {
@@ -334,9 +333,8 @@ async function handleCallback(query) {
   if (data.startsWith('lunas:')) {
     const slug = data.slice(6);
     const ref = adminDb.collection('invitations').doc(slug);
-    const snap = await ref.get();
-    if (!snap.exists) return send(chatId, `🔍 Order tidak ketemu.`);
-    const inv = snap.data();
+    const inv = await getMergedInvitation(adminDb, slug);
+    if (!inv) return send(chatId, `🔍 Order tidak ketemu.`);
     if (inv.status === 'paid') return send(chatId, `✅ Sudah lunas sebelumnya.`);
     await ref.update({ status: 'paid', updatedAt: Date.now() });
     const packages = await getPackages();

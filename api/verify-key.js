@@ -23,7 +23,11 @@ export default async function handler(req, res) {
     }
 
     await clearFailures(req);
-    return res.status(200).json({ success: true })
+    const privateSnap = await adminDb.collection('invitation_private').doc(slug).get()
+    return res.status(200).json({
+      success: true,
+      privateData: privateSnap.exists ? privateSnap.data() : {},
+    })
   } catch (err) {
     if (err.status === 429) {
       return res.status(429).json({ error: err.message })
