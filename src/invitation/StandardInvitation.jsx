@@ -230,7 +230,7 @@ export function StandardInvitation({ data, guest = '', preview = false, theme })
               <Reveal fx="countdown" sectionAnims={theme.sectionAnims}><Countdown tick={tick} date={data.date} data={data} couple={couple} scene={scenes.date} /></Reveal>
             )}
             {showEvents && (
-              <Reveal fx="events" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} />}</Reveal>
+              <Reveal fx="events" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <EventsAttari events={data.events || []} scene={scenes.event} /> : <Events events={data.events || []} isDark={isDark} scene={scenes.event} couple={couple} />}</Reveal>
             )}
             {formConfig.showCheckIn && showEvents && !isUnpaid && (
               <Reveal fx="events" sectionAnims={theme.sectionAnims}><CheckIn data={data} guest={guest} couple={couple} scene={scenes.event} onOpen={() => setShowPass(true)} /></Reveal>

@@ -456,7 +456,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
       </AnimatePresence>
 
       {open && (
-        <main className="kj-column">
+        <>
           {/* ====== RAILING NAVIGASI FASE BULAN (desktop) ====== */}
           <nav className="kj-rail" aria-label="Navigasi babak">
             {railSecs.map(([s, label], i) => (
@@ -473,6 +473,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
             ))}
           </nav>
 
+          <main className="kj-column">
           {/* ============ AYAT ============ */}
           <section id="kj-sec-ayat" className={`kj-section ${secIn['kj-sec-ayat'] ? 'is-in' : ''}`}>
             <Reveal>
@@ -829,7 +830,8 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
               <p className="kj-credit">Kejora · Sebuah Undangan ByAruna</p>
             </Reveal>
           </section>
-        </main>
+          </main>
+        </>
       )}
     </div>
     </MotionConfig>
