@@ -56,6 +56,7 @@ export function useStudioSave({
     }
     setSaving(true)
     setError('')
+    setSavedThemeId('')
     try {
       const themePayload = {
         name: themeName,

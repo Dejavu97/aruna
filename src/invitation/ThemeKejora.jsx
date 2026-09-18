@@ -108,6 +108,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
   const [wishesList, setWishesList] = useState(data.wishes || [])
   const [wishForm, setWishForm] = useState({ name: guest || '', message: '' })
   const [wishSent, setWishSent] = useState(false)
+  const locked = Boolean(data.demo || preview)
 
   const [count, setCount] = useState(() => countdownParts(data.date, data.events?.[0]?.time?.split(' ')[0] || '08:00'))
 
@@ -356,7 +357,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
 
   const handleRsvp = async (e) => {
     e.preventDefault()
-    if (!rsvpForm.name.trim() || preview || data.demo) return
+    if (!rsvpForm.name.trim() || locked) return
     try {
       await addRsvp(data.slug, rsvpForm)
       setRsvpSent(true)
@@ -365,7 +366,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
 
   const handleWish = async (e) => {
     e.preventDefault()
-    if (!wishForm.name.trim() || !wishForm.message.trim() || preview || data.demo) return
+    if (!wishForm.name.trim() || !wishForm.message.trim() || locked) return
     try {
       await addWish(data.slug, wishForm)
       setWishesList((prev) => [{ name: wishForm.name, message: wishForm.message, createdAt: Date.now() }, ...prev])
@@ -727,7 +728,9 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
                       onChange={(e) => setRsvpForm({ ...rsvpForm, guests: Number(e.target.value) || 1 })}
                     />
                   </div>
-                  <button type="submit" className="kj-btn-submit">Kirim Konfirmasi</button>
+                  <button type="submit" className="kj-btn-submit" disabled={locked}>
+                    {locked ? 'Mode Preview' : 'Kirim Konfirmasi'}
+                  </button>
                 </form>
               ) : (
                 <p className="kj-form-done">Terima kasih — konfirmasi Anda telah tercatat di langit kami.</p>
@@ -757,8 +760,8 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
                     required
                   />
                 </div>
-                <button type="submit" className="kj-btn-submit">
-                  Kirim Doa
+                <button type="submit" className="kj-btn-submit" disabled={locked}>
+                  {locked ? 'Mode Preview' : 'Kirim Doa'}
                 </button>
                 {wishSent && (
                   <p className="kj-form-done">Doa Anda kini bersandar di antara bintang-bintang.</p>

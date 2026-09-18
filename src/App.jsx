@@ -31,18 +31,25 @@ function PageLoader() {
   )
 }
 
+const FIRST_PARTY_HOSTS = new Set([
+  'byaruna.my.id',
+  'www.byaruna.my.id',
+  'aruna-whydidyoucomehere.vercel.app',
+  'aruna-git-main-whydidyoucomehere.vercel.app',
+])
+
+function isFirstPartyHostname(rawHostname) {
+  const hostname = String(rawHostname || '').trim().toLowerCase().replace(/\.$/, '')
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.endsWith('.localhost')) return true
+  if (FIRST_PARTY_HOSTS.has(hostname)) return true
+  return hostname.endsWith('.ngrok-free.app')
+}
+
 export default function App() {
   const [maintenance, setMaintenance] = useState(defaultMaintenanceSettings)
   const location = useLocation()
   const hostname = window.location.hostname
-  const isCustomDomain =
-    !hostname.includes('localhost') &&
-    !hostname.includes('127.0.0.1') &&
-    !hostname.includes('byaruna.my.id') &&
-    !hostname.includes('byaruna') &&
-    !hostname.includes('aruna.com') &&
-    !hostname.includes('vercel.app') &&
-    !hostname.includes('ngrok-free.app')
+  const isCustomDomain = !isFirstPartyHostname(hostname)
 
   useEffect(() => {
     fetchMaintenanceSettings().then(setMaintenance).catch(() => {})

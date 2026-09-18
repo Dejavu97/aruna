@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { 
   Sparkles, Palette, Type, Layout, Image as ImageIcon, Music, 
   Save, Eye, ArrowLeft, Check, RefreshCw, Upload, Smartphone, Tablet,
@@ -24,8 +24,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 export function useStudioState() {
   const navigate = useNavigate()
+  const { themeId: routeThemeId = '' } = useParams()
   const [params] = useSearchParams()
-  const starterId = params.get('from') || ''
+  const starterId = routeThemeId || params.get('from') || ''
   const customConcept = params.get('concept') || ''
   const previewScrollRef = useRef(null)
   const audioRef = useRef(null)
@@ -331,8 +332,9 @@ export function useStudioState() {
   const [savedThemeId, setSavedThemeId] = useState('')
   const [error, setError] = useState('')
 
-  // Handle starterId or customConcept from URL Query
+  // Handle starterId from route/query or customConcept from URL Query
   useEffect(() => {
+    let live = true
     if (starterId) {
       const base = themes.find((t) => t.id === starterId)
       if (base) {
@@ -340,6 +342,61 @@ export function useStudioState() {
         if (base.colors) setColors(base.colors)
         if (base.fonts) setFonts((prev) => ({ ...prev, ...base.fonts }))
         if (base.cover) setCustomAssets((prev) => ({ ...prev, coverImgUrl: base.cover }))
+      } else {
+        fetchCustomTheme(starterId)
+          .then((custom) => {
+            if (!live) return
+            if (!custom) {
+              setError('Tema custom tidak ditemukan.')
+              return
+            }
+            if (custom.name != null) setThemeName(custom.name)
+            if (custom.creator != null) setCreatorName(custom.creator)
+            if (custom.description != null) setThemeDesc(custom.description)
+            if (typeof custom.isPublic === 'boolean') setIsPublic(custom.isPublic)
+            else if (Array.isArray(custom.tags)) setIsPublic(custom.tags.includes('publik'))
+            if (custom.sections) setSections(custom.sections)
+            if (custom.colors) setColors(custom.colors)
+            if (custom.twilightColors) setTwilightColors(custom.twilightColors)
+            if (custom.opacities) setOpacities(custom.opacities)
+            if (custom.fonts) setFonts(custom.fonts)
+            if (custom.monogramStyle != null) setMonogramStyle(custom.monogramStyle)
+            if (custom.monogramInitials != null) setMonogramInitials(custom.monogramInitials)
+            if (custom.dresscodeSettings) setDresscodeSettings(custom.dresscodeSettings)
+            if (custom.wishesStyle != null) setWishesStyle(custom.wishesStyle)
+            if (custom.dividerShape != null) setDividerShape(custom.dividerShape)
+            if (custom.cardStyler) setCardStyler(custom.cardStyler)
+            if (custom.guestTouchFx != null) setGuestTouchFx(custom.guestTouchFx)
+            if (custom.livingMotion) setLivingMotion(custom.livingMotion)
+            if (custom.photoColorFilter != null) setPhotoColorFilter(custom.photoColorFilter)
+            if (custom.galleryLayout != null) setGalleryLayout(custom.galleryLayout)
+            if (custom.coverStyle != null) setCoverStyle(custom.coverStyle)
+            if (custom.openingAnimation != null) setOpeningAnimation(custom.openingAnimation)
+            if (custom.ornamentStyle != null) setOrnamentStyle(custom.ornamentStyle)
+            if (custom.layoutStyle != null) setLayoutStyle(custom.layoutStyle)
+            if (custom.particleEffect != null) setParticleEffect(custom.particleEffect)
+            if (custom.coupleTransition != null) setCoupleTransition(custom.coupleTransition)
+            if (custom.ornamentTransition != null) setOrnamentTransition(custom.ornamentTransition)
+            if (custom.panelTransition != null) setPanelTransition(custom.panelTransition)
+            if (custom.customAssets || custom.cover) {
+              setCustomAssets((prev) => ({
+                ...prev,
+                ...(custom.customAssets || {}),
+                ...(!custom.customAssets?.coverImgUrl && custom.cover ? { coverImgUrl: custom.cover } : {}),
+              }))
+            }
+            if (custom.ornaments) setOrnaments(custom.ornaments)
+            if (custom.sectionAnims) setSectionAnims(custom.sectionAnims)
+            if (custom.backgroundFx) setBackgroundFx(custom.backgroundFx)
+            if (custom.cardFx) setCardFx((prev) => ({ ...prev, ...custom.cardFx }))
+            if (custom.customCss != null) setCustomCss(custom.customCss)
+            if (custom.layout != null) setBaseLayout(custom.layout)
+            if (custom.blankCanvas != null) setBlankCanvas(custom.blankCanvas)
+            setAnimKey((k) => k + 1)
+          })
+          .catch((err) => {
+            if (live) setError(err.message || 'Gagal memuat tema custom.')
+          })
       }
     } else if (customConcept) {
       setMoodPrompt(customConcept)
@@ -372,6 +429,9 @@ export function useStudioState() {
       }
       applyPreset(matched)
       setThemeName(`Konsep: ${customConcept.slice(0, 24)}...`)
+    }
+    return () => {
+      live = false
     }
   }, [starterId, customConcept])
 

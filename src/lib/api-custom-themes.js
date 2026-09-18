@@ -57,19 +57,20 @@ export async function createCustomTheme(themeData) {
     createdAt: Date.now(),
   }
 
-  // If recreating, remove from deleted blacklist
-  try {
-    const deletedList = JSON.parse(localStorage.getItem('aruna_deleted_custom_themes') || '[]')
-    const cleaned = deletedList.filter(id => id !== themeId)
-    localStorage.setItem('aruna_deleted_custom_themes', JSON.stringify(cleaned))
-  } catch {}
-
   try {
     const docRef = doc(db, 'custom_themes', themeId)
     await setDoc(docRef, data)
   } catch (err) {
     console.warn('Firestore setDoc custom_themes:', err)
+    throw new Error('Gagal menyimpan tema ke cloud. Coba lagi.')
   }
+
+  // If recreating, remove from deleted blacklist only after cloud persistence succeeds.
+  try {
+    const deletedList = JSON.parse(localStorage.getItem('aruna_deleted_custom_themes') || '[]')
+    const cleaned = deletedList.filter(id => id !== themeId)
+    localStorage.setItem('aruna_deleted_custom_themes', JSON.stringify(cleaned))
+  } catch {}
 
   try {
     const savedList = JSON.parse(localStorage.getItem('aruna_custom_themes') || '[]')

@@ -229,8 +229,11 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
     setTimeout(() => setCopiedIndex(null), 2500)
   }
 
+  const locked = Boolean(data.demo || preview)
+
   const handleSendWish = async (e) => {
     e.preventDefault()
+    if (locked) return
     if (!wishName.trim() || !wishText.trim()) return
     setWishBusy(true)
 
@@ -740,8 +743,8 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                   />
                 </div>
 
-                <button type="submit" disabled={wishBusy} className="jb-open-btn" style={{ width: '100%', justifyContent: 'center' }}>
-                  <Send size={16} /> {wishBusy ? 'MENGIRIM...' : 'KIRIM UCAPAN'}
+                <button type="submit" disabled={wishBusy || locked} className="jb-open-btn" style={{ width: '100%', justifyContent: 'center' }}>
+                  <Send size={16} /> {locked ? 'MODE PREVIEW' : wishBusy ? 'MENGIRIM...' : 'KIRIM UCAPAN'}
                 </button>
               </motion.form>
 
