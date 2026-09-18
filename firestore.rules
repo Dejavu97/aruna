@@ -33,16 +33,22 @@ service cloud.firestore {
           'hideWatermark',
           'paymentStatus',
           'paidAt',
-          'isPaid'
+          'isPaid',
+          'rsvps',
+          'wishes'
         ]) == false
         && (
           // Owner Google hanya dapat mengubah dokumennya sendiri.
           (request.auth != null && resource.data.ownerUid == request.auth.uid)
           // Admin Google tetap boleh mengedit konten, tetapi status hanya lewat API.
           || (request.auth != null && request.auth.token.email == 'admin@byaruna.my.id')
-          // Guestbook/views dipertahankan untuk batch terpisah Stage 12 berikutnya.
-          || request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['rsvps', 'wishes', 'views'])
+          // View counter tetap boleh bertambah dari renderer publik. RSVP dan
+          // wishes hanya boleh ditulis melalui /api/guestbook.
+          || (
+            request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['views'])
+            && request.resource.data.views == resource.data.views + 1
+          )
         );
 
       // Delete lifecycle selalu melalui /api/delete-invitation agar public,
@@ -73,18 +79,28 @@ service cloud.firestore {
     }
 
     // =========================================================================
-    // 4. THEME STUDIO - TEMA KUSTOM (/custom_themes) — tidak berubah (fitur
-    //    publik ThemeStudio sedang dipakai; pengetatan menyusul terpisah)
+    // 4. THEME STUDIO - TEMA KUSTOM (/custom_themes)
     // =========================================================================
     match /custom_themes/{id} {
       allow read: if true;
-      allow create: if true;
-      // Update dikunci: edit = tulis dokumen ID baru (clone), bukan timpa
-      // milik orang. Anon tidak boleh update (sebelumnya: true = siapa pun
-      // bisa timpa tema orang via console bermodal ID katalog publik).
-      // Admin login (request.auth) tetap boleh update/restore.
-      allow update: if request.auth != null;
-      allow delete: if request.auth != null;
+      allow create: if request.auth != null
+        && (
+          request.auth.token.email == 'admin@byaruna.my.id'
+          || request.resource.data.ownerUid == request.auth.uid
+        );
+      allow update: if request.auth != null
+        && (
+          request.auth.token.email == 'admin@byaruna.my.id'
+          || (
+            resource.data.ownerUid == request.auth.uid
+            && request.resource.data.ownerUid == resource.data.ownerUid
+          )
+        );
+      allow delete: if request.auth != null
+        && (
+          request.auth.token.email == 'admin@byaruna.my.id'
+          || resource.data.ownerUid == request.auth.uid
+        );
     }
 
     // =========================================================================

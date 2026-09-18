@@ -16,7 +16,7 @@ test('direct invitation and private lifecycle creates are denied', () => {
 
 test('all client invitation updates preserve payment status and private fields', () => {
   assert.match(rules, /request\.resource\.data\.status == resource\.data\.status/)
-  assert.match(rules, /affectedKeys\(\)\.hasAny\(\[\s*'customerWhatsapp',[\s\S]*?'waReminderTemplate',[\s\S]*?'isPaid',?\s*\]\) == false/)
+  assert.match(rules, /affectedKeys\(\)\.hasAny\(\[\s*'customerWhatsapp',[\s\S]*?'waReminderTemplate',[\s\S]*?'isPaid',[\s\S]*?'wishes',?\s*\]\) == false/)
 })
 
 test('client invitation deletion is denied', () => {

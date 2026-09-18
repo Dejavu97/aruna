@@ -1,5 +1,6 @@
-import { db } from './firebase'
+import { auth, db } from './firebase'
 import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, orderBy } from 'firebase/firestore'
+import { buildOwnedCustomTheme } from './custom-theme-ownership'
 
 export async function fetchCustomThemes() {
   let deletedIds = []
@@ -51,11 +52,7 @@ export async function fetchCustomTheme(id) {
 
 export async function createCustomTheme(themeData) {
   const themeId = themeData.id || ('ct_' + Math.random().toString(36).slice(2, 10))
-  const data = {
-    ...themeData,
-    id: themeId,
-    createdAt: Date.now(),
-  }
+  const data = buildOwnedCustomTheme(themeData, auth.currentUser, { themeId })
 
   try {
     const docRef = doc(db, 'custom_themes', themeId)
@@ -82,11 +79,13 @@ export async function createCustomTheme(themeData) {
 }
 
 export async function deleteCustomTheme(id) {
+  if (!auth.currentUser) throw new Error('Masuk dengan Google untuk menghapus tema.')
   try {
     const docRef = doc(db, 'custom_themes', id)
     await deleteDoc(docRef)
   } catch (err) {
     console.warn('Firestore deleteDoc custom_themes:', err)
+    throw new Error('Gagal menghapus tema dari cloud. Pastikan tema ini milik Anda.')
   }
 
   try {
