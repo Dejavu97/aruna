@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { adminAuth, adminDb } from './_firebase.js'
-import { verifyAdminCredentials } from './_auth.js'
+import { verifyPrivilegedAdmin } from './_auth.js'
 import {
   buildCreationRecords,
   createInvitationRecords,
@@ -30,10 +30,10 @@ function validatePayload(payload, { requireCustomer = true } = {}) {
   }
 }
 
-async function resolveCreationPayload(body) {
+async function resolveCreationPayload(req, body) {
   if (!['clone', 'restore'].includes(body.action)) return body.payload
 
-  if (!(await verifyAdminCredentials(body))) {
+  if (!(await verifyPrivilegedAdmin(req, body))) {
     throw Object.assign(new Error('Tidak diizinkan.'), { status: 403 })
   }
   if (body.action === 'restore') return body.payload
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {}
-    const payload = await resolveCreationPayload(body)
+    const payload = await resolveCreationPayload(req, body)
     validatePayload(payload, { requireCustomer: !['clone', 'restore'].includes(body.action) })
     const owner = await resolveOwner(body, payload)
 

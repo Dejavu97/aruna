@@ -35,7 +35,8 @@ service cloud.firestore {
           'paidAt',
           'isPaid',
           'rsvps',
-          'wishes'
+          'wishes',
+          'customDomain'
         ]) == false
         && (
           // Owner Google hanya dapat mengubah dokumennya sendiri.

@@ -1,5 +1,6 @@
 import { adminDb } from './_firebase.js';
-import { verifyAdminCredentials } from './_auth.js';
+import { verifyPrivilegedAdmin } from './_auth.js';
+import { hasPrivilegedAdminCredential } from './_admin-guard.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import { partitionInvitationUpdate } from './_invitation-lifecycle.js';
 
@@ -9,13 +10,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { slug, editKey, payload } = req.body
+    const body = req.body || null
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Body JSON tidak valid.' })
+    }
+    const { slug, editKey, payload } = body
 
     if (!slug || !payload || typeof payload !== 'object') {
       return res.status(400).json({ error: 'Slug and valid payload are required' })
     }
 
-    const isAdmin = await verifyAdminCredentials(req.body)
+    const attemptedAdmin = hasPrivilegedAdminCredential(body)
+    const isAdmin = await verifyPrivilegedAdmin(req, body)
     let isAuthorized = isAdmin
 
     // Otorisasi pelanggan via editKey (brankas private_keys, dibaca Admin SDK)
@@ -28,7 +34,7 @@ export default async function handler(req, res) {
     }
 
     if (!isAuthorized) {
-      return res.status(403).json({ error: 'Akses ditolak: Kunci rahasia (editKey/adminKey) tidak valid.' })
+      return res.status(403).json({ error: attemptedAdmin ? 'Tidak diizinkan.' : 'Akses ditolak: Kunci edit tidak valid.' })
     }
 
     const { publicPayload, privatePayload } = partitionInvitationUpdate(payload, isAdmin)
@@ -54,6 +60,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ success: true })
   } catch (err) {
+    if (err.status === 429) return res.status(429).json({ error: err.message })
     console.error('Update API Error:', err)
     return res.status(500).json({ error: err.message })
   }

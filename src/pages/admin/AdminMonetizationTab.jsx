@@ -1,4 +1,4 @@
-import { saveAdSettings, updateInvitation, uploadFile } from '../../lib/api'
+import { saveAdSettings, uploadFile } from '../../lib/api'
 import {
   CreditCard,
   ExternalLink,
@@ -1002,7 +1002,19 @@ export default function AdminMonetizationTab({ adSettings,
                                   onClick={async () => {
                                     if (!confirm(`Putuskan domain "${inv.customDomain}" dari undangan "${coupleName}"? Undangan akan kembali ke URL standar /u/${inv.slug}.`)) return
                                     try {
-                                      await updateInvitation(inv.slug, { customDomain: null })
+                                      const res = await fetch('/api/remove-domain', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                          domain: inv.customDomain,
+                                          slug: inv.slug,
+                                          editKey: inv.editKey,
+                                        }),
+                                      })
+                                      const data = await res.json().catch(() => ({}))
+                                      if (!res.ok || !data.success) {
+                                        throw new Error(data.error || 'Gagal melepas domain.')
+                                      }
                                       alert(`Domain ${inv.customDomain} berhasil dilepas.`)
                                       load()
                                     } catch (err) {

@@ -30,6 +30,7 @@ const SERVER_CONTROLLED_FIELDS = Object.freeze([
   'paidAt',
   'isPaid',
   'ownerUid',
+  'customDomain',
 ])
 
 const IMMUTABLE_UPDATE_FIELDS = Object.freeze([
@@ -39,6 +40,7 @@ const IMMUTABLE_UPDATE_FIELDS = Object.freeze([
   'updatedAt',
   'schemaVersion',
   'editKey',
+  'customDomain',
 ])
 
 const CUSTOMER_PRIVILEGED_FIELDS = Object.freeze([

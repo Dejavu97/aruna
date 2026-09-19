@@ -1,5 +1,5 @@
 import { adminDb } from './_firebase.js';
-import { verifyPassword, hashPassword } from './_auth.js';
+import { verifyPrivilegedAdmin } from './_auth.js';
 
 // ============ ADMIN SETTINGS & VOUCHERS (P1 hardening) ============
 // Semua operasi tulis settings/vouchers kini lewat sini dengan verifikasi
@@ -11,40 +11,19 @@ import { verifyPassword, hashPassword } from './_auth.js';
 // setVoucher  -> /vouchers/{code}
 // setSetting  -> /settings/{doc} (doc wajib != 'admin_auth')
 
-const ADMIN_AUTH_DOC = 'settings/admin_auth';
-
-async function readStoredPassword() {
-  const snap = await adminDb.doc(ADMIN_AUTH_DOC).get();
-  return snap.exists ? snap.data()?.password || null : null;
-}
-
-async function isAdmin(adminKey) {
-  if (!adminKey) return false;
-  const stored = await readStoredPassword();
-  if (stored) {
-    if (!verifyPassword(adminKey, stored)) return false;
-    // Migrasi transparan plain → hash
-    if (!stored.startsWith('scrypt$')) {
-      await adminDb.collection('settings').doc('admin_auth').set({
-        password: hashPassword(adminKey),
-        updatedAt: Date.now(),
-      }, { merge: true });
-    }
-    return true;
-  }
-  // Bootstrap: belum ada password tersimpan
-  return ['aruna2026', 'byaruna2026'].includes(String(adminKey));
-}
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { adminKey, action, code, data, doc: docName } = req.body || {};
+    const body = req.body || null;
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Body JSON tidak valid.' });
+    }
+    const { action, code, data, doc: docName } = body;
 
-    const authorized = await isAdmin(adminKey);
+    const authorized = await verifyPrivilegedAdmin(req, body);
     if (!authorized) {
       return res.status(403).json({ error: 'Tidak diizinkan.' });
     }
@@ -106,6 +85,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Action tidak dikenal.' });
     }
   } catch (err) {
+    if (err.status === 429) return res.status(429).json({ error: err.message });
     console.error('Admin settings API Error:', err);
     return res.status(500).json({ error: err.message });
   }

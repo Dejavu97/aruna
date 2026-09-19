@@ -1,5 +1,5 @@
 import { adminDb } from './_firebase.js'
-import { verifyAdminCredentials } from './_auth.js'
+import { verifyPrivilegedAdmin } from './_auth.js'
 import { listMergedInvitations } from './_invitation-lifecycle.js'
 
 export default async function handler(req, res) {
@@ -8,7 +8,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (!(await verifyAdminCredentials(req.body || {}))) {
+    const body = req.body || null
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Body JSON tidak valid.' })
+    }
+    if (!(await verifyPrivilegedAdmin(req, body))) {
       return res.status(403).json({ error: 'Tidak diizinkan.' })
     }
 
@@ -23,6 +27,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ success: true, invitations: merged })
   } catch (err) {
+    if (err.status === 429) return res.status(429).json({ error: err.message })
     console.error('Admin Invitations API Error:', err)
     return res.status(500).json({ error: 'Gagal memuat data undangan.' })
   }

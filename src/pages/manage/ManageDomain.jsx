@@ -1,4 +1,3 @@
-import { updateInvitation } from '../../lib/api'
 import { copyText } from '../../lib/utils'
 
 /** ManageDomain — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
@@ -42,25 +41,17 @@ export default function ManageDomain({ customDomain,
                       .replace(/\/.*$/, '')
 
                     try {
-                      // 1. Selalu simpan ke database Firestore terlebih dahulu
-                      await updateInvitation(slug, { customDomain: cleanDomain }, editKey)
-                      setItem((prev) => ({ ...prev, customDomain: cleanDomain }))
-                      setCustomDomain(cleanDomain)
-
-                      // 2. Hubungkan ke Vercel di background jika API tersedia
-                      try {
-                        const res = await fetch('/api/add-domain', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ domain: cleanDomain, slug, editKey }),
-                        })
-                        if (!res.ok) {
-                          const d = await res.json().catch(() => ({}))
-                          console.warn('Vercel domain connection note:', d.error)
-                        }
-                      } catch (vErr) {
-                        console.warn('Vercel API call note:', vErr)
+                      const res = await fetch('/api/add-domain', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ domain: cleanDomain, slug, editKey }),
+                      })
+                      const data = await res.json().catch(() => ({}))
+                      if (!res.ok || !data.success) {
+                        throw new Error(data.error || 'Gagal menghubungkan domain.')
                       }
+                      setItem((prev) => ({ ...prev, customDomain: data.domain }))
+                      setCustomDomain(data.domain)
 
                       alert('Domain pribadi berhasil dihubungkan! Silakan arahkan DNS domain Anda sesuai tabel petunjuk di bawah.')
                     } catch (err) {
@@ -79,21 +70,17 @@ export default function ManageDomain({ customDomain,
                       setError('')
                       const prevDomain = item.customDomain
                       try {
-                        // 1. Hapus dari database Firestore
-                        await updateInvitation(slug, { customDomain: null }, editKey)
+                        const res = await fetch('/api/remove-domain', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ domain: prevDomain, slug, editKey }),
+                        })
+                        const data = await res.json().catch(() => ({}))
+                        if (!res.ok || !data.success) {
+                          throw new Error(data.error || 'Gagal menghapus domain.')
+                        }
                         setItem((prev) => ({ ...prev, customDomain: null }))
                         setCustomDomain('')
-
-                        // 2. Hapus dari Vercel di background jika tersedia
-                        try {
-                          await fetch('/api/remove-domain', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ domain: prevDomain, slug, editKey }),
-                          })
-                        } catch (vErr) {
-                          console.warn('Vercel API remove note:', vErr)
-                        }
 
                         alert('Domain pribadi berhasil dihapus.')
                       } catch (err) {

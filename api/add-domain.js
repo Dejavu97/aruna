@@ -1,67 +1,82 @@
 import { adminDb } from './_firebase.js';
+import { addDomainBoundary, normalizeDomain } from './_domain-boundary.js';
+
+function vercelConfig() {
+  const token = process.env.VERCEL_API_TOKEN;
+  const projectId = process.env.VERCEL_PROJECT_ID;
+  const teamId = process.env.VERCEL_TEAM_ID;
+  if (!token || !projectId) throw Object.assign(new Error('Server configuration missing'), { status: 500 });
+  return { token, projectId, teamId };
+}
+
+function projectDomainUrl({ projectId, teamId }, domain = '', version = 'v10') {
+  const suffix = domain ? `/${encodeURIComponent(domain)}` : '';
+  const query = teamId ? `?teamId=${encodeURIComponent(teamId)}` : '';
+  return `https://api.vercel.com/${version}/projects/${encodeURIComponent(projectId)}/domains${suffix}${query}`;
+}
+
+async function parseJson(response) {
+  return response.json().catch(() => ({}));
+}
 
 export default async function handler(req, res) {
-  // Hanya menerima metode POST
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' })
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
-    const { domain, slug, editKey } = req.body
-
-    if (!domain || !slug || !editKey) {
-      return res.status(400).json({ error: 'Domain, slug, and editKey are required' })
+    const body = req.body || null;
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Body JSON tidak valid.' });
     }
-
-    // Validasi editKey ke Firebase (Mencegah spam API oleh hacker)
-    const secretRef = adminDb.collection('private_keys').doc(slug)
-    const secretSnap = await secretRef.get()
-    
-    if (!secretSnap.exists || secretSnap.data().editKey !== editKey) {
-      return res.status(403).json({ error: 'Akses ditolak: Kunci rahasia (editKey) tidak valid atau undangan tidak ditemukan.' })
+    if (!body.domain || !body.slug || !body.editKey) {
+      return res.status(400).json({ error: 'Domain, slug, and editKey are required' });
     }
+    let config;
+    const getConfig = () => (config ||= vercelConfig());
 
-    // Mengambil informasi rahasia dari environment variables Vercel
-    const VERCEL_API_TOKEN = process.env.VERCEL_API_TOKEN
-    const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID
-    const VERCEL_TEAM_ID = process.env.VERCEL_TEAM_ID // Optional, jika project ada di bawah team
-
-    if (!VERCEL_API_TOKEN || !VERCEL_PROJECT_ID) {
-      return res.status(500).json({ error: 'Server configuration missing' })
-    }
-
-    // Memanggil API Vercel untuk menambahkan domain ke project
-    let apiUrl = `https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains`
-    if (VERCEL_TEAM_ID) {
-      apiUrl += `?teamId=${VERCEL_TEAM_ID}`
-    }
-
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${VERCEL_API_TOKEN}`,
-        'Content-Type': 'application/json',
+    const result = await addDomainBoundary(body, {
+      verifyEditKey: async (slug, editKey) => {
+        const snap = await adminDb.collection('private_keys').doc(slug).get();
+        return snap.exists && snap.data()?.editKey === editKey;
       },
-      body: JSON.stringify({ name: domain }),
-    })
+      loadInvitation: async (slug) => {
+        const snap = await adminDb.collection('invitations').doc(slug).get();
+        return snap.exists ? snap.data() : null;
+      },
+      addToVercel: async (domain) => {
+        const activeConfig = getConfig();
+        const response = await fetch(projectDomainUrl(activeConfig), {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${activeConfig.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name: domain }),
+        });
+        return { ok: response.ok, status: response.status, data: await parseJson(response) };
+      },
+      verifyAttachedToProject: async (domain) => {
+        const activeConfig = getConfig();
+        const response = await fetch(projectDomainUrl(activeConfig, domain, 'v9'), {
+          headers: { Authorization: `Bearer ${activeConfig.token}` },
+        });
+        if (!response.ok) return false;
+        const data = await parseJson(response);
+        return normalizeDomain(data.name) === domain;
+      },
+      saveDomainMapping: async (slug, domain) => {
+        await adminDb.collection('invitations').doc(slug).update({
+          customDomain: domain,
+          updatedAt: Date.now(),
+        });
+      },
+    });
 
-    const data = await response.json()
-
-    if (!response.ok) {
-      const msg = data.error?.message || ''
-      const code = data.error?.code || ''
-      // Jika domain sudah ada di proyek Vercel ini atau sudah terdaftar di akun Vercel, itu status valid
-      if (msg.includes('already in use') || code === 'domain_already_in_use' || code === 'forbidden') {
-        return res.status(200).json({ success: true, domain, note: 'Domain sudah aktif di proyek Vercel.' })
-      }
-      throw new Error(msg || 'Gagal menambahkan domain ke Vercel')
-    }
-
-    // Jika berhasil
-    return res.status(200).json({ success: true, domain: data.name })
-
+    return res.status(200).json(result);
   } catch (error) {
-    console.error('Error adding domain:', error)
-    return res.status(500).json({ error: error.message })
+    const status = Number(error.status) || 500;
+    if (status >= 500) console.error('Error adding domain:', error);
+    return res.status(status).json({ error: error.message || 'Gagal menambahkan domain.' });
   }
 }

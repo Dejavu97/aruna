@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { adminAuth, adminDb } from './_firebase.js';
+import { createPrivilegedAdminGuard } from './_admin-guard.js';
 
 const ADMIN_EMAIL = 'admin@byaruna.my.id';
 const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
@@ -44,12 +45,15 @@ export async function assertNotLocked(req) {
 /** Catat satu percobaan gagal. Setelah MAX_FAILS, pasang lock. */
 export async function recordFailure(req) {
   const ref = throttleDoc(getClientIp(req));
-  const snap = await ref.get();
-  const data = snap.exists ? snap.data() || {} : {};
-  const fails = (data.fails || 0) + 1;
-  const update = { fails, lastFail: Date.now() };
-  if (fails >= MAX_FAILS) update.lockUntil = Date.now() + LOCK_MS;
-  await ref.set(update, { merge: true });
+  await adminDb.runTransaction(async (transaction) => {
+    const snap = await transaction.get(ref);
+    const data = snap.exists ? snap.data() || {} : {};
+    const now = Date.now();
+    const fails = (data.fails || 0) + 1;
+    const update = { fails, lastFail: now };
+    if (fails >= MAX_FAILS) update.lockUntil = now + LOCK_MS;
+    transaction.set(ref, update, { merge: true });
+  });
 }
 
 /** Reset counter setelah sukses. */
@@ -80,7 +84,7 @@ export function verifyPassword(plain, stored) {
 }
 
 /** Verify existing Firebase-admin or custom-password credentials. */
-export async function verifyAdminCredentials(body = {}) {
+async function verifyAdminCredentials(body = {}) {
   if (body.idToken) {
     try {
       const token = await adminAuth.verifyIdToken(String(body.idToken));
@@ -102,3 +106,10 @@ export async function verifyAdminCredentials(body = {}) {
   }
   return !storedPass && BOOTSTRAP_PASSWORDS.includes(String(body.adminKey));
 }
+
+export const verifyPrivilegedAdmin = createPrivilegedAdminGuard({
+  assertNotLocked,
+  recordFailure,
+  clearFailures,
+  verifyCredentials: verifyAdminCredentials,
+});
