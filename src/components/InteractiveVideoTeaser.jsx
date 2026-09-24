@@ -7,7 +7,7 @@ const DEMO_VIDEOS = [
     id: 'bunny_featured',
     title: 'Tema Unggulan: Royal Bunny Fairytale',
     tag: 'Royal Bunny Showcase',
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    url: null,
     poster: '/themes/kelinci/cover.jpg',
     link: '/tema/royal-bunny',
     couple: 'Sarah & Budi · Royal Bunny',
@@ -17,7 +17,7 @@ const DEMO_VIDEOS = [
     id: 'birthday',
     title: 'Perayaan Ulang Tahun: Sweet 17th',
     tag: 'Birthday Motion',
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    url: null,
     poster: '/assets/local/birthday_party_cover.jpg',
     link: '/tema/sweet-seventeen',
     couple: 'Sarah Bella (17th)',
@@ -27,7 +27,7 @@ const DEMO_VIDEOS = [
     id: 'capsule',
     title: 'Surat Romantis & Kapsul Kenangan',
     tag: 'Love Letter Capsule',
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    url: null,
     poster: '/assets/local/couple_garden.jpg',
     link: '/tema/birthday-memory-capsule',
     couple: 'Untuk Sarah · Birthday Love Letter',
@@ -37,7 +37,7 @@ const DEMO_VIDEOS = [
 
 export default function InteractiveVideoTeaser() {
   const [activeIdx, setActiveIdx] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(true)
+  const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(true)
   const videoRef = useRef(null)
 
@@ -92,7 +92,7 @@ export default function InteractiveVideoTeaser() {
                     type="button"
                     onClick={() => {
                       setActiveIdx(idx)
-                      setIsPlaying(true)
+                      setIsPlaying(false)
                     }}
                     className={`px-3.5 py-2 text-xs font-semibold rounded-xs border transition-colors ${
                       activeIdx === idx
@@ -168,17 +168,22 @@ export default function InteractiveVideoTeaser() {
 
                 {/* Inner Screen Area */}
                 <div className="relative rounded-[32px] overflow-hidden aspect-[9/18] bg-black">
-                  <video
-                    ref={videoRef}
-                    key={activeDemo.url}
-                    src={activeDemo.url}
-                    poster={activeDemo.poster}
-                    autoPlay
-                    loop
-                    muted={isMuted}
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
+                  {activeDemo.url ? (
+                    <video
+                      ref={videoRef}
+                      key={activeDemo.url}
+                      src={activeDemo.url}
+                      poster={activeDemo.poster}
+                      autoPlay
+                      loop
+                      muted={isMuted}
+                      playsInline
+                      onError={() => setIsPlaying(false)}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img src={activeDemo.poster} alt="" className="w-full h-full object-cover" />
+                  )}
 
                   {/* Top Subtle Gradient */}
                   <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
@@ -196,7 +201,7 @@ export default function InteractiveVideoTeaser() {
                     </div>
 
                     {/* Video Player Floating Controls */}
-                    <div className="flex items-center justify-between pt-1 border-t border-white/20">
+                    {activeDemo.url && <div className="flex items-center justify-between pt-1 border-t border-white/20">
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -222,7 +227,7 @@ export default function InteractiveVideoTeaser() {
                       >
                         Buka Demo <ArrowRight size={10} />
                       </Link>
-                    </div>
+                    </div>}
                   </div>
                 </div>
 

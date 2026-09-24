@@ -19,7 +19,7 @@ export const themes = [
     cover: '/themes/covers/kejora.svg',
     layout: 'kejora',
     opener: 'DUA BINTANG, SATU LANGIT',
-    music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+    music: '/music/tiny_paws.mp3',
     fonts: {
       display: '"Cormorant Garamond", Georgia, serif',
       script: '"Cormorant Garamond", serif',
@@ -912,7 +912,7 @@ export const demos = {
   'kejora': demo({
     themeId: 'kejora',
     slug: 'kejora-aurelia-julian',
-    music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+    music: '/music/tiny_paws.mp3',
     groom: {
       nick: 'Julian',
       full: 'Raden Julian Danendra, B.Arch.',
@@ -2041,7 +2041,7 @@ export const demos = {
     ],
     events: [],
     banks: [],
-    music: 'https://assets.mixkit.co/music/preview/mixkit-wedding-acoustic-guitar-583.mp3',
+    music: '/music/tiny_paws.mp3',
     wishes: [
       {
         id: 'w1',

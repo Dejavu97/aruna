@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, MapPin, Play, Home, Users, CalendarDays, Images, Heart, Gift as GiftIcon, MailOpen, ExternalLink } from 'lucide-react'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
+import { resolveInvitationMusic } from './musicSource'
 import {
   copyText,
   countdownParts,
@@ -535,6 +536,27 @@ export default function AttariInvitation({ data, guest = '', preview = false }) 
   const [lightbox, setLightbox] = useState(null)
   const [copied, setCopied] = useState('')
   const [musicOn, setMusicOn] = useState(false)
+  const audioRef = useRef(null)
+  const musicSrc = resolveInvitationMusic(data.music)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio || !musicOn) return undefined
+    const attempt = audio.play()
+    if (attempt?.catch) attempt.catch(() => setMusicOn(false))
+    return undefined
+  }, [musicOn])
+
+  function toggleMusic() {
+    const audio = audioRef.current
+    if (!audio) return setMusicOn(false)
+    if (musicOn) {
+      audio.pause()
+      setMusicOn(false)
+    } else {
+      setMusicOn(true)
+    }
+  }
   const [showPass, setShowPass] = useState(false)
   const [local, setLocal] = useState(data)
 
@@ -576,15 +598,15 @@ export default function AttariInvitation({ data, guest = '', preview = false }) 
               data={data}
               guest={guest}
               coverImg={coverImg}
-              onOpen={() => { setOpen(true); setMusicOn(Boolean(data.music)) }}
+              onOpen={() => { setOpen(true); setMusicOn(Boolean(musicSrc)) }}
             />
           )}
         </AnimatePresence>
 
         {open && (
           <main className="at-main">
-            {data.music && <MusicBtn on={musicOn} onToggle={() => setMusicOn(v => !v)} />}
-            {data.music && musicOn && <audio src={data.music} autoPlay loop />}
+            {musicSrc && <MusicBtn on={musicOn} onToggle={toggleMusic} />}
+            {musicSrc && <audio ref={audioRef} src={musicSrc} autoPlay={musicOn} loop onError={() => setMusicOn(false)} onPlay={() => setMusicOn(true)} onPause={() => setMusicOn(false)} />}
             <Reveal><Hero data={data} bride={bride} groom={groom} /></Reveal>
             <Reveal delay={0.1}><Quote data={data} /></Reveal>
             <Reveal><Couple data={data} /></Reveal>

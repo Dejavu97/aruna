@@ -4,6 +4,7 @@ import { Volume2, VolumeX, MapPin, Copy, Check } from 'lucide-react'
 import { addRsvp, addWish } from '../lib/api'
 import { formatLongDate, formatTime, safeUrl, countdownParts } from '../lib/utils'
 import './ThemeKejora.css'
+import { resolveInvitationMusic } from './musicSource'
 
 /**
  * KEJORA — Pernikahan di Bawah Langit Malam
@@ -84,6 +85,7 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
   const [open, setOpen] = useState(false)
   const [musicOn, setMusicOn] = useState(false)
   const audioRef = useRef(null)
+  const musicSrc = resolveInvitationMusic(data.music)
 
   const playMusic = useCallback((el) => {
     if (!el) {
@@ -154,13 +156,13 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
 
   /* A — moon gate flythrough: warp 1.4s lalu buka */
   const openInvite = useCallback(() => {
-    if (data.music) playMusic(audioRef.current)
+    if (musicSrc) playMusic(audioRef.current)
     setWarping(true)
     setTimeout(() => {
       setOpen(true)
       window.scrollTo({ top: 0 })
     }, 1400)
-  }, [data.music, playMusic])
+  }, [musicSrc, playMusic])
 
   /* C — orrery galeri: drag untuk memutar */
   const [orrAngle, setOrrAngle] = useState(0)
@@ -391,9 +393,17 @@ export default function ThemeKejora({ data, guest = '', preview = false, theme }
       </div>
 
       {/* ============ MUSIK ============ */}
-      {data.music && (
+      {musicSrc && (
         <>
-          <audio ref={audioRef} src={data.music} loop preload="auto" />
+          <audio
+            ref={audioRef}
+            src={musicSrc}
+            loop
+            preload="auto"
+            onError={() => setMusicOn(false)}
+            onPlay={() => setMusicOn(true)}
+            onPause={() => setMusicOn(false)}
+          />
           <div className="kj-audio-bar">
             <button
               type="button"

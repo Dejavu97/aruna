@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, MapPin, Pause, Play, Home, Users, CalendarDays, Calendar, Images, Heart, Gift as GiftIcon, MailOpen, Camera } from 'lucide-react'
 import { BatikLine, Corner, Flourish, StarGeom } from './Ornaments'
@@ -26,6 +26,7 @@ import { getFormMode, getThemeFeatures } from '../data/themes'
 import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 import AdSlot from '../components/AdSlot'
+import { resolveInvitationMusic } from './musicSource'
 
 export function StandardInvitation({ data, guest = '', preview = false, theme }) {
   const formConfig = useMemo(() => getFormMode(theme), [theme])
@@ -36,6 +37,7 @@ export function StandardInvitation({ data, guest = '', preview = false, theme })
   const [lightbox, setLightbox] = useState(null)
   const [copied, setCopied] = useState('')
   const [musicOn, setMusicOn] = useState(false)
+  const audioRef = useRef(null)
   const [showPass, setShowPass] = useState(false)
   const [showFrameModal, setShowFrameModal] = useState(false)
   const [local, setLocal] = useState(data)
@@ -51,6 +53,26 @@ export function StandardInvitation({ data, guest = '', preview = false, theme })
   const showEvents = formConfig.showEvents && features.events?.enabled !== false && (data.events || []).length > 0
   const showGift = formConfig.showBanks && ((data.banks || []).length > 0 || data.qris || data.giftAddress)
   const showCouple = formConfig.showCoupleCard !== false && !isLoveLetter
+  const musicSrc = resolveInvitationMusic(data.music)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio || !musicOn) return undefined
+    const attempt = audio.play()
+    if (attempt?.catch) attempt.catch(() => setMusicOn(false))
+    return undefined
+  }, [musicOn])
+
+  function toggleMusic() {
+    const audio = audioRef.current
+    if (!audio) return setMusicOn(false)
+    if (musicOn) {
+      audio.pause()
+      setMusicOn(false)
+    } else {
+      setMusicOn(true)
+    }
+  }
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -179,7 +201,7 @@ export function StandardInvitation({ data, guest = '', preview = false, theme })
               formConfig={formConfig}
               onOpen={() => {
                 setOpen(true)
-                setMusicOn(Boolean(data.music))
+                setMusicOn(Boolean(musicSrc))
               }}
             />
           )}
@@ -211,13 +233,23 @@ export function StandardInvitation({ data, guest = '', preview = false, theme })
               <button
                 type="button"
                 className="music-btn"
-                onClick={() => setMusicOn((v) => !v)}
+                onClick={toggleMusic}
                 aria-label={musicOn ? 'Matikan musik' : 'Putar musik'}
               >
                 {musicOn ? <Pause size={16} /> : <Play size={16} />}
               </button>
             )}
-            {data.music && musicOn && <audio src={data.music} autoPlay loop />}
+            {musicSrc && (
+              <audio
+                ref={audioRef}
+                src={musicSrc}
+                autoPlay={musicOn}
+                loop
+                onError={() => setMusicOn(false)}
+                onPlay={() => setMusicOn(true)}
+                onPause={() => setMusicOn(false)}
+              />
+            )}
 
             <Reveal fx="hero" sectionAnims={theme.sectionAnims}>{theme.layout === 'attari' ? <HeroAttari theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} /> : <Hero theme={theme} data={data} couple={couple} coverImg={coverImg} scene={scenes.home} formConfig={formConfig} />}</Reveal>
             <Reveal fx="greeting" sectionAnims={theme.sectionAnims}><Greeting theme={theme} text={theme.greeting} scene={scenes.home} /></Reveal>
