@@ -1,22 +1,26 @@
+import { resolveWatermarkPresentation } from '../lib/watermark-authority'
+
 export default function Watermark({ data, theme, className = '' }) {
-  if (data?.watermarkMode === 'hidden') {
+  const { mode, text, url } = resolveWatermarkPresentation(data)
+
+  if (mode === 'hidden') {
     return null
   }
 
-  if (data?.watermarkMode === 'custom' && data?.customWatermarkText) {
-    if (data?.customWatermarkUrl) {
+  if (mode === 'custom' && text) {
+    if (url) {
       return (
         <a
-          href={data.customWatermarkUrl}
+          href={url}
           target="_blank"
           rel="noreferrer"
           className={`hover:underline opacity-85 hover:opacity-100 transition-opacity ${className}`}
         >
-          {data.customWatermarkText}
+          {text}
         </a>
       )
     }
-    return <span className={className}>{data.customWatermarkText}</span>
+    return <span className={className}>{text}</span>
   }
 
   return (

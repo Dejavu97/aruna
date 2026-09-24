@@ -54,6 +54,12 @@ const CUSTOMER_PRIVILEGED_FIELDS = Object.freeze([
   'isPaid',
 ])
 
+export const PREMIUM_WATERMARK_FIELDS = Object.freeze([
+  'watermarkMode',
+  'customWatermarkText',
+  'customWatermarkUrl',
+])
+
 export function generateEditKey() {
   return randomBytes(24).toString('base64url')
 }
@@ -68,7 +74,7 @@ export function sanitizeInvitationSlug(value) {
     .slice(0, 80)
 }
 
-export function splitInvitationPayload(payload = {}) {
+export function splitInvitationPayload(payload = {}, { allowPremiumWatermark = false } = {}) {
   const publicData = { ...payload }
   const privateData = {}
 
@@ -78,14 +84,20 @@ export function splitInvitationPayload(payload = {}) {
   }
 
   for (const field of SERVER_CONTROLLED_FIELDS) delete publicData[field]
+  if (!allowPremiumWatermark) {
+    for (const field of PREMIUM_WATERMARK_FIELDS) delete publicData[field]
+  }
   return { publicData, privateData }
 }
 
-export function partitionInvitationUpdate(payload = {}, isAdmin = false) {
+export function partitionInvitationUpdate(payload = {}, isAdmin = false, allowPremiumWatermark = isAdmin) {
   const publicPayload = { ...payload }
   for (const field of IMMUTABLE_UPDATE_FIELDS) delete publicPayload[field]
   if (!isAdmin) {
     for (const field of CUSTOMER_PRIVILEGED_FIELDS) delete publicPayload[field]
+  }
+  if (!allowPremiumWatermark) {
+    for (const field of PREMIUM_WATERMARK_FIELDS) delete publicPayload[field]
   }
 
   const privatePayload = {}
@@ -103,8 +115,9 @@ export function buildCreationRecords(payload, {
   ownerUid = '',
   customerEmail = '',
   now = Date.now(),
+  allowPremiumWatermark = false,
 }) {
-  const { publicData, privateData } = splitInvitationPayload(payload)
+  const { publicData, privateData } = splitInvitationPayload(payload, { allowPremiumWatermark })
 
   return {
     publicData: {

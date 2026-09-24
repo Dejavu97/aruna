@@ -27,6 +27,8 @@ export default function ManageRingkas({ copied,
   tab,
   text,
   watermarkMode }) {
+  const watermarkPremiumEnabled = item?.status === 'paid'
+
   return (
 
           <div className="grid gap-6 lg:grid-cols-3">
@@ -151,12 +153,17 @@ export default function ManageRingkas({ copied,
                   <p className="text-xs text-stone max-w-xl leading-relaxed">
                     Atur nama brand Wedding Organizer / fotografer Anda di bagian footer undangan tamu atau sembunyikan watermark sepenuhnya.
                   </p>
+                  {!watermarkPremiumEnabled && (
+                    <p className="text-xs font-semibold text-amber-800">
+                      Fitur premium tersedia setelah pelunasan dikonfirmasi admin.
+                    </p>
+                  )}
                 </div>
 
                 <button
                   type="button"
                   onClick={handleSaveWatermark}
-                  disabled={savingWatermark}
+                  disabled={savingWatermark || (!watermarkPremiumEnabled && watermarkMode !== 'default')}
                   className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
                 >
                   <Check size={13} /> {savingWatermark ? 'Menyimpan...' : 'Simpan Branding'}
@@ -169,24 +176,28 @@ export default function ManageRingkas({ copied,
                   ['default', 'Standar Aruna', 'Menampilkan: Dibuat dengan Aruna · Tema ...'],
                   ['custom', 'White-Label Kustom', 'Menampilkan nama brand / WO / Fotografer Anda'],
                   ['hidden', 'Sembunyikan Total', '100% Bersih tanpa teks watermark sama sekali'],
-                ].map(([modeVal, modeTitle, modeDesc]) => (
-                  <button
-                    key={modeVal}
-                    type="button"
-                    onClick={() => setWatermarkMode(modeVal)}
-                    className={`p-3 border text-left rounded-xs transition-colors space-y-1 ${
-                      watermarkMode === modeVal
-                        ? 'border-gold-deep bg-gold/10 font-semibold text-ink shadow-xs'
-                        : 'border-ink/15 text-stone hover:border-ink/40'
-                    }`}
-                  >
-                    <p className="font-bold text-ink">{modeTitle}</p>
-                    <p className="text-[11px] text-stone leading-tight">{modeDesc}</p>
-                  </button>
-                ))}
+                ].map(([modeVal, modeTitle, modeDesc]) => {
+                  const premiumMode = modeVal !== 'default'
+                  return (
+                    <button
+                      key={modeVal}
+                      type="button"
+                      onClick={() => setWatermarkMode(modeVal)}
+                      disabled={premiumMode && !watermarkPremiumEnabled}
+                      className={`p-3 border text-left rounded-xs transition-colors space-y-1 disabled:cursor-not-allowed disabled:opacity-50 ${
+                        watermarkMode === modeVal
+                          ? 'border-gold-deep bg-gold/10 font-semibold text-ink shadow-xs'
+                          : 'border-ink/15 text-stone hover:border-ink/40'
+                      }`}
+                    >
+                      <p className="font-bold text-ink">{modeTitle}</p>
+                      <p className="text-[11px] text-stone leading-tight">{modeDesc}</p>
+                    </button>
+                  )
+                })}
               </div>
 
-              {watermarkMode === 'custom' && (
+              {watermarkPremiumEnabled && watermarkMode === 'custom' && (
                 <div className="grid sm:grid-cols-2 gap-3 pt-2 text-xs bg-ivory/50 p-3.5 border border-ink/10 rounded-xs animate-in fade-in">
                   <div>
                     <label className="block uppercase tracking-wider text-stone font-semibold mb-1">

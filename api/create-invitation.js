@@ -97,6 +97,7 @@ export default async function handler(req, res) {
       ownerUid: owner.ownerUid,
       customerEmail: owner.customerEmail,
       now: Date.now(),
+      allowPremiumWatermark: isRestore && payload.status === 'paid',
     })
     // Restore adalah jalur admin-terautentikasi; normal create/clone tetap unpaid.
     if (isRestore && payload.status === 'paid') records.publicData.status = 'paid'

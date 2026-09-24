@@ -37,12 +37,20 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: attemptedAdmin ? 'Tidak diizinkan.' : 'Akses ditolak: Kunci edit tidak valid.' })
     }
 
-    const { publicPayload, privatePayload } = partitionInvitationUpdate(payload, isAdmin)
-
     // Satu batch menjaga public/private update konsisten. Delete sentinel
     // membersihkan field private legacy saat dokumen lama pertama kali diedit.
     const docRef = adminDb.collection('invitations').doc(slug)
     const privateRef = adminDb.collection('invitation_private').doc(slug)
+    let allowPremiumWatermark = isAdmin
+    if (!isAdmin) {
+      const existingInvitation = await docRef.get()
+      if (!existingInvitation.exists) {
+        return res.status(404).json({ error: 'Undangan tidak ditemukan.' })
+      }
+      allowPremiumWatermark = existingInvitation.data()?.status === 'paid'
+    }
+    const { publicPayload, privatePayload } = partitionInvitationUpdate(payload, isAdmin, allowPremiumWatermark)
+
     const publicUpdate = {
       ...publicPayload,
       updatedAt: Date.now(),
