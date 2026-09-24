@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import MaintenanceScreen from './components/MaintenanceScreen'
 import { AuthProvider } from './context/AuthContext'
 import { defaultMaintenanceSettings, fetchMaintenanceSettings } from './lib/api'
+import { isFirstPartyHostname } from './lib/host-boundary'
 
 // Code-Splitting: Lazy load pages to dramatically reduce initial bundle size for guests
 const Themes = lazy(() => import('./pages/Themes'))
@@ -29,20 +30,6 @@ function PageLoader() {
       </div>
     </div>
   )
-}
-
-const FIRST_PARTY_HOSTS = new Set([
-  'byaruna.my.id',
-  'www.byaruna.my.id',
-  'aruna-whydidyoucomehere.vercel.app',
-  'aruna-git-main-whydidyoucomehere.vercel.app',
-])
-
-function isFirstPartyHostname(rawHostname) {
-  const hostname = String(rawHostname || '').trim().toLowerCase().replace(/\.$/, '')
-  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.endsWith('.localhost')) return true
-  if (FIRST_PARTY_HOSTS.has(hostname)) return true
-  return hostname.endsWith('.ngrok-free.app')
 }
 
 export default function App() {

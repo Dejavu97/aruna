@@ -1,0 +1,175 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+import { createOgHandler } from '../api/_og-boundary.js'
+import { isFirstPartyHostname, normalizeRequestHost } from '../src/lib/host-boundary.js'
+
+const BASE_HTML = `<!doctype html><html><head>
+<title>ByAruna — Undangan Digital Eksklusif & Elegan</title>
+<meta name="description" content="Generic ByAruna" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://byaruna.my.id/" />
+<!-- Open Graph / Facebook / WhatsApp Preview -->
+<meta property="og:title" content="Generic ByAruna" />
+<!-- Google Structured Data / JSON-LD Rich Snippets -->
+</head><body><div id="root"></div><script type="module" src="/assets/app.js"></script></body></html>`
+
+function invitation(overrides = {}) {
+  return {
+    themeId: 'emas-senja',
+    bride: { nick: 'Ayu', photo: '/ayu.jpg' },
+    groom: { nick: 'Bima' },
+    customDomain: 'undangan.example',
+    ...overrides,
+  }
+}
+
+function makeDb({ slugs = {}, domains = {} } = {}) {
+  return {
+    collection(name) {
+      assert.equal(name, 'invitations')
+      return {
+        doc(slug) {
+          return { async get() {
+            const data = slugs[slug]
+            return { exists: Boolean(data), id: slug, data: () => data }
+          } }
+        },
+        where(field, operator, values) {
+          assert.equal(field, 'customDomain')
+          assert.equal(operator, 'in')
+          return {
+            limit() { return this },
+            async get() {
+              const entries = Object.entries(domains)
+                .filter(([, data]) => values.includes(data.customDomain))
+                .map(([id, data]) => ({ id, data: () => data }))
+              return { empty: entries.length === 0, docs: entries }
+            },
+          }
+        },
+      }
+    },
+  }
+}
+
+function makeResponse() {
+  return {
+    statusCode: 200,
+    headers: {},
+    body: '',
+    status(code) { this.statusCode = code; return this },
+    setHeader(name, value) { this.headers[name.toLowerCase()] = value },
+    send(body) { this.body = body; return this },
+  }
+}
+
+async function request({ host, path = '/', query = {}, db }) {
+  const req = {
+    headers: { host, 'x-forwarded-host': host, 'x-forwarded-proto': 'https' },
+    query: { path: path.replace(/^\//, ''), ...query },
+  }
+  const res = makeResponse()
+  await createOgHandler({ db, loadHtml: () => BASE_HTML })(req, res)
+  return res
+}
+
+test('host authority normalizes valid hosts and recognizes every first-party host family', () => {
+  assert.equal(normalizeRequestHost('BYARUNA.MY.ID.'), 'byaruna.my.id')
+  assert.equal(normalizeRequestHost('aruna-preview-abc.vercel.app'), 'aruna-preview-abc.vercel.app')
+  assert.equal(isFirstPartyHostname('byaruna.my.id'), true)
+  assert.equal(isFirstPartyHostname('www.byaruna.my.id'), true)
+  assert.equal(isFirstPartyHostname('aruna-preview-abc.vercel.app'), true)
+  assert.equal(isFirstPartyHostname('customer.example'), false)
+  assert.throws(() => normalizeRequestHost('good.example/evil'))
+  assert.throws(() => normalizeRequestHost('good.example\r\nX-Evil: yes'))
+})
+
+test('first-party root and known Vercel hosts retain the normal ByAruna shell', async () => {
+  for (const host of ['byaruna.my.id', 'aruna-preview-abc.vercel.app']) {
+    const res = await request({ host, db: makeDb() })
+    assert.equal(res.statusCode, 200)
+    assert.equal(res.body, BASE_HTML)
+  }
+})
+
+test('existing first-party /u/:slug returns escaped invitation metadata and keeps SPA bootable', async () => {
+  const data = invitation({
+    bride: { nick: `Ayu <script>alert("x")</script> & 'Kawan'`, photo: '/ayu.jpg' },
+  })
+  const res = await request({
+    host: 'byaruna.my.id',
+    path: '/u/ayu-bima',
+    query: { slug: 'ayu-bima' },
+    db: makeDb({ slugs: { 'ayu-bima': data } }),
+  })
+  assert.equal(res.statusCode, 200)
+  assert.match(res.body, /The Wedding of Ayu &lt;script&gt;alert\(&quot;x&quot;\)&lt;\/script&gt; &amp; 'Kawan' &amp; Bima/)
+  assert.doesNotMatch(res.body, /<script>alert\("x"\)<\/script>/)
+  assert.match(res.body, /<meta name="robots" content="noindex, nofollow"/)
+  assert.match(res.body, /<meta property="og:url" content="https:\/\/byaruna\.my\.id\/u\/ayu-bima"/)
+  assert.match(res.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/u\/ayu-bima"/)
+  assert.match(res.body, /<script type="module" src="\/assets\/app\.js"><\/script>/)
+})
+
+test('mapped custom host root receives invitation metadata, noindex, custom canonical URL, and SPA shell', async () => {
+  const data = invitation()
+  const res = await request({
+    host: 'undangan.example',
+    db: makeDb({ domains: { 'ayu-bima': data } }),
+  })
+  assert.equal(res.statusCode, 200)
+  assert.match(res.body, /<title>The Wedding of Ayu &amp; Bima<\/title>/)
+  assert.match(res.body, /<meta name="description" content="Tanpa mengurangi rasa hormat/)
+  assert.match(res.body, /<meta property="og:title" content="The Wedding of Ayu &amp; Bima"/)
+  assert.match(res.body, /<meta property="og:image" content="https:\/\/undangan\.example\/ayu\.jpg"/)
+  assert.match(res.body, /<meta name="robots" content="noindex, nofollow"/)
+  assert.match(res.body, /<meta property="og:url" content="https:\/\/undangan\.example\/"/)
+  assert.match(res.body, /<link rel="canonical" href="https:\/\/undangan\.example\/"/)
+  assert.match(res.body, /<meta name="twitter:title"/)
+  assert.match(res.body, /<script type="module" src="\/assets\/app\.js"><\/script>/)
+})
+
+test('mapped custom-host deep links resolve by authoritative Host and keep root canonical URL', async () => {
+  const data = invitation()
+  const res = await request({
+    host: 'undangan.example',
+    path: '/tamu/ayu',
+    query: { slug: 'other-invitation', host: 'attacker.example' },
+    db: makeDb({
+      slugs: { 'other-invitation': invitation({ bride: { nick: 'Attacker' } }) },
+      domains: { 'ayu-bima': data },
+    }),
+  })
+  assert.equal(res.statusCode, 200)
+  assert.match(res.body, /The Wedding of Ayu &amp; Bima/)
+  assert.doesNotMatch(res.body, /Attacker/)
+  assert.match(res.body, /og:url" content="https:\/\/undangan\.example\/"/)
+})
+
+test('unknown custom host fails closed without generic indexable ByAruna metadata', async () => {
+  const res = await request({ host: 'unknown.example', query: { host: 'undangan.example' }, db: makeDb() })
+  assert.equal(res.statusCode, 404)
+  assert.match(res.body, /noindex, nofollow/)
+  assert.doesNotMatch(res.body, /Generic ByAruna/)
+  assert.doesNotMatch(res.body, /og:title/)
+})
+
+test('malicious Host input is rejected before lookup or HTML injection', async () => {
+  const res = await request({ host: 'good.example/"><script>alert(1)</script>', db: makeDb() })
+  assert.equal(res.statusCode, 400)
+  assert.match(res.body, /noindex, nofollow/)
+  assert.doesNotMatch(res.body, /<script>alert\(1\)<\/script>/)
+})
+
+test('Vercel routing preserves /u/:slug and sends only application fallbacks through the host boundary', async () => {
+  const config = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'))
+  assert.deepEqual(config.rewrites[0], {
+    source: '/u/:slug*',
+    destination: '/api/og?slug=$1',
+  })
+  assert.deepEqual(config.rewrites[1], {
+    source: '/((?!api/|sitemap\\.xml|robots\\.txt).*)',
+    destination: '/api/og?path=$1',
+  })
+})
