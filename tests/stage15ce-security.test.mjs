@@ -44,6 +44,16 @@ test('notification endpoint requires proof and does not return provider results'
   assert.doesNotMatch(source, /json\(\{ success: allOk, results \}\)/)
 })
 
+test('deduped existing slug still requires notification proof', () => {
+  const source = fs.readFileSync(new URL('../api/notify-telegram.js', import.meta.url), 'utf8')
+  const proofCheck = source.indexOf('if (!verifyNotificationProof(proof')
+  const dedupeLookup = source.indexOf("const logRef = adminDb.collection('notification_log')")
+  const dedupeResponse = source.indexOf('json({ success: true, deduped: true })')
+  assert.ok(proofCheck >= 0)
+  assert.ok(dedupeLookup > proofCheck)
+  assert.ok(dedupeResponse > proofCheck)
+})
+
 test('admin authentication has no source bootstrap password fallback', () => {
   const auth = fs.readFileSync(new URL('../server/_auth.js', import.meta.url), 'utf8')
   const login = fs.readFileSync(new URL('../api/admin-login.js', import.meta.url), 'utf8')

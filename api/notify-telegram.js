@@ -55,13 +55,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Slug tidak valid.' });
     }
 
-    // Dedupe: 1 slug = 1 notif
-    const logRef = adminDb.collection('notification_log').doc(cleanSlug);
-    const logSnap = await logRef.get();
-    if (logSnap.exists) {
-      return res.status(200).json({ success: true, deduped: true });
-    }
-
     const inv = await getMergedInvitation(adminDb, cleanSlug);
     if (!inv) {
       return res.status(404).json({ error: 'Undangan tidak ditemukan.' });
@@ -80,6 +73,13 @@ export default async function handler(req, res) {
       if (ageMs > 30 * 60 * 1000) {
         return res.status(429).json({ error: 'Order terlalu lama, notif dilewati.' });
       }
+    }
+
+    // Dedupe only after proof and recency checks: slug alone never succeeds.
+    const logRef = adminDb.collection('notification_log').doc(cleanSlug);
+    const logSnap = await logRef.get();
+    if (logSnap.exists) {
+      return res.status(200).json({ success: true, deduped: true });
     }
 
     const base = (process.env.SITE_BASE_URL || 'https://byaruna.my.id').replace(/\/$/, '');
