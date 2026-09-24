@@ -393,7 +393,12 @@ export default async function handler(req, res) {
       const got = req.headers['x-telegram-bot-api-secret-token'];
       if (got !== secret) return res.status(403).json({ error: 'Bad secret' });
     }
-    const update = req.body || {};
+    const isObjectBody = req.body && typeof req.body === 'object' && !Array.isArray(req.body);
+    if (!isObjectBody) {
+      // Telegram retries are avoided by acknowledging malformed payloads safely.
+      return res.status(200).json({ ok: true, ignored: true });
+    }
+    const update = req.body;
     if (update.callback_query) await handleCallback(update.callback_query);
     else if (update.message) await handleMessage(update.message);
     return res.status(200).json({ ok: true });

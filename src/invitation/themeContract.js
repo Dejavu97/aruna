@@ -60,7 +60,7 @@ export function validateThemeManifest(manifest) {
     popular: Boolean(manifest.popular),
     collection: manifest.collection || 'classic',
     description: manifest.description || '',
-    cover: manifest.cover || '/themes/default.jpg',
+    cover: manifest.cover || '/og-image.png',
     layout: manifest.layout,
     opener: manifest.opener || 'THE WEDDING OF',
     music: manifest.music || '',

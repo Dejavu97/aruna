@@ -8,9 +8,18 @@ export default async function handler(req, res) {
 
   try {
     await assertNotLocked(req); // 429 bila IP terkunci
-    const { slug, editKey } = req.body
+    const body = req.body
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Slug and editKey are required' })
+    }
+    const { slug, editKey } = body
 
-    if (!slug || !editKey) {
+    if (
+      typeof slug !== 'string' ||
+      !/^[a-z0-9-_]{2,80}$/.test(slug) ||
+      typeof editKey !== 'string' ||
+      !editKey.trim()
+    ) {
       return res.status(400).json({ error: 'Slug and editKey are required' })
     }
 
