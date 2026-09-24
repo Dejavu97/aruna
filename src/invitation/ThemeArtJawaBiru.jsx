@@ -456,7 +456,7 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                           viewport={{ once: true }}
                           transition={{ duration: 0.8, ease: "easeOut" }}
                         >
-                          <img src={st.image || (isEven ? '/themes/jawa-biru/groom_full.jpg' : '/themes/jawa-biru/bride_full.jpg')} alt={st.title} />
+                          <img src={st.image || (isEven ? '/themes/jawa-biru/groom_full.jpg' : '/themes/jawa-biru/bride_full.jpg')} alt={st.title} loading="lazy" decoding="async" />
                         </motion.div>
 
                         {/* Content Animated Opposite Side */}
@@ -506,10 +506,10 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                         transition={{ duration: 0.8, delay: idx * 0.2 }}
                       >
                         {/* Card Header Banner Image */}
-                        <img src={bannerImg} alt={eventTitle} className="jb-event-banner-img" />
+                        <img src={bannerImg} alt={eventTitle} className="jb-event-banner-img" loading="lazy" decoding="async" />
 
                         {/* Gold Circular Badge */}
-                        <img src={iconImg} alt="Badge" className="jb-event-badge-icon" />
+                        <img src={iconImg} alt="Badge" className="jb-event-badge-icon" loading="lazy" decoding="async" />
 
                         <div className="jb-event-inner">
                           <h3 className="jb-event-title">{eventTitle}</h3>
@@ -645,7 +645,7 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                       viewport={{ once: true }}
                       transition={{ duration: 0.6, delay: i * 0.15 }}
                     >
-                      <img src={imgUrl} alt={`Gallery ${i + 1}`} />
+                      <img src={imgUrl} alt={`Gallery ${i + 1}`} loading="lazy" decoding="async" />
                     </motion.div>
                   ))}
                 </div>
@@ -705,6 +705,8 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
                     <img
                       src={data.qris}
                       alt="QRIS"
+                      loading="lazy"
+                      decoding="async"
                       style={{ width: '220px', margin: '1rem auto', display: 'block', borderRadius: '8px', background: '#fff', padding: '8px' }}
                     />
                   </motion.div>

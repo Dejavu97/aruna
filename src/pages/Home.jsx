@@ -334,6 +334,8 @@ function VibeAndStudioSection() {
                 <img
                   src="/assets/local/couple_laughing_1.jpg"
                   alt="Studio Preview"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-3 text-white">
