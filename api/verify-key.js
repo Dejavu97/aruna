@@ -1,5 +1,5 @@
-import { adminDb } from './_firebase.js';
-import { assertNotLocked, recordFailure, clearFailures } from './_auth.js';
+import { adminDb } from '../server/_firebase.js';
+import { assertNotLocked, recordFailure, clearFailures } from '../server/_auth.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

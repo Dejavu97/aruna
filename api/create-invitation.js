@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto'
-import { adminAuth, adminDb } from './_firebase.js'
-import { verifyPrivilegedAdmin } from './_auth.js'
+import { adminAuth, adminDb } from '../server/_firebase.js'
+import { verifyPrivilegedAdmin } from '../server/_auth.js'
 import {
   buildCreationRecords,
   createInvitationRecords,
   generateEditKey,
   getMergedInvitation,
   sanitizeInvitationSlug,
-} from './_invitation-lifecycle.js'
+} from '../server/_invitation-lifecycle.js'
 
 const MAX_PAYLOAD_BYTES = 800_000
 

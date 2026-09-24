@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { createOgHandler } from '../api/_og-boundary.js'
+import { createOgHandler } from '../server/_og-boundary.js'
 import { isFirstPartyHostname, normalizeRequestHost } from '../src/lib/host-boundary.js'
 
 const BASE_HTML = `<!doctype html><html><head>

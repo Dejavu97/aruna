@@ -66,8 +66,8 @@ Tidak ada state management eksternal (Context + local state). Tidak ada Express 
 ### Backend serverless (`api/`, Vercel Functions, Node)
 | File | Fungsi | Auth |
 |---|---|---|
-| `_firebase.js` | init firebase-admin dari `FIREBASE_SERVICE_ACCOUNT` | — |
-| `_auth.js` | helper throttle per-IP + hash/scrypt password (dipakai verify-key, admin-login) | — |
+- `server/_firebase.js` | init firebase-admin dari `FIREBASE_SERVICE_ACCOUNT` | — |
+- `server/_auth.js` | helper throttle per-IP + hash/scrypt password (dipakai verify-key, admin-login) | — |
 | `og.js` | `GET /u/:slug` — baca undangan, inject OG tags ke `dist/index.html` (preview WA/IG) | publik |
 | `verify-key.js` | verifikasi `editKey` (brankas `private_keys`) | publik (butuh editKey) |
 | `guestbook.js` (2026-09-14) | tulis RSVP/ucapan tamu via Admin SDK; throttle 1 kirim/20 dtk, 20/jam per IP+slug (koleksi `guestbook_throttle`) | publik (tamu anonim) |

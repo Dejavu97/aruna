@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { FieldValue } from 'firebase-admin/firestore';
-import { getClientIp } from './_auth.js';
-import { adminDb } from './_firebase.js';
-import { submitGuestbookEntry } from './_guestbook.js';
+import { getClientIp } from '../server/_auth.js';
+import { adminDb } from '../server/_firebase.js';
+import { submitGuestbookEntry } from '../server/_guestbook.js';
 
 // Single guestbook write boundary. Throttle and invitation append share one
 // transaction so concurrent anonymous submissions cannot bypass limits or

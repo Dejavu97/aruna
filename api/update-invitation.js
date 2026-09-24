@@ -1,8 +1,8 @@
-import { adminDb } from './_firebase.js';
-import { verifyPrivilegedAdmin } from './_auth.js';
-import { hasPrivilegedAdminCredential } from './_admin-guard.js';
+import { adminDb } from '../server/_firebase.js';
+import { verifyPrivilegedAdmin } from '../server/_auth.js';
+import { hasPrivilegedAdminCredential } from '../server/_admin-guard.js';
 import { FieldValue } from 'firebase-admin/firestore';
-import { partitionInvitationUpdate } from './_invitation-lifecycle.js';
+import { partitionInvitationUpdate } from '../server/_invitation-lifecycle.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

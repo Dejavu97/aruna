@@ -47,10 +47,10 @@ To ensure that **new themes, event types, or visual features NEVER break the res
 4. **Isolated Theme Method for High-Complexity Layouts:**
    - Bespoke themes (e.g., *Art Jawa Biru, Boarding Pass, Royal Bunny, Wedding Gazette, Adat Jawa, Kejora*) reside in their own standalone files in `src/invitation/` with namespaced CSS classes to prevent global style leakage.
 5. **Single Backend Path (Fase 1 refactor, 2026-08-31):**
-   - Express server (`server/index.js`) SUDAH DIHAPUS. Satu-satunya jalur backend: serverless functions di `api/*.js` (Firebase Admin via `api/_firebase.js`).
+   - Express server (`server/index.js`) SUDAH DIHAPUS. Satu-satunya jalur backend: serverless functions di `api/*.js` (Firebase Admin via `server/_firebase.js`).
    - `GET /u/:slug` → rewrite `vercel.json` → `api/og.js`: baca `invitations/{slug}`, inject OG tags (og:title, og:image, description, nama tamu dari `?to=`) ke `dist/index.html` — inilah yang membuat preview WhatsApp/Instagram bekerja.
    - Upload langsung client → Cloudinary (bukan lewat API). Kelima serverless lama (`verify-key`, `update-invitation`, `delete-invitation`, `add-domain`, `remove-domain`) + `admin-login` TERPAKAI klien via `src/lib/api.js`.
-   - GOTCHA: jangan pernah import `firebase-admin`/`firebase/auth` modul berat lain di `api/*.js` di luar pola `api/_firebase.js` — crash saat bundling Vercel.
+   - GOTCHA: jangan pernah import `firebase-admin`/`firebase/auth` modul berat lain di `api/*.js` di luar pola `server/_firebase.js` — crash saat bundling Vercel.
 
 ---
 
@@ -358,7 +358,7 @@ erDiagram
 
 ```
 ├── 🔒 CRITICAL & PROTECTED (Do NOT modify without architectural approval)
-│   ├── api/_firebase.js
+│   ├── server/_firebase.js
 │   ├── api/og.js
 │   ├── api/admin-login.js
 │   ├── api/update-invitation.js

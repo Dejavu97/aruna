@@ -1,5 +1,5 @@
-import { adminDb } from './_firebase.js';
-import { getMergedInvitation } from './_invitation-lifecycle.js';
+import { adminDb } from '../server/_firebase.js';
+import { getMergedInvitation } from '../server/_invitation-lifecycle.js';
 
 // ============ NOTIFIKASI ORDER BARU → TELEGRAM ADMIN ============
 // Dipanggil fire-and-forget dari Order.jsx setelah createInvitation sukses.

@@ -10,7 +10,7 @@ import {
   mergeInvitationData,
   partitionInvitationUpdate,
   splitInvitationPayload,
-} from '../api/_invitation-lifecycle.js'
+} from '../server/_invitation-lifecycle.js'
 
 class FakeDb {
   constructor(seed = {}, failSetAt = 0) {

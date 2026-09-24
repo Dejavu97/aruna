@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { adminDb } from './_firebase.js';
-import { createOgHandler } from './_og-boundary.js';
+import { adminDb } from '../server/_firebase.js';
+import { createOgHandler } from '../server/_og-boundary.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

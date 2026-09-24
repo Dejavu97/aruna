@@ -1,5 +1,5 @@
-import { adminDb } from './_firebase.js';
-import { assertNotLocked, recordFailure, clearFailures, hashPassword, verifyPassword, verifyPrivilegedAdmin } from './_auth.js';
+import { adminDb } from '../server/_firebase.js';
+import { assertNotLocked, recordFailure, clearFailures, hashPassword, verifyPassword, verifyPrivilegedAdmin } from '../server/_auth.js';
 
 // Password bootstrap bawaan — hanya berlaku jika settings/admin_auth BELUM ada.
 const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];

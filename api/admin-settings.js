@@ -1,5 +1,5 @@
-import { adminDb } from './_firebase.js';
-import { verifyPrivilegedAdmin } from './_auth.js';
+import { adminDb } from '../server/_firebase.js';
+import { verifyPrivilegedAdmin } from '../server/_auth.js';
 
 // ============ ADMIN SETTINGS & VOUCHERS (P1 hardening) ============
 // Semua operasi tulis settings/vouchers kini lewat sini dengan verifikasi

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises'
 import {
   buildCreationRecords,
   partitionInvitationUpdate,
-} from '../api/_invitation-lifecycle.js'
+} from '../server/_invitation-lifecycle.js'
 import { resolveWatermarkPresentation } from '../src/lib/watermark-authority.js'
 
 const premiumFields = ['watermarkMode', 'customWatermarkText', 'customWatermarkUrl']

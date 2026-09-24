@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { submitGuestbookEntry } from '../api/_guestbook.js'
+import { submitGuestbookEntry } from '../server/_guestbook.js'
 
 class Snapshot {
   constructor(value) {

@@ -4,7 +4,9 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/u/:slug*", "destination": "/api/og?slug=$1" },
-    { "source": "/((?!api/|sitemap\\.xml|robots\\.txt).*)", "destination": "/api/og?path=$1" }
+    { "source": "/((?!api/|sitemap\\.xml|robots\\.txt).*)", "destination": "/api/og?path=$1" },
+    { "source": "/api/add-domain", "destination": "/api/domain?action=add" },
+    { "source": "/api/remove-domain", "destination": "/api/domain?action=remove" }
   ],
   "headers": [
     {

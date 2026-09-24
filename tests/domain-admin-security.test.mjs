@@ -5,9 +5,9 @@ import {
   addDomainBoundary,
   normalizeDomain,
   removeDomainBoundary,
-} from '../api/_domain-boundary.js'
-import { createPrivilegedAdminGuard } from '../api/_admin-guard.js'
-import { partitionInvitationUpdate } from '../api/_invitation-lifecycle.js'
+} from '../server/_domain-boundary.js'
+import { createPrivilegedAdminGuard } from '../server/_admin-guard.js'
+import { partitionInvitationUpdate } from '../server/_invitation-lifecycle.js'
 
 const makeDomainDeps = ({ assignedDomain = 'a.example.com', keyValid = true, addResult } = {}) => {
   const calls = { vercelAdd: 0, vercelRemove: 0, firestoreSave: 0, firestoreClear: 0, verify: 0 }
@@ -115,7 +115,7 @@ test('all same-admin-credential endpoints use the shared privileged guard', asyn
 })
 
 test('touched endpoints validate bodyless POST safely', async () => {
-  for (const file of ['add-domain.js', 'remove-domain.js', 'update-invitation.js', 'delete-invitation.js', 'admin-settings.js']) {
+  for (const file of ['domain.js', 'update-invitation.js', 'delete-invitation.js', 'admin-settings.js']) {
     const source = await readFile(new URL(`../api/${file}`, import.meta.url), 'utf8')
     assert.match(source, /req\.body[^\n]*typeof req\.body !== 'object'|const body = req\.body \|\| null/, file)
   }
