@@ -71,8 +71,8 @@
 | `telegram-webhook.js` | header secret Telegram + allowlist chat ID | `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_ADMIN_IDS` |
 
 ### Storage & upload
-- Tidak memakai Firebase Storage. Upload = Cloudinary **unsigned preset** `'arunawedd'` (cloud `a6luorsr`, folder `aruna_uploads`), langsung dari browser (`uploadFile` di api.js). Kompresi client di `lib/upload.js` (≤1600px, JPEG q0.84).
-- Guard kode (2026-09-14): hanya gambar (png/jpg/gif/webp/svg) & audio (mp3/wav/ogg), maks 8MB — ditolak sebelum keluar jaringan. Lapis utama tetap pengaturan preset di panel Cloudinary (unsigned = siapa pun dengan nama preset bisa upload langsung, lewati guard kode).
+- Tidak memakai Firebase Storage. Upload memakai otorisasi signed Cloudinary melalui action `upload-signature` pada `api/create-invitation.js`; server memverifikasi Firebase ID token, memilih folder `aruna_uploads/{verifiedUid}`, membuat `public_id`, dan menandatangani parameter minimal. Kompresi tetap client di `lib/upload.js` (≤1600px, JPEG q0.84).
+- Server dan client membatasi gambar (png/jpg/gif/webp/svg) & audio (mp3/wav/ogg), maks 8MB. Client guard hanya UX; boundary keamanan adalah verifikasi token dan signature server.
 - Koleksi throttle: `guestbook_throttle/{ip|slug}` (lastAt, count, windowStart) — proteksi flood buku tamu, bukan data bisnis.
 
 ### Environment & secrets
@@ -90,11 +90,11 @@ ManageDomain → `addDomain(domain, slug, editKey)` → `api/add-domain.js` (ver
 3. `safeUrl()` di `src/lib/utils.js` wajib untuk semua `<a href>` dari database (blok `javascript:`) — 2026-09-14: wishlist `w.url` (Invitation.jsx) ikut dibungkus; sebelumnya render mentah = stored XSS.
 4. Kapasitas & sanitasi: rsvps/wishes ≤500 item, name ≤100, message ≤500 (`api/guestbook.js` + fallback `addRsvp`/`addWish`). Throttle server: 1 kirim/20 dtk, 20/jam per IP+slug (koleksi `guestbook_throttle`).
 5. `adminKey` bukan session — jangan pernah dipakai sebagai pengganti auth Google utk akses dokumen milik user lain via client SDK.
-6. Upload preset Cloudinary: jangan ubah ke signed tanpa rencana (butuh server signing); jangan hardcode secret Cloudinary di client.
+6. Cloudinary API secret hanya boleh berada di environment server; upload client tidak boleh memakai unsigned preset.
 
 ## 4. WARNING ringkas
 - `theme_demos` tanpa rule → client write selalu gagal (fungsi demo override admin tidak berfungsi via client) — perlu rule + jalur admin atau hapus fitur.
 - `custom_themes` publik penuh (by design) tanpa validasi payload — potensi junk docs.
-- Cloudinary unsigned — potensi abuse upload.
+- Preset unsigned lama `arunawedd` harus dinonaktifkan/dikonversi menjadi restricted atau signed di Cloudinary Dashboard.
 - `usedCount` voucher tak pernah ter-update otomatis.
 - `.env.example` memuat variabel legacy yang menyesatkan.

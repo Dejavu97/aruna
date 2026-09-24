@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { adminAuth, adminDb } from '../server/_firebase.js'
 import { verifyPrivilegedAdmin } from '../server/_auth.js'
+import { buildCloudinaryUploadAuthorization } from '../server/_cloudinary-upload.js'
 import {
   buildCreationRecords,
   createInvitationRecords,
@@ -77,6 +78,15 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {}
+    if (body.action === 'upload-signature') {
+      const authorization = req.headers.authorization
+      const upload = await buildCloudinaryUploadAuthorization({
+        authorization,
+        body,
+        verifyIdToken: (token) => adminAuth.verifyIdToken(token),
+      })
+      return res.status(200).json(upload)
+    }
     const payload = await resolveCreationPayload(req, body)
     validatePayload(payload, { requireCustomer: !['clone', 'restore'].includes(body.action) })
     const owner = await resolveOwner(body, payload)

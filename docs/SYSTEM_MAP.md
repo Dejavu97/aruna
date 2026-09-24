@@ -129,8 +129,9 @@ Tidak ada state management eksternal (Context + local state). Tidak ada Express 
    → semua tulis via adminApiCall → api/admin-settings.js / update-invitation / delete-invitation
    → read tetap client SDK (fetchVouchers, fetchSettings, fetchAdminInvitations)
 
-[Upload media] MediaUpload → lib/upload.js (compressImage canvas) → 
-   api.js uploadFile → Cloudinary unsigned preset 'arunawedd' (cloud a6luorsr) → URL disimpan di dokumen
+[Upload media] MediaUpload → lib/upload.js (compressImage canvas) →
+   api.js uploadFile → /api/create-invitation?action=upload-signature
+   (Firebase ID token + signed Cloudinary params) → Cloudinary → URL disimpan di dokumen
 ```
 
 ## 5. Environment & Secrets
@@ -138,7 +139,7 @@ Tidak ada state management eksternal (Context + local state). Tidak ada Express 
 | Variabel | Sisi | Fungsi |
 |---|---|---|
 | `FIREBASE_SERVICE_ACCOUNT` | serverless (Vercel) | kredensial firebase-admin (json string) |
-| Cloudinary preset `'arunawedd'` | hardcoded client | unsigned upload — by design, batasi via preset panel Cloudinary |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | serverless (Vercel) | signed upload authorization; API secret server-only |
 | Firebase client config | inline `src/lib/firebase.js` | publik by design (identitas API, bukan secret) |
 
 `.env.example` berisi legacy `BLOB_READ_WRITE_TOKEN`/`OWNER_BANK*`/`ADMIN_PASSWORD` — TIDAK dipakai kode lagi (server/ dihapus). UNKNOWN: apakah masih di-set di dashboard Vercel — bersihkan bila tidak.
