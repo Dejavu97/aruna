@@ -82,9 +82,12 @@ export async function deleteCustomTheme(id) {
   if (!auth.currentUser) throw new Error('Masuk dengan Google untuk menghapus tema.')
   try {
     const docRef = doc(db, 'custom_themes', id)
+    const docSnap = await getDoc(docRef)
+    if (!docSnap.exists()) throw new Error('Tema kustom tidak ditemukan atau sudah dihapus.')
     await deleteDoc(docRef)
   } catch (err) {
     console.warn('Firestore deleteDoc custom_themes:', err)
+    if (err.message === 'Tema kustom tidak ditemukan atau sudah dihapus.') throw err
     throw new Error('Gagal menghapus tema dari cloud. Pastikan tema ini milik Anda.')
   }
 

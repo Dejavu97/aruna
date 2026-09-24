@@ -457,8 +457,8 @@ export function useAdminState() {
   async function handleDeleteCustomTheme(themeId, themeName) {
     if (!confirm(`Hapus tema kustom "${themeName || themeId}"? Tema ini akan dihapus dari katalog dan database.`)) return
     try {
-      setCustomThemesList((prev) => prev.filter((ct) => ct.id !== themeId))
       await deleteCustomTheme(themeId)
+      setCustomThemesList((prev) => prev.filter((ct) => ct.id !== themeId))
       alert(`Tema "${themeName || themeId}" berhasil dihapus.`)
       load()
     } catch (err) {
