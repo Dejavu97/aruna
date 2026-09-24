@@ -1,9 +1,6 @@
 import { adminDb } from '../server/_firebase.js';
 import { assertNotLocked, recordFailure, clearFailures, hashPassword, verifyPassword, verifyPrivilegedAdmin } from '../server/_auth.js';
 
-// Password bootstrap bawaan — hanya berlaku jika settings/admin_auth BELUM ada.
-const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
-
 async function readStoredPassword() {
   const snap = await adminDb.collection('settings').doc('admin_auth').get();
   return snap.exists ? snap.data()?.password || null : null;
@@ -38,16 +35,7 @@ export default async function handler(req, res) {
         }
         return res.status(200).json({ success: true, mode: 'custom' })
       }
-      // Bootstrap: belum ada password tersimpan → hanya default bawaan
-      if (BOOTSTRAP_PASSWORDS.includes(password)) {
-        await clearFailures(req);
-        // Bootstrap sukses = langsung tulis hash agar plain bootstrap tak menginap di DB
-        await adminDb.collection('settings').doc('admin_auth').set({
-          password: hashPassword(password),
-          updatedAt: Date.now(),
-        }, { merge: true });
-        return res.status(200).json({ success: true, mode: 'bootstrap' })
-      }
+      // Tanpa admin_auth tidak ada provisioning anonim: fail closed.
       await recordFailure(req);
       return res.status(403).json({ error: 'Tidak diizinkan.' })
     }

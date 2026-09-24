@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { adminAuth, adminDb } from '../server/_firebase.js'
 import { verifyPrivilegedAdmin } from '../server/_auth.js'
 import { buildCloudinaryUploadAuthorization } from '../server/_cloudinary-upload.js'
+import { createNotificationProof } from '../server/_notification-proof.js'
 import {
   buildCreationRecords,
   createInvitationRecords,
@@ -119,6 +120,11 @@ export default async function handler(req, res) {
       editKey,
       orderCode,
       status: records.publicData.status,
+      notificationProof: createNotificationProof({
+        slug,
+        createdAt: records.publicData.createdAt,
+        orderCode,
+      }),
     })
   } catch (err) {
     const status = Number(err.status) || (/sudah dipakai/i.test(err.message) ? 409 : 500)

@@ -42,7 +42,7 @@ export function isFirstPartyHostname(rawHostname) {
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.endsWith('.localhost')) return true
   if (FIRST_PARTY_HOSTS.includes(hostname)) return true
   if (FIRST_PARTY_VERCEL_DEPLOYMENT.test(hostname) || FIRST_PARTY_VERCEL_BRANCH.test(hostname)) return true
-  return hostname.endsWith('.ngrok-free.app')
+  return false
 }
 
 export function equivalentCustomDomains(hostname) {

@@ -53,7 +53,7 @@
 
 ### Dua dunia auth
 1. **Klien (pemilik undangan):** Google popup (`AuthContext.loginWithGoogle`) → `/dashboard`, WeddingForm sinkron email/uid. Dipakai di rules Kasus A (owner).
-2. **Admin platform:** **password** (bukan Google) → `loginAdmin()` → `POST /api/admin-login` (server-side compare vs `settings/admin_auth`; bootstrap `aruna2026/byaruna2026` hanya bila belum ada password tersimpan). `adminKey` = password, disimpan localStorage, dikirim ke serverless tiap operasi tulis.
+2. **Admin platform:** **password** (bukan Google) → `loginAdmin()` → `POST /api/admin-login` (server-side compare vs `settings/admin_auth`; tanpa dokumen credential, login fail-closed). `adminKey` = password, disimpan localStorage, dikirim ke serverless tiap operasi tulis.
 3. **Tamu:** anonim total; hanya `addRsvp`/`addWish`/`views` (diff-keys), verify via `?to=` string (kosmetik, bukan auth).
 
 ### Serverless API auth matrix

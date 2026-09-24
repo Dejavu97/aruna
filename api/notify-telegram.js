@@ -1,9 +1,10 @@
 import { adminDb } from '../server/_firebase.js';
 import { getMergedInvitation } from '../server/_invitation-lifecycle.js';
+import { verifyNotificationProof } from '../server/_notification-proof.js';
 
 // ============ NOTIFIKASI ORDER BARU → TELEGRAM ADMIN ============
 // Dipanggil fire-and-forget dari Order.jsx setelah createInvitation sukses.
-// Body: { slug }
+// Body: { slug, proof } — proof diterbitkan oleh /api/create-invitation.
 // Anti-spam: hanya kirim 1x per slug (koleksi notification_log) + hanya bila
 // createdAt < 30 menit (mencegah orang iseng memicu notif slug lama).
 // Env Vercel (server-only, JANGAN commit): TELEGRAM_BOT_TOKEN,
@@ -48,7 +49,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { slug, secret } = req.body || {};
+    const { slug, proof } = req.body || {};
     const cleanSlug = String(slug || '').trim().toLowerCase();
     if (!cleanSlug || !/^[a-z0-9-_]{2,80}$/.test(cleanSlug)) {
       return res.status(400).json({ error: 'Slug tidak valid.' });
@@ -66,10 +67,15 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Undangan tidak ditemukan.' });
     }
 
-    // Bypass recency hanya bila secret cocok (untuk test manual server-side)
-    const masterSecret = process.env.NOTIFY_SECRET;
-    const bypass = masterSecret && secret === masterSecret;
-    if (!bypass && inv.createdAt) {
+    if (!verifyNotificationProof(proof, {
+      slug: cleanSlug,
+      createdAt: inv.createdAt,
+      orderCode: inv.orderCode,
+    })) {
+      return res.status(403).json({ error: 'Bukti notifikasi tidak valid.' });
+    }
+
+    if (inv.createdAt) {
       const ageMs = Date.now() - Number(inv.createdAt);
       if (ageMs > 30 * 60 * 1000) {
         return res.status(429).json({ error: 'Order terlalu lama, notif dilewati.' });
@@ -92,7 +98,7 @@ export default async function handler(req, res) {
       `🔗 <a href="${base}/u/${cleanSlug}">Buka undangan</a>\n` +
       `🛠 <a href="${base}/admin">Buka Admin</a>`;
 
-    const results = [];
+    let allOk = true;
     for (const chatId of adminIds) {
       const tg = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
@@ -104,15 +110,14 @@ export default async function handler(req, res) {
           disable_web_page_preview: true,
         }),
       });
-      const body = await tg.json().catch(() => ({}));
-      results.push({ chatId, ok: tg.ok, body });
+      await tg.json().catch(() => ({}));
+      allOk = allOk && tg.ok;
     }
 
-    const allOk = results.every((r) => r.ok);
     if (allOk) {
       await logRef.set({ slug: cleanSlug, sentAt: Date.now(), orderCode: inv.orderCode || '' });
     }
-    return res.status(allOk ? 200 : 502).json({ success: allOk, results });
+    return res.status(allOk ? 200 : 502).json({ success: allOk });
   } catch (err) {
     console.error('Notify telegram error:', err);
     return res.status(500).json({ error: err.message });

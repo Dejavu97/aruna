@@ -3,7 +3,7 @@ import { adminAuth, adminDb } from './_firebase.js';
 import { createPrivilegedAdminGuard } from './_admin-guard.js';
 
 const ADMIN_EMAIL = 'admin@byaruna.my.id';
-const BOOTSTRAP_PASSWORDS = ['aruna2026', 'byaruna2026'];
+
 
 // ============ SHARED AUTH HELPERS (admin-login, admin-settings, update-invitation, delete-invitation, verify-key) ============
 
@@ -104,7 +104,7 @@ async function verifyAdminCredentials(body = {}) {
     }
     return true;
   }
-  return !storedPass && BOOTSTRAP_PASSWORDS.includes(String(body.adminKey));
+  return false;
 }
 
 export const verifyPrivilegedAdmin = createPrivilegedAdminGuard({

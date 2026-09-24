@@ -35,7 +35,7 @@ Dokumen ini mencatat seluruh rincian pembaruan, evolusi fitur, dan penguatan sis
 * **Tema studio dikunci silang:** `custom_themes` create tetap publik, update/delete butuh login Google. Edit publik = simpan ID baru, bukan timpa milik orang.
 * **Anti-iframe:** `vercel.json` kirim `frame-ancestors 'self'`, `X-Frame-Options SAMEORIGIN`, `Referrer-Policy`, `nosniff`.
 * **Buku tamu anti-banjir:** endpoint baru `api/guestbook.js` — 1 kirim/20 detik, maks 20/jam per IP+slug. `addRsvp`/`addWish` lewat sini dulu, fallback tulis langsung bila API mati.
-* **Upload dijaga:** `uploadFile` tolak non-gambar/audio & >8MB. Preset Cloudinary `arunawedd` → folder `aruna_uploads` (diset manual di panel Cloudinary).
+* **Upload dijaga:** `uploadFile` memakai signed Cloudinary authorization melalui `/api/create-invitation`, menolak non-gambar/audio & >8MB, dan memakai folder server-derived `aruna_uploads/{verifiedUid}`.
 * **Kode order acak:** `AR`+8 char (`crypto.randomUUID`), sebelumnya 4 digit. Order lama tetap valid.
 * **Dokumen sinkron:** `DATABASE_SECURITY.md`, `SYSTEM_MAP.md`, `DATA_MODEL.md`, `AI_RULES.md`, `WORKFLOW.md`, `THEME_STUDIO_MAP.md` v1.1.
 

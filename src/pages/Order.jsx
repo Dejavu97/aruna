@@ -60,7 +60,7 @@ export default function Order() {
         fetch('/api/notify-telegram', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug: created.slug }),
+          body: JSON.stringify({ slug: created.slug, proof: created.notificationProof }),
         }).catch(() => {})
       } catch {}
       localStorage.removeItem(`aruna.draft.${activeThemeId}`)

@@ -73,13 +73,16 @@ service cloud.firestore {
     }
 
     // =========================================================================
-    // 3. ULASAN & TESTIMONI PELANGGAN (/testimonials) — tidak berubah
+    // 3. ULASAN & TESTIMONI PELANGGAN (/testimonials)
     // =========================================================================
     match /testimonials/{id} {
       allow read: if true;
       allow create: if (request.resource.data.stars >= 1 && request.resource.data.stars <= 5)
                     || (request.resource.data.rating >= 1 && request.resource.data.rating <= 5);
-      allow update, delete: if request.auth != null;
+      // Tidak ada ownerUid yang dapat dipercaya pada model testimonial saat ini.
+      // Moderasi perubahan/penghapusan hanya melalui admin terotorisasi.
+      allow update, delete: if request.auth != null
+        && request.auth.token.email == 'admin@byaruna.my.id';
     }
 
     // =========================================================================
