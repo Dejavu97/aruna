@@ -1,9 +1,13 @@
 export const FIRST_PARTY_HOSTS = Object.freeze([
   'byaruna.my.id',
   'www.byaruna.my.id',
+  'aruna-sand.vercel.app',
   'aruna-whydidyoucomehere.vercel.app',
   'aruna-git-main-whydidyoucomehere.vercel.app',
 ])
+
+const FIRST_PARTY_VERCEL_DEPLOYMENT = /^aruna-[a-z0-9]+-whydidyoucomehere\.vercel\.app$/
+const FIRST_PARTY_VERCEL_BRANCH = /^aruna-git-[a-z0-9-]+-whydidyoucomehere\.vercel\.app$/
 
 export function normalizeRequestHost(rawHost) {
   let host = String(Array.isArray(rawHost) ? rawHost[0] : rawHost || '').trim().toLowerCase()
@@ -37,7 +41,8 @@ export function isFirstPartyHostname(rawHostname) {
   }
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.endsWith('.localhost')) return true
   if (FIRST_PARTY_HOSTS.includes(hostname)) return true
-  return hostname.endsWith('.vercel.app') || hostname.endsWith('.ngrok-free.app')
+  if (FIRST_PARTY_VERCEL_DEPLOYMENT.test(hostname) || FIRST_PARTY_VERCEL_BRANCH.test(hostname)) return true
+  return hostname.endsWith('.ngrok-free.app')
 }
 
 export function equivalentCustomDomains(hostname) {

@@ -85,6 +85,68 @@ function invitationTags(item, { origin, publicUrl, guestName }) {
   ].join('\n    ');
 }
 
+const ROUTE_META = Object.freeze({
+  home: {
+    title: 'ByAruna — Undangan Digital Eksklusif & Elegan',
+    description: 'Pilih tema aesthetic mewah, isi data acara, dan sebar tautan lewat WhatsApp. Tanpa ribet, terasa seperti kertas mahal.',
+    robots: 'index, follow',
+    canonical: '/',
+  },
+  catalog: {
+    title: 'Katalog Tema Undangan Digital — ByAruna',
+    description: 'Jelajahi tema undangan pernikahan, kartu ucapan, ulang tahun, wisuda, aqiqah, dan acara perusahaan di ByAruna.',
+    robots: 'index, follow',
+    canonical: '/tema',
+  },
+  studio: {
+    title: 'Theme Studio — Racik Undangan Digital ByAruna',
+    description: 'Racik tema undangan digital Anda sendiri dengan warna, layout, tipografi, animasi, dan media yang bebas dikustomisasi.',
+    robots: 'index, follow',
+    canonical: '/studio',
+  },
+});
+
+function routeMeta(pathname = '') {
+  const path = `/${String(pathname).replace(/^\/+|\/+$/g, '')}`;
+  if (path === '/') return ROUTE_META.home;
+  if (path === '/tema' || path.startsWith('/tema/')) return ROUTE_META.catalog;
+  if (path === '/studio' || path.startsWith('/studio/')) return ROUTE_META.studio;
+  return null;
+}
+
+function routeTags(meta, origin) {
+  const canonical = `${origin}${meta.canonical}`;
+  const image = `${origin}/og-image.png`;
+  return [
+    `<title>${escapeHtml(meta.title)}</title>`,
+    `<meta name="description" content="${escapeHtml(meta.description)}" />`,
+    `<meta name="robots" content="${escapeHtml(meta.robots)}" />`,
+    `<link rel="canonical" href="${escapeHtml(canonical)}" />`,
+    '<meta property="og:type" content="website" />',
+    `<meta property="og:url" content="${escapeHtml(canonical)}" />`,
+    `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
+    `<meta property="og:image" content="${escapeHtml(image)}" />`,
+    '<meta property="og:image:width" content="1200" />',
+    '<meta property="og:image:height" content="630" />',
+    '<meta property="og:site_name" content="ByAruna" />',
+    '<meta property="og:locale" content="id_ID" />',
+    '<meta name="twitter:card" content="summary_large_image" />',
+    `<meta name="twitter:url" content="${escapeHtml(canonical)}" />`,
+    `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
+    `<meta name="twitter:image" content="${escapeHtml(image)}" />`,
+  ].join('\n    ');
+}
+
+export function injectRouteMeta(html, meta, origin) {
+  let output = html
+    .replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, '')
+    .replace(/<meta\b[^>]*(?:name|property)=["'](?:description|robots|og:[^"']+|twitter:[^"']+)["'][^>]*\/?\s*>/gi, '')
+    .replace(/<link\b[^>]*rel=["']canonical["'][^>]*\/?\s*>/gi, '');
+  return output.replace('</head>', `    ${routeTags(meta, origin)}\n  </head>`);
+}
+
 export function injectInvitationMeta(html, item, options) {
   const tags = invitationTags(item, options);
   let output = html
@@ -155,8 +217,18 @@ export function createOgHandler({ db, loadHtml }) {
     }
 
     if (firstParty && !item) {
+      if (req.query.slug) {
+        setHtmlHeaders(res);
+        return res.status(404).send(safeFailureHtml('Undangan tidak ditemukan'));
+      }
+      const meta = routeMeta(req.query.path);
+      if (!meta) {
+        setHtmlHeaders(res);
+        return res.status(404).send(safeFailureHtml('Halaman tidak ditemukan'));
+      }
+      const origin = 'https://byaruna.my.id';
       setHtmlHeaders(res, 's-maxage=60, stale-while-revalidate=600');
-      return res.status(200).send(html);
+      return res.status(200).send(injectRouteMeta(html, meta, origin));
     }
     if (!firstParty && !item) {
       setHtmlHeaders(res);

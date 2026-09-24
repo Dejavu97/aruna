@@ -74,23 +74,63 @@ async function request({ host, path = '/', query = {}, db }) {
   return res
 }
 
-test('host authority normalizes valid hosts and recognizes every first-party host family', () => {
+test('host authority recognizes only ByAruna Vercel hosts', () => {
   assert.equal(normalizeRequestHost('BYARUNA.MY.ID.'), 'byaruna.my.id')
-  assert.equal(normalizeRequestHost('aruna-preview-abc.vercel.app'), 'aruna-preview-abc.vercel.app')
+  assert.equal(normalizeRequestHost('aruna-hzcgvb516-whydidyoucomehere.vercel.app'), 'aruna-hzcgvb516-whydidyoucomehere.vercel.app')
   assert.equal(isFirstPartyHostname('byaruna.my.id'), true)
   assert.equal(isFirstPartyHostname('www.byaruna.my.id'), true)
-  assert.equal(isFirstPartyHostname('aruna-preview-abc.vercel.app'), true)
+  assert.equal(isFirstPartyHostname('aruna-hzcgvb516-whydidyoucomehere.vercel.app'), true)
+  assert.equal(isFirstPartyHostname('aruna-git-feature-x-whydidyoucomehere.vercel.app'), true)
+  assert.equal(isFirstPartyHostname('attacker-project.vercel.app'), false)
   assert.equal(isFirstPartyHostname('customer.example'), false)
   assert.throws(() => normalizeRequestHost('good.example/evil'))
   assert.throws(() => normalizeRequestHost('good.example\r\nX-Evil: yes'))
 })
 
 test('first-party root and known Vercel hosts retain the normal ByAruna shell', async () => {
-  for (const host of ['byaruna.my.id', 'aruna-preview-abc.vercel.app']) {
+  for (const host of ['byaruna.my.id', 'aruna-hzcgvb516-whydidyoucomehere.vercel.app']) {
     const res = await request({ host, db: makeDb() })
     assert.equal(res.statusCode, 200)
-    assert.equal(res.body, BASE_HTML)
+    assert.match(res.body, /<title>ByAruna — Undangan Digital Eksklusif &amp; Elegan<\/title>/)
   }
+})
+
+test('unrelated Vercel hosts are treated as unknown custom domains', async () => {
+  const res = await request({ host: 'attacker-project.vercel.app', db: makeDb() })
+  assert.equal(res.statusCode, 404)
+  assert.match(res.body, /noindex, nofollow/)
+  assert.doesNotMatch(res.body, /Generic ByAruna|og:title/)
+})
+
+test('first-party public routes receive route-aware canonical and OG metadata', async () => {
+  const catalog = await request({ host: 'byaruna.my.id', path: '/tema', db: makeDb() })
+  assert.equal(catalog.statusCode, 200)
+  assert.match(catalog.body, /<title>Katalog Tema Undangan Digital — ByAruna<\/title>/)
+  assert.match(catalog.body, /<meta name="robots" content="index, follow"/)
+  assert.match(catalog.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/tema"/)
+  assert.match(catalog.body, /<meta property="og:url" content="https:\/\/byaruna\.my\.id\/tema"/)
+
+  const studio = await request({ host: 'byaruna.my.id', path: '/studio', db: makeDb() })
+  assert.equal(studio.statusCode, 200)
+  assert.match(studio.body, /<title>Theme Studio — Racik Undangan Digital ByAruna<\/title>/)
+  assert.match(studio.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/studio"/)
+  assert.match(studio.body, /<meta property="og:url" content="https:\/\/byaruna\.my\.id\/studio"/)
+})
+
+test('homepage keeps homepage metadata and unknown invitation is a non-indexable 404', async () => {
+  const home = await request({ host: 'byaruna.my.id', path: '/', db: makeDb() })
+  assert.equal(home.statusCode, 200)
+  assert.match(home.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/"/)
+
+  const unknown = await request({
+    host: 'byaruna.my.id',
+    path: '/u/unknown-stage14b',
+    query: { slug: 'unknown-stage14b' },
+    db: makeDb(),
+  })
+  assert.equal(unknown.statusCode, 404)
+  assert.match(unknown.body, /noindex, nofollow/)
+  assert.doesNotMatch(unknown.body, /canonical|og:url|ByAruna — Undangan Digital/)
 })
 
 test('existing first-party /u/:slug returns escaped invitation metadata and keeps SPA bootable', async () => {
