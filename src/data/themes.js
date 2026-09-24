@@ -984,7 +984,7 @@ export const demos = {
   'art-jawa-biru': demo({
     themeId: 'art-jawa-biru',
     slug: 'yogi-ratna',
-    music: '/music/gamelan_lambang_sari.mp3',
+    music: '/music/gamelan_lambang_sari_web.mp3',
     groom: {
       nick: 'Yogi',
       full: 'R. Mas Yogi Pradipta, S.Kom.',
@@ -1054,7 +1054,7 @@ export const demos = {
   'adat-jawa': demo({
     themeId: 'adat-jawa',
     slug: 'ayu-dimas',
-    music: '/music/gamelan_lambang_sari.mp3',
+    music: '/music/gamelan_lambang_sari_web.mp3',
     groom: {
       nick: 'Dimas',
       full: 'R. Dimas Suryo Diningrat, S.T., M.Sc.',

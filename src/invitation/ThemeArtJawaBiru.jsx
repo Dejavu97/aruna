@@ -7,6 +7,7 @@ import {
 import { copyText, googleCalendarUrl, wazeUrl, safeUrl, instagramUrl } from '../lib/utils'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import Watermark from '../components/Watermark'
+import { resolveArtJawaMusic } from './artJawaAudio'
 import './ThemeArtJawaBiru.css'
 
 function formatLongDate(dateStr) {
@@ -139,24 +140,32 @@ function Cover({ data = {}, guest = '', onOpen }) {
 /* ===================================================
    FLOATING AUDIO PLAYER
    =================================================== */
-function FloatingAudio({ src }) {
-  const [playing, setPlaying] = useState(true)
+function FloatingAudio({ src, active, startRef }) {
+  const [playing, setPlaying] = useState(false)
   const audioRef = useRef(null)
 
-  useEffect(() => {
-    if (audioRef.current && src) {
-      audioRef.current.volume = 0.6
-      audioRef.current.play().catch(() => setPlaying(false))
+  const attemptPlay = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.volume = 0.6
+    try {
+      Promise.resolve(audio.play())
+        .then(() => setPlaying(!audio.paused))
+        .catch(() => setPlaying(false))
+    } catch {
+      setPlaying(false)
     }
-  }, [src])
+  }
+
+  startRef.current = attemptPlay
 
   const toggle = () => {
-    if (!audioRef.current) return
-    if (playing) {
-      audioRef.current.pause()
-      setPlaying(false)
+    const audio = audioRef.current
+    if (!audio) return
+    if (!audio.paused) {
+      audio.pause()
     } else {
-      audioRef.current.play().then(() => setPlaying(true)).catch(() => {})
+      attemptPlay()
     }
   }
 
@@ -164,15 +173,26 @@ function FloatingAudio({ src }) {
 
   return (
     <>
-      <audio ref={audioRef} src={src} loop autoPlay playsInline />
-      <button 
-        type="button" 
-        onClick={toggle} 
-        className={`jb-music-float ${!playing ? 'jb-music-paused' : ''}`}
-        aria-label="Toggle Music"
-      >
-        {playing ? <Music size={20} /> : <Play size={20} />}
-      </button>
+      <audio
+        ref={audioRef}
+        src={src}
+        loop
+        playsInline
+        preload="none"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onError={() => setPlaying(false)}
+      />
+      {active && (
+        <button
+          type="button"
+          onClick={toggle}
+          className={`jb-music-float ${!playing ? 'jb-music-paused' : ''}`}
+          aria-label="Toggle Music"
+        >
+          {playing ? <Music size={20} /> : <Play size={20} />}
+        </button>
+      )}
     </>
   )
 }
@@ -182,6 +202,7 @@ function FloatingAudio({ src }) {
    =================================================== */
 export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = false }) {
   const [opened, setOpened] = useState(false)
+  const audioStartRef = useRef(() => {})
   const [copied, setCopied] = useState('')
   const [copiedIndex, setCopiedIndex] = useState(null)
   const [local, setLocal] = useState(data)
@@ -231,6 +252,11 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
 
   const locked = Boolean(data.demo || preview)
 
+  const handleOpen = () => {
+    setOpened(true)
+    audioStartRef.current()
+  }
+
   const handleSendWish = async (e) => {
     e.preventDefault()
     if (locked) return
@@ -265,13 +291,19 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
 
   return (
     <div className="art-biru-wrap">
+      <FloatingAudio
+        src={resolveArtJawaMusic(data.music)}
+        active={opened}
+        startRef={audioStartRef}
+      />
+
       {/* Cover Screen */}
       <AnimatePresence>
         {!opened && (
           <Cover 
             data={data} 
             guest={guest} 
-            onOpen={() => setOpened(true)} 
+            onOpen={handleOpen}
           />
         )}
       </AnimatePresence>
@@ -284,8 +316,6 @@ export default function ThemeArtJawaBiru({ data = {}, guest = '', preview = fals
           transition={{ duration: 0.8 }}
           id="home"
         >
-          {/* Background Music */}
-          <FloatingAudio src={data.music || '/music/gamelan_lambang_sari.mp3'} />
 
           {/* 1. HERO / SALAM PEMBUKA */}
           <section className="jb-pad jb-hero">

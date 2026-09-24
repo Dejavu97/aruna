@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, MapPin, Play, Home, Users, CalendarDays, Images, Heart, Gift as GiftIcon, MailOpen, ExternalLink } from 'lucide-react'
 import { addRsvp, addWish, fetchInvitation } from '../lib/api'
 import AdSlot from '../components/AdSlot'
+import { resolveArtJawaMusic } from './artJawaAudio'
 import {
   copyText,
   countdownParts,
@@ -659,7 +660,7 @@ export default function ThemeAdatJawa({ data, guest = '', preview = false }) {
         {open && (
           <main className="jw-main">
             {data.music && <MusicBtn on={musicOn} onToggle={() => setMusicOn(v => !v)} />}
-            {data.music && musicOn && <audio src={data.music} autoPlay loop />}
+            {data.music && musicOn && <audio src={resolveArtJawaMusic(data.music)} autoPlay loop />}
             <Reveal><Hero data={data} bride={bride} groom={groom} /></Reveal>
             <Reveal delay={0.1}><Quote data={data} /></Reveal>
             <Reveal><Couple data={data} /></Reveal>
