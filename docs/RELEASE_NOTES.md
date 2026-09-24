@@ -4,6 +4,19 @@ Dokumen ini mencatat seluruh rincian pembaruan, evolusi fitur, dan penguatan sis
 
 ---
 
+## Stage 12 Production Launch Hardening 2026-09-24
+
+* **Lifecycle undangan:** creation dipindahkan ke server boundary yang memisahkan public invitation, private customer/order metadata, dan edit key secara atomik; delete dan slug reuse mengikuti lifecycle yang sama.
+* **Payment/premium authority:** customer selalu mulai unpaid, status dan premium fields dilindungi, serta watermark hidden/custom hanya berlaku untuk invitation paid.
+* **RSVP & wishes:** guest writes menjadi API-only dengan transaction, throttle, dan proteksi direct Firestore replacement.
+* **Tenant & admin security:** domain removal memverifikasi kepemilikan slug/domain, custom theme mutations mengikuti owner, dan seluruh privileged admin path memakai shared lockout guard.
+* **Custom-domain metadata:** initial HTTP response untuk mapped custom host kini membawa metadata invitation, canonical custom hostname, dan `noindex, nofollow`; unknown/malformed hosts fail closed.
+* **Art Jawa:** audio 15 MB diganti derivative 3.03 MB dan ditunda sampai user membuka invitation, dengan failure-safe playback state.
+* **Release gate:** 48/48 Stage 12 contracts PASS, lint 353 warnings / 0 errors, production build PASS, browser smoke 7 jalur PASS, dan production writes 0.
+* **Legacy note:** dokumen produksi lama yang masih menyimpan private customer metadata di public invitation tetap memerlukan migration terpisah; migration tidak dilakukan dalam Stage 12.
+
+---
+
 ## Stage 8 Controlled Cleanup 2026-09-14 (audit Bagian 7 → batch kecil)
 
 * **8A komentar:** alias permanen `jawa-biru` + 4 pinjam layout (sweet-seventeen, graduation-honors, aqiqah-al-fatih, corporate-gala) didokumentasikan agar tidak dihapus dikira duplikat.
