@@ -68,3 +68,11 @@ test('configured scrypt admin credential remains verifiable', () => {
   assert.match(auth, /crypto\.timingSafeEqual/)
   assert.match(auth, /return false;\n}\n\nexport const verifyPrivilegedAdmin/)
 })
+
+test('Firebase admin credentials can use admin settings and password-change paths', () => {
+  const api = fs.readFileSync(new URL('../src/lib/api.js', import.meta.url), 'utf8')
+  const login = fs.readFileSync(new URL('../api/admin-login.js', import.meta.url), 'utf8')
+  assert.match(api, /adminApiCall[\s\S]*getAdminCredentials\(\)/)
+  assert.match(api, /action: 'change'[\s\S]*\.\.\.creds/)
+  assert.match(login, /\(!adminKey && !idToken\)/)
+})

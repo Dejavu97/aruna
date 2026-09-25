@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { claimInvitationToCurrentUser, fetchUserInvitations, getRememberedEditKeys } from '../lib/api'
+import { claimInvitationToCurrentUser, fetchUserInvitations } from '../lib/api'
 import { formatLongDate, invitationUrl, isEventEditLocked } from '../lib/utils'
 import { formatRupiah, packages, getPackageById } from '../data/site'
 import {
@@ -80,25 +80,6 @@ export default function Dashboard() {
     }
   }
 
-  async function linkRememberedInvitations() {
-    const remembered = Object.entries(getRememberedEditKeys()).filter(([, key]) => key)
-    if (!remembered.length) {
-      setLinkMessage('Tidak ada kode edit tersimpan di perangkat ini.')
-      return
-    }
-    setLinking(true)
-    setLinkMessage('')
-    let linked = 0
-    for (const [slug, editKey] of remembered) {
-      try {
-        await claimInvitationToCurrentUser(slug, editKey)
-        linked += 1
-      } catch {}
-    }
-    await loadInvitations()
-    setLinkMessage(linked ? `${linked} undangan berhasil dihubungkan ke akun ini.` : 'Tidak ada undangan tersimpan yang dapat dihubungkan.')
-    setLinking(false)
-  }
 
   if (authLoading || (loading && user)) {
     return (
@@ -175,14 +156,6 @@ export default function Dashboard() {
                 Hubungkan sekali menggunakan slug dan kode edit. Setelah itu undangan dapat dibuka dari akun Google ini di perangkat lain tanpa membawa kode edit.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={linkRememberedInvitations}
-              disabled={linking}
-              className="border border-ink/20 bg-white px-4 py-2 text-[11px] uppercase tracking-wider font-semibold hover:border-gold-deep disabled:opacity-50"
-            >
-              Gunakan akses tersimpan di perangkat ini
-            </button>
           </div>
           <form onSubmit={handleLinkInvitation} className="grid gap-2 sm:grid-cols-[1fr_1.4fr_auto]">
             <input
@@ -222,7 +195,19 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {invitations.length === 0 ? (
+          {error ? (
+            <div className="border border-red-200 bg-red-50 p-6 rounded-sm text-center max-w-lg mx-auto">
+              <p className="font-display text-lg font-bold text-red-900">Dashboard gagal dimuat</p>
+              <p className="mt-2 text-xs text-red-700 leading-relaxed">{error}</p>
+              <button
+                type="button"
+                onClick={loadInvitations}
+                className="mt-4 border border-red-300 bg-white px-4 py-2 text-xs uppercase tracking-wider font-semibold text-red-900"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          ) : invitations.length === 0 ? (
             /* Empty State */
             <div className="border border-dashed border-ink/20 bg-paper/60 p-12 text-center rounded-sm space-y-4 max-w-lg mx-auto">
               <div className="w-12 h-12 rounded-full bg-gold/10 text-gold-deep flex items-center justify-center mx-auto">

@@ -181,10 +181,11 @@ export async function changeAdminPassword(newPassword) {
   }
 
   try {
+    const creds = await getAdminCredentials()
     const res = await fetch('/api/admin-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'change', adminKey: getAdminKey(), newPassword: cleanPass })
+      body: JSON.stringify({ action: 'change', newPassword: cleanPass, ...creds })
     })
     const data = await res.json().catch(() => ({}))
     if (!res.ok || !data.success) {
@@ -209,12 +210,12 @@ export async function changeAdminPassword(newPassword) {
 // Klien TIDAK menulis Firestore langsung utk koleksi ini — rules sudah menutup
 // jalur klien; fungsi2 save* di bawah otomatis ikut lewat jalur aman ini.
 async function adminApiCall(body) {
-  const adminKey = getAdminKey()
-  if (!adminKey) throw new Error('Unauthorized')
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const creds = await getAdminCredentials()
   const res = await fetch('/api/admin-settings', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ adminKey, ...body })
+    body: JSON.stringify({ ...creds, ...body })
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok || !data.success) {

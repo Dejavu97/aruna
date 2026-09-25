@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { action, password, adminKey, newPassword } = req.body || {}
+    const { action, password, adminKey, idToken, newPassword } = req.body || {}
 
     // ---- LOGIN: verifikasi password tersimpan (hash) ----
     if (action === 'login') {
@@ -42,8 +42,8 @@ export default async function handler(req, res) {
 
     // ---- GANTI PASSWORD: hanya sesi admin dengan password valid saat ini ----
     if (action === 'change') {
-      if (!adminKey || !newPassword) {
-        return res.status(400).json({ error: 'adminKey dan newPassword wajib diisi.' })
+      if ((!adminKey && !idToken) || !newPassword) {
+        return res.status(400).json({ error: 'Kredensial admin dan newPassword wajib diisi.' })
       }
       const clean = String(newPassword).trim()
       if (clean.length < 8) {

@@ -54,3 +54,9 @@ test('owner session wins over stale remembered edit keys and omits secrets from 
   assert.match(manage, /hasCustomerSession \? '' : editKey/)
   assert.match(edit, /hasCustomerSession\) navigate\(\`\/kelola\//)
 })
+
+test('dashboard does not bulk-submit remembered keys into the shared throttle', () => {
+  assert.doesNotMatch(dashboard, /linkRememberedInvitations/)
+  assert.doesNotMatch(dashboard, /getRememberedEditKeys/)
+  assert.match(dashboard, /Dashboard gagal dimuat/)
+})
