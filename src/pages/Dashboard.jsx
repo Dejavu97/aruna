@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchUserInvitations } from '../lib/api'
+import { fetchUserInvitations, getEditKey } from '../lib/api'
 import { formatLongDate, invitationUrl, isEventEditLocked } from '../lib/utils'
-import { formatRupiah, packages, getPackageById } from '../data/site'
+import { formatRupiah, packages, getPackagesByEventType } from '../data/site'
+import { invitePath } from '../lib/nav'
 import {
   Plus,
   ExternalLink,
@@ -158,7 +159,9 @@ export default function Dashboard() {
                 const title = isSingle
                   ? item.bride?.nick || item.customerName || 'Acara Spesial'
                   : `${item.bride?.nick} & ${item.groom?.nick}`
-                const pack = getPackageById(item.packageId, item.eventType)
+                const packageList = getPackagesByEventType(item.eventType)
+                const currentPackageIndex = packageList.findIndex((p) => p.id === item.packageId)
+                const canUpgrade = currentPackageIndex >= 0 && currentPackageIndex < packageList.length - 1
 
                 return (
                   <article
@@ -227,6 +230,14 @@ export default function Dashboard() {
 
                     {/* Card Actions Footer */}
                     <div className="p-4 bg-ivory/60 border-t border-ink/10 grid grid-cols-2 gap-2 text-xs">
+                      {canUpgrade && (
+                        <Link
+                          to={invitePath(`/kelola/${item.slug}`, { key: getEditKey(item.slug), from: 'customer' })}
+                          className="col-span-2 border border-gold-deep bg-gold-deep/10 text-gold-deep py-2.5 text-center uppercase tracking-wider font-bold rounded-xs hover:bg-gold-deep hover:text-white transition-colors"
+                        >
+                          ↑ Upgrade Paket
+                        </Link>
+                      )}
                       <Link
                         to={`/kelola/${item.slug}?from=customer`}
                         className="bg-ink text-ivory py-2 text-center uppercase tracking-wider font-semibold rounded-xs hover:bg-gold-deep transition-colors"

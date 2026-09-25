@@ -266,7 +266,7 @@ export default function Manage() {
           </div>
         </div>
 
-        {!isAdmin && editKey && <ManageUpgrade item={item} slug={slug} editKey={editKey} reload={reload} />}
+        {!isAdmin && editKey && <div id="upgrade"><ManageUpgrade item={item} slug={slug} editKey={editKey} reload={reload} /></div>}
 
         {/* H+1 Grace Period Banner */}
         {!isAdmin && isEventEditLocked(item?.date, 1) && (
