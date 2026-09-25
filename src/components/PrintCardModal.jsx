@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Printer, Download, QrCode, Sparkles, Check, Copy, Sliders, Layers, Upload, RefreshCw, Image as ImageIcon, Plus, Trash2, FileText, CheckCircle2, Scissors, Maximize2 } from 'lucide-react'
 import { formatLongDate, invitationUrl, copyText } from '../lib/utils'
 import { uploadFile } from '../lib/api'
@@ -13,6 +13,12 @@ const bgTexturePresets = [
   { id: 'gold-leaf', label: 'Emas Elegan', url: '/assets/local/gold_texture.jpg' },
   { id: 'floral', label: 'Bunga Pastel', url: '/assets/local/pastel_flower_texture.jpg' },
 ]
+
+const MM_TO_CSS_PX = 96 / 25.4
+const PREVIEW_PAGE = {
+  portrait: { widthMm: 210, heightMm: 297, maxWidthPx: 540 },
+  landscape: { widthMm: 297, heightMm: 210, maxWidthPx: 620 },
+}
 
 export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
   const [cardType, setCardType] = useState('souvenir') // 'souvenir' | 'enclosure' | 'table' | 'bifold'
@@ -64,7 +70,47 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
   const [copied, setCopied] = useState(false)
   const [autoFilled, setAutoFilled] = useState(false)
+  const previewAreaRef = useRef(null)
+  const [previewAvailableWidth, setPreviewAvailableWidth] = useState(620)
 
+  useEffect(() => {
+    const element = previewAreaRef.current
+    if (!element) return undefined
+
+    const updateWidth = () => {
+      const computed = window.getComputedStyle(element)
+      const horizontalPadding =
+        (parseFloat(computed.paddingLeft) || 0) + (parseFloat(computed.paddingRight) || 0)
+      setPreviewAvailableWidth(Math.max(240, element.clientWidth - horizontalPadding))
+    }
+
+    updateWidth()
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateWidth) : null
+    observer?.observe(element)
+    window.addEventListener('resize', updateWidth)
+
+    return () => {
+      observer?.disconnect()
+      window.removeEventListener('resize', updateWidth)
+    }
+  }, [])
+
+  const previewShellStyle = (orientation) => {
+    const page = PREVIEW_PAGE[orientation]
+    const physicalWidthPx = page.widthMm * MM_TO_CSS_PX
+    const physicalHeightPx = page.heightMm * MM_TO_CSS_PX
+    const scale = Math.min(
+      1,
+      page.maxWidthPx / physicalWidthPx,
+      Math.max(1, previewAvailableWidth) / physicalWidthPx,
+    )
+
+    return {
+      width: `${physicalWidthPx * scale}px`,
+      height: `${physicalHeightPx * scale}px`,
+      '--print-preview-scale': String(scale),
+    }
+  }
 
   const fullUrl = invitationUrl(item.slug)
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(fullUrl)}&margin=10&format=png`
@@ -261,7 +307,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`print-card print-card-souvenir relative box-border w-full h-full min-h-0 p-2 sm:p-2.5 rounded-xs border flex flex-col justify-between text-left overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card print-card-souvenir relative box-border w-full h-full min-h-0 p-2.5 rounded-xs border flex flex-col justify-between text-left overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -270,30 +316,30 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         {/* Top: Kicker & Couple Name */}
         <div className="relative z-10 flex items-start justify-between gap-1 border-b border-current/15 pb-0.5">
           <div className="min-w-0 flex-1">
-            <p className="print-card-kicker text-[6.5px] sm:text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70 leading-none truncate">{formData.kicker || 'WEDDING SOUVENIR'}</p>
-            <h4 className="print-card-names font-display text-[13px] sm:text-[14.5px] font-bold tracking-tight leading-tight mt-0.5 truncate">{formData.brideNick} &amp; {formData.groomNick}</h4>
+            <p className="print-card-kicker text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70 leading-none truncate">{formData.kicker || 'WEDDING SOUVENIR'}</p>
+            <h4 className="print-card-names font-display text-[14.5px] font-bold tracking-tight leading-tight mt-0.5 truncate">{formData.brideNick} &amp; {formData.groomNick}</h4>
           </div>
-          <span className="print-card-date text-[6.5px] sm:text-[7px] font-semibold opacity-75 font-mono whitespace-nowrap">{formData.eventDate}</span>
+          <span className="print-card-date text-[7px] font-semibold opacity-75 font-mono whitespace-nowrap">{formData.eventDate}</span>
         </div>
 
         {/* Middle: Content + QR Code */}
         <div className="relative z-10 grid grid-cols-12 gap-1.5 items-center my-auto min-h-0">
           <div className="col-span-8 space-y-0.5 min-w-0">
-            <p className="print-card-subtitle text-[7px] sm:text-[7.5px] opacity-85 leading-tight italic line-clamp-2">
+            <p className="print-card-subtitle text-[7.5px] opacity-85 leading-tight italic line-clamp-2">
               "{formData.subtitle || 'Terima kasih atas kehadiran & doa restu Anda'}"
             </p>
             {renderPhotoBadge(32)}
           </div>
           <div className="col-span-4 flex flex-col items-center justify-center text-center">
             <div className="p-0.5 bg-white rounded-xs border border-black/10 shadow-xs">
-              <img src={qrCodeUrl} alt="QR" className="print-card-qr w-7 h-7 sm:w-8 sm:h-8 object-contain" />
+              <img src={qrCodeUrl} alt="QR" className="print-card-qr w-8 h-8 object-contain" />
             </div>
-            <p className="print-card-qr-label text-[5px] sm:text-[5.5px] uppercase tracking-widest font-bold opacity-75 mt-0.5 leading-none">Scan Galeri</p>
+            <p className="print-card-qr-label text-[5.5px] uppercase tracking-widest font-bold opacity-75 mt-0.5 leading-none">Scan Galeri</p>
           </div>
         </div>
 
         {/* Bottom Footer */}
-        <div className="print-card-footer relative z-10 flex items-center justify-between pt-0.5 border-t border-current/15 text-[6px] sm:text-[6.5px] opacity-70">
+        <div className="print-card-footer relative z-10 flex items-center justify-between pt-0.5 border-t border-current/15 text-[6.5px] opacity-70">
           <span className="truncate max-w-[65%]">{fullUrl.replace(/^https?:\/\//, '')}</span>
           <span className="font-semibold uppercase tracking-wider whitespace-nowrap">Aruna Digital</span>
         </div>
@@ -314,7 +360,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`print-card ${isA6 ? 'print-card-enclosure print-card-enclosure-a6' : 'print-card-table print-card-table-a5'} relative box-border w-full h-full min-h-0 p-3 sm:p-4 rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card print-card-enclosure ${isA6 ? 'print-card-enclosure-a6' : 'print-card-enclosure-a5'} relative box-border w-full h-full min-h-0 p-4 rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -365,17 +411,17 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         <div
           key={idx}
           style={bgStyle}
-          className={`print-card print-card-table-tent relative box-border w-full h-full min-h-0 rounded-xs border grid grid-rows-2 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+          className={`print-card print-card-table print-card-table-tent relative box-border w-full h-full min-h-0 rounded-xs border grid grid-rows-2 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
         >
           {bgTextureUrl && (
             <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
           )}
 
           {/* Top Half (Front Face) */}
-          <div className="relative z-10 p-2.5 sm:p-3 flex flex-col items-center justify-between border-b border-dashed border-current/40 min-h-0">
+          <div className="relative z-10 p-3 flex flex-col items-center justify-between border-b border-dashed border-current/40 min-h-0">
             <p className="text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70">{couple} · {formData.eventDate}</p>
             <div className="my-auto">
-              <h2 className="font-display text-xl sm:text-2xl font-black uppercase tracking-wider leading-none">{currentTable}</h2>
+              <h2 className="font-display text-2xl font-black uppercase tracking-wider leading-none">{currentTable}</h2>
               <p className="text-[7.5px] italic opacity-80 mt-0.5">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
             </div>
             <div className="flex items-center gap-1.5">
@@ -387,10 +433,10 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           </div>
 
           {/* Bottom Half (Back Face) */}
-          <div className="relative z-10 p-2.5 sm:p-3 flex flex-col items-center justify-between min-h-0">
+          <div className="relative z-10 p-3 flex flex-col items-center justify-between min-h-0">
             <p className="text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70">{couple} · {formData.eventDate}</p>
             <div className="my-auto">
-              <h2 className="font-display text-xl sm:text-2xl font-black uppercase tracking-wider leading-none">{currentTable}</h2>
+              <h2 className="font-display text-2xl font-black uppercase tracking-wider leading-none">{currentTable}</h2>
               <p className="text-[7.5px] italic opacity-80 mt-0.5">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
             </div>
             <p className="text-[6px] uppercase tracking-widest opacity-60">Aruna Digital Wedding</p>
@@ -404,7 +450,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`print-card ${isA6 ? 'print-card-enclosure print-card-enclosure-a6' : 'print-card-table print-card-table-a5'} relative box-border w-full h-full min-h-0 p-3 sm:p-4 rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card print-card-table ${isA6 ? 'print-card-table-a6' : 'print-card-table-a5'} relative box-border w-full h-full min-h-0 p-4 rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -417,7 +463,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
         {/* Big Table Number */}
         <div className="relative z-10 space-y-0.5 my-auto w-full min-h-0">
-          <h2 className={`font-display font-black uppercase tracking-wider leading-none ${isA6 ? 'text-2xl' : 'text-3xl sm:text-4xl'}`}>{currentTable}</h2>
+          <h2 className={`font-display font-black uppercase tracking-wider leading-none ${isA6 ? 'text-2xl' : 'text-4xl'}`}>{currentTable}</h2>
           <p className={`italic opacity-85 ${isA6 ? 'text-[7.5px]' : 'text-[9.5px]'}`}>{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
           {renderPhotoBadge(isA6 ? 34 : 48)}
         </div>
@@ -446,7 +492,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`print-card print-card-bifold relative box-border w-full h-full min-h-0 p-4 sm:p-5 rounded-xs border grid grid-cols-2 gap-4 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card print-card-bifold relative box-border w-full h-full min-h-0 p-5 rounded-xs border grid grid-cols-2 gap-4 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -524,52 +570,53 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       {/* 100% AUTO-FIT A4 PRINT CSS RULES                     */}
       {/* ---------------------------------------------------- */}
       <style>{`
+        /*
+         * One authoritative geometry for both preview and print.
+         * Screen mode only scales the full A4 page; it never resizes card internals.
+         */
+        .print-sheet {
+          margin: 0 !important;
+          padding: 0 !important;
+          box-sizing: border-box !important;
+          overflow: hidden !important;
+          display: flex !important;
+          flex-direction: column !important;
+        }
+        .print-sheet-portrait {
+          width: 198mm !important;
+          height: 285mm !important;
+        }
+        .print-sheet-landscape {
+          width: 285mm !important;
+          height: 198mm !important;
+        }
+
         @media screen {
-          .print-sheet-portrait {
-            width: min(100%, 540px);
-            aspect-ratio: 210 / 297;
+          .print-preview-shell {
+            position: relative;
+            flex: 0 0 auto;
+            overflow: hidden;
           }
-          .print-sheet-landscape {
-            width: min(100%, 620px);
-            aspect-ratio: 297 / 210;
+          .print-page {
+            box-sizing: border-box;
+            background: #fff;
+            transform: scale(var(--print-preview-scale));
+            transform-origin: top left;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
           }
-          .print-card-souvenir .print-card-names {
-            font-size: 16px;
+          .print-page-portrait {
+            width: 210mm;
+            height: 297mm;
+            padding: 6mm;
           }
-          .print-card-souvenir .print-card-kicker,
-          .print-card-souvenir .print-card-date {
-            font-size: 8px;
-          }
-          .print-card-souvenir .print-card-subtitle {
-            font-size: 9px;
-          }
-          .print-card-souvenir .print-card-photo {
-            width: 42px !important;
-            height: 42px !important;
-          }
-          .print-card-souvenir .print-card-qr {
-            width: 44px !important;
-            height: 44px !important;
-          }
-          .print-card-souvenir .print-card-qr-label,
-          .print-card-souvenir .print-card-footer {
-            font-size: 7px;
-          }
-          .print-card-bifold h4 {
-            font-size: 22px;
-          }
-          .print-card-bifold p {
-            font-size: 10px;
-          }
-          .print-card-bifold .print-card-photo {
-            width: 46px !important;
-            height: 46px !important;
-          }
-          .print-card-bifold img[alt="QR Code"] {
-            width: 58px !important;
-            height: 58px !important;
+          .print-page-landscape {
+            width: 297mm;
+            height: 210mm;
+            padding: 6mm;
           }
         }
+
         @media print {
           @page {
             size: ${cardType === 'bifold' ? 'A4 landscape' : 'A4 portrait'};
@@ -612,172 +659,43 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             padding: 0 !important;
             background: #fff !important;
           }
+          .print-page-group {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            page-break-after: always;
+            break-after: page;
+          }
+          .print-page-group:last-child {
+            page-break-after: auto;
+            break-after: auto;
+          }
+          .print-preview-shell {
+            width: auto !important;
+            height: auto !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .print-page {
+            width: auto !important;
+            height: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            transform: none !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+          }
           .print-sheet-portrait {
             width: 198mm !important;
             height: 285mm !important;
-            max-height: none !important;
-            page-break-after: always;
-            break-after: page;
-            margin: 0 auto !important;
-            padding: 0 !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-            display: flex !important;
-            flex-direction: column !important;
           }
           .print-sheet-landscape {
             width: 285mm !important;
             height: 198mm !important;
-            max-height: none !important;
-            page-break-after: always;
-            break-after: page;
-            margin: 0 auto !important;
-            padding: 0 !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-            display: flex !important;
-            flex-direction: column !important;
           }
-          .print-sheet:last-child {
-            page-break-after: avoid;
-            break-after: avoid;
-          }
-          .print-card-souvenir {
-            padding: 4mm !important;
-          }
-          .print-card-souvenir .print-card-kicker {
-            font-size: 2.1mm !important;
-            line-height: 1.15 !important;
-          }
-          .print-card-souvenir .print-card-names {
-            font-size: 5mm !important;
-            line-height: 1.05 !important;
-          }
-          .print-card-souvenir .print-card-date {
-            font-size: 2.1mm !important;
-          }
-          .print-card-souvenir .print-card-subtitle {
-            font-size: 2.7mm !important;
-            line-height: 1.2 !important;
-          }
-          .print-card-souvenir .print-card-photo {
-            width: 18mm !important;
-            height: 18mm !important;
-          }
-          .print-card-souvenir .print-card-qr {
-            width: 22mm !important;
-            height: 22mm !important;
-          }
-          .print-card-souvenir .print-card-qr-label {
-            font-size: 1.7mm !important;
-            line-height: 1.1 !important;
-          }
-          .print-card-souvenir .print-card-footer {
-            padding-top: 1mm !important;
-            font-size: 1.8mm !important;
-          }
-
-          .print-card-enclosure {
-            padding: 6mm !important;
-          }
-          .print-card-enclosure .print-card-photo {
-            width: 30mm !important;
-            height: 30mm !important;
-          }
-          .print-card-enclosure .print-card-qr,
-          .print-card-enclosure img[alt="QR Code"] {
-            width: 35mm !important;
-            height: 35mm !important;
-          }
-          .print-card-enclosure .print-card-names,
-          .print-card-enclosure h3 {
-            font-size: 8mm !important;
-          }
-          .print-card-enclosure .print-card-kicker {
-            font-size: 3mm !important;
-          }
-          .print-card-enclosure .print-card-date {
-            font-size: 3mm !important;
-          }
-          .print-card-enclosure .print-card-subtitle {
-            font-size: 2.8mm !important;
-          }
-          .print-card-enclosure-a6 {
-            padding: 5mm !important;
-          }
-          .print-card-enclosure-a6 .print-card-photo {
-            width: 14mm !important;
-            height: 14mm !important;
-          }
-          .print-card-enclosure-a6 .print-card-qr,
-          .print-card-enclosure-a6 img[alt="QR Code"] {
-            width: 18mm !important;
-            height: 18mm !important;
-          }
-          .print-card-enclosure-a6 .print-card-names,
-          .print-card-enclosure-a6 h3 {
-            font-size: 5.5mm !important;
-          }
-          .print-card-enclosure-a6 .print-card-kicker,
-          .print-card-enclosure-a6 .print-card-date {
-            font-size: 2.2mm !important;
-          }
-          .print-card-enclosure-a6 .print-card-subtitle {
-            font-size: 2mm !important;
-          }
-
-          .print-card-table h2 {
-            font-size: 10mm !important;
-          }
-          .print-card-table p {
-            font-size: 2.8mm !important;
-          }
-          .print-card-table .print-card-photo {
-            width: 30mm !important;
-            height: 30mm !important;
-          }
-          .print-card-table img[alt="QR Code"],
-          .print-card-table img[alt="QR"] {
-            width: 30mm !important;
-            height: 30mm !important;
-          }
-          .print-card-table-tent img[alt="QR"] {
-            width: 18mm !important;
-            height: 18mm !important;
-          }
-          .print-card-table-a5 h2 {
-            font-size: 7mm !important;
-          }
-          .print-card-table-a5 .print-card-photo {
-            width: 18mm !important;
-            height: 18mm !important;
-          }
-          .print-card-table-a5 img[alt="QR Code"],
-          .print-card-table-a5 img[alt="QR"] {
-            width: 20mm !important;
-            height: 20mm !important;
-          }
-
-          .print-card-bifold {
-            padding: 8mm !important;
-            gap: 8mm !important;
-          }
-          .print-card-bifold h4 {
-            font-size: 8mm !important;
-          }
-          .print-card-bifold p {
-            font-size: 3mm !important;
-            line-height: 1.25 !important;
-          }
-          .print-card-bifold .print-card-photo {
-            width: 20mm !important;
-            height: 20mm !important;
-          }
-          .print-card-bifold img[alt="QR Code"] {
-            width: 24mm !important;
-            height: 24mm !important;
-          }
-
           .no-print {
             display: none !important;
           }
@@ -875,7 +793,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         />
 
           {/* Preview & Print Sheet Area - 7 Cols */}
-          <div className="lg:col-span-7 bg-black/5 p-3 sm:p-5 rounded-sm border border-ink/10 flex flex-col items-center justify-start overflow-y-auto max-h-[82vh] print:bg-white print:p-0 print:border-none print:w-full print:max-h-none print-area-wrapper">
+          <div ref={previewAreaRef} className="lg:col-span-7 bg-black/5 p-3 sm:p-5 rounded-sm border border-ink/10 flex flex-col items-center justify-start overflow-auto max-h-[82vh] print:bg-white print:p-0 print:border-none print:w-full print:max-h-none print-area-wrapper">
             
             <div className="mb-2 text-center border-b border-dashed pb-2 w-full print:hidden flex items-center justify-between">
               <p className="text-[10.5px] uppercase tracking-widest text-stone font-bold">
@@ -884,65 +802,78 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
               <span className="text-[9.5px] font-mono bg-ink/5 px-2 py-0.5 rounded text-stone">Auto-Fit Grid A4</span>
             </div>
 
-            {/* SOUVENIR GRID (8 KARTU PER LEMBAR A4 PORTRAIT - 100% AUTO-FIT) */}
+            {/* SOUVENIR GRID (8 KARTU PER LEMBAR A4 PORTRAIT) */}
             {cardType === 'souvenir' && (
-              <div className="print-sheet-portrait print-sheet bg-white p-3 sm:p-4 rounded-xs shadow-md border border-black/15 w-full max-w-[540px] aspect-[210/297] box-border print:shadow-none print:border-none print:p-0 print:w-full print:max-w-none print:aspect-auto flex flex-col justify-between overflow-hidden">
-                <div className="grid grid-cols-2 grid-rows-4 gap-2 sm:gap-2.5 w-full h-full min-h-0">
-                  {Array.from({ length: 8 }).map((_, idx) => renderSouvenirCard(idx + 1))}
+              <div className="print-page-group w-full flex flex-col items-center">
+                <div className="print-preview-shell" style={previewShellStyle('portrait')}>
+                  <div className="print-page print-page-portrait">
+                    <div className="print-sheet print-sheet-portrait bg-white">
+                      <div className="grid grid-cols-2 grid-rows-4 gap-2.5 w-full h-full min-h-0">
+                        {Array.from({ length: 8 }).map((_, idx) => renderSouvenirCard(idx + 1))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="pt-1.5 text-center text-[7px] text-stone uppercase tracking-widest border-t border-dashed mt-1 print:hidden">
+                <div className="no-print pt-1.5 text-center text-[7px] text-stone uppercase tracking-widest">
                   ✂ Gunting mengikuti garis tepi kartu · Aruna Digital Wedding Invitation
                 </div>
               </div>
             )}
 
-            {/* MINI ENCLOSURE (2 OR 4 PER LEMBAR A4 PORTRAIT - 100% AUTO-FIT) */}
+            {/* MINI ENCLOSURE (2 OR 4 PER LEMBAR A4 PORTRAIT) */}
             {cardType === 'enclosure' && (
-              <div className="print-sheet-portrait print-sheet bg-white p-3 sm:p-4 rounded-xs shadow-md border border-black/15 w-full max-w-[540px] aspect-[210/297] box-border print:shadow-none print:border-none print:p-0 print:w-full print:max-w-none print:aspect-auto flex flex-col justify-between overflow-hidden">
-                {enclosureLayout === '4-per-page' ? (
-                  <div className="grid grid-cols-2 grid-rows-2 gap-2.5 w-full h-full min-h-0">
-                    {Array.from({ length: 4 }).map((_, idx) => renderEnclosureCard('4-per-page', idx + 1))}
+              <div className="print-page-group w-full flex flex-col items-center">
+                <div className="print-preview-shell" style={previewShellStyle('portrait')}>
+                  <div className="print-page print-page-portrait">
+                    <div className="print-sheet print-sheet-portrait bg-white">
+                      {enclosureLayout === '4-per-page' ? (
+                        <div className="grid grid-cols-2 grid-rows-2 gap-2.5 w-full h-full min-h-0">
+                          {Array.from({ length: 4 }).map((_, idx) => renderEnclosureCard('4-per-page', idx + 1))}
+                        </div>
+                      ) : (
+                        <div className="grid grid-rows-2 gap-3 w-full h-full min-h-0">
+                          {Array.from({ length: 2 }).map((_, idx) => renderEnclosureCard('2-per-page', idx + 1))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <div className="grid grid-rows-2 gap-3 w-full h-full min-h-0">
-                    {Array.from({ length: 2 }).map((_, idx) => renderEnclosureCard('2-per-page', idx + 1))}
-                  </div>
-                )}
-                <div className="pt-1.5 text-center text-[7px] text-stone uppercase tracking-widest border-t border-dashed mt-1 print:hidden">
+                </div>
+                <div className="no-print pt-1.5 text-center text-[7px] text-stone uppercase tracking-widest">
                   ✂ Potong mengikuti garis tepi kartu · Aruna Digital Wedding Invitation
                 </div>
               </div>
             )}
 
-            {/* TABLE CARDS BATCH (PAGINATED SHEETS OF A4 PORTRAIT - 100% AUTO-FIT) */}
+            {/* TABLE CARDS BATCH (PAGINATED A4 PORTRAIT SHEETS) */}
             {cardType === 'table' && (
               <div className="w-full space-y-6 print:space-y-0">
                 {Array.from({ length: Math.ceil(tableList.length / itemsPerSheet) }).map((_, sheetIdx) => {
                   const itemsOnThisSheet = tableList.slice(sheetIdx * itemsPerSheet, sheetIdx * itemsPerSheet + itemsPerSheet)
                   return (
-                    <div
-                      key={sheetIdx}
-                      className="print-sheet-portrait print-sheet bg-white p-3 sm:p-4 rounded-xs shadow-md border border-black/15 w-full max-w-[540px] aspect-[210/297] box-border mx-auto print:shadow-none print:border-none print:p-0 print:w-full print:max-w-none print:aspect-auto flex flex-col justify-between overflow-hidden"
-                    >
-                      <div className="mb-1 text-center text-[8.5px] text-stone font-mono uppercase tracking-wider print:hidden">
+                    <div key={sheetIdx} className="print-page-group w-full flex flex-col items-center">
+                      <div className="no-print mb-1 text-center text-[8.5px] text-stone font-mono uppercase tracking-wider">
                         Lembar A4 Halaman #{sheetIdx + 1}
                       </div>
-
-                      {tableLayout === '4-per-page' ? (
-                        <div className="grid grid-cols-2 grid-rows-2 gap-2.5 w-full h-full min-h-0">
-                          {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, '4-per-page', `tbl_${sheetIdx}_${idx}`))}
+                      <div className="print-preview-shell" style={previewShellStyle('portrait')}>
+                        <div className="print-page print-page-portrait">
+                          <div className="print-sheet print-sheet-portrait bg-white">
+                            {tableLayout === '4-per-page' ? (
+                              <div className="grid grid-cols-2 grid-rows-2 gap-2.5 w-full h-full min-h-0">
+                                {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, '4-per-page', `tbl_${sheetIdx}_${idx}`))}
+                              </div>
+                            ) : tableLayout === 'tent-fold' ? (
+                              <div className="grid grid-rows-2 gap-3 w-full h-full min-h-0">
+                                {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, 'tent-fold', `tbl_${sheetIdx}_${idx}`))}
+                              </div>
+                            ) : (
+                              <div className="grid grid-rows-2 gap-3 w-full h-full min-h-0">
+                                {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, '2-per-page', `tbl_${sheetIdx}_${idx}`))}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      ) : tableLayout === 'tent-fold' ? (
-                        <div className="grid grid-rows-2 gap-3 w-full h-full min-h-0">
-                          {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, 'tent-fold', `tbl_${sheetIdx}_${idx}`))}
-                        </div>
-                      ) : (
-                        <div className="grid grid-rows-2 gap-3 w-full h-full min-h-0">
-                          {itemsOnThisSheet.map((tblName, idx) => renderTableCard(tblName, '2-per-page', `tbl_${sheetIdx}_${idx}`))}
-                        </div>
-                      )}
-
-                      <div className="pt-1.5 text-center text-[7px] text-stone uppercase tracking-widest border-t border-dashed mt-1 print:hidden">
+                      </div>
+                      <div className="no-print pt-1.5 text-center text-[7px] text-stone uppercase tracking-widest">
                         ✂ Gunting &amp; Lipat Kartu Meja · Aruna Digital Wedding Invitation
                       </div>
                     </div>
@@ -951,13 +882,19 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
               </div>
             )}
 
-            {/* BIFOLD FOLDABLE INVITATION (A4 LANDSCAPE - 100% AUTO-FIT) */}
+            {/* BIFOLD FOLDABLE INVITATION (A4 LANDSCAPE) */}
             {cardType === 'bifold' && (
-              <div className="print-sheet-landscape print-sheet bg-white p-3 sm:p-4 rounded-xs shadow-md border border-black/15 w-full max-w-[620px] aspect-[297/210] box-border print:shadow-none print:border-none print:p-0 print:w-full print:max-w-none print:aspect-auto flex flex-col justify-between overflow-hidden">
-                <div className="w-full h-full min-h-0">
-                  {renderBifoldCard(1)}
+              <div className="print-page-group w-full flex flex-col items-center">
+                <div className="print-preview-shell" style={previewShellStyle('landscape')}>
+                  <div className="print-page print-page-landscape">
+                    <div className="print-sheet print-sheet-landscape bg-white">
+                      <div className="w-full h-full min-h-0">
+                        {renderBifoldCard(1)}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="pt-1.5 text-center text-[7px] text-stone uppercase tracking-widest border-t border-dashed mt-1 print:hidden">
+                <div className="no-print pt-1.5 text-center text-[7px] text-stone uppercase tracking-widest">
                   ✂ Lipat dua mengikuti garis putus-putus tengah · Aruna Digital Wedding Invitation
                 </div>
               </div>
