@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { adminAuth, adminDb } from '../server/_firebase.js'
-import { verifyPrivilegedAdmin } from '../server/_auth.js'
-import { buildCloudinaryUploadAuthorization } from '../server/_cloudinary-upload.js'
+import { getClientIp, verifyPrivilegedAdmin } from '../server/_auth.js'
+import { buildCloudinaryUploadAuthorization, createUploadCapability } from '../server/_cloudinary-upload.js'
 import { createNotificationProof } from '../server/_notification-proof.js'
 import {
   buildCreationRecords,
@@ -12,6 +12,29 @@ import {
 } from '../server/_invitation-lifecycle.js'
 
 const MAX_PAYLOAD_BYTES = 800_000
+const CAPABILITY_WINDOW_MS = 10 * 60 * 1000
+const CAPABILITY_MAX_ISSUES = 12
+const capabilityIssues = new Map()
+
+function assertCapabilityIssueRate(ip, now = Date.now()) {
+  const key = String(ip || 'unknown')
+  const current = capabilityIssues.get(key)
+  if (!current || now - current.startedAt >= CAPABILITY_WINDOW_MS) {
+    capabilityIssues.set(key, { startedAt: now, count: 1 })
+    return
+  }
+  if (current.count >= CAPABILITY_MAX_ISSUES) {
+    throw Object.assign(new Error('Terlalu banyak permintaan upload. Coba lagi sebentar.'), { status: 429 })
+  }
+  current.count += 1
+}
+
+async function verifyInvitationEditKey(slug, editKey) {
+  const invitationSnap = await adminDb.collection('invitations').doc(slug).get()
+  if (!invitationSnap.exists) return false
+  const keySnap = await adminDb.collection('private_keys').doc(slug).get()
+  return keySnap.exists && keySnap.data()?.editKey === editKey
+}
 
 function generateOrderCode() {
   return 'AR' + randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
@@ -79,12 +102,27 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {}
+    if (body.action === 'upload-capability') {
+      const now = Date.now()
+      assertCapabilityIssueRate(getClientIp(req), now)
+      const capability = createUploadCapability({
+        now,
+        clientIp: getClientIp(req),
+      })
+      return res.status(200).json({
+        capability: capability.token,
+        expiresAt: capability.expiresAt,
+      })
+    }
     if (body.action === 'upload-signature') {
       const authorization = req.headers.authorization
       const upload = await buildCloudinaryUploadAuthorization({
         authorization,
         body,
+        clientIp: getClientIp(req),
         verifyIdToken: (token) => adminAuth.verifyIdToken(token),
+        verifyEditKey: verifyInvitationEditKey,
+        verifyAdmin: (input) => verifyPrivilegedAdmin(req, input),
       })
       return res.status(200).json(upload)
     }

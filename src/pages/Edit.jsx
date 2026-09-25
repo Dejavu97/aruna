@@ -171,6 +171,7 @@ export default function Edit() {
           themeId={item.themeId}
           initial={initialFormData}
           customThemes={customThemes}
+          uploadContext={fromAdmin ? { adminKey: getAdminKey() } : { slug, editKey: key }}
           mode="edit"
           submitting={busy}
           error={error}

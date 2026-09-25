@@ -2,34 +2,65 @@ import { auth } from './firebase'
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 const OK_TYPE = /^(image\/(png|jpe?g|gif|webp|svg\+xml)|audio\/(mpeg|mp3|wav|ogg|x-wav))$/i
+let cachedCapability = null
 
-export async function uploadFile(file) {
+function storedAdminKey() {
+  try {
+    return localStorage.getItem('aruna.adminKey') || ''
+  } catch {
+    return ''
+  }
+}
+
+async function getPublicUploadCapability() {
+  if (cachedCapability && cachedCapability.expiresAt > Date.now() + 30_000) return cachedCapability.capability
+  const response = await fetch('/api/create-invitation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'upload-capability' }),
+  })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok || !data.capability) {
+    throw new Error(data.error || 'Gagal menyiapkan kapabilitas upload.')
+  }
+  cachedCapability = { capability: data.capability, expiresAt: Number(data.expiresAt) || 0 }
+  return data.capability
+}
+
+export async function uploadFile(file, context = {}) {
   if (!OK_TYPE.test(file?.type || '')) {
     throw new Error('Tipe file tidak didukung (hanya gambar & audio).')
   }
   if ((file?.size || 0) > MAX_UPLOAD_BYTES) {
     throw new Error('Ukuran file terlalu besar (maksimal 8MB).')
   }
-  const user = auth.currentUser
-  if (!user) throw new Error('Masuk dengan Google untuk mengupload media.')
 
-  let idToken
-  try {
-    idToken = await user.getIdToken()
-  } catch {
-    throw new Error('Sesi pengguna tidak valid.')
+  const headers = { 'Content-Type': 'application/json' }
+  const credentials = {}
+  const user = auth.currentUser
+  if (user) {
+    try {
+      headers.Authorization = 'Bearer ' + await user.getIdToken()
+    } catch {
+      throw new Error('Sesi pengguna tidak valid.')
+    }
+  } else if (context.slug || context.editKey) {
+    credentials.slug = context.slug
+    credentials.editKey = context.editKey
+  } else if (context.adminKey || storedAdminKey()) {
+    credentials.adminKey = context.adminKey || storedAdminKey()
+  } else {
+    credentials.capability = context.capability || await getPublicUploadCapability()
   }
 
   const authRes = await fetch('/api/create-invitation', {
     method: 'POST',
-    headers: {
-      Authorization: 'Bearer ' + idToken,
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({
       action: 'upload-signature',
       fileType: file.type,
       fileSize: file.size,
+      ...credentials,
     }),
   })
   if (!authRes.ok) {

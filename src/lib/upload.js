@@ -20,8 +20,8 @@ export async function compressImage(file, max = 1600) {
   return new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' })
 }
 
-export async function sendUpload(file) {
-  const prepared = file.type.startsWith('image/') ? await compressImage(file) : file
-  const { url } = await uploadFile(prepared)
-  return url
+export async function sendUpload(file, context = {}) {
+  const prepared = file?.type?.startsWith('image/') ? await compressImage(file) : file
+  const result = await uploadFile(prepared, context)
+  return result.url
 }

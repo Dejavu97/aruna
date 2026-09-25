@@ -130,8 +130,9 @@ Tidak ada state management eksternal (Context + local state). Tidak ada Express 
    → read tetap client SDK (fetchVouchers, fetchSettings, fetchAdminInvitations)
 
 [Upload media] MediaUpload → lib/upload.js (compressImage canvas) →
-   api.js uploadFile → /api/create-invitation?action=upload-signature
-   (Firebase ID token + signed Cloudinary params) → Cloudinary → URL disimpan di dokumen
+   api.js uploadFile → /api/create-invitation?action=upload-capability (Order/Theme Studio)
+   atau upload-signature (Firebase/editKey/adminKey/capability)
+   → server-derived signed Cloudinary params → Cloudinary → URL disimpan di dokumen
 ```
 
 ## 5. Environment & Secrets

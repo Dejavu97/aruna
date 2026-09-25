@@ -14,7 +14,7 @@ const bgTexturePresets = [
   { id: 'floral', label: 'Bunga Pastel', url: '/assets/local/pastel_flower_texture.jpg' },
 ]
 
-export default function PrintCardModal({ item, onClose }) {
+export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
   const [cardType, setCardType] = useState('souvenir') // 'souvenir' | 'enclosure' | 'table' | 'bifold'
   const [themeStyle, setThemeStyle] = useState('gold-ivory') // 'gold-ivory' | 'monochrome' | 'sage-green' | 'royal-navy'
   const [activeTab, setActiveTab] = useState('text') // 'text' | 'image' | 'table'
@@ -204,7 +204,7 @@ export default function PrintCardModal({ item, onClose }) {
       }
       reader.readAsDataURL(file)
 
-      uploadFile(file).then((res) => {
+      uploadFile(file, uploadContext).then((res) => {
         if (type === 'photo') setPhotoUrl(res.url)
         else setBgTextureUrl(res.url)
       }).catch(() => {})

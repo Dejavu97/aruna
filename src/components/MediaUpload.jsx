@@ -7,6 +7,7 @@ export default function MediaUpload({
   onChange,
   accept = 'image/*',
   multiple = false,
+  uploadContext = {},
 }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -24,7 +25,7 @@ export default function MediaUpload({
     setError('')
     try {
       const urls = []
-      for (const file of files) urls.push(await sendUpload(file))
+      for (const file of files) urls.push(await sendUpload(file, uploadContext))
       if (multiple) onChange([...(value || []), ...urls])
       else onChange(urls[0])
     } catch (err) {

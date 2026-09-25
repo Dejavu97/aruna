@@ -71,8 +71,9 @@
 | `telegram-webhook.js` | header secret Telegram + allowlist chat ID | `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_ADMIN_IDS` |
 
 ### Storage & upload
-- Tidak memakai Firebase Storage. Upload memakai otorisasi signed Cloudinary melalui action `upload-signature` pada `api/create-invitation.js`; server memverifikasi Firebase ID token, memilih folder `aruna_uploads/{verifiedUid}`, membuat `public_id`, dan menandatangani parameter minimal. Kompresi tetap client di `lib/upload.js` (≤1600px, JPEG q0.84).
-- Server dan client membatasi gambar (png/jpg/gif/webp/svg) & audio (mp3/wav/ogg), maks 8MB. Client guard hanya UX; boundary keamanan adalah verifikasi token dan signature server.
+- Tidak memakai Firebase Storage. Upload memakai otorisasi signed Cloudinary melalui action `upload-signature` pada `api/create-invitation.js`. Server menerima salah satu authority yang diverifikasi: Firebase ID token, `slug+editKey`, password `adminKey`, atau capability publik singkat untuk Order/Theme Studio. Folder, `public_id`, tipe, ukuran, dan parameter tanda tangan tetap dibuat server-side. Kompresi tetap client di `lib/upload.js` (≤1600px, JPEG q0.84).
+- Capability publik memakai HMAC server-side berbasis `CLOUDINARY_API_SECRET`, TTL maksimal 10 menit, terikat IP, dan penerbitannya dibatasi 12 kali/10 menit per IP pada instance. Ini bukan unrestricted anonymous signing; rate limit in-memory tidak atomik lintas instance dan residual abuse limitation tersebut diterima.
+- Server dan client membatasi gambar (png/jpg/gif/webp/svg) & audio (mp3/wav/ogg), maks 8MB. Client guard hanya UX; boundary keamanan adalah verifikasi authority dan signature server.
 - Koleksi throttle: `guestbook_throttle/{ip|slug}` (lastAt, count, windowStart) — proteksi flood buku tamu, bukan data bisnis.
 
 ### Environment & secrets
@@ -95,6 +96,6 @@ ManageDomain → `addDomain(domain, slug, editKey)` → `api/add-domain.js` (ver
 ## 4. WARNING ringkas
 - `theme_demos` tanpa rule → client write selalu gagal (fungsi demo override admin tidak berfungsi via client) — perlu rule + jalur admin atau hapus fitur.
 - `custom_themes` publik penuh (by design) tanpa validasi payload — potensi junk docs.
-- Preset unsigned lama `arunawedd` harus dinonaktifkan/dikonversi menjadi restricted atau signed di Cloudinary Dashboard.
+- Preset unsigned lama `arunawedd` sudah dihapus dan tidak boleh dibuat ulang; upload hanya melalui authority terverifikasi + signature server.
 - `usedCount` voucher tak pernah ter-update otomatis.
 - `.env.example` memuat variabel legacy yang menyesatkan.

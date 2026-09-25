@@ -87,6 +87,7 @@ export default function InvitationForm({
   error = '',
   onSubmit,
   customThemes = [],
+  uploadContext = {},
 }) {
   const { user, loginWithGoogle } = useAuth()
   const theme = getTheme(themeId, customThemes)
@@ -403,6 +404,7 @@ export default function InvitationForm({
                 </div>
               )}
               <MediaUpload
+                uploadContext={uploadContext}
                 label={formConfig.person1PhotoLabel}
                 value={form.bride.photo}
                 onChange={(v) => update('bride.photo', v)}
@@ -450,6 +452,7 @@ export default function InvitationForm({
                   </div>
                 )}
                 <MediaUpload
+                uploadContext={uploadContext}
                   label="Foto mempelai pria"
                   value={form.groom.photo}
                   onChange={(v) => update('groom.photo', v)}
@@ -541,6 +544,7 @@ export default function InvitationForm({
                     <Field label="Isi cerita" value={s.body} onChange={(v) => update(`story.${i}.body`, v)} />
                     {features.story?.withPhoto && (
                       <MediaUpload
+                uploadContext={uploadContext}
                         label="Foto momen cerita (opsional)"
                         value={s.image}
                         onChange={(v) => update(`story.${i}.image`, v)}
@@ -565,6 +569,7 @@ export default function InvitationForm({
 
             {features.backdrop && (
               <MediaUpload
+                uploadContext={uploadContext}
                 label="Foto background (otomatis di-blur). Kosong = template tema"
                 value={form.backdrop}
                 onChange={(v) => update('backdrop', v)}
@@ -590,6 +595,7 @@ export default function InvitationForm({
 
             {showQris && (
               <MediaUpload
+                uploadContext={uploadContext}
                 label="Foto QRIS (opsional)"
                 value={form.qris}
                 onChange={(v) => update('qris', v)}
@@ -598,6 +604,7 @@ export default function InvitationForm({
 
             {features.heroImage && (
               <MediaUpload
+                uploadContext={uploadContext}
                 label="Foto Utama Tiket Boarding Pass"
                 value={Array.isArray(form.gallery) ? form.gallery[0] || '' : form.gallery || ''}
                 onChange={(v) => update('gallery', v ? [v] : [])}
@@ -607,6 +614,7 @@ export default function InvitationForm({
 
             {features.gallery && (
               <MediaUpload
+                uploadContext={uploadContext}
                 label="Galeri foto"
                 value={form.gallery}
                 onChange={(v) => update('gallery', v)}
@@ -616,6 +624,7 @@ export default function InvitationForm({
 
             {features.music && (
               <MediaUpload
+                uploadContext={uploadContext}
                 label="Musik latar (mp3, opsional)"
                 value={form.music}
                 onChange={(v) => update('music', v)}
@@ -665,6 +674,7 @@ export default function InvitationForm({
             {showFrame && (
               <>
                 <MediaUpload
+                uploadContext={uploadContext}
                   label="Gambar frame foto (opsional)"
                   value={form.frameImage}
                   onChange={(v) => update('frameImage', v)}
@@ -686,6 +696,7 @@ export default function InvitationForm({
                     <Field label="Harga" value={w.price} onChange={(v) => update(`wishlist.${i}.price`, v)} />
                     <Field label="Link beli" value={w.url} onChange={(v) => update(`wishlist.${i}.url`, v)} />
                     <MediaUpload
+                uploadContext={uploadContext}
                       label="Foto barang"
                       value={w.image}
                       onChange={(v) => update(`wishlist.${i}.image`, v)}

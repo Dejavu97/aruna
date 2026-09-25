@@ -454,6 +454,7 @@ export default function Manage() {
       {showPrintCardModal && item && (
         <PrintCardModal
           item={item}
+          uploadContext={isAdmin ? { adminKey: getAdminKey() } : { slug, editKey }}
           onClose={() => setShowPrintCardModal(false)}
         />
       )}
