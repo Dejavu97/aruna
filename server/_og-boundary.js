@@ -104,6 +104,12 @@ const ROUTE_META = Object.freeze({
     robots: 'index, follow',
     canonical: '/studio',
   },
+  customerSpa: {
+    title: 'ByAruna — Kelola Undangan',
+    description: 'Kelola undangan digital ByAruna.',
+    robots: 'noindex, nofollow',
+    canonical: '/',
+  },
 });
 
 function routeMeta(pathname = '') {
@@ -111,6 +117,9 @@ function routeMeta(pathname = '') {
   if (path === '/') return ROUTE_META.home;
   if (path === '/tema' || path.startsWith('/tema/')) return ROUTE_META.catalog;
   if (path === '/studio' || path.startsWith('/studio/')) return ROUTE_META.studio;
+  if (path === '/berhasil' || path.startsWith('/berhasil/')) return ROUTE_META.customerSpa;
+  if (path === '/kelola' || path.startsWith('/kelola/')) return ROUTE_META.customerSpa;
+  if (path === '/edit' || path.startsWith('/edit/')) return ROUTE_META.customerSpa;
   return null;
 }
 

@@ -117,6 +117,29 @@ test('first-party public routes receive route-aware canonical and OG metadata', 
   assert.match(studio.body, /<meta property="og:url" content="https:\/\/byaruna\.my\.id\/studio"/)
 })
 
+test('customer SPA routes serve the shell without reflecting edit credentials', async () => {
+  const secret = 'SECRET_EDIT_KEY_SHOULD_NOT_LEAK'
+  for (const path of ['/berhasil/test-slug', '/kelola/test-slug', '/edit/test-slug']) {
+    const res = await request({ host: 'byaruna.my.id', path, db: makeDb() })
+    assert.equal(res.statusCode, 200)
+    assert.match(res.body, /<script type="module" src="\/assets\/app\.js"><\/script>/)
+    assert.match(res.body, /<meta name="robots" content="noindex, nofollow"/)
+    assert.doesNotMatch(res.body, /SECRET_EDIT_KEY_SHOULD_NOT_LEAK/)
+  }
+
+  for (const path of ['/kelola/test-slug', '/edit/test-slug']) {
+    const res = await request({
+      host: 'byaruna.my.id',
+      path,
+      query: { key: secret, from: 'customer' },
+      db: makeDb(),
+    })
+    assert.equal(res.statusCode, 200)
+    assert.match(res.body, /<script type="module" src="\/assets\/app\.js"><\/script>/)
+    assert.doesNotMatch(res.body, /SECRET_EDIT_KEY_SHOULD_NOT_LEAK/)
+  }
+})
+
 test('homepage keeps homepage metadata and unknown invitation is a non-indexable 404', async () => {
   const home = await request({ host: 'byaruna.my.id', path: '/', db: makeDb() })
   assert.equal(home.statusCode, 200)
