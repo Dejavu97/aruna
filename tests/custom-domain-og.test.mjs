@@ -8,7 +8,7 @@ const BASE_HTML = `<!doctype html><html><head>
 <title>ByAruna — Undangan Digital Eksklusif & Elegan</title>
 <meta name="description" content="Generic ByAruna" />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://byaruna.my.id/" />
+<link rel="canonical" href="https://byaruna.com/" />
 <!-- Open Graph / Facebook / WhatsApp Preview -->
 <meta property="og:title" content="Generic ByAruna" />
 <!-- Google Structured Data / JSON-LD Rich Snippets -->
@@ -77,6 +77,8 @@ async function request({ host, path = '/', query = {}, db }) {
 test('host authority recognizes only ByAruna Vercel hosts', () => {
   assert.equal(normalizeRequestHost('BYARUNA.MY.ID.'), 'byaruna.my.id')
   assert.equal(normalizeRequestHost('aruna-hzcgvb516-whydidyoucomehere.vercel.app'), 'aruna-hzcgvb516-whydidyoucomehere.vercel.app')
+  assert.equal(isFirstPartyHostname('byaruna.com'), true)
+  assert.equal(isFirstPartyHostname('www.byaruna.com'), true)
   assert.equal(isFirstPartyHostname('byaruna.my.id'), true)
   assert.equal(isFirstPartyHostname('www.byaruna.my.id'), true)
   assert.equal(isFirstPartyHostname('aruna-hzcgvb516-whydidyoucomehere.vercel.app'), true)
@@ -88,7 +90,7 @@ test('host authority recognizes only ByAruna Vercel hosts', () => {
 })
 
 test('first-party root and known Vercel hosts retain the normal ByAruna shell', async () => {
-  for (const host of ['byaruna.my.id', 'aruna-hzcgvb516-whydidyoucomehere.vercel.app']) {
+  for (const host of ['byaruna.com', 'byaruna.my.id', 'aruna-hzcgvb516-whydidyoucomehere.vercel.app']) {
     const res = await request({ host, db: makeDb() })
     assert.equal(res.statusCode, 200)
     assert.match(res.body, /<title>ByAruna — Undangan Digital Eksklusif &amp; Elegan<\/title>/)
