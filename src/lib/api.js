@@ -297,6 +297,19 @@ export async function fetchAdminInvitations() {
   return data.invitations
 }
 
+export async function fetchAdminInvitation(slug) {
+  if (!getAdminKey()) throw new Error('Unauthorized')
+  const creds = await getAdminCredentials()
+  const res = await fetch('/api/admin-invitations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, ...creds }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) throw new Error(data.error || 'Gagal memuat undangan admin.')
+  return data.invitation
+}
+
 // Kredensial admin untuk serverless: ID token (sesi Firebase email admin)
 // atau password tersimpan (sesi password-kustom tanpa Firebase session).
 async function getAdminCredentials() {

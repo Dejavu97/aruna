@@ -4,7 +4,7 @@ import { Lock, Shield } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import InvitationForm, { blankInvitation } from '../components/WeddingForm'
-import { fetchInvitation, fetchOwnedInvitation, fetchCustomThemes, getAdminKey, getEditKey, updateInvitation } from '../lib/api'
+import { fetchAdminInvitation, fetchInvitation, fetchOwnedInvitation, fetchCustomThemes, getAdminKey, getEditKey, updateInvitation } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import { isEventEditLocked, formatLongDate } from '../lib/utils'
 
@@ -38,11 +38,13 @@ export default function Edit() {
     async function load() {
       setLoading(true)
       try {
-        const data = hasCustomerSession
-          ? await fetchOwnedInvitation(slug).catch((ownerError) => (
-              key ? fetchInvitation(slug, key) : Promise.reject(ownerError)
-            ))
-          : await fetchInvitation(slug, key)
+        const data = fromAdmin
+          ? await fetchAdminInvitation(slug)
+          : hasCustomerSession
+            ? await fetchOwnedInvitation(slug).catch((ownerError) => (
+                key ? fetchInvitation(slug, key) : Promise.reject(ownerError)
+              ))
+            : await fetchInvitation(slug, key)
         if (live) {
           setItem(data)
         }

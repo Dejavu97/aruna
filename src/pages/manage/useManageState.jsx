@@ -7,7 +7,7 @@ import QrCameraScanner from '../../components/QrCameraScanner'
 import WeddingFrameModal from '../../components/WeddingFrameModal'
 import PrintCardModal from '../../components/PrintCardModal'
 import LoveQRCardGenerator from '../../components/LoveQRCardGenerator'
-import { fetchInvitation, fetchOwnedInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../../lib/api'
+import { fetchAdminInvitation, fetchInvitation, fetchOwnedInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
 import { copyText, formatLongDate, invitationUrl, uid, isEventEditLocked } from '../../lib/utils'
 import { shareWaLink, waLink } from '../../data/site'
@@ -91,11 +91,13 @@ export function useManageState() {
   useEffect(() => {
     let live = true
     setLoading(true)
-    const invitationRequest = hasCustomerSession
-      ? fetchOwnedInvitation(slug).catch((ownerError) => (
-          editKey ? fetchInvitation(slug, editKey) : Promise.reject(ownerError)
-        ))
-      : fetchInvitation(slug, editKey)
+    const invitationRequest = isAdmin
+      ? fetchAdminInvitation(slug)
+      : hasCustomerSession
+        ? fetchOwnedInvitation(slug).catch((ownerError) => (
+            editKey ? fetchInvitation(slug, editKey) : Promise.reject(ownerError)
+          ))
+        : fetchInvitation(slug, editKey)
     Promise.all([
       invitationRequest,
       getAnnouncement().catch(() => '')
@@ -478,11 +480,13 @@ export function useManageState() {
 
   async function reload() {
     try {
-      const data = hasCustomerSession
-        ? await fetchOwnedInvitation(slug).catch((ownerError) => (
-            editKey ? fetchInvitation(slug, editKey) : Promise.reject(ownerError)
-          ))
-        : await fetchInvitation(slug, editKey)
+      const data = isAdmin
+        ? await fetchAdminInvitation(slug)
+        : hasCustomerSession
+          ? await fetchOwnedInvitation(slug).catch((ownerError) => (
+              editKey ? fetchInvitation(slug, editKey) : Promise.reject(ownerError)
+            ))
+          : await fetchInvitation(slug, editKey)
       setItem(data)
       setText((data.guests || []).join('\n'))
       if (data.waTemplate) setWaTemplate(data.waTemplate)

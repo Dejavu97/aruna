@@ -60,3 +60,12 @@ test('dashboard does not bulk-submit remembered keys into the shared throttle', 
   assert.doesNotMatch(dashboard, /getRememberedEditKeys/)
   assert.match(dashboard, /Dashboard gagal dimuat/)
 })
+
+test('admin edit/manage fetch merged private invitation data instead of public-only Firestore data', async () => {
+  const apiSource = await readFile(new URL('../src/lib/api.js', import.meta.url), 'utf8')
+  const adminEndpoint = await readFile(new URL('../api/admin-invitations.js', import.meta.url), 'utf8')
+  assert.match(apiSource, /export async function fetchAdminInvitation\(slug\)/)
+  assert.match(adminEndpoint, /getMergedInvitation\(adminDb, slug\)/)
+  assert.match(edit, /fromAdmin[\s\S]*fetchAdminInvitation\(slug\)/)
+  assert.match(manage, /fetchAdminInvitation\(slug\)/)
+})

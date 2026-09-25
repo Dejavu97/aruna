@@ -1,6 +1,6 @@
 import { adminDb } from '../server/_firebase.js'
 import { verifyPrivilegedAdmin } from '../server/_auth.js'
-import { listMergedInvitations } from '../server/_invitation-lifecycle.js'
+import { getMergedInvitation, listMergedInvitations } from '../server/_invitation-lifecycle.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,6 +14,23 @@ export default async function handler(req, res) {
     }
     if (!(await verifyPrivilegedAdmin(req, body))) {
       return res.status(403).json({ error: 'Tidak diizinkan.' })
+    }
+
+    if (body.slug) {
+      const slug = String(body.slug).trim().toLowerCase()
+      if (!/^[a-z0-9-_]{2,80}$/.test(slug)) {
+        return res.status(400).json({ error: 'Slug tidak valid.' })
+      }
+      const invitation = await getMergedInvitation(adminDb, slug)
+      if (!invitation) return res.status(404).json({ error: 'Undangan tidak ditemukan.' })
+      const keySnap = await adminDb.collection('private_keys').doc(slug).get()
+      return res.status(200).json({
+        success: true,
+        invitation: {
+          ...invitation,
+          editKey: keySnap.exists ? keySnap.data()?.editKey || '' : '',
+        },
+      })
     }
 
     const invitations = await listMergedInvitations(adminDb)
