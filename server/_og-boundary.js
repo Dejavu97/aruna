@@ -4,6 +4,8 @@ import {
   normalizeRequestHost,
 } from '../src/lib/host-boundary.js';
 
+const PRIMARY_SITE_ORIGIN = 'https://byaruna.com';
+
 export function escapeHtml(value) {
   return String(value || '')
     .replaceAll('&', '&amp;')
@@ -250,7 +252,7 @@ export function createOgHandler({ db, loadHtml }) {
         setHtmlHeaders(res);
         return res.status(404).send(safeFailureHtml('Halaman tidak ditemukan'));
       }
-      const origin = 'https://byaruna.my.id';
+      const origin = PRIMARY_SITE_ORIGIN;
       setHtmlHeaders(res, 's-maxage=60, stale-while-revalidate=600');
       return res.status(200).send(injectRouteMeta(html, meta, origin));
     }
@@ -261,7 +263,8 @@ export function createOgHandler({ db, loadHtml }) {
 
     const forwardedProto = String(req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim().toLowerCase();
     const proto = forwardedProto === 'http' ? 'http' : 'https';
-    const origin = `${proto}://${hostname}`;
+    const requestOrigin = `${proto}://${hostname}`;
+    const origin = firstParty ? PRIMARY_SITE_ORIGIN : requestOrigin;
     const publicUrl = firstParty ? `${origin}/u/${encodeURIComponent(item.id)}` : `${origin}/`;
     const guestName = String(req.query.to || '');
     const output = injectInvitationMeta(html, item, { origin, publicUrl, guestName });
