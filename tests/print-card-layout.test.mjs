@@ -98,3 +98,25 @@ test('bifold content is physically sized for a full landscape A4 sheet', () => {
   assert.match(source, /\.print-card-bifold \.print-card-bifold-qr[\s\S]*?width: 26mm !important/)
   assert.match(source, /\.print-card-bifold \.print-card-bifold-details[\s\S]*?font-size: 3\.2mm !important/)
 })
+
+test('bifold uses bride and groom portrait fields instead of gallery photo state', () => {
+  assert.match(source, /const bridePortraitUrl = item\.bride\?\.photo \|\| ''/)
+  assert.match(source, /const groomPortraitUrl = item\.groom\?\.photo \|\| ''/)
+  const start = source.indexOf('const renderBifoldCard')
+  const end = source.indexOf('// Items per sheet calculation', start)
+  const bifold = source.slice(start, end)
+  assert.match(bifold, /renderBifoldPortraits\(\)/)
+  assert.doesNotMatch(bifold, /renderPhotoBadge\(/)
+})
+
+test('bifold compacts content into a centered stack instead of justify-between gaps', () => {
+  const start = source.indexOf('const renderBifoldCard')
+  const end = source.indexOf('// Items per sheet calculation', start)
+  const bifold = source.slice(start, end)
+  assert.match(bifold, /print-card-bifold-stack/)
+  assert.match(bifold, /justify-center/)
+  assert.doesNotMatch(bifold, /justify-between/)
+  assert.match(source, /\.print-card-bifold-stack[\s\S]*?gap: 7mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-portrait[\s\S]*?width: 34mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-title[\s\S]*?font-size: 10mm !important/)
+})

@@ -114,6 +114,8 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
   const fullUrl = invitationUrl(item.slug)
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(fullUrl)}&margin=10&format=png`
+  const bridePortraitUrl = item.bride?.photo || ''
+  const groomPortraitUrl = item.groom?.photo || ''
 
   // Auto-fill from item data
   const handleAutoFill = () => {
@@ -287,6 +289,28 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
     return (
       <div className={`print-card-photo overflow-hidden border border-current/30 shadow-xs my-0.5 mx-auto ${shapeClass}`} style={{ width: `${size}px`, height: `${size}px` }}>
         <img src={photoUrl} alt="Couple" className="w-full h-full object-cover object-top" />
+      </div>
+    )
+  }
+
+  const renderBifoldPortraits = () => {
+    const portraits = [
+      bridePortraitUrl ? { key: 'bride', src: bridePortraitUrl, label: formData.brideNick || 'Mempelai' } : null,
+      groomPortraitUrl ? { key: 'groom', src: groomPortraitUrl, label: formData.groomNick || 'Mempelai' } : null,
+    ].filter(Boolean)
+
+    if (!portraits.length) return null
+
+    return (
+      <div className="print-card-bifold-portraits flex items-start justify-center gap-4">
+        {portraits.map((portrait) => (
+          <div key={portrait.key} className="text-center space-y-1">
+            <div className="print-card-bifold-portrait overflow-hidden rounded-full border border-current/25 shadow-xs mx-auto">
+              <img src={portrait.src} alt={portrait.label} className="w-full h-full object-cover object-top" />
+            </div>
+            <p className="print-card-bifold-portrait-label font-display font-semibold">{portrait.label}</p>
+          </div>
+        ))}
       </div>
     )
   }
@@ -498,54 +522,59 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
         )}
 
-        {/* Left Panel: Akad & Quotes */}
-        <div className="relative z-10 flex flex-col items-center justify-between pr-3 border-r border-dashed border-current/40 min-h-0">
-          <div className="space-y-0.5 w-full">
-            <p className="print-card-bifold-kicker text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">Undangan Pernikahan</p>
-            <h4 className="print-card-bifold-title font-display text-lg font-bold truncate">{couple}</h4>
-            <div className="w-8 h-[1px] bg-current opacity-30 mx-auto my-0.5" />
-            {formData.quote && (
-              <p className="print-card-bifold-quote text-[7.5px] opacity-75 italic leading-relaxed px-1 line-clamp-3">“{formData.quote}”</p>
-            )}
-          </div>
+        {/* Left Panel: invitation story + Akad */}
+        <div className="print-card-bifold-panel relative z-10 flex flex-col items-center justify-center pr-3 border-r border-dashed border-current/40 min-h-0">
+          <div className="print-card-bifold-stack w-full flex flex-col items-center">
+            <div className="w-full">
+              <p className="print-card-bifold-kicker text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">Undangan Pernikahan</p>
+              <h4 className="print-card-bifold-title font-display text-lg font-bold truncate">{couple}</h4>
+              <div className="print-card-bifold-divider bg-current opacity-30 mx-auto" />
+              {formData.quote && (
+                <p className="print-card-bifold-quote text-[7.5px] opacity-75 italic leading-relaxed px-1 line-clamp-4">“{formData.quote}”</p>
+              )}
+            </div>
 
-          <div className="print-card-bifold-details space-y-0.5 text-[8.5px] opacity-90 leading-relaxed px-1 w-full my-auto">
-            <p className="print-card-bifold-section-title font-bold text-[9.5px] uppercase tracking-wider">{formData.akadTitle}</p>
-            <p className="font-semibold">{formData.eventDate} · {formData.akadTime}</p>
-            <p className="line-clamp-2">{formData.akadVenue}</p>
-            {formData.akadAddress && <p className="text-[7.5px] opacity-70 line-clamp-1">{formData.akadAddress}</p>}
-          </div>
+            <div className="print-card-bifold-details opacity-90 leading-relaxed px-1 w-full">
+              <p className="print-card-bifold-section-title font-bold uppercase tracking-wider">{formData.akadTitle}</p>
+              <p className="print-card-bifold-meta font-semibold">{formData.eventDate} · {formData.akadTime}</p>
+              <p className="print-card-bifold-venue font-bold line-clamp-2">{formData.akadVenue}</p>
+              {formData.akadAddress && <p className="print-card-bifold-address opacity-70 line-clamp-2">{formData.akadAddress}</p>}
+            </div>
 
-          <div className="pt-1.5 border-t border-current/15 w-full space-y-0.5">
-            <p className="print-card-bifold-qr-label text-[7px] uppercase tracking-widest opacity-70 font-semibold">Peta &amp; Navigasi Lokasi</p>
-            <div className="p-0.5 bg-white rounded-xs border border-black/10 inline-block">
-              <img src={qrCodeUrl} alt="QR Code" className="print-card-bifold-qr w-12 h-12 object-contain" />
+            <div className="print-card-bifold-qr-block border-t border-current/15 w-full">
+              <p className="print-card-bifold-qr-label uppercase tracking-widest opacity-70 font-semibold">Peta &amp; Navigasi Lokasi</p>
+              <div className="bg-white rounded-xs border border-black/10 inline-block">
+                <img src={qrCodeUrl} alt="QR Code" className="print-card-bifold-qr object-contain" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right Panel: Resepsi & Digital RSVP */}
-        <div className="relative z-10 flex flex-col items-center justify-between pl-3 min-h-0">
-          <div className="space-y-0.5 w-full">
-            <div className="print-card-bifold-monogram w-7 h-7 mx-auto rounded-full border border-current/30 flex items-center justify-center font-display text-[10px] font-bold italic mb-0.5">
-              {formData.brideNick[0] || 'S'}&amp;{formData.groomNick[0] || 'B'}
+        {/* Right Panel: mempelai + Resepsi + Digital RSVP */}
+        <div className="print-card-bifold-panel relative z-10 flex flex-col items-center justify-center pl-3 min-h-0">
+          <div className="print-card-bifold-stack w-full flex flex-col items-center">
+            <div className="w-full">
+              <div className="print-card-bifold-monogram mx-auto rounded-full border border-current/30 flex items-center justify-center font-display font-bold italic">
+                {formData.brideNick[0] || 'S'}&amp;{formData.groomNick[0] || 'B'}
+              </div>
+              <p className="print-card-bifold-kicker uppercase tracking-[0.2em] font-semibold opacity-70">{formData.resepsiTitle}</p>
+              <p className="print-card-bifold-meta font-semibold">{formData.eventDate} · {formData.resepsiTime}</p>
+              <p className="print-card-bifold-venue font-bold line-clamp-2">{formData.resepsiVenue}</p>
             </div>
-            <p className="print-card-bifold-kicker text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">{formData.resepsiTitle}</p>
-            <p className="print-card-bifold-meta font-semibold text-[9px]">{formData.eventDate} · {formData.resepsiTime}</p>
-            <p className="print-card-bifold-venue text-[9px] font-bold line-clamp-2">{formData.resepsiVenue}</p>
-            {renderPhotoBadge(38)}
-          </div>
 
-          <div className="print-card-bifold-note space-y-0.5 text-[8px] opacity-80 leading-relaxed px-1 w-full my-auto">
-            <p className="italic leading-tight line-clamp-2">{formData.footerNote}</p>
-          </div>
+            {renderBifoldPortraits()}
 
-          <div className="pt-1.5 border-t border-current/15 w-full space-y-0.5">
-            <p className="print-card-bifold-qr-label text-[7px] uppercase tracking-widest opacity-70 font-semibold">Konfirmasi RSVP &amp; Ucapan Live</p>
-            <div className="p-0.5 bg-white rounded-xs border border-black/10 inline-block">
-              <img src={qrCodeUrl} alt="QR Code" className="print-card-bifold-qr w-12 h-12 object-contain" />
+            <div className="print-card-bifold-note opacity-80 leading-relaxed px-1 w-full">
+              <p className="italic leading-snug line-clamp-3">{formData.footerNote}</p>
             </div>
-            <p className="print-card-bifold-url font-mono text-[7px] opacity-60 break-all">{fullUrl}</p>
+
+            <div className="print-card-bifold-qr-block border-t border-current/15 w-full">
+              <p className="print-card-bifold-qr-label uppercase tracking-widest opacity-70 font-semibold">Konfirmasi RSVP &amp; Ucapan Live</p>
+              <div className="bg-white rounded-xs border border-black/10 inline-block">
+                <img src={qrCodeUrl} alt="QR Code" className="print-card-bifold-qr object-contain" />
+              </div>
+              <p className="print-card-bifold-url font-mono opacity-60 break-all">{fullUrl}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -795,52 +824,88 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           font-size: 2mm !important;
         }
 
-        /* Bifold uses the full A4 landscape sheet, so px defaults were far too small. */
+        /* Bifold: dense editorial composition for the full A4 landscape sheet. */
         .print-card-bifold {
-          padding: 8mm !important;
-          gap: 8mm !important;
+          padding: 9mm !important;
+          gap: 10mm !important;
+        }
+        .print-card-bifold-panel {
+          padding-top: 3mm !important;
+          padding-bottom: 3mm !important;
+        }
+        .print-card-bifold-stack {
+          gap: 7mm !important;
         }
         .print-card-bifold .print-card-bifold-kicker {
-          font-size: 3mm !important;
+          font-size: 3.2mm !important;
         }
         .print-card-bifold .print-card-bifold-title {
-          font-size: 8mm !important;
-          line-height: 1.05 !important;
+          margin-top: 1.5mm !important;
+          font-size: 10mm !important;
+          line-height: 1.02 !important;
+        }
+        .print-card-bifold .print-card-bifold-divider {
+          width: 18mm !important;
+          height: 0.35mm !important;
+          margin-top: 2mm !important;
+          margin-bottom: 2mm !important;
         }
         .print-card-bifold .print-card-bifold-quote {
-          font-size: 3mm !important;
+          font-size: 3.3mm !important;
+          line-height: 1.45 !important;
+          max-width: 112mm !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
         }
         .print-card-bifold .print-card-bifold-details,
         .print-card-bifold .print-card-bifold-note {
-          font-size: 3.2mm !important;
+          font-size: 3.6mm !important;
         }
         .print-card-bifold .print-card-bifold-section-title {
-          font-size: 4mm !important;
+          font-size: 4.7mm !important;
         }
         .print-card-bifold .print-card-bifold-monogram {
-          width: 14mm !important;
-          height: 14mm !important;
-          font-size: 4mm !important;
+          width: 16mm !important;
+          height: 16mm !important;
+          margin-bottom: 2mm !important;
+          font-size: 4.5mm !important;
         }
         .print-card-bifold .print-card-bifold-meta {
-          font-size: 3.2mm !important;
+          margin-top: 1mm !important;
+          font-size: 3.6mm !important;
         }
         .print-card-bifold .print-card-bifold-venue {
-          font-size: 3.5mm !important;
+          margin-top: 1mm !important;
+          font-size: 4mm !important;
         }
-        .print-card-bifold .print-card-photo {
-          width: 24mm !important;
-          height: 24mm !important;
+        .print-card-bifold .print-card-bifold-address {
+          margin-top: 1mm !important;
+          font-size: 2.9mm !important;
+        }
+        .print-card-bifold .print-card-bifold-portraits {
+          gap: 6mm !important;
+        }
+        .print-card-bifold .print-card-bifold-portrait {
+          width: 34mm !important;
+          height: 34mm !important;
+        }
+        .print-card-bifold .print-card-bifold-portrait-label {
+          font-size: 3.3mm !important;
+        }
+        .print-card-bifold .print-card-bifold-qr-block {
+          padding-top: 4mm !important;
         }
         .print-card-bifold .print-card-bifold-qr {
-          width: 26mm !important;
-          height: 26mm !important;
+          width: 30mm !important;
+          height: 30mm !important;
+          margin-top: 2mm !important;
         }
         .print-card-bifold .print-card-bifold-qr-label {
-          font-size: 2.5mm !important;
+          font-size: 2.7mm !important;
         }
         .print-card-bifold .print-card-bifold-url {
-          font-size: 2.2mm !important;
+          margin-top: 1.5mm !important;
+          font-size: 2.3mm !important;
         }
 
         @media screen {
