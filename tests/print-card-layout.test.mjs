@@ -65,9 +65,13 @@ test('enclosure and table renderers cannot swap print classes', () => {
 })
 
 test('screen helper labels do not consume printable sheet space', () => {
-  assert.match(source, /print-page-group[\s\S]*?print-preview-shell[\s\S]*?print-page print-page-portrait[\s\S]*?print-sheet print-sheet-portrait/)
-  assert.match(source, /no-print pt-1\.5 text-center/)
-  assert.doesNotMatch(source, /print-sheet[^"]*"[^>]*>[\s\S]{0,300}print:hidden/)
+  const markupStart = source.indexOf('{/* SOUVENIR GRID')
+  const markupEnd = source.indexOf('\n          </div>\n\n        </div>', markupStart)
+  const previewMarkup = source.slice(markupStart, markupEnd)
+
+  assert.match(previewMarkup, /print-page-group[\s\S]*?print-preview-shell[\s\S]*?print-page print-page-portrait[\s\S]*?print-sheet print-sheet-portrait/)
+  assert.match(previewMarkup, /no-print pt-1\.5 text-center/)
+  assert.doesNotMatch(previewMarkup, /print:hidden/)
 })
 
 test('all supported sheet variants and grids remain available', () => {
