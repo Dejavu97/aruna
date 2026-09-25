@@ -8,6 +8,7 @@ export default function ManageUpgrade({ item, slug, editKey, reload }) {
   const [selected, setSelected] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
     let live = true
@@ -41,39 +42,49 @@ export default function ManageUpgrade({ item, slug, editKey, reload }) {
   const message = pending && `Halo ByAruna, saya ingin konfirmasi pembayaran upgrade undangan ${item.orderCode || slug} dari ${current.name} ke ${pending.toName}. Selisih tagihan ${formatRupiah(pending.amount)}. Mohon dicek: ${window.location.origin}/u/${slug}`
 
   return (
-    <div className="mt-6 border border-gold/40 bg-paper p-5 sm:p-6 space-y-4 rounded-sm">
-      <div>
-        <h2 className="font-display text-2xl font-bold">Upgrade paket</h2>
-        <p className="text-sm text-stone mt-1">Paket saat ini: {current.name} · {formatRupiah(current.price)}. Bayar hanya selisih harga paket.</p>
+    <section className="mt-6 border border-gold/40 bg-paper rounded-sm shadow-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
+        <div className="min-w-0">
+          <h2 className="font-display text-lg font-bold">Upgrade paket</h2>
+          <p className="text-xs text-stone">Saat ini: {current.name} · {formatRupiah(current.price)}{pending ? ' · Menunggu konfirmasi' : ''}</p>
+        </div>
+        {!pending && prices && !error && item.status !== 'paid' && current.price > 0 ? (
+          <span className="text-xs text-amber-800">Lunasi paket ini dahulu</span>
+        ) : !pending && prices && !error ? (
+          <button type="button" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)} className="rounded-xs border border-gold-deep px-4 py-2 text-xs font-bold text-gold-deep hover:bg-gold-deep hover:text-white">
+            {expanded ? 'Tutup pilihan' : 'Lihat pilihan upgrade'}
+          </button>
+        ) : null}
       </div>
       {pending ? (
-        <div className="space-y-3 text-sm">
+        <div className="space-y-3 border-t border-ink/10 px-4 py-4 text-sm sm:px-5">
           <p className="font-semibold">Menunggu konfirmasi: {pending.toName} · selisih {formatRupiah(pending.amount)}</p>
           {bank && <p>Transfer ke {bank.bank} {bank.number} a.n. {bank.name}</p>}
           <p className="text-stone">Paket baru aktif setelah admin mengonfirmasi pembayaran.</p>
           <a className="inline-flex bg-green-700 px-4 py-2 text-white text-xs font-semibold" href={waLink(message)} target="_blank" rel="noreferrer">Konfirmasi pembayaran lewat WhatsApp</a>
         </div>
-      ) : !prices ? (
-        <p className="text-sm text-stone">Memuat harga terbaru...</p>
-      ) : item.status !== 'paid' && current.price > 0 ? (
-        <p className="text-sm text-amber-800">Lunasi paket saat ini sebelum melakukan upgrade.</p>
-      ) : (
-        <div className="space-y-3">
-          <div className="grid gap-2 sm:grid-cols-2">
+      ) : !prices && !error ? (
+        <p className="border-t border-ink/10 px-4 py-3 text-xs text-stone sm:px-5">Memuat harga terbaru...</p>
+      ) : expanded && prices ? (
+        <div className="space-y-4 border-t border-ink/10 px-4 py-4 sm:px-5">
+          <p className="text-xs text-stone">Pilih paket berikutnya. Tagihan hanya selisih dari harga paket saat ini.</p>
+          <div className="flex flex-wrap gap-2">
             {options.map((p) => (
-              <label key={p.id} className={`cursor-pointer border p-3 text-sm ${selected === p.id ? 'border-gold-deep bg-gold/10' : 'border-ink/15'}`}>
+              <label key={p.id} className={`w-full cursor-pointer rounded-xs border p-3 text-sm sm:w-64 ${selected === p.id ? 'border-gold-deep bg-gold/10' : 'border-ink/15'}`}>
                 <input type="radio" name="upgrade-package" className="mr-2 accent-gold-deep" checked={selected === p.id} onChange={() => setSelected(p.id)} />
                 <strong>{p.name}</strong> · Tambah {formatRupiah(p.price - current.price)}
               </label>
             ))}
           </div>
-          <button type="button" disabled={!selected || busy} onClick={requestUpgrade} className="bg-ink px-4 py-2 text-xs font-semibold uppercase text-white disabled:opacity-50">
-            {busy ? 'Mengajukan...' : 'Ajukan upgrade'}
-          </button>
-          <p className="text-xs text-stone">Nominal akhir diverifikasi server saat diajukan dan tidak berubah selama menunggu konfirmasi.</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <button type="button" disabled={!selected || busy} onClick={requestUpgrade} className="bg-ink px-4 py-2 text-xs font-semibold uppercase text-white disabled:opacity-50">
+              {busy ? 'Mengajukan...' : 'Ajukan upgrade'}
+            </button>
+            <p className="text-xs text-stone">Harga dikunci saat upgrade diajukan.</p>
+          </div>
         </div>
-      )}
-      {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
-    </div>
+      ) : null}
+      {error && <p role="alert" className="px-4 pb-3 text-xs text-red-700 sm:px-5">{error}</p>}
+    </section>
   )
 }
