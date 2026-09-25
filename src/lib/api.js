@@ -13,7 +13,12 @@ const ADMIN_EMAIL = 'admin@byaruna.my.id'
 export function getAdminKey() {
   if (auth.currentUser?.email === ADMIN_EMAIL) return 'firebase-admin'
   try {
-    return localStorage.getItem(ADMIN_KEY) || ''
+    const stored = localStorage.getItem(ADMIN_KEY) || ''
+    if (stored === 'firebase-admin') {
+      localStorage.removeItem(ADMIN_KEY)
+      return ''
+    }
+    return stored
   } catch {
     return ''
   }
@@ -327,6 +332,28 @@ export async function updateInvitation(slug, payload, editKey) {
     throw new Error(data.error || 'Gagal memperbarui undangan.')
   }
   return { success: true }
+}
+
+async function domainApiCall(action, domain, slug, editKey = '') {
+  const creds = await getAdminCredentials()
+  const res = await fetch(`/api/${action}-domain`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ domain, slug, editKey, ...creds }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || (action === 'add' ? 'Gagal menghubungkan domain.' : 'Gagal menghapus domain.'))
+  }
+  return data
+}
+
+export function addCustomDomain(domain, slug, editKey = '') {
+  return domainApiCall('add', domain, slug, editKey)
+}
+
+export function removeCustomDomain(domain, slug, editKey = '') {
+  return domainApiCall('remove', domain, slug, editKey)
 }
 
 export async function setInvitationStatus(slug, status) {

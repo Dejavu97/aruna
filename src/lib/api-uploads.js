@@ -7,7 +7,8 @@ let cachedCapability = null
 
 function storedAdminKey() {
   try {
-    return localStorage.getItem('aruna.adminKey') || ''
+    const stored = localStorage.getItem('aruna.adminKey') || ''
+    return stored === 'firebase-admin' ? '' : stored
   } catch {
     return ''
   }

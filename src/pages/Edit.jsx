@@ -15,7 +15,7 @@ export default function Edit() {
   const navigate = useNavigate()
   const [item, setItem] = useState(null)
   const [customThemes, setCustomThemes] = useState([])
-  const hasAdminKey = Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
+  const hasAdminKey = Boolean(getAdminKey())
   const fromAdmin = params.get('from') === 'admin' && hasAdminKey
   const hasCustomerSession = Boolean(user) && !fromAdmin
   const initialKey = params.get('key') || getEditKey(slug) || (fromAdmin ? 'admin-bypass' : '')

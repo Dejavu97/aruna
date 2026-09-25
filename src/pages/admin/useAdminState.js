@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { auth } from '../../lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
-import { changeAdminPassword, cloneInvitation, createFullBackupData, defaultMaintenanceSettings, defaultSeoSettings, defaultSiteProfile, defaultWaTemplates, deleteCustomTheme, deleteInvitation, deleteVoucher, fetchAdSettings, fetchAdminInvitations, fetchCustomThemes, fetchDynamicPackages, fetchMaintenanceSettings, fetchSeoSettings, fetchSettings, fetchSiteProfile, fetchVouchers, fetchWaTemplates, getAnnouncement, restoreFullBackupData, saveAdSettings, saveAnnouncement, saveDynamicPackages, saveMaintenanceSettings, savePaymentSettings, saveSeoSettings, saveSiteProfile, saveVoucher, saveWaTemplates, setAdminKey, updateInvitation, uploadFile } from '../../lib/api'
+import { changeAdminPassword, cloneInvitation, createFullBackupData, defaultMaintenanceSettings, defaultSeoSettings, defaultSiteProfile, defaultWaTemplates, deleteCustomTheme, deleteInvitation, deleteVoucher, fetchAdSettings, fetchAdminInvitations, fetchCustomThemes, fetchDynamicPackages, fetchMaintenanceSettings, fetchSeoSettings, fetchSettings, fetchSiteProfile, fetchVouchers, fetchWaTemplates, getAnnouncement, restoreFullBackupData, saveAdSettings, saveAnnouncement, saveDynamicPackages, saveMaintenanceSettings, savePaymentSettings, saveSeoSettings, saveSiteProfile, saveVoucher, saveWaTemplates, updateInvitation, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
 import { formatRupiah, getPackageById, packages as defaultPackages } from '../../data/site'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
@@ -145,11 +145,8 @@ export function useAdminState() {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      setAuthed(Boolean(user))
+      setAuthed(user?.email === 'admin@byaruna.my.id')
       setLoading(false)
-      if (user) {
-        setAdminKey('firebase-admin')
-      }
     })
     return () => unsub()
   }, [])
