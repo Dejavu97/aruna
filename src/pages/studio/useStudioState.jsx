@@ -316,9 +316,9 @@ export function useStudioState() {
     bridePhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
     groomPhotoUrl: '',
     groomPhotoSettings: { scale: 1, posX: 0, posY: 0, fit: 'cover', brightness: 100, blur: 0 },
-    customMusicUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=piano-moment-9835.mp3',
+    customMusicUrl: '/music/tiny_paws.mp3',
     customMusicTitle: 'A Thousand Years (Piano Instrumental)',
-    voiceStoryUrl: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8b91dc389.mp3?filename=soft-romantic-piano-10708.mp3',
+    voiceStoryUrl: '',
     voiceStoryTitle: 'Pesan Suara Mempelai: Pertemuan Pertama',
   })
 

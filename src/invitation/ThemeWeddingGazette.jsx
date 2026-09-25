@@ -155,7 +155,7 @@ export default function ThemeWeddingGazette({ data, guest = '', preview = false,
   }
 
   const couple = `${data.bride?.nick || 'Andini'} & ${data.groom?.nick || 'Dimas'}`
-  const bgMusic = data.music || theme?.music || 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=piano-moment-9835.mp3'
+  const bgMusic = data.music || theme?.music || '/music/tiny_paws.mp3'
 
   // Rotogravure Gallery Photos
   const galleryPhotos = useMemo(() => {
