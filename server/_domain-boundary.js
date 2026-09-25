@@ -33,20 +33,35 @@ function isAlreadyAttachedConflict(result) {
     || message.includes('already exists')
 }
 
-async function authorizeOwner({ slug, editKey }, deps) {
-  if (!slug || !editKey || !(await deps.verifyEditKey(slug, editKey))) {
-    throw boundaryError('Tidak diizinkan.', 403)
-  }
+async function authorizeOwner(input, deps) {
+  const slug = String(input?.slug || '').trim()
+  if (!slug) throw boundaryError('Tidak diizinkan.', 403)
+
   const invitation = await deps.loadInvitation(slug)
   if (!invitation) throw boundaryError('Undangan tidak ditemukan.', 404)
-  return invitation
+
+  const editKey = String(input?.editKey || '')
+  if (editKey && await deps.verifyEditKey(slug, editKey)) return invitation
+
+  if (input?.idToken && typeof deps.verifyFirebaseOwner === 'function') {
+    if (await deps.verifyFirebaseOwner(invitation, input.idToken)) return invitation
+  }
+
+  if (input?.idToken && typeof deps.verifyFirebaseAdmin === 'function') {
+    if (await deps.verifyFirebaseAdmin(input.idToken)) return invitation
+  }
+
+  if (input?.adminKey && typeof deps.verifyAdmin === 'function') {
+    if (await deps.verifyAdmin(input)) return invitation
+  }
+
+  throw boundaryError('Tidak diizinkan.', 403)
 }
 
 export async function removeDomainBoundary(input, deps) {
   const domain = normalizeDomain(input?.domain)
   const slug = String(input?.slug || '').trim()
-  const editKey = String(input?.editKey || '')
-  const invitation = await authorizeOwner({ slug, editKey }, deps)
+  const invitation = await authorizeOwner({ ...input, slug }, deps)
   const assignedDomain = normalizeDomain(invitation.customDomain)
   if (domain !== assignedDomain) throw boundaryError('Tidak diizinkan.', 403)
 
@@ -61,8 +76,7 @@ export async function removeDomainBoundary(input, deps) {
 export async function addDomainBoundary(input, deps) {
   const domain = normalizeDomain(input?.domain)
   const slug = String(input?.slug || '').trim()
-  const editKey = String(input?.editKey || '')
-  await authorizeOwner({ slug, editKey }, deps)
+  await authorizeOwner({ ...input, slug }, deps)
 
   const addition = await deps.addToVercel(domain)
   let idempotent = false

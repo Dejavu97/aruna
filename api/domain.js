@@ -1,5 +1,8 @@
-import { adminDb } from '../server/_firebase.js';
+import { adminAuth, adminDb } from '../server/_firebase.js';
+import { verifyPrivilegedAdmin } from '../server/_auth.js';
 import { addDomainBoundary, normalizeDomain, removeDomainBoundary } from '../server/_domain-boundary.js';
+
+const ADMIN_EMAIL = 'admin@byaruna.my.id';
 
 function vercelConfig() {
   const token = process.env.VERCEL_API_TOKEN;
@@ -29,12 +32,29 @@ async function loadInvitation(slug) {
   return snap.exists ? snap.data() : null;
 }
 
-async function addDomain(body) {
+async function addDomain(req, body) {
   let config;
   const getConfig = () => (config ||= vercelConfig());
   return addDomainBoundary(body, {
     verifyEditKey,
     loadInvitation,
+    verifyFirebaseOwner: async (invitation, idToken) => {
+      try {
+        const token = await adminAuth.verifyIdToken(String(idToken));
+        return Boolean(token?.uid && invitation?.ownerUid && token.uid === invitation.ownerUid);
+      } catch {
+        return false;
+      }
+    },
+    verifyFirebaseAdmin: async (idToken) => {
+      try {
+        const token = await adminAuth.verifyIdToken(String(idToken));
+        return token?.email === ADMIN_EMAIL;
+      } catch {
+        return false;
+      }
+    },
+    verifyAdmin: (input) => verifyPrivilegedAdmin(req, input),
     addToVercel: async (domain) => {
       const activeConfig = getConfig();
       const response = await fetch(projectDomainUrl(activeConfig), {
@@ -65,12 +85,29 @@ async function addDomain(body) {
   });
 }
 
-async function removeDomain(body) {
+async function removeDomain(req, body) {
   let config;
   const getConfig = () => (config ||= vercelConfig());
   return removeDomainBoundary(body, {
     verifyEditKey,
     loadInvitation,
+    verifyFirebaseOwner: async (invitation, idToken) => {
+      try {
+        const token = await adminAuth.verifyIdToken(String(idToken));
+        return Boolean(token?.uid && invitation?.ownerUid && token.uid === invitation.ownerUid);
+      } catch {
+        return false;
+      }
+    },
+    verifyFirebaseAdmin: async (idToken) => {
+      try {
+        const token = await adminAuth.verifyIdToken(String(idToken));
+        return token?.email === ADMIN_EMAIL;
+      } catch {
+        return false;
+      }
+    },
+    verifyAdmin: (input) => verifyPrivilegedAdmin(req, input),
     removeFromVercel: async (domain) => {
       const activeConfig = getConfig();
       const response = await fetch(projectDomainUrl(activeConfig, domain, 'v9'), {
@@ -109,12 +146,12 @@ export default async function handler(req, res) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return res.status(400).json({ error: 'Body JSON tidak valid.' });
   }
-  if (!body.domain || !body.slug || !body.editKey) {
-    return res.status(400).json({ error: 'Domain, slug, and editKey are required' });
+  if (!body.domain || !body.slug || (!body.editKey && !body.idToken && !body.adminKey)) {
+    return res.status(400).json({ error: 'Domain, slug, and authorization are required' });
   }
 
   try {
-    const result = action === 'add' ? await addDomain(body) : await removeDomain(body);
+    const result = action === 'add' ? await addDomain(req, body) : await removeDomain(req, body);
     return res.status(200).json(result);
   } catch (error) {
     const status = Number(error.status) || 500;

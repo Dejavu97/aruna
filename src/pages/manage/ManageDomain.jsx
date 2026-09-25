@@ -1,4 +1,4 @@
-import { copyText } from '../../lib/utils'
+import { addCustomDomain, removeCustomDomain } from '../../lib/api'
 
 /** ManageDomain — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageDomain({ customDomain,
@@ -41,15 +41,7 @@ export default function ManageDomain({ customDomain,
                       .replace(/\/.*$/, '')
 
                     try {
-                      const res = await fetch('/api/add-domain', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ domain: cleanDomain, slug, editKey }),
-                      })
-                      const data = await res.json().catch(() => ({}))
-                      if (!res.ok || !data.success) {
-                        throw new Error(data.error || 'Gagal menghubungkan domain.')
-                      }
+                      const data = await addCustomDomain(cleanDomain, slug, editKey)
                       setItem((prev) => ({ ...prev, customDomain: data.domain }))
                       setCustomDomain(data.domain)
 
@@ -70,15 +62,7 @@ export default function ManageDomain({ customDomain,
                       setError('')
                       const prevDomain = item.customDomain
                       try {
-                        const res = await fetch('/api/remove-domain', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ domain: prevDomain, slug, editKey }),
-                        })
-                        const data = await res.json().catch(() => ({}))
-                        if (!res.ok || !data.success) {
-                          throw new Error(data.error || 'Gagal menghapus domain.')
-                        }
+                        const data = await removeCustomDomain(prevDomain, slug, editKey)
                         setItem((prev) => ({ ...prev, customDomain: null }))
                         setCustomDomain('')
 
