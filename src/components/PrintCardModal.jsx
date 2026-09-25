@@ -516,65 +516,63 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`print-card print-card-bifold relative box-border w-full h-full min-h-0 p-5 rounded-xs border grid grid-cols-2 gap-4 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card print-card-bifold relative box-border w-full h-full min-h-0 p-5 rounded-xs border grid grid-cols-2 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
+        <div className="print-card-bifold-fold-line absolute pointer-events-none border-l border-dashed border-current/40" />
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
         )}
 
         {/* Left Panel: invitation story + Akad */}
-        <div className="print-card-bifold-panel relative z-10 flex flex-col items-center justify-center pr-3 border-r border-dashed border-current/40 min-h-0">
-          <div className="print-card-bifold-stack w-full flex flex-col items-center">
-            <div className="w-full">
+        <div className="print-card-bifold-panel print-card-bifold-panel-left relative z-10 min-h-0">
+          <div className="print-card-bifold-region print-card-bifold-region-top w-full">
               <p className="print-card-bifold-kicker text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">Undangan Pernikahan</p>
               <h4 className="print-card-bifold-title font-display text-lg font-bold truncate">{couple}</h4>
               <div className="print-card-bifold-divider bg-current opacity-30 mx-auto" />
               {formData.quote && (
                 <p className="print-card-bifold-quote text-[7.5px] opacity-75 italic leading-relaxed px-1 line-clamp-4">“{formData.quote}”</p>
               )}
-            </div>
+          </div>
 
-            <div className="print-card-bifold-details opacity-90 leading-relaxed px-1 w-full">
+          <div className="print-card-bifold-region print-card-bifold-region-middle print-card-bifold-details opacity-90 leading-relaxed px-1 w-full">
               <p className="print-card-bifold-section-title font-bold uppercase tracking-wider">{formData.akadTitle}</p>
               <p className="print-card-bifold-meta font-semibold">{formData.eventDate} · {formData.akadTime}</p>
               <p className="print-card-bifold-venue font-bold line-clamp-2">{formData.akadVenue}</p>
               {formData.akadAddress && <p className="print-card-bifold-address opacity-70 line-clamp-2">{formData.akadAddress}</p>}
-            </div>
+          </div>
 
-            <div className="print-card-bifold-qr-block border-t border-current/15 w-full">
+          <div className="print-card-bifold-region print-card-bifold-region-bottom print-card-bifold-qr-block border-t border-current/15 w-full">
               <p className="print-card-bifold-qr-label uppercase tracking-widest opacity-70 font-semibold">Peta &amp; Navigasi Lokasi</p>
               <div className="bg-white rounded-xs border border-black/10 inline-block">
                 <img src={qrCodeUrl} alt="QR Code" className="print-card-bifold-qr object-contain" />
               </div>
-            </div>
           </div>
         </div>
 
         {/* Right Panel: mempelai + Resepsi + Digital RSVP */}
-        <div className="print-card-bifold-panel relative z-10 flex flex-col items-center justify-center pl-3 min-h-0">
-          <div className="print-card-bifold-stack w-full flex flex-col items-center">
-            <div className="w-full">
+        <div className="print-card-bifold-panel print-card-bifold-panel-right relative z-10 min-h-0">
+          <div className="print-card-bifold-region print-card-bifold-region-top w-full">
               <div className="print-card-bifold-monogram mx-auto rounded-full border border-current/30 flex items-center justify-center font-display font-bold italic">
                 {formData.brideNick[0] || 'S'}&amp;{formData.groomNick[0] || 'B'}
               </div>
               <p className="print-card-bifold-kicker uppercase tracking-[0.2em] font-semibold opacity-70">{formData.resepsiTitle}</p>
               <p className="print-card-bifold-meta font-semibold">{formData.eventDate} · {formData.resepsiTime}</p>
               <p className="print-card-bifold-venue font-bold line-clamp-2">{formData.resepsiVenue}</p>
-            </div>
+          </div>
 
+          <div className="print-card-bifold-region print-card-bifold-region-middle w-full">
             {renderBifoldPortraits()}
-
             <div className="print-card-bifold-note opacity-80 leading-relaxed px-1 w-full">
               <p className="italic leading-snug line-clamp-3">{formData.footerNote}</p>
             </div>
+          </div>
 
-            <div className="print-card-bifold-qr-block border-t border-current/15 w-full">
+          <div className="print-card-bifold-region print-card-bifold-region-bottom print-card-bifold-qr-block border-t border-current/15 w-full">
               <p className="print-card-bifold-qr-label uppercase tracking-widest opacity-70 font-semibold">Konfirmasi RSVP &amp; Ucapan Live</p>
               <div className="bg-white rounded-xs border border-black/10 inline-block">
                 <img src={qrCodeUrl} alt="QR Code" className="print-card-bifold-qr object-contain" />
               </div>
               <p className="print-card-bifold-url font-mono opacity-60 break-all">{fullUrl}</p>
-            </div>
           </div>
         </div>
       </div>
@@ -824,17 +822,44 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           font-size: 2mm !important;
         }
 
-        /* Bifold: dense editorial composition for the full A4 landscape sheet. */
+        /* Bifold: exact 50/50 fold geometry with aligned content rows. */
         .print-card-bifold {
           padding: 9mm !important;
-          gap: 10mm !important;
+          gap: 0 !important;
+        }
+        .print-card-bifold-fold-line {
+          left: 50% !important;
+          top: 9mm !important;
+          bottom: 9mm !important;
+          transform: translateX(-0.5px);
+          z-index: 20;
         }
         .print-card-bifold-panel {
+          display: grid !important;
+          grid-template-rows: 58mm 62mm 42mm !important;
+          row-gap: 6mm !important;
+          align-content: center !important;
           padding-top: 3mm !important;
           padding-bottom: 3mm !important;
+          min-width: 0 !important;
         }
-        .print-card-bifold-stack {
-          gap: 7mm !important;
+        .print-card-bifold-panel-left {
+          padding-left: 7mm !important;
+          padding-right: 7mm !important;
+        }
+        .print-card-bifold-panel-right {
+          padding-left: 7mm !important;
+          padding-right: 7mm !important;
+        }
+        .print-card-bifold-region {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+          min-height: 0 !important;
+        }
+        .print-card-bifold-region-bottom {
+          justify-content: flex-start !important;
         }
         .print-card-bifold .print-card-bifold-kicker {
           font-size: 3.2mm !important;
@@ -884,6 +909,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         }
         .print-card-bifold .print-card-bifold-portraits {
           gap: 6mm !important;
+          margin-bottom: 4mm !important;
         }
         .print-card-bifold .print-card-bifold-portrait {
           width: 34mm !important;

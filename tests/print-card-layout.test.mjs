@@ -93,10 +93,10 @@ test('table cards and tent-fold use physical rather than tiny px sizing', () => 
 })
 
 test('bifold content is physically sized for a full landscape A4 sheet', () => {
-  assert.match(source, /\.print-card-bifold \.print-card-bifold-title[\s\S]*?font-size: 8mm !important/)
-  assert.match(source, /\.print-card-bifold \.print-card-photo[\s\S]*?width: 24mm !important/)
-  assert.match(source, /\.print-card-bifold \.print-card-bifold-qr[\s\S]*?width: 26mm !important/)
-  assert.match(source, /\.print-card-bifold \.print-card-bifold-details[\s\S]*?font-size: 3\.2mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-title[\s\S]*?font-size: 10mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-portrait[\s\S]*?width: 34mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-qr[\s\S]*?width: 30mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-details[\s\S]*?font-size: 3\.6mm !important/)
 })
 
 test('bifold uses bride and groom portrait fields instead of gallery photo state', () => {
@@ -119,4 +119,26 @@ test('bifold compacts content into a centered stack instead of justify-between g
   assert.match(source, /\.print-card-bifold-stack[\s\S]*?gap: 7mm !important/)
   assert.match(source, /\.print-card-bifold \.print-card-bifold-portrait[\s\S]*?width: 34mm !important/)
   assert.match(source, /\.print-card-bifold \.print-card-bifold-title[\s\S]*?font-size: 10mm !important/)
+})
+
+test('bifold fold line is absolute at the exact physical center', () => {
+  const start = source.indexOf('const renderBifoldCard')
+  const end = source.indexOf('// Items per sheet calculation', start)
+  const bifold = source.slice(start, end)
+
+  assert.match(bifold, /print-card-bifold-fold-line absolute/)
+  assert.doesNotMatch(bifold, /border-r border-dashed/)
+  assert.match(source, /\.print-card-bifold-fold-line[\s\S]*?left: 50% !important/)
+  assert.match(source, /\.print-card-bifold[\s\S]*?gap: 0 !important/)
+})
+
+test('bifold panels share identical row tracks so key baselines align', () => {
+  assert.match(source, /\.print-card-bifold-panel[\s\S]*?grid-template-rows: 58mm 62mm 42mm !important/)
+  assert.match(source, /row-gap: 6mm !important/)
+  assert.match(source, /print-card-bifold-panel-left/)
+  assert.match(source, /print-card-bifold-panel-right/)
+  const leftPadding = /\.print-card-bifold-panel-left[\s\S]*?padding-left: 7mm !important[\s\S]*?padding-right: 7mm !important/.test(source)
+  const rightPadding = /\.print-card-bifold-panel-right[\s\S]*?padding-left: 7mm !important[\s\S]*?padding-right: 7mm !important/.test(source)
+  assert.equal(leftPadding, true)
+  assert.equal(rightPadding, true)
 })
