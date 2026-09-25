@@ -294,13 +294,25 @@ export async function fetchAdminInvitations() {
 // Kredensial admin untuk serverless: ID token (sesi Firebase email admin)
 // atau password tersimpan (sesi password-kustom tanpa Firebase session).
 async function getAdminCredentials() {
+  // Prefer the real platform-admin Firebase session when present.
+  if (auth.currentUser?.email === ADMIN_EMAIL) {
+    try {
+      return { idToken: await auth.currentUser.getIdToken() }
+    } catch {}
+  }
+
+  // A stored custom admin password must win over a normal customer Google
+  // session; otherwise admin actions would accidentally send the customer token.
+  const key = getAdminKey()
+  if (key) return { adminKey: key }
+
+  // Normal Firebase users use their ID token for owner-authorized customer writes.
   if (auth.currentUser) {
     try {
       return { idToken: await auth.currentUser.getIdToken() }
     } catch {}
   }
-  const key = getAdminKey()
-  return key ? { adminKey: key } : {}
+  return {}
 }
 
 export async function updateInvitation(slug, payload, editKey) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SiteNav from '../components/SiteNav'
@@ -33,7 +33,7 @@ export default function Dashboard() {
   const [linkMessage, setLinkMessage] = useState('')
   const navigate = useNavigate()
 
-  async function loadInvitations() {
+  const loadInvitations = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
@@ -44,7 +44,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -53,7 +53,7 @@ export default function Dashboard() {
     }
 
     if (user) loadInvitations()
-  }, [user, authLoading, navigate])
+  }, [user, authLoading, navigate, loadInvitations])
 
   async function handleLogout() {
     await logout()
