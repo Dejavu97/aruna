@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchUserInvitations } from '../lib/api'
+import { claimInvitationToCurrentUser, fetchUserInvitations, getRememberedEditKeys } from '../lib/api'
 import { formatLongDate, invitationUrl, isEventEditLocked } from '../lib/utils'
 import { formatRupiah, packages, getPackageById } from '../data/site'
 import {
@@ -26,7 +26,25 @@ export default function Dashboard() {
   const { user, logout, loading: authLoading } = useAuth()
   const [invitations, setInvitations] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [linkSlug, setLinkSlug] = useState('')
+  const [linkKey, setLinkKey] = useState('')
+  const [linking, setLinking] = useState(false)
+  const [linkMessage, setLinkMessage] = useState('')
   const navigate = useNavigate()
+
+  async function loadInvitations() {
+    setLoading(true)
+    setError('')
+    try {
+      setInvitations(await fetchUserInvitations())
+    } catch (err) {
+      setError(err.message || 'Gagal memuat undangan akun.')
+      setInvitations([])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -34,21 +52,52 @@ export default function Dashboard() {
       return
     }
 
-    if (user) {
-      fetchUserInvitations(user.uid, user.email)
-        .then((list) => {
-          setInvitations(list)
-        })
-        .catch((err) => {
-          console.error('Failed to load user invitations:', err)
-        })
-        .finally(() => setLoading(false))
-    }
+    if (user) loadInvitations()
   }, [user, authLoading, navigate])
 
   async function handleLogout() {
     await logout()
     navigate('/')
+  }
+
+  async function handleLinkInvitation(e) {
+    e?.preventDefault()
+    const slug = linkSlug.trim().toLowerCase()
+    const editKey = linkKey.trim()
+    if (!slug || !editKey) return
+    setLinking(true)
+    setLinkMessage('')
+    try {
+      await claimInvitationToCurrentUser(slug, editKey)
+      setLinkSlug('')
+      setLinkKey('')
+      setLinkMessage('Undangan berhasil dihubungkan ke akun Google ini.')
+      await loadInvitations()
+    } catch (err) {
+      setLinkMessage(err.message || 'Gagal menghubungkan undangan.')
+    } finally {
+      setLinking(false)
+    }
+  }
+
+  async function linkRememberedInvitations() {
+    const remembered = Object.entries(getRememberedEditKeys()).filter(([, key]) => key)
+    if (!remembered.length) {
+      setLinkMessage('Tidak ada kode edit tersimpan di perangkat ini.')
+      return
+    }
+    setLinking(true)
+    setLinkMessage('')
+    let linked = 0
+    for (const [slug, editKey] of remembered) {
+      try {
+        await claimInvitationToCurrentUser(slug, editKey)
+        linked += 1
+      } catch {}
+    }
+    await loadInvitations()
+    setLinkMessage(linked ? `${linked} undangan berhasil dihubungkan ke akun ini.` : 'Tidak ada undangan tersimpan yang dapat dihubungkan.')
+    setLinking(false)
   }
 
   if (authLoading || (loading && user)) {
@@ -114,6 +163,50 @@ export default function Dashboard() {
               <LogOut size={13} /> Keluar
             </button>
           </div>
+        </div>
+
+        {/* One-time ownership linking for invitations created anonymously */}
+        <div className="border border-gold-deep/25 bg-paper p-5 sm:p-6 rounded-sm shadow-xs space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[10px] uppercase tracking-widest text-gold-deep font-bold">Hubungkan Undangan Lama</p>
+              <h2 className="font-display text-xl font-bold text-ink mt-1">Pernah membuat undangan tanpa login?</h2>
+              <p className="text-xs text-stone mt-1 max-w-2xl leading-relaxed">
+                Hubungkan sekali menggunakan slug dan kode edit. Setelah itu undangan dapat dibuka dari akun Google ini di perangkat lain tanpa membawa kode edit.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={linkRememberedInvitations}
+              disabled={linking}
+              className="border border-ink/20 bg-white px-4 py-2 text-[11px] uppercase tracking-wider font-semibold hover:border-gold-deep disabled:opacity-50"
+            >
+              Gunakan akses tersimpan di perangkat ini
+            </button>
+          </div>
+          <form onSubmit={handleLinkInvitation} className="grid gap-2 sm:grid-cols-[1fr_1.4fr_auto]">
+            <input
+              value={linkSlug}
+              onChange={(e) => setLinkSlug(e.target.value)}
+              placeholder="slug-undangan"
+              className="border border-ink/20 bg-white px-3 py-2.5 text-xs font-mono"
+            />
+            <input
+              value={linkKey}
+              onChange={(e) => setLinkKey(e.target.value)}
+              placeholder="Kode edit rahasia"
+              className="border border-ink/20 bg-white px-3 py-2.5 text-xs font-mono"
+            />
+            <button
+              type="submit"
+              disabled={linking || !linkSlug.trim() || !linkKey.trim()}
+              className="bg-ink text-ivory px-5 py-2.5 text-xs uppercase tracking-wider font-semibold disabled:opacity-50"
+            >
+              {linking ? 'Menghubungkan…' : 'Hubungkan'}
+            </button>
+          </form>
+          {linkMessage && <p className="text-xs text-stone">{linkMessage}</p>}
+          {error && <p className="text-xs text-red-700">{error}</p>}
         </div>
 
         {/* Invitations Section */}

@@ -1,8 +1,9 @@
-import { adminDb } from '../server/_firebase.js';
+import { adminAuth, adminDb } from '../server/_firebase.js';
 import { verifyPrivilegedAdmin } from '../server/_auth.js';
-import { hasPrivilegedAdminCredential } from '../server/_admin-guard.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import { partitionInvitationUpdate } from '../server/_invitation-lifecycle.js';
+
+const ADMIN_EMAIL = 'admin@byaruna.my.id'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -20,11 +21,35 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Slug and valid payload are required' })
     }
 
-    const attemptedAdmin = hasPrivilegedAdminCredential(body)
-    const isAdmin = await verifyPrivilegedAdmin(req, body)
-    let isAuthorized = isAdmin
+    const docRef = adminDb.collection('invitations').doc(slug)
+    const privateRef = adminDb.collection('invitation_private').doc(slug)
 
-    // Otorisasi pelanggan via editKey (brankas private_keys, dibaca Admin SDK)
+    // A Firebase token can belong to the platform admin or a normal customer.
+    // Decode it once so customer sessions never hit the privileged-admin throttle.
+    let decodedToken = null
+    if (body.idToken) {
+      try {
+        decodedToken = await adminAuth.verifyIdToken(String(body.idToken))
+      } catch {}
+    }
+
+    let isAdmin = false
+    if (body.adminKey) {
+      isAdmin = await verifyPrivilegedAdmin(req, { adminKey: body.adminKey })
+    } else if (decodedToken?.email === ADMIN_EMAIL) {
+      isAdmin = true
+    }
+
+    let isAuthorized = isAdmin
+    let existingInvitation = null
+
+    if (!isAuthorized && decodedToken?.uid) {
+      existingInvitation = await docRef.get()
+      if (existingInvitation.exists && existingInvitation.data()?.ownerUid === decodedToken.uid) {
+        isAuthorized = true
+      }
+    }
+
     if (!isAuthorized && editKey) {
       const secretRef = adminDb.collection('private_keys').doc(slug)
       const secretSnap = await secretRef.get()
@@ -34,16 +59,13 @@ export default async function handler(req, res) {
     }
 
     if (!isAuthorized) {
-      return res.status(403).json({ error: attemptedAdmin ? 'Tidak diizinkan.' : 'Akses ditolak: Kunci edit tidak valid.' })
+      const attemptedAdmin = Boolean(body.adminKey || decodedToken?.email === ADMIN_EMAIL)
+      return res.status(403).json({ error: attemptedAdmin ? 'Tidak diizinkan.' : 'Akses ditolak: akun atau kunci edit tidak valid.' })
     }
 
-    // Satu batch menjaga public/private update konsisten. Delete sentinel
-    // membersihkan field private legacy saat dokumen lama pertama kali diedit.
-    const docRef = adminDb.collection('invitations').doc(slug)
-    const privateRef = adminDb.collection('invitation_private').doc(slug)
     let allowPremiumWatermark = isAdmin
     if (!isAdmin) {
-      const existingInvitation = await docRef.get()
+      if (!existingInvitation) existingInvitation = await docRef.get()
       if (!existingInvitation.exists) {
         return res.status(404).json({ error: 'Undangan tidak ditemukan.' })
       }

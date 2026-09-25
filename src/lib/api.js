@@ -8,9 +8,10 @@ import { defaultWaTemplates, fetchWaTemplates } from './api-wa-templates'
 
 const ADMIN_KEY = 'aruna.adminKey'
 const EDIT_KEYS = 'aruna.editKeys'
+const ADMIN_EMAIL = 'admin@byaruna.my.id'
 
 export function getAdminKey() {
-  if (auth.currentUser) return 'firebase-admin'
+  if (auth.currentUser?.email === ADMIN_EMAIL) return 'firebase-admin'
   try {
     return localStorage.getItem(ADMIN_KEY) || ''
   } catch {
@@ -37,6 +38,10 @@ export function rememberEditKey(slug, key) {
 
 export function getEditKey(slug) {
   return readEditKeys()[slug] || ''
+}
+
+export function getRememberedEditKeys() {
+  return { ...readEditKeys() }
 }
 
 function readEditKeys() {
@@ -594,32 +599,41 @@ export async function saveMaintenanceSettings(settings) {
   return { success: true }
 }
 
-export async function fetchUserInvitations(uid, email) {
-  if (!uid && !email) return []
+async function customerAccessCall(action, payload = {}) {
+  const user = auth.currentUser
+  if (!user) throw new Error('Silakan masuk dengan Google terlebih dahulu.')
+  let idToken = ''
   try {
-    const q1 = query(collection(db, 'invitations'), where('ownerUid', '==', uid))
-    const snap1 = await getDocs(q1)
-    const list = snap1.docs.map((d) => ({ ...d.data(), slug: d.id }))
-
-    if (email) {
-      const q2 = query(collection(db, 'invitations'), where('customerEmail', '==', email))
-      const snap2 = await getDocs(q2)
-      const list2 = snap2.docs.map((d) => ({ ...d.data(), slug: d.id }))
-
-      const merged = [...list]
-      for (const item of list2) {
-        if (!merged.some((m) => m.slug === item.slug)) {
-          merged.push(item)
-        }
-      }
-      return merged.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-    }
-
-    return list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-  } catch (err) {
-    console.warn('fetchUserInvitations error:', err)
-    return []
+    idToken = await user.getIdToken()
+  } catch {
+    throw new Error('Sesi pengguna tidak valid. Silakan masuk kembali.')
   }
+
+  const res = await fetch('/api/verify-key', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, idToken, ...payload }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Akses akun pelanggan gagal.')
+  }
+  return data
+}
+
+export async function fetchUserInvitations() {
+  const data = await customerAccessCall('owner-list')
+  return Array.isArray(data.invitations) ? data.invitations : []
+}
+
+export async function fetchOwnedInvitation(slug) {
+  const data = await customerAccessCall('owner-fetch', { slug })
+  return data.invitation
+}
+
+export async function claimInvitationToCurrentUser(slug, editKey) {
+  const data = await customerAccessCall('claim-owner', { slug, editKey })
+  return data.invitation
 }
 
 export { fetchPublicTestimonials, submitPublicTestimonial } from './api-testimonials'

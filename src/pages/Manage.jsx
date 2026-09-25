@@ -55,6 +55,7 @@ export default function Manage() {
   handleSaveWatermark,
   importInfo,
   isAdmin,
+  hasCustomerSession,
   item,
   loading,
   messageMode,
@@ -118,7 +119,7 @@ export default function Manage() {
     )
   }
 
-  if (!editKey && !isAdmin) {
+  if (!editKey && !isAdmin && !hasCustomerSession) {
     return (
       <div className="grid min-h-dvh place-items-center bg-ivory px-5 text-center">
         <div className="max-w-md w-full p-6 sm:p-8 bg-paper border border-ink/15 rounded-sm space-y-4 shadow-sm">

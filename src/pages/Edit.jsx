@@ -4,10 +4,12 @@ import { Lock, Shield } from 'lucide-react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import InvitationForm, { blankInvitation } from '../components/WeddingForm'
-import { fetchInvitation, fetchCustomThemes, getAdminKey, getEditKey, updateInvitation } from '../lib/api'
+import { fetchInvitation, fetchOwnedInvitation, fetchCustomThemes, getAdminKey, getEditKey, updateInvitation } from '../lib/api'
+import { useAuth } from '../context/AuthContext'
 import { isEventEditLocked, formatLongDate } from '../lib/utils'
 
 export default function Edit() {
+  const { user } = useAuth()
   const { slug } = useParams()
   const [params] = useSearchParams()
   const navigate = useNavigate()
@@ -15,6 +17,7 @@ export default function Edit() {
   const [customThemes, setCustomThemes] = useState([])
   const hasAdminKey = Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
   const fromAdmin = params.get('from') === 'admin' && hasAdminKey
+  const hasCustomerSession = Boolean(user) && !fromAdmin
   const initialKey = params.get('key') || getEditKey(slug) || (fromAdmin ? 'admin-bypass' : '')
   const [key, setKey] = useState(initialKey)
   const [typed, setTyped] = useState(key)
@@ -35,7 +38,7 @@ export default function Edit() {
     async function load() {
       setLoading(true)
       try {
-        const data = await fetchInvitation(slug, key)
+        const data = hasCustomerSession && !key ? await fetchOwnedInvitation(slug) : await fetchInvitation(slug, key)
         if (live) {
           setItem(data)
         }
@@ -48,12 +51,12 @@ export default function Edit() {
         if (live) setLoading(false)
       }
     }
-    if (key || fromAdmin) load()
+    if (key || fromAdmin || hasCustomerSession) load()
     else setLoading(false)
     return () => {
       live = false
     }
-  }, [slug, key, fromAdmin])
+  }, [slug, key, fromAdmin, hasCustomerSession, user?.uid])
 
   async function onSubmit(payload, message) {
     if (message || !payload) {
@@ -71,7 +74,8 @@ export default function Edit() {
     try {
       await updateInvitation(slug, payload, key)
       if (params.get('from') === 'admin') navigate('/admin')
-      else navigate(`/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`)
+      else if (key) navigate(`/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`)
+      else navigate(`/kelola/${slug}?from=customer`)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -83,7 +87,9 @@ export default function Edit() {
     ? '/admin'
     : key
       ? `/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`
-      : '/'
+      : hasCustomerSession
+        ? '/dashboard'
+        : '/'
 
   const isLocked = !fromAdmin && isEventEditLocked(item?.date, 1)
 
@@ -149,7 +155,7 @@ export default function Edit() {
             </div>
             <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
               <Link
-                to={`/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`}
+                to={key ? `/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer` : `/kelola/${slug}?from=customer`}
                 className="bg-ink text-ivory px-5 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors"
               >
                 Kembali ke Dashboard
@@ -171,7 +177,7 @@ export default function Edit() {
           themeId={item.themeId}
           initial={initialFormData}
           customThemes={customThemes}
-          uploadContext={fromAdmin ? { adminKey: getAdminKey() } : { slug, editKey: key }}
+          uploadContext={fromAdmin ? { adminKey: getAdminKey() } : key ? { slug, editKey: key } : {}}
           mode="edit"
           submitting={busy}
           error={error}

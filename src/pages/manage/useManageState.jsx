@@ -7,7 +7,8 @@ import QrCameraScanner from '../../components/QrCameraScanner'
 import WeddingFrameModal from '../../components/WeddingFrameModal'
 import PrintCardModal from '../../components/PrintCardModal'
 import LoveQRCardGenerator from '../../components/LoveQRCardGenerator'
-import { fetchInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../../lib/api'
+import { fetchInvitation, fetchOwnedInvitation, getAdminKey, getEditKey, rememberEditKey, updateInvitation, replyWish, getAnnouncement } from '../../lib/api'
+import { useAuth } from '../../context/AuthContext'
 import { copyText, formatLongDate, invitationUrl, uid, isEventEditLocked } from '../../lib/utils'
 import { shareWaLink, waLink } from '../../data/site'
 import { backFromInvite, invitePath } from '../../lib/nav'
@@ -31,13 +32,15 @@ function getDefaultReminderTemplate(eventType) {
 }
 
 export function useManageState() {
+  const { user } = useAuth()
   const { slug } = useParams()
   const [params] = useSearchParams()
   const queryKey = params.get('key') || ''
   const from = params.get('from') || (getAdminKey() && !queryKey ? 'admin' : '')
   const adminLoggedIn = Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
   const editKey = queryKey || getEditKey(slug) || (adminLoggedIn ? 'admin-bypass' : '')
-  const isAdmin = from === 'admin' || adminLoggedIn
+  const isAdmin = adminLoggedIn
+  const hasCustomerSession = Boolean(user) && !isAdmin
 
   const [item, setItem] = useState(null)
   const [text, setText] = useState('')
@@ -71,8 +74,12 @@ export function useManageState() {
   const [showStoryModal, setShowStoryModal] = useState(false)
   const [showPrintCardModal, setShowPrintCardModal] = useState(false)
 
-  const backHref = backFromInvite(slug, { key: editKey && !isAdmin ? editKey : '', from: isAdmin ? 'admin' : '' })
-  const backLabel = isAdmin ? '← Kembali ke admin' : '← Kembali ke halaman bayar'
+  const backHref = isAdmin
+    ? '/admin'
+    : hasCustomerSession && !editKey
+      ? '/dashboard'
+      : backFromInvite(slug, { key: editKey, from: '' })
+  const backLabel = isAdmin ? '← Kembali ke admin' : hasCustomerSession && !editKey ? '← Kembali ke dashboard' : '← Kembali ke halaman bayar'
 
   useEffect(() => {
     if (queryKey) rememberEditKey(slug, queryKey)
@@ -83,8 +90,11 @@ export function useManageState() {
   useEffect(() => {
     let live = true
     setLoading(true)
+    const invitationRequest = hasCustomerSession && !editKey
+      ? fetchOwnedInvitation(slug)
+      : fetchInvitation(slug, editKey)
     Promise.all([
-      fetchInvitation(slug, editKey),
+      invitationRequest,
       getAnnouncement().catch(() => '')
     ])
       .then(([data, ann]) => {
@@ -110,7 +120,7 @@ export function useManageState() {
     return () => {
       live = false
     }
-  }, [slug, editKey, isAdmin])
+  }, [slug, editKey, isAdmin, hasCustomerSession, user?.uid])
 
   const [guestSearch, setGuestSearch] = useState('')
   const [copiedMsg, setCopiedMsg] = useState('')
@@ -465,7 +475,7 @@ export function useManageState() {
 
   async function reload() {
     try {
-      const data = await fetchInvitation(slug, editKey)
+      const data = hasCustomerSession && !editKey ? await fetchOwnedInvitation(slug) : await fetchInvitation(slug, editKey)
       setItem(data)
       setText((data.guests || []).join('\n'))
       if (data.waTemplate) setWaTemplate(data.waTemplate)
@@ -505,6 +515,7 @@ export function useManageState() {
     guestsWithCheckIn,
     guestsWithRsvp,
     isAdmin,
+    hasCustomerSession,
     hadirCount,
     handleFileUpload,
     handleQrScanned,
