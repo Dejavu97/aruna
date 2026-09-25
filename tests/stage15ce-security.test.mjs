@@ -24,6 +24,8 @@ test('host boundary rejects arbitrary ngrok and unrelated Vercel hosts', () => {
   assert.equal(isFirstPartyHostname('unrelated.vercel.app'), false)
   assert.equal(isFirstPartyHostname('localhost'), true)
   assert.equal(isFirstPartyHostname('127.0.0.1'), true)
+  assert.equal(isFirstPartyHostname('byaruna.com'), true)
+  assert.equal(isFirstPartyHostname('www.byaruna.com'), true)
   assert.equal(isFirstPartyHostname('byaruna.my.id'), true)
   assert.equal(isFirstPartyHostname('aruna-abc123-whydidyoucomehere.vercel.app'), true)
 })
