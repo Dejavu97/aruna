@@ -152,10 +152,9 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       footerNote: 'Mohon doa restu dan kehadiran Anda · ByAruna Digital Invitation',
     })
 
-    if (item.gallery?.[0] || item.bride?.photo) {
-      setPhotoUrl(item.gallery?.[0] || item.bride?.photo || '')
-      setShowPhoto(true)
-    }
+    const defaultPrintPhoto = item.gallery?.[0] || item.bride?.photo || item.groom?.photo || ''
+    setPhotoUrl(defaultPrintPhoto)
+    setShowPhoto(Boolean(defaultPrintPhoto))
     setBifoldBridePhotoUrl(item.bride?.photo || '')
     setBifoldGroomPhotoUrl(item.groom?.photo || '')
 
