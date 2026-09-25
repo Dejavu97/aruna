@@ -1,4 +1,5 @@
 import { auth } from './firebase'
+import { buildCloudinaryFormData } from './cloudinary-upload-request'
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 const OK_TYPE = /^(image\/(png|jpe?g|gif|webp|svg\+xml)|audio\/(mpeg|mp3|wav|ogg|x-wav))$/i
@@ -25,6 +26,23 @@ async function getPublicUploadCapability() {
   }
   cachedCapability = { capability: data.capability, expiresAt: Number(data.expiresAt) || 0 }
   return data.capability
+}
+
+function sanitizeCloudinaryMessage(message) {
+  return String(message || '')
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/(api[_-]?key|signature|secret|token|authorization|editkey|adminkey|capability)\s*[:=]\s*[^,; ]+/gi, '$1=[REDACTED]')
+    .slice(0, 240)
+}
+
+async function cloudinaryUploadError(response) {
+  let message = ''
+  try {
+    const data = await response.json()
+    message = data?.error?.message || data?.error || ''
+  } catch {}
+  const safeMessage = sanitizeCloudinaryMessage(message)
+  return new Error(safeMessage ? `Gagal mengupload media: ${safeMessage}` : 'Gagal mengupload media.')
 }
 
 export async function uploadFile(file, context = {}) {
@@ -70,20 +88,14 @@ export async function uploadFile(file, context = {}) {
   }
 
   const authorization = await authRes.json()
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('api_key', authorization.apiKey)
-  formData.append('timestamp', String(authorization.params.timestamp))
-  formData.append('folder', authorization.params.folder)
-  formData.append('public_id', authorization.params.public_id)
-  formData.append('signature', authorization.signature)
+  const formData = buildCloudinaryFormData(file, authorization)
 
   const uploadRes = await fetch(authorization.uploadUrl, {
     method: 'POST',
     body: formData,
   })
   if (!uploadRes.ok) {
-    throw new Error('Gagal mengupload gambar.')
+    throw await cloudinaryUploadError(uploadRes)
   }
 
   const data = await uploadRes.json()

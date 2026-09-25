@@ -221,10 +221,13 @@ export function buildCloudinaryUploadAuthorization({
   const authorized = authorizeUploadRequest({ ...request, capabilitySecret: request.capabilitySecret || apiSecret })
   return authorized.then(({ params, resourceType, ...meta }) => ({
     params,
+    apiKey,
+    timestamp: params.timestamp,
+    folder: params.folder,
+    publicId: params.public_id,
     resourceType,
     ...meta,
     ...createCloudinarySignature({ params, apiSecret }),
-    apiKey,
     uploadUrl: `https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/${resourceType}/upload`,
   }))
 }

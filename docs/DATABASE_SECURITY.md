@@ -73,6 +73,7 @@
 ### Storage & upload
 - Tidak memakai Firebase Storage. Upload memakai otorisasi signed Cloudinary melalui action `upload-signature` pada `api/create-invitation.js`. Server menerima salah satu authority yang diverifikasi: Firebase ID token, `slug+editKey`, password `adminKey`, atau capability publik singkat untuk Order/Theme Studio. Folder, `public_id`, tipe, ukuran, dan parameter tanda tangan tetap dibuat server-side. Kompresi tetap client di `lib/upload.js` (≤1600px, JPEG q0.84).
 - Capability publik memakai HMAC server-side berbasis `CLOUDINARY_API_SECRET`, TTL maksimal 10 menit, terikat IP, dan penerbitannya dibatasi 12 kali/10 menit per IP pada instance. Ini bukan unrestricted anonymous signing; rate limit in-memory tidak atomik lintas instance dan residual abuse limitation tersebut diterima.
+- Signed response contract is explicit: server returns public `apiKey`, `timestamp`, `folder`, `publicId`, and `signature`; client maps them to Cloudinary form fields `api_key`, `timestamp`, `folder`, `public_id`, and `signature`. `upload_preset` is never sent.
 - Server dan client membatasi gambar (png/jpg/gif/webp/svg) & audio (mp3/wav/ogg), maks 8MB. Client guard hanya UX; boundary keamanan adalah verifikasi authority dan signature server.
 - Koleksi throttle: `guestbook_throttle/{ip|slug}` (lastAt, count, windowStart) — proteksi flood buku tamu, bukan data bisnis.
 
