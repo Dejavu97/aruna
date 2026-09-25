@@ -28,6 +28,8 @@ test('print owns the full paper and internal 6mm page padding instead of browser
   assert.match(source, /\.print-sheet-landscape[\s\S]*?width: 285mm !important[\s\S]*?height: 198mm !important/)
   assert.match(print, /\.print-page-group-portrait[\s\S]*?width: 210mm !important[\s\S]*?height: 297mm !important/)
   assert.match(print, /\.print-page-group-landscape[\s\S]*?width: 297mm !important[\s\S]*?height: 210mm !important/)
+  assert.match(source, /print-preview-shell print-preview-shell-portrait/)
+  assert.match(source, /print-preview-shell print-preview-shell-landscape/)
   assert.doesNotMatch(source, /width: 100vw !important|height: 100vh !important/)
 })
 

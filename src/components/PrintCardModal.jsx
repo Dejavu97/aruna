@@ -935,7 +935,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             {/* BIFOLD FOLDABLE INVITATION (A4 LANDSCAPE) */}
             {cardType === 'bifold' && (
               <div className="print-page-group print-page-group-landscape w-full flex flex-col items-center">
-                <div className="print-preview-shell" style={previewShellStyle('landscape')}>
+                <div className="print-preview-shell print-preview-shell-landscape" style={previewShellStyle('landscape')}>
                   <div className="print-page print-page-landscape">
                     <div className="print-sheet print-sheet-landscape bg-white">
                       <div className="w-full h-full min-h-0">
