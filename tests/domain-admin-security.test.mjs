@@ -57,6 +57,26 @@ test('invalid edit key fails before domain or Vercel mutation', async () => {
   assert.equal(attempt.calls.firestoreClear, 0)
 })
 
+test('linked Google owner can manage domain without carrying editKey', async () => {
+  const attempt = makeDomainDeps({ keyValid: false })
+  attempt.deps.loadInvitation = async () => ({ customDomain: 'a.example.com', ownerUid: 'owner-1' })
+  attempt.deps.verifyFirebaseOwner = async (invitation, token) => invitation.ownerUid === 'owner-1' && token === 'owner-token'
+
+  const added = await addDomainBoundary(
+    { domain: 'a.example.com', slug: 'slug-a', idToken: 'owner-token' },
+    attempt.deps,
+  )
+  assert.equal(added.success, true)
+  assert.equal(attempt.calls.vercelAdd, 1)
+
+  const removed = await removeDomainBoundary(
+    { domain: 'a.example.com', slug: 'slug-a', idToken: 'owner-token' },
+    attempt.deps,
+  )
+  assert.equal(removed.success, true)
+  assert.equal(attempt.calls.vercelRemove, 1)
+})
+
 test('add-domain accepts genuine success and verified same-project idempotency only', async () => {
   const success = makeDomainDeps()
   await addDomainBoundary({ domain: 'a.example.com', slug: 'slug-a', editKey: 'key-a' }, success.deps)
@@ -125,13 +145,13 @@ const manageDomain = await readFile(new URL('../src/pages/manage/ManageDomain.js
 const adminMonetization = await readFile(new URL('../src/pages/admin/AdminMonetizationTab.jsx', import.meta.url), 'utf8')
 
 test('domain UI changes active state only after successful API response', () => {
-  assert.match(manageDomain, /fetch\('\/api\/add-domain'[\s\S]*?if \(!res\.ok[\s\S]*?setItem/)
-  assert.match(manageDomain, /fetch\('\/api\/remove-domain'[\s\S]*?if \(!res\.ok[\s\S]*?setItem/)
+  assert.match(manageDomain, /addCustomDomain\(cleanDomain, slug, editKey\)[\s\S]*?setItem/)
+  assert.match(manageDomain, /removeCustomDomain\(prevDomain, slug, editKey\)[\s\S]*?setItem/)
   assert.doesNotMatch(manageDomain, /Vercel domain connection note|Vercel API call note/)
 })
 
 test('admin domain removal uses the same verified domain boundary', () => {
-  assert.match(adminMonetization, /fetch\('\/api\/remove-domain'/)
+  assert.match(adminMonetization, /removeCustomDomain\(inv\.customDomain, inv\.slug, inv\.editKey\)/)
   assert.doesNotMatch(adminMonetization, /updateInvitation\(inv\.slug, \{ customDomain: null \}\)/)
 })
 
