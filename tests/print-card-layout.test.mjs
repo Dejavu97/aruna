@@ -75,3 +75,26 @@ test('all supported sheet variants and grids remain available', () => {
   assert.match(source, /grid-cols-2 grid-rows-2/)
   assert.match(source, /renderBifoldCard\(1\)/)
 })
+
+test('mini invitation has readable physical sizing for both 2/page and 4/page', () => {
+  assert.match(source, /\.print-card-enclosure-a5 \.print-card-names[\s\S]*?font-size: 8mm !important/)
+  assert.match(source, /\.print-card-enclosure-a5 \.print-card-photo[\s\S]*?width: 30mm !important/)
+  assert.match(source, /\.print-card-enclosure-a5 \.print-card-qr[\s\S]*?width: 34mm !important/)
+  assert.match(source, /\.print-card-enclosure-a6 \.print-card-names[\s\S]*?font-size: 5\.8mm !important/)
+  assert.match(source, /\.print-card-enclosure-a6 \.print-card-qr[\s\S]*?width: 22mm !important/)
+})
+
+test('table cards and tent-fold use physical rather than tiny px sizing', () => {
+  assert.match(source, /\.print-card-table-a5 \.print-card-table-number[\s\S]*?font-size: 14mm !important/)
+  assert.match(source, /\.print-card-table-a5 \.print-card-table-qr[\s\S]*?width: 30mm !important/)
+  assert.match(source, /\.print-card-table-a6 \.print-card-table-number[\s\S]*?font-size: 9mm !important/)
+  assert.match(source, /\.print-card-table-tent \.print-card-table-number[\s\S]*?font-size: 10mm !important/)
+  assert.match(source, /\.print-card-table-tent \.print-card-table-qr[\s\S]*?width: 14mm !important/)
+})
+
+test('bifold content is physically sized for a full landscape A4 sheet', () => {
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-title[\s\S]*?font-size: 8mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-photo[\s\S]*?width: 24mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-qr[\s\S]*?width: 26mm !important/)
+  assert.match(source, /\.print-card-bifold \.print-card-bifold-details[\s\S]*?font-size: 3\.2mm !important/)
+})

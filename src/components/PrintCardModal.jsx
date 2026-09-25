@@ -367,26 +367,26 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         )}
 
         <div className="relative z-10 space-y-0.5 w-full">
-          <div className={`mx-auto rounded-full border border-current/30 flex items-center justify-center font-display font-bold italic ${isA6 ? 'w-6 h-6 text-[8.5px]' : 'w-8 h-8 text-xs'}`}>
+          <div className={`print-card-monogram mx-auto rounded-full border border-current/30 flex items-center justify-center font-display font-bold italic ${isA6 ? 'w-6 h-6 text-[8.5px]' : 'w-8 h-8 text-xs'}`}>
             {formData.brideNick[0] || 'S'}&amp;{formData.groomNick[0] || 'B'}
           </div>
-          <p className={`uppercase tracking-[0.25em] font-semibold opacity-70 ${isA6 ? 'text-[7px]' : 'text-[8.5px]'}`}>{formData.kicker || 'UNDANGAN PERNIKAHAN'}</p>
-          <h3 className={`font-display font-bold tracking-tight ${isA6 ? 'text-[14px]' : 'text-[20px]'}`}>{couple}</h3>
+          <p className={`print-card-kicker uppercase tracking-[0.25em] font-semibold opacity-70 ${isA6 ? 'text-[7px]' : 'text-[8.5px]'}`}>{formData.kicker || 'UNDANGAN PERNIKAHAN'}</p>
+          <h3 className={`print-card-names font-display font-bold tracking-tight ${isA6 ? 'text-[14px]' : 'text-[20px]'}`}>{couple}</h3>
           {formData.brideParents && !isA6 && (
-            <p className="text-[7.5px] opacity-75 italic leading-tight line-clamp-1">{formData.brideParents}</p>
+            <p className="print-card-parents text-[7.5px] opacity-75 italic leading-tight line-clamp-1">{formData.brideParents}</p>
           )}
-          <p className={`font-semibold opacity-90 ${isA6 ? 'text-[7.5px]' : 'text-[9.5px]'}`}>{formData.eventDate}</p>
+          <p className={`print-card-date font-semibold opacity-90 ${isA6 ? 'text-[7.5px]' : 'text-[9.5px]'}`}>{formData.eventDate}</p>
         </div>
 
         <div className="relative z-10 space-y-1 flex flex-col items-center w-full my-auto min-h-0">
           {renderPhotoBadge(isA6 ? 36 : 55)}
           <div className={`bg-white rounded-xs border border-black/10 shadow-xs ${isA6 ? 'p-1' : 'p-1.5'}`}>
-            <img src={qrCodeUrl} alt="QR Code" className={isA6 ? 'w-14 h-14 object-contain' : 'w-20 h-20 object-contain'} />
+            <img src={qrCodeUrl} alt="QR Code" className={`print-card-qr ${isA6 ? 'w-14 h-14' : 'w-20 h-20'} object-contain`} />
           </div>
-          <p className={`leading-relaxed opacity-85 italic px-2 line-clamp-2 ${isA6 ? 'text-[6.5px]' : 'text-[8.5px]'}`}>{formData.subtitle}</p>
+          <p className={`print-card-subtitle leading-relaxed opacity-85 italic px-2 line-clamp-2 ${isA6 ? 'text-[6.5px]' : 'text-[8.5px]'}`}>{formData.subtitle}</p>
         </div>
 
-        <div className={`relative z-10 w-full pt-1 border-t border-current/15 font-mono opacity-70 break-all ${isA6 ? 'text-[6px]' : 'text-[8px]'}`}>
+        <div className={`print-card-footer relative z-10 w-full pt-1 border-t border-current/15 font-mono opacity-70 break-all ${isA6 ? 'text-[6px]' : 'text-[8px]'}`}>
           {fullUrl}
         </div>
       </div>
@@ -419,27 +419,27 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
           {/* Top Half (Front Face) */}
           <div className="relative z-10 p-3 flex flex-col items-center justify-between border-b border-dashed border-current/40 min-h-0">
-            <p className="text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70">{couple} · {formData.eventDate}</p>
+            <p className="print-card-table-meta text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70">{couple} · {formData.eventDate}</p>
             <div className="my-auto">
-              <h2 className="font-display text-2xl font-black uppercase tracking-wider leading-none">{currentTable}</h2>
-              <p className="text-[7.5px] italic opacity-80 mt-0.5">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
+              <h2 className="print-card-table-number font-display text-2xl font-black uppercase tracking-wider leading-none">{currentTable}</h2>
+              <p className="print-card-table-subtitle text-[7.5px] italic opacity-80 mt-0.5">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="p-0.5 bg-white rounded-xs border border-black/10">
-                <img src={qrCodeUrl} alt="QR" className="w-5 h-5 object-contain" />
+                <img src={qrCodeUrl} alt="QR" className="print-card-table-qr w-5 h-5 object-contain" />
               </div>
-              <span className="text-[6px] uppercase tracking-wider opacity-70 font-semibold">Scan Galeri &amp; Doa</span>
+              <span className="print-card-table-qr-label text-[6px] uppercase tracking-wider opacity-70 font-semibold">Scan Galeri &amp; Doa</span>
             </div>
           </div>
 
           {/* Bottom Half (Back Face) */}
           <div className="relative z-10 p-3 flex flex-col items-center justify-between min-h-0">
-            <p className="text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70">{couple} · {formData.eventDate}</p>
+            <p className="print-card-table-meta text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70">{couple} · {formData.eventDate}</p>
             <div className="my-auto">
-              <h2 className="font-display text-2xl font-black uppercase tracking-wider leading-none">{currentTable}</h2>
-              <p className="text-[7.5px] italic opacity-80 mt-0.5">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
+              <h2 className="print-card-table-number font-display text-2xl font-black uppercase tracking-wider leading-none">{currentTable}</h2>
+              <p className="print-card-table-subtitle text-[7.5px] italic opacity-80 mt-0.5">{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
             </div>
-            <p className="text-[6px] uppercase tracking-widest opacity-60">Aruna Digital Wedding</p>
+            <p className="print-card-table-footer text-[6px] uppercase tracking-widest opacity-60">Aruna Digital Wedding</p>
           </div>
         </div>
       )
@@ -457,25 +457,25 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         )}
 
         <div className="relative z-10 space-y-0.5 w-full">
-          <p className={`uppercase tracking-[0.25em] font-semibold opacity-70 ${isA6 ? 'text-[7px]' : 'text-[8.5px]'}`}>The Wedding Of {couple}</p>
+          <p className={`print-card-table-meta uppercase tracking-[0.25em] font-semibold opacity-70 ${isA6 ? 'text-[7px]' : 'text-[8.5px]'}`}>The Wedding Of {couple}</p>
           <div className="w-8 h-[1px] bg-current opacity-30 mx-auto my-0.5" />
         </div>
 
         {/* Big Table Number */}
         <div className="relative z-10 space-y-0.5 my-auto w-full min-h-0">
-          <h2 className={`font-display font-black uppercase tracking-wider leading-none ${isA6 ? 'text-2xl' : 'text-4xl'}`}>{currentTable}</h2>
-          <p className={`italic opacity-85 ${isA6 ? 'text-[7.5px]' : 'text-[9.5px]'}`}>{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
+          <h2 className={`print-card-table-number font-display font-black uppercase tracking-wider leading-none ${isA6 ? 'text-2xl' : 'text-4xl'}`}>{currentTable}</h2>
+          <p className={`print-card-table-subtitle italic opacity-85 ${isA6 ? 'text-[7.5px]' : 'text-[9.5px]'}`}>{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
           {renderPhotoBadge(isA6 ? 34 : 48)}
         </div>
 
         <div className="relative z-10 space-y-0.5 flex flex-col items-center">
           <div className="p-1 bg-white rounded-xs border border-black/10 shadow-xs">
-            <img src={qrCodeUrl} alt="QR Code" className={isA6 ? 'w-12 h-12 object-contain' : 'w-16 h-16 object-contain'} />
+            <img src={qrCodeUrl} alt="QR Code" className={`print-card-table-qr ${isA6 ? 'w-12 h-12' : 'w-16 h-16'} object-contain`} />
           </div>
-          <p className={`uppercase tracking-wider opacity-75 font-semibold ${isA6 ? 'text-[6px]' : 'text-[7.5px]'}`}>Scan untuk Foto &amp; Ucapan Live</p>
+          <p className={`print-card-table-qr-label uppercase tracking-wider opacity-75 font-semibold ${isA6 ? 'text-[6px]' : 'text-[7.5px]'}`}>Scan untuk Foto &amp; Ucapan Live</p>
         </div>
 
-        <p className={`relative z-10 font-semibold opacity-60 uppercase tracking-widest ${isA6 ? 'text-[6.5px]' : 'text-[8px]'}`}>{formData.eventDate}</p>
+        <p className={`print-card-table-date relative z-10 font-semibold opacity-60 uppercase tracking-widest ${isA6 ? 'text-[6.5px]' : 'text-[8px]'}`}>{formData.eventDate}</p>
       </div>
     )
   }
@@ -501,25 +501,25 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         {/* Left Panel: Akad & Quotes */}
         <div className="relative z-10 flex flex-col items-center justify-between pr-3 border-r border-dashed border-current/40 min-h-0">
           <div className="space-y-0.5 w-full">
-            <p className="text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">Undangan Pernikahan</p>
-            <h4 className="font-display text-lg font-bold truncate">{couple}</h4>
+            <p className="print-card-bifold-kicker text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">Undangan Pernikahan</p>
+            <h4 className="print-card-bifold-title font-display text-lg font-bold truncate">{couple}</h4>
             <div className="w-8 h-[1px] bg-current opacity-30 mx-auto my-0.5" />
             {formData.quote && (
-              <p className="text-[7.5px] opacity-75 italic leading-relaxed px-1 line-clamp-3">“{formData.quote}”</p>
+              <p className="print-card-bifold-quote text-[7.5px] opacity-75 italic leading-relaxed px-1 line-clamp-3">“{formData.quote}”</p>
             )}
           </div>
 
-          <div className="space-y-0.5 text-[8.5px] opacity-90 leading-relaxed px-1 w-full my-auto">
-            <p className="font-bold text-[9.5px] uppercase tracking-wider">{formData.akadTitle}</p>
+          <div className="print-card-bifold-details space-y-0.5 text-[8.5px] opacity-90 leading-relaxed px-1 w-full my-auto">
+            <p className="print-card-bifold-section-title font-bold text-[9.5px] uppercase tracking-wider">{formData.akadTitle}</p>
             <p className="font-semibold">{formData.eventDate} · {formData.akadTime}</p>
             <p className="line-clamp-2">{formData.akadVenue}</p>
             {formData.akadAddress && <p className="text-[7.5px] opacity-70 line-clamp-1">{formData.akadAddress}</p>}
           </div>
 
           <div className="pt-1.5 border-t border-current/15 w-full space-y-0.5">
-            <p className="text-[7px] uppercase tracking-widest opacity-70 font-semibold">Peta &amp; Navigasi Lokasi</p>
+            <p className="print-card-bifold-qr-label text-[7px] uppercase tracking-widest opacity-70 font-semibold">Peta &amp; Navigasi Lokasi</p>
             <div className="p-0.5 bg-white rounded-xs border border-black/10 inline-block">
-              <img src={qrCodeUrl} alt="QR Code" className="w-12 h-12 object-contain" />
+              <img src={qrCodeUrl} alt="QR Code" className="print-card-bifold-qr w-12 h-12 object-contain" />
             </div>
           </div>
         </div>
@@ -527,25 +527,25 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         {/* Right Panel: Resepsi & Digital RSVP */}
         <div className="relative z-10 flex flex-col items-center justify-between pl-3 min-h-0">
           <div className="space-y-0.5 w-full">
-            <div className="w-7 h-7 mx-auto rounded-full border border-current/30 flex items-center justify-center font-display text-[10px] font-bold italic mb-0.5">
+            <div className="print-card-bifold-monogram w-7 h-7 mx-auto rounded-full border border-current/30 flex items-center justify-center font-display text-[10px] font-bold italic mb-0.5">
               {formData.brideNick[0] || 'S'}&amp;{formData.groomNick[0] || 'B'}
             </div>
-            <p className="text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">{formData.resepsiTitle}</p>
-            <p className="font-semibold text-[9px]">{formData.eventDate} · {formData.resepsiTime}</p>
-            <p className="text-[9px] font-bold line-clamp-2">{formData.resepsiVenue}</p>
+            <p className="print-card-bifold-kicker text-[8px] uppercase tracking-[0.2em] font-semibold opacity-70">{formData.resepsiTitle}</p>
+            <p className="print-card-bifold-meta font-semibold text-[9px]">{formData.eventDate} · {formData.resepsiTime}</p>
+            <p className="print-card-bifold-venue text-[9px] font-bold line-clamp-2">{formData.resepsiVenue}</p>
             {renderPhotoBadge(38)}
           </div>
 
-          <div className="space-y-0.5 text-[8px] opacity-80 leading-relaxed px-1 w-full my-auto">
+          <div className="print-card-bifold-note space-y-0.5 text-[8px] opacity-80 leading-relaxed px-1 w-full my-auto">
             <p className="italic leading-tight line-clamp-2">{formData.footerNote}</p>
           </div>
 
           <div className="pt-1.5 border-t border-current/15 w-full space-y-0.5">
-            <p className="text-[7px] uppercase tracking-widest opacity-70 font-semibold">Konfirmasi RSVP &amp; Ucapan Live</p>
+            <p className="print-card-bifold-qr-label text-[7px] uppercase tracking-widest opacity-70 font-semibold">Konfirmasi RSVP &amp; Ucapan Live</p>
             <div className="p-0.5 bg-white rounded-xs border border-black/10 inline-block">
-              <img src={qrCodeUrl} alt="QR Code" className="w-12 h-12 object-contain" />
+              <img src={qrCodeUrl} alt="QR Code" className="print-card-bifold-qr w-12 h-12 object-contain" />
             </div>
-            <p className="font-mono text-[7px] opacity-60 break-all">{fullUrl}</p>
+            <p className="print-card-bifold-url font-mono text-[7px] opacity-60 break-all">{fullUrl}</p>
           </div>
         </div>
       </div>
@@ -643,6 +643,204 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         .print-card-souvenir .print-card-footer {
           padding-top: 1mm !important;
           font-size: 1.8mm !important;
+        }
+
+        /* Mini invitation: separate A5-ish 2/page and A6-ish 4/page physical sizes. */
+        .print-card-enclosure-a5 {
+          padding: 8mm !important;
+        }
+        .print-card-enclosure-a5 .print-card-monogram {
+          width: 15mm !important;
+          height: 15mm !important;
+          font-size: 4mm !important;
+        }
+        .print-card-enclosure-a5 .print-card-kicker {
+          font-size: 3mm !important;
+        }
+        .print-card-enclosure-a5 .print-card-names {
+          font-size: 8mm !important;
+          line-height: 1.05 !important;
+        }
+        .print-card-enclosure-a5 .print-card-parents {
+          font-size: 3mm !important;
+        }
+        .print-card-enclosure-a5 .print-card-date {
+          font-size: 3.4mm !important;
+        }
+        .print-card-enclosure-a5 .print-card-photo {
+          width: 30mm !important;
+          height: 30mm !important;
+        }
+        .print-card-enclosure-a5 .print-card-qr {
+          width: 34mm !important;
+          height: 34mm !important;
+        }
+        .print-card-enclosure-a5 .print-card-subtitle {
+          font-size: 3mm !important;
+        }
+        .print-card-enclosure-a5 .print-card-footer {
+          font-size: 2.4mm !important;
+        }
+
+        .print-card-enclosure-a6 {
+          padding: 5mm !important;
+        }
+        .print-card-enclosure-a6 .print-card-monogram {
+          width: 10mm !important;
+          height: 10mm !important;
+          font-size: 3mm !important;
+        }
+        .print-card-enclosure-a6 .print-card-kicker {
+          font-size: 2.4mm !important;
+        }
+        .print-card-enclosure-a6 .print-card-names {
+          font-size: 5.8mm !important;
+          line-height: 1.05 !important;
+        }
+        .print-card-enclosure-a6 .print-card-date {
+          font-size: 2.7mm !important;
+        }
+        .print-card-enclosure-a6 .print-card-photo {
+          width: 18mm !important;
+          height: 18mm !important;
+        }
+        .print-card-enclosure-a6 .print-card-qr {
+          width: 22mm !important;
+          height: 22mm !important;
+        }
+        .print-card-enclosure-a6 .print-card-subtitle {
+          font-size: 2.4mm !important;
+        }
+        .print-card-enclosure-a6 .print-card-footer {
+          font-size: 2mm !important;
+        }
+
+        /* Standing table cards. */
+        .print-card-table-a5 {
+          padding: 8mm !important;
+        }
+        .print-card-table-a5 .print-card-table-meta {
+          font-size: 3mm !important;
+        }
+        .print-card-table-a5 .print-card-table-number {
+          font-size: 14mm !important;
+          line-height: 1 !important;
+        }
+        .print-card-table-a5 .print-card-table-subtitle {
+          font-size: 3.5mm !important;
+        }
+        .print-card-table-a5 .print-card-photo {
+          width: 30mm !important;
+          height: 30mm !important;
+        }
+        .print-card-table-a5 .print-card-table-qr {
+          width: 30mm !important;
+          height: 30mm !important;
+        }
+        .print-card-table-a5 .print-card-table-qr-label {
+          font-size: 2.4mm !important;
+        }
+        .print-card-table-a5 .print-card-table-date {
+          font-size: 3mm !important;
+        }
+
+        .print-card-table-a6 {
+          padding: 5mm !important;
+        }
+        .print-card-table-a6 .print-card-table-meta {
+          font-size: 2.4mm !important;
+        }
+        .print-card-table-a6 .print-card-table-number {
+          font-size: 9mm !important;
+          line-height: 1 !important;
+        }
+        .print-card-table-a6 .print-card-table-subtitle {
+          font-size: 2.7mm !important;
+        }
+        .print-card-table-a6 .print-card-photo {
+          width: 18mm !important;
+          height: 18mm !important;
+        }
+        .print-card-table-a6 .print-card-table-qr {
+          width: 22mm !important;
+          height: 22mm !important;
+        }
+        .print-card-table-a6 .print-card-table-qr-label {
+          font-size: 2mm !important;
+        }
+        .print-card-table-a6 .print-card-table-date {
+          font-size: 2.3mm !important;
+        }
+
+        /* Tent-fold has two readable faces inside each half-sheet card. */
+        .print-card-table-tent > div {
+          padding: 5mm !important;
+        }
+        .print-card-table-tent .print-card-table-meta {
+          font-size: 2.5mm !important;
+        }
+        .print-card-table-tent .print-card-table-number {
+          font-size: 10mm !important;
+          line-height: 1 !important;
+        }
+        .print-card-table-tent .print-card-table-subtitle {
+          font-size: 2.8mm !important;
+        }
+        .print-card-table-tent .print-card-table-qr {
+          width: 14mm !important;
+          height: 14mm !important;
+        }
+        .print-card-table-tent .print-card-table-qr-label,
+        .print-card-table-tent .print-card-table-footer {
+          font-size: 2mm !important;
+        }
+
+        /* Bifold uses the full A4 landscape sheet, so px defaults were far too small. */
+        .print-card-bifold {
+          padding: 8mm !important;
+          gap: 8mm !important;
+        }
+        .print-card-bifold .print-card-bifold-kicker {
+          font-size: 3mm !important;
+        }
+        .print-card-bifold .print-card-bifold-title {
+          font-size: 8mm !important;
+          line-height: 1.05 !important;
+        }
+        .print-card-bifold .print-card-bifold-quote {
+          font-size: 3mm !important;
+        }
+        .print-card-bifold .print-card-bifold-details,
+        .print-card-bifold .print-card-bifold-note {
+          font-size: 3.2mm !important;
+        }
+        .print-card-bifold .print-card-bifold-section-title {
+          font-size: 4mm !important;
+        }
+        .print-card-bifold .print-card-bifold-monogram {
+          width: 14mm !important;
+          height: 14mm !important;
+          font-size: 4mm !important;
+        }
+        .print-card-bifold .print-card-bifold-meta {
+          font-size: 3.2mm !important;
+        }
+        .print-card-bifold .print-card-bifold-venue {
+          font-size: 3.5mm !important;
+        }
+        .print-card-bifold .print-card-photo {
+          width: 24mm !important;
+          height: 24mm !important;
+        }
+        .print-card-bifold .print-card-bifold-qr {
+          width: 26mm !important;
+          height: 26mm !important;
+        }
+        .print-card-bifold .print-card-bifold-qr-label {
+          font-size: 2.5mm !important;
+        }
+        .print-card-bifold .print-card-bifold-url {
+          font-size: 2.2mm !important;
         }
 
         @media screen {
