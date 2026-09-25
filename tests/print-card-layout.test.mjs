@@ -23,8 +23,21 @@ test('print card keeps screen preview sizing separate from print sizing', () => 
   assert.match(portrait, /height: 285mm !important/)
   assert.match(landscape, /width: 285mm !important/)
   assert.match(landscape, /height: 198mm !important/)
-  assert.doesNotMatch(portrait + landscape, /100vh|width: 100% !important/)
+  assert.doesNotMatch(source, /width: 100vw !important|height: 100vh !important/)
+  assert.ok(source.includes('.print-card-souvenir {'))
+  assert.ok(source.includes('.print-card-souvenir .print-card-names {'))
+  assert.ok(source.includes('font-size: 5mm !important'))
+  assert.ok(source.includes('.print-card-souvenir .print-card-qr {'))
+  assert.ok(source.includes('width: 22mm !important'))
+  assert.ok(source.includes('height: 22mm !important'))
+  assert.ok(source.includes('.print-card-souvenir .print-card-photo {'))
+  assert.ok(source.includes('width: 18mm !important'))
+  assert.ok(source.includes('height: 18mm !important'))
+  assert.ok(source.includes('position: static !important'))
+  assert.ok(source.includes('overflow: visible !important'))
+  assert.ok(source.includes('break-after: page'))
 })
+
 
 test('print card retains all supported sheet variants and current grids', () => {
   assert.match(source, /if \(cardType === 'souvenir'\) return 8/)

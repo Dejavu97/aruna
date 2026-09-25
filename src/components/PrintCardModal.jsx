@@ -239,7 +239,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
     const size = customSize || photoSize
     const shapeClass = photoShape === 'circle' ? 'rounded-full' : photoShape === 'arch' ? 'rounded-t-full rounded-b-xs' : 'rounded-xs'
     return (
-      <div className={`overflow-hidden border border-current/30 shadow-xs my-0.5 mx-auto ${shapeClass}`} style={{ width: `${size}px`, height: `${size}px` }}>
+      <div className={`print-card-photo overflow-hidden border border-current/30 shadow-xs my-0.5 mx-auto ${shapeClass}`} style={{ width: `${size}px`, height: `${size}px` }}>
         <img src={photoUrl} alt="Couple" className="w-full h-full object-cover object-top" />
       </div>
     )
@@ -261,7 +261,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`relative box-border w-full h-full min-h-0 p-2 sm:p-2.5 rounded-xs border flex flex-col justify-between text-left overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card print-card-souvenir relative box-border w-full h-full min-h-0 p-2 sm:p-2.5 rounded-xs border flex flex-col justify-between text-left overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -270,30 +270,30 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         {/* Top: Kicker & Couple Name */}
         <div className="relative z-10 flex items-start justify-between gap-1 border-b border-current/15 pb-0.5">
           <div className="min-w-0 flex-1">
-            <p className="text-[6.5px] sm:text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70 leading-none truncate">{formData.kicker || 'WEDDING SOUVENIR'}</p>
-            <h4 className="font-display text-[13px] sm:text-[14.5px] font-bold tracking-tight leading-tight mt-0.5 truncate">{formData.brideNick} &amp; {formData.groomNick}</h4>
+            <p className="print-card-kicker text-[6.5px] sm:text-[7px] uppercase tracking-[0.2em] font-semibold opacity-70 leading-none truncate">{formData.kicker || 'WEDDING SOUVENIR'}</p>
+            <h4 className="print-card-names font-display text-[13px] sm:text-[14.5px] font-bold tracking-tight leading-tight mt-0.5 truncate">{formData.brideNick} &amp; {formData.groomNick}</h4>
           </div>
-          <span className="text-[6.5px] sm:text-[7px] font-semibold opacity-75 font-mono whitespace-nowrap">{formData.eventDate}</span>
+          <span className="print-card-date text-[6.5px] sm:text-[7px] font-semibold opacity-75 font-mono whitespace-nowrap">{formData.eventDate}</span>
         </div>
 
         {/* Middle: Content + QR Code */}
         <div className="relative z-10 grid grid-cols-12 gap-1.5 items-center my-auto min-h-0">
           <div className="col-span-8 space-y-0.5 min-w-0">
-            <p className="text-[7px] sm:text-[7.5px] opacity-85 leading-tight italic line-clamp-2">
+            <p className="print-card-subtitle text-[7px] sm:text-[7.5px] opacity-85 leading-tight italic line-clamp-2">
               "{formData.subtitle || 'Terima kasih atas kehadiran & doa restu Anda'}"
             </p>
             {renderPhotoBadge(32)}
           </div>
           <div className="col-span-4 flex flex-col items-center justify-center text-center">
             <div className="p-0.5 bg-white rounded-xs border border-black/10 shadow-xs">
-              <img src={qrCodeUrl} alt="QR" className="w-7 h-7 sm:w-8 sm:h-8 object-contain" />
+              <img src={qrCodeUrl} alt="QR" className="print-card-qr w-7 h-7 sm:w-8 sm:h-8 object-contain" />
             </div>
-            <p className="text-[5px] sm:text-[5.5px] uppercase tracking-widest font-bold opacity-75 mt-0.5 leading-none">Scan Galeri</p>
+            <p className="print-card-qr-label text-[5px] sm:text-[5.5px] uppercase tracking-widest font-bold opacity-75 mt-0.5 leading-none">Scan Galeri</p>
           </div>
         </div>
 
         {/* Bottom Footer */}
-        <div className="relative z-10 flex items-center justify-between pt-0.5 border-t border-current/15 text-[6px] sm:text-[6.5px] opacity-70">
+        <div className="print-card-footer relative z-10 flex items-center justify-between pt-0.5 border-t border-current/15 text-[6px] sm:text-[6.5px] opacity-70">
           <span className="truncate max-w-[65%]">{fullUrl.replace(/^https?:\/\//, '')}</span>
           <span className="font-semibold uppercase tracking-wider whitespace-nowrap">Aruna Digital</span>
         </div>
@@ -314,7 +314,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`relative box-border w-full h-full min-h-0 p-3 sm:p-4 rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card ${isA6 ? 'print-card-enclosure print-card-enclosure-a6' : 'print-card-table print-card-table-a5'} relative box-border w-full h-full min-h-0 p-3 sm:p-4 rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -365,7 +365,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         <div
           key={idx}
           style={bgStyle}
-          className={`relative box-border w-full h-full min-h-0 rounded-xs border grid grid-rows-2 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+          className={`print-card print-card-table-tent relative box-border w-full h-full min-h-0 rounded-xs border grid grid-rows-2 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
         >
           {bgTextureUrl && (
             <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -404,7 +404,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`relative box-border w-full h-full min-h-0 p-3 sm:p-4 rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card ${isA6 ? 'print-card-enclosure print-card-enclosure-a6' : 'print-card-table print-card-table-a5'} relative box-border w-full h-full min-h-0 p-3 sm:p-4 rounded-xs border flex flex-col items-center justify-between text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -446,7 +446,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div
         key={idx}
         style={bgStyle}
-        className={`relative box-border w-full h-full min-h-0 p-4 sm:p-5 rounded-xs border grid grid-cols-2 gap-4 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
+        className={`print-card print-card-bifold relative box-border w-full h-full min-h-0 p-4 sm:p-5 rounded-xs border grid grid-cols-2 gap-4 text-center overflow-hidden ${styles.cardBg} ${styles.border} shadow-xs print:shadow-none`}
       >
         {bgTextureUrl && (
           <div className={`absolute inset-0 pointer-events-none ${styles.overlay}`} style={{ opacity: bgOverlayOpacity / 100 }} />
@@ -533,6 +533,42 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             width: min(100%, 620px);
             aspect-ratio: 297 / 210;
           }
+          .print-card-souvenir .print-card-names {
+            font-size: 16px;
+          }
+          .print-card-souvenir .print-card-kicker,
+          .print-card-souvenir .print-card-date {
+            font-size: 8px;
+          }
+          .print-card-souvenir .print-card-subtitle {
+            font-size: 9px;
+          }
+          .print-card-souvenir .print-card-photo {
+            width: 42px !important;
+            height: 42px !important;
+          }
+          .print-card-souvenir .print-card-qr {
+            width: 44px !important;
+            height: 44px !important;
+          }
+          .print-card-souvenir .print-card-qr-label,
+          .print-card-souvenir .print-card-footer {
+            font-size: 7px;
+          }
+          .print-card-bifold h4 {
+            font-size: 22px;
+          }
+          .print-card-bifold p {
+            font-size: 10px;
+          }
+          .print-card-bifold .print-card-photo {
+            width: 46px !important;
+            height: 46px !important;
+          }
+          .print-card-bifold img[alt="QR Code"] {
+            width: 58px !important;
+            height: 58px !important;
+          }
         }
         @media print {
           @page {
@@ -543,8 +579,6 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             margin: 0 !important;
             padding: 0 !important;
             background: #fff !important;
-            width: 100vw !important;
-            height: 100vh !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
@@ -554,10 +588,24 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           .print-area-wrapper, .print-area-wrapper * {
             visibility: visible;
           }
+          .fixed:has(.print-area-wrapper),
+          .fixed:has(.print-area-wrapper) > div,
+          .fixed:has(.print-area-wrapper) > div > .grid {
+            position: static !important;
+            inset: auto !important;
+            display: block !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
           .print-area-wrapper {
-            position: absolute;
-            left: 0;
-            top: 0;
+            position: static !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            top: auto !important;
             width: 100% !important;
             max-width: none !important;
             margin: 0 !important;
@@ -594,6 +642,142 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             page-break-after: avoid;
             break-after: avoid;
           }
+          .print-card-souvenir {
+            padding: 4mm !important;
+          }
+          .print-card-souvenir .print-card-kicker {
+            font-size: 2.1mm !important;
+            line-height: 1.15 !important;
+          }
+          .print-card-souvenir .print-card-names {
+            font-size: 5mm !important;
+            line-height: 1.05 !important;
+          }
+          .print-card-souvenir .print-card-date {
+            font-size: 2.1mm !important;
+          }
+          .print-card-souvenir .print-card-subtitle {
+            font-size: 2.7mm !important;
+            line-height: 1.2 !important;
+          }
+          .print-card-souvenir .print-card-photo {
+            width: 18mm !important;
+            height: 18mm !important;
+          }
+          .print-card-souvenir .print-card-qr {
+            width: 22mm !important;
+            height: 22mm !important;
+          }
+          .print-card-souvenir .print-card-qr-label {
+            font-size: 1.7mm !important;
+            line-height: 1.1 !important;
+          }
+          .print-card-souvenir .print-card-footer {
+            padding-top: 1mm !important;
+            font-size: 1.8mm !important;
+          }
+
+          .print-card-enclosure {
+            padding: 6mm !important;
+          }
+          .print-card-enclosure .print-card-photo {
+            width: 30mm !important;
+            height: 30mm !important;
+          }
+          .print-card-enclosure .print-card-qr,
+          .print-card-enclosure img[alt="QR Code"] {
+            width: 35mm !important;
+            height: 35mm !important;
+          }
+          .print-card-enclosure .print-card-names,
+          .print-card-enclosure h3 {
+            font-size: 8mm !important;
+          }
+          .print-card-enclosure .print-card-kicker {
+            font-size: 3mm !important;
+          }
+          .print-card-enclosure .print-card-date {
+            font-size: 3mm !important;
+          }
+          .print-card-enclosure .print-card-subtitle {
+            font-size: 2.8mm !important;
+          }
+          .print-card-enclosure-a6 {
+            padding: 5mm !important;
+          }
+          .print-card-enclosure-a6 .print-card-photo {
+            width: 14mm !important;
+            height: 14mm !important;
+          }
+          .print-card-enclosure-a6 .print-card-qr,
+          .print-card-enclosure-a6 img[alt="QR Code"] {
+            width: 18mm !important;
+            height: 18mm !important;
+          }
+          .print-card-enclosure-a6 .print-card-names,
+          .print-card-enclosure-a6 h3 {
+            font-size: 5.5mm !important;
+          }
+          .print-card-enclosure-a6 .print-card-kicker,
+          .print-card-enclosure-a6 .print-card-date {
+            font-size: 2.2mm !important;
+          }
+          .print-card-enclosure-a6 .print-card-subtitle {
+            font-size: 2mm !important;
+          }
+
+          .print-card-table h2 {
+            font-size: 10mm !important;
+          }
+          .print-card-table p {
+            font-size: 2.8mm !important;
+          }
+          .print-card-table .print-card-photo {
+            width: 30mm !important;
+            height: 30mm !important;
+          }
+          .print-card-table img[alt="QR Code"],
+          .print-card-table img[alt="QR"] {
+            width: 30mm !important;
+            height: 30mm !important;
+          }
+          .print-card-table-tent img[alt="QR"] {
+            width: 18mm !important;
+            height: 18mm !important;
+          }
+          .print-card-table-a5 h2 {
+            font-size: 7mm !important;
+          }
+          .print-card-table-a5 .print-card-photo {
+            width: 18mm !important;
+            height: 18mm !important;
+          }
+          .print-card-table-a5 img[alt="QR Code"],
+          .print-card-table-a5 img[alt="QR"] {
+            width: 20mm !important;
+            height: 20mm !important;
+          }
+
+          .print-card-bifold {
+            padding: 8mm !important;
+            gap: 8mm !important;
+          }
+          .print-card-bifold h4 {
+            font-size: 8mm !important;
+          }
+          .print-card-bifold p {
+            font-size: 3mm !important;
+            line-height: 1.25 !important;
+          }
+          .print-card-bifold .print-card-photo {
+            width: 20mm !important;
+            height: 20mm !important;
+          }
+          .print-card-bifold img[alt="QR Code"] {
+            width: 24mm !important;
+            height: 24mm !important;
+          }
+
           .no-print {
             display: none !important;
           }
