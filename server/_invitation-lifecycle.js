@@ -8,6 +8,8 @@ export const PRIVATE_INVITATION_FIELDS = Object.freeze([
   'voucher',
   'packagePrice',
   'packageName',
+  'pendingUpgrade',
+  'upgradeHistory',
   'guests',
   'checkIns',
   'waTemplate',
@@ -24,6 +26,8 @@ const SERVER_CONTROLLED_FIELDS = Object.freeze([
   'orderCode',
   'packagePrice',
   'packageName',
+  'pendingUpgrade',
+  'upgradeHistory',
   'views',
   'rsvps',
   'wishes',
@@ -47,6 +51,8 @@ const IMMUTABLE_UPDATE_FIELDS = Object.freeze([
   'packageId',
   'packagePrice',
   'packageName',
+  'pendingUpgrade',
+  'upgradeHistory',
   'customDomain',
 ])
 

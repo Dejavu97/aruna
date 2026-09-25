@@ -327,6 +327,27 @@ export async function setInvitationStatus(slug, status) {
   return updateInvitation(slug, { status }, '')
 }
 
+export async function upgradePackage(slug, targetPackageId, editKey) {
+  const res = await fetch('/api/upgrade-package', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, targetPackageId, editKey, action: 'request' }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(data.error || 'Gagal mengajukan upgrade.')
+  return data
+}
+
+export async function confirmPackageUpgrade(slug) {
+  const creds = await getAdminCredentials()
+  const res = await fetch('/api/upgrade-package', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, action: 'confirm', ...creds }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(data.error || 'Gagal mengonfirmasi upgrade.')
+  return data
+}
+
 export async function deleteInvitation(slug) {
   if (!getAdminKey()) throw new Error('Unauthorized')
   const creds = await getAdminCredentials()

@@ -1,4 +1,4 @@
-import { deleteInvitation, rememberEditKey, setInvitationStatus } from '../../lib/api'
+import { confirmPackageUpgrade, deleteInvitation, rememberEditKey, setInvitationStatus } from '../../lib/api'
 import {
   Copy,
   CopyPlus,
@@ -199,6 +199,23 @@ export default function AdminOrdersTab({ adminPackages,
                         {formatRupiah(totalPrice)}
                       </span>
                     </div>
+
+                    {item.pendingUpgrade && (
+                      <div className="border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950 flex flex-wrap items-center justify-between gap-2">
+                        <span>Upgrade ke <strong>{item.pendingUpgrade.toName}</strong> · Tambahan <strong>{formatRupiah(item.pendingUpgrade.amount)}</strong> · Menunggu pembayaran</span>
+                        <button
+                          type="button"
+                          className="bg-green-700 text-white px-3 py-2 font-semibold"
+                          onClick={async () => {
+                            if (!window.confirm(`Konfirmasi pembayaran upgrade ${formatRupiah(item.pendingUpgrade.amount)} untuk ${item.orderCode || item.slug}?`)) return
+                            try { await confirmPackageUpgrade(item.slug); await load() }
+                            catch (err) { alert(err.message) }
+                          }}
+                        >
+                          Konfirmasi pembayaran upgrade
+                        </button>
+                      </div>
+                    )}
 
                     <div>
                       <h2 className="font-display text-2xl font-bold">

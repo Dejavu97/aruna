@@ -18,6 +18,7 @@ import ManageCheckIn from './manage/ManageCheckIn'
 import ManageUcapan from './manage/ManageUcapan'
 import ManageDomain from './manage/ManageDomain'
 import ManageTamu from './manage/ManageTamu'
+import ManageUpgrade from './manage/ManageUpgrade'
 
 /**
  * Manage — thin orchestrator (Fase 3c). State/logic verbatim di
@@ -264,6 +265,8 @@ export default function Manage() {
             </button>
           </div>
         </div>
+
+        {!isAdmin && editKey && <ManageUpgrade item={item} slug={slug} editKey={editKey} reload={reload} />}
 
         {/* H+1 Grace Period Banner */}
         {!isAdmin && isEventEditLocked(item?.date, 1) && (

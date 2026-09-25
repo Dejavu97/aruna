@@ -17,6 +17,7 @@ service cloud.firestore {
       // boleh menulis metadata private/order ke dokumen publik.
       allow update: if
         request.resource.data.status == resource.data.status
+        && request.resource.data.packageId == resource.data.packageId
         && request.resource.data.diff(resource.data).affectedKeys().hasAny([
           'customerWhatsapp',
           'customerEmail',
