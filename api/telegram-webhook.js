@@ -70,7 +70,7 @@ function packOf(list, inv) {
   if (inv.packagePrice !== undefined && Number.isSafeInteger(Number(inv.packagePrice))) {
     return { id, name: inv.packageName || id, price: Number(inv.packagePrice) };
   }
-  return list.find((p) => p.id === id) || { id, name: id || '-', price: 0 };
+  return list.find((p) => p.id === id && (p.eventType || 'wedding') === (inv.eventType || 'wedding')) || { id, name: id || '-', price: 0 };
 }
 async function getWaTemplates() {
   try {

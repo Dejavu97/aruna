@@ -6,10 +6,6 @@ export async function resolveOrderPackage(db, packageId, eventType = 'wedding') 
     throw Object.assign(new Error('Paket yang dipilih tidak valid.'), { status: 400 })
   }
 
-  // Admin pricing only manages wedding packages. The same IDs also appear in
-  // other event types, whose prices must remain independent.
-  if (eventType !== 'wedding') return { name: base.name, price: base.price }
-
   let snapshot
   try {
     snapshot = await db.collection('settings').doc('packages').get()
@@ -17,7 +13,7 @@ export async function resolveOrderPackage(db, packageId, eventType = 'wedding') 
     throw Object.assign(new Error('Harga paket belum dapat diverifikasi. Coba lagi sebentar.'), { status: 503 })
   }
   const saved = snapshot.exists && Array.isArray(snapshot.data()?.packages)
-    ? snapshot.data().packages.find((p) => p?.id === packageId)
+    ? snapshot.data().packages.find((p) => p?.id === packageId && (p.eventType || 'wedding') === eventType)
     : null
   if (!saved) return { name: base.name, price: base.price }
 

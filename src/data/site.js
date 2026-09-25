@@ -256,11 +256,10 @@ export const eventPackages = {
 
 export function getPackagesByEventType(eventType = 'wedding', savedPackages = null) {
   const defaults = eventPackages[eventType] || eventPackages.wedding
-  // Admin pricing currently edits wedding packages only. IDs are reused by
-  // other event types, so never apply wedding prices to their packages.
-  if (eventType !== 'wedding' || !Array.isArray(savedPackages)) return defaults
+  if (!Array.isArray(savedPackages)) return defaults
   return defaults.map((base) => {
-    const saved = savedPackages.find((p) => p?.id === base.id)
+    // Old admin settings have no eventType and belong to wedding only.
+    const saved = savedPackages.find((p) => p?.id === base.id && (p.eventType || 'wedding') === eventType)
     if (!saved) return base
     const price = Number(saved.price)
     return {
@@ -271,6 +270,11 @@ export function getPackagesByEventType(eventType = 'wedding', savedPackages = nu
       features: Array.isArray(saved.features) ? saved.features : base.features,
     }
   })
+}
+
+export function getEditablePackages(savedPackages = null) {
+  return Object.keys(eventPackages).flatMap((eventType) =>
+    getPackagesByEventType(eventType, savedPackages).map((pkg) => ({ ...pkg, eventType })))
 }
 
 export function getPackageById(packageId, eventType = 'wedding', savedPackages = null) {

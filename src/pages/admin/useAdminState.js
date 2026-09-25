@@ -3,7 +3,7 @@ import { auth } from '../../lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { changeAdminPassword, cloneInvitation, createFullBackupData, defaultMaintenanceSettings, defaultSeoSettings, defaultSiteProfile, defaultWaTemplates, deleteCustomTheme, deleteInvitation, deleteVoucher, fetchAdSettings, fetchAdminInvitations, fetchCustomThemes, fetchDynamicPackages, fetchMaintenanceSettings, fetchSeoSettings, fetchSettings, fetchSiteProfile, fetchVouchers, fetchWaTemplates, getAnnouncement, restoreFullBackupData, saveAdSettings, saveAnnouncement, saveDynamicPackages, saveMaintenanceSettings, savePaymentSettings, saveSeoSettings, saveSiteProfile, saveVoucher, saveWaTemplates, updateInvitation, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
-import { formatRupiah, getOrderPackage, packages as defaultPackages } from '../../data/site'
+import { formatRupiah, getEditablePackages, getOrderPackage } from '../../data/site'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
 import { getDummyWeddingData } from '../../data/dummyData'
 
@@ -58,7 +58,7 @@ export function useAdminState() {
   const [savingPayment, setSavingPayment] = useState(false)
 
   // Dynamic Packages State
-  const [adminPackages, setAdminPackages] = useState(defaultPackages)
+  const [adminPackages, setAdminPackages] = useState(() => getEditablePackages())
   const [savingPackages, setSavingPackages] = useState(false)
 
   // Ad Settings State (Default OFF / Inactive)
@@ -205,9 +205,7 @@ export function useAdminState() {
       if (fetchedPayment && Array.isArray(fetchedPayment.banks)) {
         setPaymentSettings(fetchedPayment)
       }
-      if (fetchedPkgs && Array.isArray(fetchedPkgs)) {
-        setAdminPackages(fetchedPkgs)
-      }
+      if (fetchedPkgs && Array.isArray(fetchedPkgs)) setAdminPackages(getEditablePackages(fetchedPkgs))
       if (fetchedAds) {
         setAdSettings(fetchedAds)
       }

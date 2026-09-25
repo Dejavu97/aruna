@@ -27,7 +27,7 @@ async function resolvePrice(packageId, eventType) {
     const snap = await adminDb.collection('settings').doc('packages').get();
     const list = snap.exists ? snap.data()?.packages : null;
     if (Array.isArray(list)) {
-      const found = list.find((p) => p.id === packageId);
+      const found = list.find((p) => p.id === packageId && (p.eventType || 'wedding') === (eventType || 'wedding'));
       if (found) return { name: found.name || packageId, price: found.price || 0 };
     }
   } catch {}

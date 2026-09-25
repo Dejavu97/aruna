@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { themes, getDemoByTheme } from '../../data/themes'
-import { formatRupiah, packages as defaultPackages, getPackageById } from '../../data/site'
+import { formatRupiah, getOrderPackage } from '../../data/site'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
 import { invitePath } from '../../lib/nav'
 
@@ -121,14 +121,15 @@ export default function AdminMonetizationTab({ adSettings,
         <div>
           <h2 className="font-display text-2xl font-bold">Pengaturan Harga &amp; Paket Layanan</h2>
           <p className="text-xs text-stone mt-0.5">
-            Ubah nominal harga setiap paket. Perubahan akan langsung aktif di halaman depan dan form pemesanan.
+            Ubah harga tiap jenis undangan. Perubahan berlaku untuk pesanan baru setelah disimpan.
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-4">
           {adminPackages.map((pkg, idx) => (
-            <div key={pkg.id} className="bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-3 flex flex-col justify-between">
+            <div key={`${pkg.eventType}-${pkg.id}`} className="bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-3 flex flex-col justify-between">
               <div className="space-y-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gold-deep">{{ wedding: 'Pernikahan', birthday: 'Ulang Tahun', graduation: 'Wisuda', aqiqah: 'Aqiqah', corporate: 'Corporate', 'love-letter': 'Surat Cinta' }[pkg.eventType] || pkg.eventType}</h3>
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs uppercase font-bold text-stone">ID: {pkg.id}</span>
                   {pkg.popular && (
@@ -146,9 +147,7 @@ export default function AdminMonetizationTab({ adSettings,
                     onChange={(e) => {
                       const val = e.target.value
                       setAdminPackages((prev) => {
-                        const n = [...prev]
-                        n[idx].name = val
-                        return n
+                        return prev.map((p, i) => i === idx ? { ...p, name: val } : p)
                       })
                     }}
                     className="w-full border border-ink/20 p-2 text-sm font-bold bg-white"
@@ -163,9 +162,7 @@ export default function AdminMonetizationTab({ adSettings,
                     onChange={(e) => {
                       const val = Number(e.target.value) || 0
                       setAdminPackages((prev) => {
-                        const n = [...prev]
-                        n[idx].price = val
-                        return n
+                        return prev.map((p, i) => i === idx ? { ...p, price: val } : p)
                       })
                     }}
                     className="w-full border border-ink/20 p-2 text-base font-mono font-bold text-green-800 bg-white"
@@ -181,9 +178,7 @@ export default function AdminMonetizationTab({ adSettings,
                     onChange={(e) => {
                       const val = e.target.value
                       setAdminPackages((prev) => {
-                        const n = [...prev]
-                        n[idx].blurb = val
-                        return n
+                        return prev.map((p, i) => i === idx ? { ...p, blurb: val } : p)
                       })
                     }}
                     className="w-full border border-ink/20 p-2 text-xs bg-white"
@@ -199,9 +194,7 @@ export default function AdminMonetizationTab({ adSettings,
                   onChange={(e) => {
                     const checked = e.target.checked
                     setAdminPackages((prev) => {
-                      const n = [...prev]
-                      n[idx].popular = checked
-                      return n
+                      return prev.map((p, i) => i === idx ? { ...p, popular: checked } : p)
                     })
                   }}
                   className="w-4 h-4 accent-gold-deep cursor-pointer"
@@ -925,7 +918,7 @@ export default function AdminMonetizationTab({ adSettings,
                       {customDomainItems.map((inv) => {
                         const isSingle = !inv.groom?.nick || inv.groom?.nick === inv.bride?.nick
                         const coupleName = isSingle ? inv.bride?.nick || inv.customerName || 'Acara' : `${inv.bride?.nick} & ${inv.groom?.nick}`
-                        const pack = adminPackages.find((p) => p.id === inv.packageId) || defaultPackages.find((p) => p.id === inv.packageId)
+                        const pack = getOrderPackage(inv, adminPackages)
                         const cleanPhone = (inv.customerWhatsapp || '').replace(/[^0-9]/g, '')
 
                         return (
