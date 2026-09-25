@@ -524,6 +524,16 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       {/* 100% AUTO-FIT A4 PRINT CSS RULES                     */}
       {/* ---------------------------------------------------- */}
       <style>{`
+        @media screen {
+          .print-sheet-portrait {
+            width: min(100%, 540px);
+            aspect-ratio: 210 / 297;
+          }
+          .print-sheet-landscape {
+            width: min(100%, 620px);
+            aspect-ratio: 297 / 210;
+          }
+        }
         @media print {
           @page {
             size: ${cardType === 'bifold' ? 'A4 landscape' : 'A4 portrait'};
@@ -555,9 +565,9 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             background: #fff !important;
           }
           .print-sheet-portrait {
-            width: 100% !important;
-            height: calc(100vh - 12mm) !important;
-            max-height: 285mm !important;
+            width: 198mm !important;
+            height: 285mm !important;
+            max-height: none !important;
             page-break-after: always;
             break-after: page;
             margin: 0 auto !important;
@@ -568,9 +578,9 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             flex-direction: column !important;
           }
           .print-sheet-landscape {
-            width: 100% !important;
-            height: calc(100vh - 12mm) !important;
-            max-height: 198mm !important;
+            width: 285mm !important;
+            height: 198mm !important;
+            max-height: none !important;
             page-break-after: always;
             break-after: page;
             margin: 0 auto !important;
