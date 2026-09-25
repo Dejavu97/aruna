@@ -42,7 +42,7 @@ test('unrelated admin/app nodes are removed from print flow so they cannot creat
 test('souvenir uses readable physical content sizes in both preview and print', () => {
   assert.match(source, /\.print-card-souvenir[\s\S]*?padding: 4mm !important/)
   assert.match(source, /\.print-card-souvenir \.print-card-names[\s\S]*?font-size: 5mm !important/)
-  assert.match(source, /\.print-card-souvenir \.print-card-photo[\s\S]*?width: 20mm !important[\s\S]*?height: 20mm !important/)
+  assert.match(source, /renderPhotoBadge\(20\)/)
   assert.match(source, /\.print-card-souvenir \.print-card-qr[\s\S]*?width: 22mm !important[\s\S]*?height: 22mm !important/)
   assert.match(source, /\.print-card-souvenir \.print-card-subtitle[\s\S]*?font-size: 2\.7mm !important/)
 })
@@ -78,7 +78,7 @@ test('all supported sheet variants and grids remain available', () => {
 
 test('mini invitation has readable physical sizing for both 2/page and 4/page', () => {
   assert.match(source, /\.print-card-enclosure-a5 \.print-card-names[\s\S]*?font-size: 8mm !important/)
-  assert.match(source, /\.print-card-enclosure-a5 \.print-card-photo[\s\S]*?width: 30mm !important/)
+  assert.match(source, /renderPhotoBadge\(isA6 \? 18 : 30\)/)
   assert.match(source, /\.print-card-enclosure-a5 \.print-card-qr[\s\S]*?width: 34mm !important/)
   assert.match(source, /\.print-card-enclosure-a6 \.print-card-names[\s\S]*?font-size: 5\.8mm !important/)
   assert.match(source, /\.print-card-enclosure-a6 \.print-card-qr[\s\S]*?width: 22mm !important/)
@@ -94,14 +94,14 @@ test('table cards and tent-fold use physical rather than tiny px sizing', () => 
 
 test('bifold content is physically sized for a full landscape A4 sheet', () => {
   assert.match(source, /\.print-card-bifold \.print-card-bifold-title[\s\S]*?font-size: 10mm !important/)
-  assert.match(source, /\.print-card-bifold \.print-card-bifold-portrait[\s\S]*?width: 34mm !important/)
+  assert.match(source, /style=\{\{ width: scaledPhotoMm\(34\), height: scaledPhotoMm\(34\) \}\}/)
   assert.match(source, /\.print-card-bifold \.print-card-bifold-qr[\s\S]*?width: 30mm !important/)
   assert.match(source, /\.print-card-bifold \.print-card-bifold-details[\s\S]*?font-size: 3\.6mm !important/)
 })
 
 test('bifold uses bride and groom portrait fields instead of gallery photo state', () => {
-  assert.match(source, /const bridePortraitUrl = item\.bride\?\.photo \|\| ''/)
-  assert.match(source, /const groomPortraitUrl = item\.groom\?\.photo \|\| ''/)
+  assert.match(source, /const bridePortraitUrl = bifoldBridePhotoUrl \|\| item\.bride\?\.photo \|\| ''/)
+  assert.match(source, /const groomPortraitUrl = bifoldGroomPhotoUrl \|\| item\.groom\?\.photo \|\| ''/)
   const start = source.indexOf('const renderBifoldCard')
   const end = source.indexOf('// Items per sheet calculation', start)
   const bifold = source.slice(start, end)
@@ -118,7 +118,7 @@ test('bifold compacts content into explicit aligned regions instead of justify-b
   assert.match(bifold, /print-card-bifold-region-bottom/)
   assert.doesNotMatch(bifold, /justify-between/)
   assert.match(source, /\.print-card-bifold-panel[\s\S]*?row-gap: 6mm !important/)
-  assert.match(source, /\.print-card-bifold \.print-card-bifold-portrait[\s\S]*?width: 34mm !important/)
+  assert.match(source, /style=\{\{ width: scaledPhotoMm\(34\), height: scaledPhotoMm\(34\) \}\}/)
   assert.match(source, /\.print-card-bifold \.print-card-bifold-title[\s\S]*?font-size: 10mm !important/)
 })
 
