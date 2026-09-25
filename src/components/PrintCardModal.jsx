@@ -56,7 +56,9 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
   const [showPhoto, setShowPhoto] = useState(false)
   const [photoUrl, setPhotoUrl] = useState('')
   const [photoShape, setPhotoShape] = useState('circle') // 'circle' | 'arch' | 'square'
-  const [photoSize, setPhotoSize] = useState(55) // px
+  const [photoSize, setPhotoSize] = useState(55) // control scale; 55 = 100%
+  const [bifoldBridePhotoUrl, setBifoldBridePhotoUrl] = useState('')
+  const [bifoldGroomPhotoUrl, setBifoldGroomPhotoUrl] = useState('')
   const [bgTextureUrl, setBgTextureUrl] = useState('')
   const [bgOverlayOpacity, setBgOverlayOpacity] = useState(88) // 0 - 100
   const [uploadingImage, setUploadingImage] = useState(false)
@@ -114,8 +116,8 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
   const fullUrl = invitationUrl(item.slug)
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(fullUrl)}&margin=10&format=png`
-  const bridePortraitUrl = item.bride?.photo || ''
-  const groomPortraitUrl = item.groom?.photo || ''
+  const bridePortraitUrl = bifoldBridePhotoUrl || item.bride?.photo || ''
+  const groomPortraitUrl = bifoldGroomPhotoUrl || item.groom?.photo || ''
 
   // Auto-fill from item data
   const handleAutoFill = () => {
@@ -154,6 +156,8 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       setPhotoUrl(item.gallery?.[0] || item.bride?.photo || '')
       setShowPhoto(true)
     }
+    setBifoldBridePhotoUrl(item.bride?.photo || '')
+    setBifoldGroomPhotoUrl(item.groom?.photo || '')
 
     setAutoFilled(true)
     setTimeout(() => setAutoFilled(false), 2000)
@@ -234,6 +238,14 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
   if (!item) return null
 
+  const photoScale = Math.max(0.55, Math.min(1.65, photoSize / 55))
+  const scaledPhotoMm = (baseMm) => `${Math.round(baseMm * photoScale * 10) / 10}mm`
+  const photoShapeClass = photoShape === 'circle'
+    ? 'rounded-full'
+    : photoShape === 'arch'
+      ? 'rounded-t-full rounded-b-xs'
+      : 'rounded-xs'
+
   // Handle Photo & BG Upload
   async function handleImageUpload(type, e) {
     const file = e.target.files?.[0]
@@ -246,6 +258,12 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         if (type === 'photo') {
           setPhotoUrl(dataUrl)
           setShowPhoto(true)
+        } else if (type === 'bifold-bride') {
+          setBifoldBridePhotoUrl(dataUrl)
+          setShowPhoto(true)
+        } else if (type === 'bifold-groom') {
+          setBifoldGroomPhotoUrl(dataUrl)
+          setShowPhoto(true)
         } else {
           setBgTextureUrl(dataUrl)
         }
@@ -254,6 +272,8 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
       uploadFile(file, uploadContext).then((res) => {
         if (type === 'photo') setPhotoUrl(res.url)
+        else if (type === 'bifold-bride') setBifoldBridePhotoUrl(res.url)
+        else if (type === 'bifold-groom') setBifoldGroomPhotoUrl(res.url)
         else setBgTextureUrl(res.url)
       }).catch(() => {})
     } catch (err) {
@@ -282,18 +302,18 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
   }
 
   // Render photo component
-  const renderPhotoBadge = (customSize = null) => {
+  const renderPhotoBadge = (baseMm) => {
     if (!showPhoto || !photoUrl) return null
-    const size = customSize || photoSize
-    const shapeClass = photoShape === 'circle' ? 'rounded-full' : photoShape === 'arch' ? 'rounded-t-full rounded-b-xs' : 'rounded-xs'
+    const size = scaledPhotoMm(baseMm)
     return (
-      <div className={`print-card-photo overflow-hidden border border-current/30 shadow-xs my-0.5 mx-auto ${shapeClass}`} style={{ width: `${size}px`, height: `${size}px` }}>
+      <div className={`print-card-photo overflow-hidden border border-current/30 shadow-xs my-0.5 mx-auto ${photoShapeClass}`} style={{ width: size, height: size }}>
         <img src={photoUrl} alt="Couple" className="w-full h-full object-cover object-top" />
       </div>
     )
   }
 
   const renderBifoldPortraits = () => {
+    if (!showPhoto) return null
     const portraits = [
       bridePortraitUrl ? { key: 'bride', src: bridePortraitUrl, label: formData.brideNick || 'Mempelai' } : null,
       groomPortraitUrl ? { key: 'groom', src: groomPortraitUrl, label: formData.groomNick || 'Mempelai' } : null,
@@ -305,7 +325,10 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       <div className="print-card-bifold-portraits flex items-start justify-center gap-4">
         {portraits.map((portrait) => (
           <div key={portrait.key} className="text-center space-y-1">
-            <div className="print-card-bifold-portrait overflow-hidden rounded-full border border-current/25 shadow-xs mx-auto">
+            <div
+              className={`print-card-bifold-portrait overflow-hidden border border-current/25 shadow-xs mx-auto ${photoShapeClass}`}
+              style={{ width: scaledPhotoMm(34), height: scaledPhotoMm(34) }}
+            >
               <img src={portrait.src} alt={portrait.label} className="w-full h-full object-cover object-top" />
             </div>
             <p className="print-card-bifold-portrait-label font-display font-semibold">{portrait.label}</p>
@@ -352,7 +375,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             <p className="print-card-subtitle text-[7.5px] opacity-85 leading-tight italic line-clamp-2">
               "{formData.subtitle || 'Terima kasih atas kehadiran & doa restu Anda'}"
             </p>
-            {renderPhotoBadge(32)}
+            {renderPhotoBadge(20)}
           </div>
           <div className="col-span-4 flex flex-col items-center justify-center text-center">
             <div className="p-0.5 bg-white rounded-xs border border-black/10 shadow-xs">
@@ -403,7 +426,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         </div>
 
         <div className="relative z-10 space-y-1 flex flex-col items-center w-full my-auto min-h-0">
-          {renderPhotoBadge(isA6 ? 36 : 55)}
+          {renderPhotoBadge(isA6 ? 18 : 30)}
           <div className={`bg-white rounded-xs border border-black/10 shadow-xs ${isA6 ? 'p-1' : 'p-1.5'}`}>
             <img src={qrCodeUrl} alt="QR Code" className={`print-card-qr ${isA6 ? 'w-14 h-14' : 'w-20 h-20'} object-contain`} />
           </div>
@@ -489,7 +512,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         <div className="relative z-10 space-y-0.5 my-auto w-full min-h-0">
           <h2 className={`print-card-table-number font-display font-black uppercase tracking-wider leading-none ${isA6 ? 'text-2xl' : 'text-4xl'}`}>{currentTable}</h2>
           <p className={`print-card-table-subtitle italic opacity-85 ${isA6 ? 'text-[7.5px]' : 'text-[9.5px]'}`}>{formData.subtitle || 'Selamat Menikmati Jamuan'}</p>
-          {renderPhotoBadge(isA6 ? 34 : 48)}
+          {renderPhotoBadge(isA6 ? 18 : 30)}
         </div>
 
         <div className="relative z-10 space-y-0.5 flex flex-col items-center">
@@ -655,10 +678,6 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           font-size: 2.7mm !important;
           line-height: 1.2 !important;
         }
-        .print-card-souvenir .print-card-photo {
-          width: 20mm !important;
-          height: 20mm !important;
-        }
         .print-card-souvenir .print-card-qr {
           width: 22mm !important;
           height: 22mm !important;
@@ -694,10 +713,6 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         .print-card-enclosure-a5 .print-card-date {
           font-size: 3.4mm !important;
         }
-        .print-card-enclosure-a5 .print-card-photo {
-          width: 30mm !important;
-          height: 30mm !important;
-        }
         .print-card-enclosure-a5 .print-card-qr {
           width: 34mm !important;
           height: 34mm !important;
@@ -727,10 +742,6 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         .print-card-enclosure-a6 .print-card-date {
           font-size: 2.7mm !important;
         }
-        .print-card-enclosure-a6 .print-card-photo {
-          width: 18mm !important;
-          height: 18mm !important;
-        }
         .print-card-enclosure-a6 .print-card-qr {
           width: 22mm !important;
           height: 22mm !important;
@@ -756,10 +767,6 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         .print-card-table-a5 .print-card-table-subtitle {
           font-size: 3.5mm !important;
         }
-        .print-card-table-a5 .print-card-photo {
-          width: 30mm !important;
-          height: 30mm !important;
-        }
         .print-card-table-a5 .print-card-table-qr {
           width: 30mm !important;
           height: 30mm !important;
@@ -783,10 +790,6 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         }
         .print-card-table-a6 .print-card-table-subtitle {
           font-size: 2.7mm !important;
-        }
-        .print-card-table-a6 .print-card-photo {
-          width: 18mm !important;
-          height: 18mm !important;
         }
         .print-card-table-a6 .print-card-table-qr {
           width: 22mm !important;
@@ -909,10 +912,6 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         .print-card-bifold .print-card-bifold-portraits {
           gap: 6mm !important;
           margin-bottom: 4mm !important;
-        }
-        .print-card-bifold .print-card-bifold-portrait {
-          width: 34mm !important;
-          height: 34mm !important;
         }
         .print-card-bifold .print-card-bifold-portrait-label {
           font-size: 3.3mm !important;
@@ -1094,6 +1093,8 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           bgOverlayOpacity={bgOverlayOpacity}
           bgTexturePresets={bgTexturePresets}
           bgTextureUrl={bgTextureUrl}
+          bifoldBridePhotoUrl={bridePortraitUrl}
+          bifoldGroomPhotoUrl={groomPortraitUrl}
           cardType={cardType}
           copied={copied}
           customTableListText={customTableListText}

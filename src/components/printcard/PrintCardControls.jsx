@@ -8,6 +8,8 @@ export default function PrintCardControls({ activeTab,
   bgOverlayOpacity,
   bgTexturePresets,
   bgTextureUrl,
+  bifoldBridePhotoUrl,
+  bifoldGroomPhotoUrl,
   cardType,
   copied,
   customTableListText,
@@ -63,7 +65,10 @@ export default function PrintCardControls({ activeTab,
                 <button
                   key={cVal}
                   type="button"
-                  onClick={() => setCardType(cVal)}
+                  onClick={() => {
+                    setCardType(cVal)
+                    if (cVal !== 'table' && activeTab === 'table') setActiveTab('text')
+                  }}
                   className={`py-2 px-2 text-[11px] font-semibold uppercase tracking-wider border rounded-xs transition-colors ${
                     cardType === cVal ? 'bg-ink text-ivory border-ink' : 'bg-white border-ink/15 text-stone hover:text-ink'
                   }`}
@@ -288,20 +293,43 @@ export default function PrintCardControls({ activeTab,
 
                 {showPhoto && (
                   <div className="space-y-2 pt-1">
-                    <div className="flex items-center gap-2">
-                      {photoUrl && (
-                        <img src={photoUrl} alt="Thumb" className="w-10 h-10 object-cover rounded-xs border" />
-                      )}
-                      <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors inline-flex items-center gap-1">
-                        <Upload size={12} /> {uploadingImage ? 'Mengunggah...' : 'Upload Foto Sendiri'}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => handleImageUpload('photo', e)}
-                        />
-                      </label>
-                    </div>
+                    {cardType === 'bifold' ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          ['bifold-bride', 'Mempelai Wanita', bifoldBridePhotoUrl],
+                          ['bifold-groom', 'Mempelai Pria', bifoldGroomPhotoUrl],
+                        ].map(([uploadType, label, src]) => (
+                          <div key={uploadType} className="border border-ink/10 bg-white/70 p-2 space-y-1.5">
+                            <p className="text-[9px] uppercase tracking-wider text-stone font-semibold">{label}</p>
+                            {src && <img src={src} alt={label} className="w-12 h-12 object-cover rounded-full border mx-auto" />}
+                            <label className="cursor-pointer border border-ink/20 bg-white text-ink px-2 py-1 text-[9px] uppercase tracking-wider hover:bg-ink/5 inline-flex items-center gap-1 justify-center w-full">
+                              <Upload size={11} /> Ganti Foto
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleImageUpload(uploadType, e)}
+                              />
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        {photoUrl && (
+                          <img src={photoUrl} alt="Thumb" className="w-10 h-10 object-cover rounded-xs border" />
+                        )}
+                        <label className="cursor-pointer border border-ink bg-ink text-ivory px-3 py-1.5 text-[10px] uppercase tracking-wider hover:bg-gold-deep transition-colors inline-flex items-center gap-1">
+                          <Upload size={12} /> {uploadingImage ? 'Mengunggah...' : 'Upload Foto Sendiri'}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleImageUpload('photo', e)}
+                          />
+                        </label>
+                      </div>
+                    )}
 
                     {/* Photo Shape & Size */}
                     <div className="grid grid-cols-3 gap-1 pt-1">
@@ -319,8 +347,8 @@ export default function PrintCardControls({ activeTab,
 
                     <div>
                       <div className="flex justify-between text-[10px] text-stone mb-0.5">
-                        <span>Ukuran Foto:</span>
-                        <span className="font-mono">{photoSize}px</span>
+                        <span>Skala Foto:</span>
+                        <span className="font-mono">{Math.round((photoSize / 55) * 100)}%</span>
                       </div>
                       <input
                         type="range"
