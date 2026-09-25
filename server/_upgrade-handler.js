@@ -1,7 +1,7 @@
-import { adminDb } from '../server/_firebase.js'
-import { verifyPrivilegedAdmin } from '../server/_auth.js'
-import { resolveOrderPackage } from '../server/_package-pricing.js'
-import { calculateUpgrade } from '../server/_upgrade-pricing.js'
+import { adminDb } from './_firebase.js'
+import { verifyPrivilegedAdmin } from './_auth.js'
+import { resolveOrderPackage } from './_package-pricing.js'
+import { calculateUpgrade } from './_upgrade-pricing.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -10,8 +10,8 @@ export default async function handler(req, res) {
     if (typeof slug !== 'string' || !/^[a-z0-9-_]{2,80}$/.test(slug)) {
       return res.status(400).json({ error: 'Undangan tidak valid.' })
     }
-    const confirm = action === 'confirm'
-    if (!confirm && action !== 'request') return res.status(400).json({ error: 'Aksi tidak valid.' })
+    const confirm = action === 'upgrade-confirm'
+    if (!confirm && action !== 'upgrade-request') return res.status(400).json({ error: 'Aksi tidak valid.' })
     if (confirm) {
       if (!await verifyPrivilegedAdmin(req, req.body)) return res.status(403).json({ error: 'Akses admin diperlukan.' })
     } else {

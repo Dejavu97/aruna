@@ -328,9 +328,9 @@ export async function setInvitationStatus(slug, status) {
 }
 
 export async function upgradePackage(slug, targetPackageId, editKey) {
-  const res = await fetch('/api/upgrade-package', {
+  const res = await fetch('/api/update-invitation', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ slug, targetPackageId, editKey, action: 'request' }),
+    body: JSON.stringify({ slug, targetPackageId, editKey, action: 'upgrade-request' }),
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(data.error || 'Gagal mengajukan upgrade.')
@@ -339,9 +339,9 @@ export async function upgradePackage(slug, targetPackageId, editKey) {
 
 export async function confirmPackageUpgrade(slug) {
   const creds = await getAdminCredentials()
-  const res = await fetch('/api/upgrade-package', {
+  const res = await fetch('/api/update-invitation', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ slug, action: 'confirm', ...creds }),
+    body: JSON.stringify({ slug, action: 'upgrade-confirm', ...creds }),
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(data.error || 'Gagal mengonfirmasi upgrade.')

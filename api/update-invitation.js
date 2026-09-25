@@ -3,6 +3,7 @@ import { verifyPrivilegedAdmin } from '../server/_auth.js';
 import { hasPrivilegedAdminCredential } from '../server/_admin-guard.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import { partitionInvitationUpdate } from '../server/_invitation-lifecycle.js';
+import handleUpgrade from '../server/_upgrade-handler.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -13,6 +14,9 @@ export default async function handler(req, res) {
     const body = req.body || null
     if (!body || typeof body !== 'object' || Array.isArray(body)) {
       return res.status(400).json({ error: 'Body JSON tidak valid.' })
+    }
+    if (body.action === 'upgrade-request' || body.action === 'upgrade-confirm') {
+      return handleUpgrade(req, res)
     }
     const { slug, editKey, payload } = body
 
