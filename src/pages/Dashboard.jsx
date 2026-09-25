@@ -230,14 +230,6 @@ export default function Dashboard() {
 
                     {/* Card Actions Footer */}
                     <div className="p-4 bg-ivory/60 border-t border-ink/10 grid grid-cols-2 gap-2 text-xs">
-                      {canUpgrade && (
-                        <Link
-                          to={invitePath(`/kelola/${item.slug}`, { key: getEditKey(item.slug), from: 'customer' })}
-                          className="col-span-2 border border-gold-deep bg-gold-deep/10 text-gold-deep py-2.5 text-center uppercase tracking-wider font-bold rounded-xs hover:bg-gold-deep hover:text-white transition-colors"
-                        >
-                          ↑ Upgrade Paket
-                        </Link>
-                      )}
                       <Link
                         to={`/kelola/${item.slug}?from=customer`}
                         className="bg-ink text-ivory py-2 text-center uppercase tracking-wider font-semibold rounded-xs hover:bg-gold-deep transition-colors"
@@ -261,14 +253,24 @@ export default function Dashboard() {
                         </Link>
                       )}
 
-                      <a
-                        href={invitationUrl(item.slug)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="col-span-2 text-center text-xs text-stone hover:text-ink underline flex items-center justify-center gap-1 pt-1"
-                      >
-                        <ExternalLink size={12} /> Buka Undangan Tamu
-                      </a>
+                      <div className="col-span-2 flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-ink/10 pt-2">
+                        <a
+                          href={invitationUrl(item.slug)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-stone hover:text-ink underline"
+                        >
+                          <ExternalLink size={12} /> Buka undangan
+                        </a>
+                        {canUpgrade && (
+                          <Link
+                            to={invitePath(`/kelola/${item.slug}`, { key: getEditKey(item.slug), from: 'customer' })}
+                            className="inline-flex items-center gap-1 font-bold text-gold-deep hover:underline"
+                          >
+                            Upgrade paket <span aria-hidden="true">→</span>
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </article>
                 )
