@@ -8,11 +8,17 @@ import { defaultWaTemplates, fetchWaTemplates } from './api-wa-templates'
 
 const ADMIN_KEY = 'aruna.adminKey'
 const EDIT_KEYS = 'aruna.editKeys'
+const ADMIN_EMAIL = 'admin@byaruna.my.id'
 
 export function getAdminKey() {
-  if (auth.currentUser) return 'firebase-admin'
+  if (auth.currentUser?.email === ADMIN_EMAIL) return 'firebase-admin'
   try {
-    return localStorage.getItem(ADMIN_KEY) || ''
+    const stored = localStorage.getItem(ADMIN_KEY) || ''
+    if (stored === 'firebase-admin') {
+      localStorage.removeItem(ADMIN_KEY)
+      return ''
+    }
+    return stored
   } catch {
     return ''
   }
@@ -24,7 +30,9 @@ export function setAdminKey(key) {
       localStorage.setItem(ADMIN_KEY, key)
     } else {
       localStorage.removeItem(ADMIN_KEY)
-      signOut(auth).catch(() => {})
+      if (auth.currentUser?.email === ADMIN_EMAIL) {
+        signOut(auth).catch(() => {})
+      }
     }
   } catch {}
 }
@@ -289,7 +297,7 @@ export async function fetchAdminInvitations() {
 // Kredensial admin untuk serverless: ID token (sesi Firebase email admin)
 // atau password tersimpan (sesi password-kustom tanpa Firebase session).
 async function getAdminCredentials() {
-  if (auth.currentUser) {
+  if (auth.currentUser?.email === ADMIN_EMAIL) {
     try {
       return { idToken: await auth.currentUser.getIdToken() }
     } catch {}

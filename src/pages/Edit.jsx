@@ -13,7 +13,7 @@ export default function Edit() {
   const navigate = useNavigate()
   const [item, setItem] = useState(null)
   const [customThemes, setCustomThemes] = useState([])
-  const hasAdminKey = Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
+  const hasAdminKey = Boolean(getAdminKey())
   const fromAdmin = params.get('from') === 'admin' && hasAdminKey
   const initialKey = params.get('key') || getEditKey(slug) || (fromAdmin ? 'admin-bypass' : '')
   const [key, setKey] = useState(initialKey)
@@ -70,7 +70,7 @@ export default function Edit() {
     setError('')
     try {
       await updateInvitation(slug, payload, key)
-      if (params.get('from') === 'admin') navigate('/admin')
+      if (fromAdmin) navigate('/admin')
       else navigate(`/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`)
     } catch (err) {
       setError(err.message)

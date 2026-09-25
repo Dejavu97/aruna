@@ -35,9 +35,9 @@ export function useManageState() {
   const [params] = useSearchParams()
   const queryKey = params.get('key') || ''
   const from = params.get('from') || (getAdminKey() && !queryKey ? 'admin' : '')
-  const adminLoggedIn = Boolean(getAdminKey() || (typeof window !== 'undefined' && localStorage.getItem('aruna.adminKey')))
+  const adminLoggedIn = Boolean(getAdminKey())
   const editKey = queryKey || getEditKey(slug) || (adminLoggedIn ? 'admin-bypass' : '')
-  const isAdmin = from === 'admin' || adminLoggedIn
+  const isAdmin = from === 'admin' && adminLoggedIn
 
   const [item, setItem] = useState(null)
   const [text, setText] = useState('')
