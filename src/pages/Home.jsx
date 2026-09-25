@@ -3,9 +3,9 @@ import { ArrowRight, Megaphone, Sparkles, Wand2, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { faqs, features, formatRupiah, packages, site, steps, waLink } from '../data/site'
+import { faqs, features, formatRupiah, getPackagesByEventType, site, steps, waLink } from '../data/site'
 import { themes } from '../data/themes'
-import { getAnnouncement } from '../lib/api'
+import { fetchDynamicPackages, getAnnouncement } from '../lib/api'
 import AdSlot from '../components/AdSlot'
 import InteractiveVideoTeaser from '../components/InteractiveVideoTeaser'
 import ClientTestimonials from '../components/ClientTestimonials'
@@ -430,13 +430,26 @@ function FeatureGrid() {
 }
 
 function Pricing() {
+  const [currentPackages, setCurrentPackages] = useState(null)
+  const [pricingError, setPricingError] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    fetchDynamicPackages()
+      .then((saved) => { if (active) setCurrentPackages(getPackagesByEventType('wedding', saved)) })
+      .catch(() => { if (active) setPricingError(true) })
+    return () => { active = false }
+  }, [])
+
   return (
     <section id="harga" className="bg-transparent py-20 text-ink">
       <div className="mx-auto max-w-6xl px-5">
         <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Harga jasa</p>
         <h2 className="mt-2 font-display text-4xl md:text-5xl">Jelas dari awal. Tidak ada biaya mengejutkan.</h2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {packages.map((p) => (
+          {pricingError && <p className="text-sm text-stone">Harga paket belum dapat dimuat. Coba muat ulang halaman.</p>}
+          {!currentPackages && !pricingError && <p className="text-sm text-stone">Memuat harga paket...</p>}
+          {(currentPackages || []).map((p) => (
             <article
               key={p.id}
               className={`flex flex-col border p-6 bg-transparent ${p.popular ? 'border-gold' : 'border-ink/15'}`}

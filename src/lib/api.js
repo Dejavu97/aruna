@@ -87,13 +87,11 @@ export async function savePaymentSettings(settings) {
 }
 
 export async function fetchDynamicPackages() {
-  try {
-    const docRef = doc(db, 'settings', 'packages')
-    const snap = await getDoc(docRef)
-    if (snap.exists() && Array.isArray(snap.data().packages)) {
-      return snap.data().packages
-    }
-  } catch {}
+  const docRef = doc(db, 'settings', 'packages')
+  const snap = await getDoc(docRef)
+  if (snap.exists() && Array.isArray(snap.data().packages)) {
+    return snap.data().packages
+  }
   return null
 }
 
@@ -633,4 +631,3 @@ export async function fetchUserInvitations(uid, email) {
 }
 
 export { fetchPublicTestimonials, submitPublicTestimonial } from './api-testimonials'
-

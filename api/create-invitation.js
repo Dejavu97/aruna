@@ -3,6 +3,7 @@ import { adminAuth, adminDb } from '../server/_firebase.js'
 import { getClientIp, verifyPrivilegedAdmin } from '../server/_auth.js'
 import { buildCloudinaryUploadAuthorization, createUploadCapability } from '../server/_cloudinary-upload.js'
 import { createNotificationProof } from '../server/_notification-proof.js'
+import { resolveOrderPackage } from '../server/_package-pricing.js'
 import {
   buildCreationRecords,
   createInvitationRecords,
@@ -148,6 +149,13 @@ export default async function handler(req, res) {
       now: Date.now(),
       allowPremiumWatermark: isRestore && payload.status === 'paid',
     })
+    if (!isRestore) {
+      // Never trust a price sent by the browser. Freeze the current server-side
+      // package price on the order so later admin edits cannot change its bill.
+      const currentPackage = await resolveOrderPackage(adminDb, payload.packageId, payload.eventType)
+      records.privateData.packagePrice = currentPackage.price
+      records.privateData.packageName = currentPackage.name
+    }
     // Restore adalah jalur admin-terautentikasi; normal create/clone tetap unpaid.
     if (isRestore && payload.status === 'paid') records.publicData.status = 'paid'
     await createInvitationRecords(adminDb, slug, records)

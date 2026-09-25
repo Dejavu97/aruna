@@ -3,7 +3,7 @@ import { auth } from '../../lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { changeAdminPassword, cloneInvitation, createFullBackupData, defaultMaintenanceSettings, defaultSeoSettings, defaultSiteProfile, defaultWaTemplates, deleteCustomTheme, deleteInvitation, deleteVoucher, fetchAdSettings, fetchAdminInvitations, fetchCustomThemes, fetchDynamicPackages, fetchMaintenanceSettings, fetchSeoSettings, fetchSettings, fetchSiteProfile, fetchVouchers, fetchWaTemplates, getAnnouncement, restoreFullBackupData, saveAdSettings, saveAnnouncement, saveDynamicPackages, saveMaintenanceSettings, savePaymentSettings, saveSeoSettings, saveSiteProfile, saveVoucher, saveWaTemplates, updateInvitation, uploadFile } from '../../lib/api'
 import { themes } from '../../data/themes'
-import { formatRupiah, getPackageById, packages as defaultPackages } from '../../data/site'
+import { formatRupiah, getOrderPackage, packages as defaultPackages } from '../../data/site'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
 import { getDummyWeddingData } from '../../data/dummyData'
 
@@ -249,8 +249,7 @@ export function useAdminState() {
     let totalViews = 0
 
     items.forEach((item) => {
-      const pack = adminPackages.find((p) => p.id === item.packageId) || defaultPackages.find((p) => p.id === item.packageId)
-      const price = pack ? pack.price : 0
+      const price = getOrderPackage(item, adminPackages).price
       const isPast = new Date(item.date).getTime() < now
 
       if (item.status === 'paid') {
@@ -609,7 +608,7 @@ export function useAdminState() {
   // Format Dynamic WhatsApp Message with Variables
   function formatWaMessage(type, item, customVars = {}) {
     const rawTemplate = waTemplates[type] || defaultWaTemplates[type] || ''
-    const pack = getPackageById(item?.packageId, item?.eventType)
+    const pack = getOrderPackage(item, adminPackages)
     const clientUrl = `${window.location.origin}/kelola/${item?.slug}?key=${item?.editKey || ''}`
     const invUrl = invitationUrl(item?.slug || '')
     const priceText = pack ? formatRupiah(pack.price) : ''

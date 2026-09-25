@@ -254,13 +254,35 @@ export const eventPackages = {
   ],
 }
 
-export function getPackagesByEventType(eventType = 'wedding') {
-  return eventPackages[eventType] || eventPackages.wedding
+export function getPackagesByEventType(eventType = 'wedding', savedPackages = null) {
+  const defaults = eventPackages[eventType] || eventPackages.wedding
+  // Admin pricing currently edits wedding packages only. IDs are reused by
+  // other event types, so never apply wedding prices to their packages.
+  if (eventType !== 'wedding' || !Array.isArray(savedPackages)) return defaults
+  return defaults.map((base) => {
+    const saved = savedPackages.find((p) => p?.id === base.id)
+    if (!saved) return base
+    const price = Number(saved.price)
+    return {
+      ...base,
+      ...saved,
+      id: base.id,
+      price: Number.isFinite(price) && price >= 0 ? price : base.price,
+      features: Array.isArray(saved.features) ? saved.features : base.features,
+    }
+  })
 }
 
-export function getPackageById(packageId, eventType = 'wedding') {
-  const list = getPackagesByEventType(eventType)
+export function getPackageById(packageId, eventType = 'wedding', savedPackages = null) {
+  const list = getPackagesByEventType(eventType, savedPackages)
   return list.find((p) => p.id === packageId) || list.find((p) => p.popular) || list[0] || packages[0]
+}
+
+export function getOrderPackage(order, savedPackages = null) {
+  const current = getPackageById(order?.packageId, order?.eventType, savedPackages)
+  const recordedPrice = Number(order?.packagePrice)
+  if (order?.packagePrice == null || !Number.isFinite(recordedPrice) || recordedPrice < 0) return current
+  return { ...current, name: order.packageName || current.name, price: recordedPrice }
 }
 
 export const packages = eventPackages.wedding

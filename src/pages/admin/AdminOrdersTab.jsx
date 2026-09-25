@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { getDemoByTheme, getTheme, themes } from '../../data/themes'
-import { formatRupiah, packages as defaultPackages, getPackageById } from '../../data/site'
+import { formatRupiah, getOrderPackage } from '../../data/site'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
 import { invitePath } from '../../lib/nav'
 
@@ -149,7 +149,7 @@ export default function AdminOrdersTab({ adminPackages,
           <div className="grid gap-4">
             {filteredOrders.map((item) => {
               const theme = getTheme(item.themeId, customThemesList)
-              const pack = adminPackages.find((p) => p.id === item.packageId) || defaultPackages.find((p) => p.id === item.packageId)
+              const pack = getOrderPackage(item, adminPackages)
               const hadir = (item.rsvps || []).filter((r) => r.status === 'hadir')
               const heads = hadir.reduce((n, r) => n + Number(r.guests || 1), 0)
               const totalPrice = pack ? pack.price : 0

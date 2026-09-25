@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { formatRupiah, packages, getPackagesByEventType } from '../data/site'
+import { formatRupiah, getPackagesByEventType } from '../data/site'
+import { fetchDynamicPackages } from '../lib/api'
 import { getTheme, themes, getThemeFeatures, getFormMode } from '../data/themes'
 import { getDummyWeddingData } from '../data/dummyData'
 import MediaUpload from './MediaUpload'
@@ -96,7 +97,11 @@ export default function InvitationForm({
   const [step, setStep] = useState(0)
   const [showPreview, setShowPreview] = useState(false)
   const [form, setForm] = useState(initial || blankInvitation(themeId, customThemes))
+  const [dynamicPackages, setDynamicPackages] = useState(null)
+  const [packagesReady, setPackagesReady] = useState(mode !== 'create')
+  const [pricingError, setPricingError] = useState('')
   const draftKey = `aruna.draft.${themeId}`
+  const availablePackages = getPackagesByEventType(formConfig.eventType, dynamicPackages)
 
   const showBanks = formConfig.showBanks && features.banks
   const showDress = formConfig.showDressLive && features.dressCode
@@ -130,6 +135,19 @@ export default function InvitationForm({
     { id: 'pemesan', label: mode === 'create' ? 'Data Diri' : 'Pemesan' },
     ...(mode === 'create' ? [{ id: 'review', label: 'Review' }] : []),
   ]
+
+  const reviewingOrder = steps[step]?.id === 'review'
+  useEffect(() => {
+    if (mode !== 'create') return
+    let active = true
+    setPackagesReady(false)
+    setPricingError('')
+    fetchDynamicPackages()
+      .then((list) => { if (active) setDynamicPackages(list) })
+      .catch(() => { if (active) setPricingError('Harga paket gagal dimuat. Muat ulang halaman sebelum memesan.') })
+      .finally(() => { if (active) setPackagesReady(true) })
+    return () => { active = false }
+  }, [mode, themeId, reviewingOrder])
 
   useEffect(() => {
     if (mode !== 'create') return
@@ -192,6 +210,10 @@ export default function InvitationForm({
 
   function submit(e) {
     e.preventDefault()
+    if (mode === 'create' && (!packagesReady || pricingError)) {
+      onSubmit(null, pricingError || 'Harga paket masih dimuat. Tunggu sebentar lalu coba lagi.')
+      return
+    }
     const needPerson2 = formConfig.showPerson2
     if (!form.bride.nick || (needPerson2 && !form.groom.nick) || !form.date) {
       onSubmit(
@@ -713,7 +735,10 @@ export default function InvitationForm({
           <div className="grid gap-5">
             {mode === 'create' && (
               <div className="grid gap-3">
-                {getPackagesByEventType(formConfig.eventType).map((p) => (
+                {(!packagesReady || pricingError) && (
+                  <p className="text-sm text-stone">{pricingError || 'Memuat harga paket terbaru...'}</p>
+                )}
+                {packagesReady && !pricingError && availablePackages.map((p) => (
                   <label
                     key={p.id}
                     className={`flex cursor-pointer items-start justify-between gap-4 border p-4 transition-colors ${
@@ -820,7 +845,7 @@ export default function InvitationForm({
 
         {/* STEP: REVIEW / KONFIRMASI (create only) */}
         {steps[step]?.id === 'review' && (() => {
-          const pkgList = getPackagesByEventType(formConfig.eventType)
+          const pkgList = availablePackages
           const pkg = pkgList.find((p) => p.id === form.packageId) || pkgList[0]
           const couple = formConfig.showPerson2
             ? `${form.bride.nick || '-'} & ${form.groom.nick || '-'}`
@@ -845,7 +870,9 @@ export default function InvitationForm({
                 <div className="flex items-start justify-between gap-3 border-b border-ink/10 pb-3">
                   <div>
                     <p className="text-[11px] uppercase tracking-wider text-stone font-semibold">Paket</p>
-                    <p className="font-display text-xl text-ink">{pkg?.name || form.packageId} — {pkg?.price === 0 ? 'Rp 0 (Gratis)' : formatRupiah(pkg?.price || 0)}</p>
+                    <p className="font-display text-xl text-ink">{!packagesReady || pricingError
+                      ? (pricingError || 'Memuat harga paket terbaru...')
+                      : `${pkg?.name || form.packageId} — ${pkg?.price === 0 ? 'Rp 0 (Gratis)' : formatRupiah(pkg?.price || 0)}`}</p>
                     {form.voucher && <p className="text-xs text-stone mt-0.5">Voucher: {form.voucher}</p>}
                   </div>
                   <button type="button" onClick={() => setStep(steps.findIndex((s) => s.id === 'pemesan'))} className="text-xs underline shrink-0">Ubah</button>

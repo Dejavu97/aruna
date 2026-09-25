@@ -65,7 +65,11 @@ async function getPackages() {
   } catch {}
   return FALLBACK_PACKAGES;
 }
-function packOf(list, id) {
+function packOf(list, inv) {
+  const id = inv.packageId;
+  if (inv.packagePrice !== undefined && Number.isSafeInteger(Number(inv.packagePrice))) {
+    return { id, name: inv.packageName || id, price: Number(inv.packagePrice) };
+  }
   return list.find((p) => p.id === id) || { id, name: id || '-', price: 0 };
 }
 async function getWaTemplates() {
@@ -114,7 +118,7 @@ function fillTemplate(raw, vars) {
 }
 async function buildWaText(type, inv, packages) {
   const tpl = await getWaTemplates();
-  const pack = packOf(packages, inv.packageId);
+  const pack = packOf(packages, inv);
   const editKey = await getEditKey(inv.slug);
   const base = baseUrl();
   const year = new Date(inv.createdAt || Date.now()).getFullYear();
@@ -150,7 +154,7 @@ async function cmdStats(chatId) {
   for (const it of items) {
     views += Number(it.views || 0);
     for (const r of it.rsvps || []) if (r.status === 'hadir') hadir += Number(r.guests || 1);
-    if (it.status === 'paid') { paid++; revenue += Number(packOf(packages, it.packageId).price || 0); }
+    if (it.status === 'paid') { paid++; revenue += Number(packOf(packages, it).price || 0); }
     else unpaid++;
   }
   await send(chatId,
@@ -167,7 +171,7 @@ async function cmdBelum(chatId) {
   if (!list.length) return send(chatId, `✅ Tidak ada order belum bayar.`);
   // Satu kartu per order (maks 8) — tombol terikat slug spesifik, tanpa ketik kode
   for (const it of list) {
-    const p = packOf(packages, it.packageId);
+    const p = packOf(packages, it);
     await send(chatId,
       `⏳ <b>${escapeHtml(it.orderCode || it.slug)}</b> — ${escapeHtml(coupleOf(it))}\n${escapeHtml(p.name)} · ${rupiah(p.price)} · ${escapeHtml(it.customerName || '-')} (${escapeHtml(it.customerWhatsapp || '-')})`,
       { reply_markup: { inline_keyboard: [[
@@ -186,7 +190,7 @@ async function cmdCari(chatId, arg) {
   const found = matchQuery(items, arg).slice(0, 5);
   if (!found.length) return send(chatId, `🔍 Tidak ketemu untuk “${escapeHtml(arg)}”.`);
   for (const it of found) {
-    const p = packOf(packages, it.packageId);
+    const p = packOf(packages, it);
     await send(chatId,
       `${it.status === 'paid' ? '✅' : '⏳'} <b>${escapeHtml(it.orderCode || it.slug)}</b> — ${escapeHtml(coupleOf(it))}\n${escapeHtml(p.name)} · ${rupiah(p.price)} · ${escapeHtml(it.customerName || '-')} (${escapeHtml(it.customerWhatsapp || '-')}) · <a href="${baseUrl()}/u/${it.slug}">${escapeHtml(it.slug)}</a>`,
       { reply_markup: { inline_keyboard: [[
@@ -209,7 +213,7 @@ async function cmdLunas(chatId, arg) {
   const it = found[0];
   if (it.status === 'paid') return send(chatId, `✅ ${escapeHtml(it.orderCode || it.slug)} sudah LUNAS.`);
   const packages = await getPackages();
-  const p = packOf(packages, it.packageId);
+  const p = packOf(packages, it);
   await send(chatId,
     `Tandai <b>LUNAS</b>?\n\n• ${escapeHtml(it.orderCode || it.slug)} — ${escapeHtml(coupleOf(it))}\n• ${escapeHtml(p.name)} — ${rupiah(p.price)}\n• ${escapeHtml(it.customerName || '-')} (${escapeHtml(it.customerWhatsapp || '-')})`,
     { reply_markup: { inline_keyboard: [[
@@ -305,7 +309,7 @@ async function handleCallback(query) {
     const inv = await getMergedInvitation(adminDb, slug);
     if (!inv) return send(chatId, `🔍 Order tidak ketemu.`);
     const packages = await getPackages();
-    const p = packOf(packages, inv.packageId);
+    const p = packOf(packages, inv);
     if (kind === 'ask') {
       if (inv.status === 'paid') return send(chatId, `✅ ${escapeHtml(inv.orderCode || slug)} sudah LUNAS.`);
       return send(chatId,

@@ -6,6 +6,8 @@ export const PRIVATE_INVITATION_FIELDS = Object.freeze([
   'customerNote',
   'orderCode',
   'voucher',
+  'packagePrice',
+  'packageName',
   'guests',
   'checkIns',
   'waTemplate',
@@ -20,6 +22,8 @@ const SERVER_CONTROLLED_FIELDS = Object.freeze([
   'schemaVersion',
   'editKey',
   'orderCode',
+  'packagePrice',
+  'packageName',
   'views',
   'rsvps',
   'wishes',
@@ -40,6 +44,9 @@ const IMMUTABLE_UPDATE_FIELDS = Object.freeze([
   'updatedAt',
   'schemaVersion',
   'editKey',
+  'packageId',
+  'packagePrice',
+  'packageName',
   'customDomain',
 ])
 

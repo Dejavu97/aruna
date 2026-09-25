@@ -18,7 +18,7 @@ import SocialMockupModal from '../../components/SocialMockupModal'
 import { getDemoByTheme, getTheme, themes } from '../../data/themes'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
 import { getDummyWeddingData } from '../../data/dummyData'
-import { formatRupiah, packages as defaultPackages, getPackageById } from '../../data/site'
+import { formatRupiah, getOrderPackage } from '../../data/site'
 import { invitePath } from '../../lib/nav'
 
 /** AdminModals — semua modal Panel Admin, diekstrak verbatim (Fase 3, perilaku identik). */
@@ -135,7 +135,7 @@ export default function AdminModals({ adminPackages,
 
   {/* INVOICE & KWITANSI RESMI MODAL */}
   {invoiceModalItem && (() => {
-    const pack = adminPackages.find((p) => p.id === invoiceModalItem.packageId) || defaultPackages.find((p) => p.id === invoiceModalItem.packageId)
+    const pack = getOrderPackage(invoiceModalItem, adminPackages)
     const isPaid = invoiceModalItem.status === 'paid'
     const invNumber = `INV/AR-${invoiceModalItem.orderCode || '0000'}/${new Date(invoiceModalItem.createdAt || Date.now()).getFullYear()}`
     const invDate = formatLongDate(new Date(invoiceModalItem.createdAt || Date.now()).toISOString())

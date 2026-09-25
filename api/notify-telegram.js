@@ -83,7 +83,9 @@ export default async function handler(req, res) {
     }
 
     const base = (process.env.SITE_BASE_URL || 'https://byaruna.my.id').replace(/\/$/, '');
-    const { name, price } = await resolvePrice(inv.packageId, inv.eventType);
+    const { name, price } = Number.isSafeInteger(Number(inv.packagePrice)) && inv.packagePrice !== undefined
+      ? { name: inv.packageName || inv.packageId, price: Number(inv.packagePrice) }
+      : await resolvePrice(inv.packageId, inv.eventType);
     const bride = inv.bride?.nick || inv.bride?.full || '-';
     const groom = inv.groom?.nick || inv.groom?.full || '-';
     const couple = groom && groom !== '-' ? `${bride} &amp; ${groom}` : escapeHtml(bride);

@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchInvitation, fetchSettings, getEditKey, rememberEditKey } from '../lib/api'
+import { fetchDynamicPackages, fetchInvitation, fetchSettings, getEditKey, rememberEditKey } from '../lib/api'
 import { copyText, invitationUrl } from '../lib/utils'
-import { formatRupiah, getPackageById, waLink } from '../data/site'
+import { formatRupiah, getOrderPackage, waLink } from '../data/site'
 import AdSlot from '../components/AdSlot'
 import LoveQRCardGenerator from '../components/LoveQRCardGenerator'
 import { CheckCircle2, AlertTriangle } from 'lucide-react'
@@ -14,6 +14,10 @@ export default function Success() {
   const [params] = useSearchParams()
   const [data, setData] = useState(null)
   const [bank, setBank] = useState(null)
+  const [dynamicPackages, setDynamicPackages] = useState(null)
+  const [pricingReady, setPricingReady] = useState(false)
+  const [pricingError, setPricingError] = useState(false)
+  const [orderError, setOrderError] = useState('')
   const [copied, setCopied] = useState('')
   const editKey = params.get('key') || getEditKey(slug)
   const url = invitationUrl(slug)
@@ -25,13 +29,19 @@ export default function Success() {
   useEffect(() => {
     fetchInvitation(slug, editKey)
       .then(setData)
-      .catch(() => setData(null))
+      .catch(() => setOrderError('Data pesanan gagal dimuat. Coba muat ulang halaman.'))
     fetchSettings()
       .then((s) => setBank(s.bank))
       .catch(() => {})
+    fetchDynamicPackages()
+      .then(setDynamicPackages)
+      .catch(() => setPricingError(true))
+      .finally(() => setPricingReady(true))
   }, [slug, editKey])
 
-  const pack = getPackageById(data?.packageId, data?.eventType)
+  const pack = getOrderPackage(data, dynamicPackages)
+  const hasRecordedPrice = data?.packagePrice != null
+    && Number.isFinite(Number(data.packagePrice)) && Number(data.packagePrice) >= 0
 
   async function copy(value, key) {
     if (await copyText(value)) {
@@ -108,7 +118,13 @@ Mohon dicek pembayarannya.`
           />
         </div>
 
-        {pack.price > 0 ? (
+        {orderError || (!hasRecordedPrice && pricingError) ? (
+          <p className="mt-5 border border-red-200 bg-red-50 p-5 text-sm text-red-800">
+            {orderError || 'Harga paket gagal dimuat. Muat ulang halaman sebelum melakukan pembayaran.'}
+          </p>
+        ) : !data || (!hasRecordedPrice && !pricingReady) ? (
+          <p className="mt-5 border border-ink/10 bg-paper p-5 text-sm text-stone">Memuat rincian pembayaran...</p>
+        ) : pack.price > 0 ? (
           <div className="mt-5 border border-gold/40 bg-paper p-5">
             <p className="text-[11px] uppercase tracking-[0.18em] text-gold-deep">Transfer paket {pack.name}</p>
             <p className="mt-2 font-display text-4xl">{formatRupiah(pack.price)}</p>
