@@ -36,9 +36,10 @@ export function useManageState() {
   const { slug } = useParams()
   const [params] = useSearchParams()
   const queryKey = params.get('key') || ''
+  const rememberedKey = getEditKey(slug)
   const from = params.get('from') || (getAdminKey() && !queryKey ? 'admin' : '')
   const adminLoggedIn = Boolean(getAdminKey())
-  const editKey = queryKey || getEditKey(slug) || (adminLoggedIn ? 'admin-bypass' : '')
+  const editKey = queryKey || rememberedKey || (adminLoggedIn ? 'admin-bypass' : '')
   const isAdmin = adminLoggedIn
   const hasCustomerSession = Boolean(user) && !isAdmin
 
@@ -76,10 +77,10 @@ export function useManageState() {
 
   const backHref = isAdmin
     ? '/admin'
-    : hasCustomerSession && !editKey
+    : hasCustomerSession
       ? '/dashboard'
       : backFromInvite(slug, { key: editKey, from: '' })
-  const backLabel = isAdmin ? '← Kembali ke admin' : hasCustomerSession && !editKey ? '← Kembali ke dashboard' : '← Kembali ke halaman bayar'
+  const backLabel = isAdmin ? '← Kembali ke admin' : hasCustomerSession ? '← Kembali ke dashboard' : '← Kembali ke halaman bayar'
 
   useEffect(() => {
     if (queryKey) rememberEditKey(slug, queryKey)
@@ -90,8 +91,10 @@ export function useManageState() {
   useEffect(() => {
     let live = true
     setLoading(true)
-    const invitationRequest = hasCustomerSession && !editKey
-      ? fetchOwnedInvitation(slug)
+    const invitationRequest = hasCustomerSession
+      ? fetchOwnedInvitation(slug).catch((ownerError) => (
+          editKey ? fetchInvitation(slug, editKey) : Promise.reject(ownerError)
+        ))
       : fetchInvitation(slug, editKey)
     Promise.all([
       invitationRequest,
@@ -475,7 +478,11 @@ export function useManageState() {
 
   async function reload() {
     try {
-      const data = hasCustomerSession && !editKey ? await fetchOwnedInvitation(slug) : await fetchInvitation(slug, editKey)
+      const data = hasCustomerSession
+        ? await fetchOwnedInvitation(slug).catch((ownerError) => (
+            editKey ? fetchInvitation(slug, editKey) : Promise.reject(ownerError)
+          ))
+        : await fetchInvitation(slug, editKey)
       setItem(data)
       setText((data.guests || []).join('\n'))
       if (data.waTemplate) setWaTemplate(data.waTemplate)

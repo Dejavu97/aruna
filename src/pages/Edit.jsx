@@ -38,7 +38,11 @@ export default function Edit() {
     async function load() {
       setLoading(true)
       try {
-        const data = hasCustomerSession && !key ? await fetchOwnedInvitation(slug) : await fetchInvitation(slug, key)
+        const data = hasCustomerSession
+          ? await fetchOwnedInvitation(slug).catch((ownerError) => (
+              key ? fetchInvitation(slug, key) : Promise.reject(ownerError)
+            ))
+          : await fetchInvitation(slug, key)
         if (live) {
           setItem(data)
         }
@@ -74,6 +78,7 @@ export default function Edit() {
     try {
       await updateInvitation(slug, payload, key)
       if (params.get('from') === 'admin') navigate('/admin')
+      else if (hasCustomerSession) navigate(`/kelola/${slug}?from=customer`)
       else if (key) navigate(`/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`)
       else navigate(`/kelola/${slug}?from=customer`)
     } catch (err) {
@@ -85,10 +90,10 @@ export default function Edit() {
 
   const backHref = fromAdmin
     ? '/admin'
-    : key
-      ? `/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`
-      : hasCustomerSession
-        ? '/dashboard'
+    : hasCustomerSession
+      ? '/dashboard'
+      : key
+        ? `/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`
         : '/'
 
   const isLocked = !fromAdmin && isEventEditLocked(item?.date, 1)
@@ -155,7 +160,7 @@ export default function Edit() {
             </div>
             <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
               <Link
-                to={key ? `/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer` : `/kelola/${slug}?from=customer`}
+                to={hasCustomerSession ? `/kelola/${slug}?from=customer` : key ? `/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer` : `/kelola/${slug}?from=customer`}
                 className="bg-ink text-ivory px-5 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors"
               >
                 Kembali ke Dashboard
@@ -177,7 +182,7 @@ export default function Edit() {
           themeId={item.themeId}
           initial={initialFormData}
           customThemes={customThemes}
-          uploadContext={fromAdmin ? { adminKey: getAdminKey() } : key ? { slug, editKey: key } : {}}
+          uploadContext={fromAdmin ? { adminKey: getAdminKey() } : hasCustomerSession ? {} : key ? { slug, editKey: key } : {}}
           mode="edit"
           submitting={busy}
           error={error}

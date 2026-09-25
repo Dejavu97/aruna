@@ -247,7 +247,7 @@ export default function Manage() {
               </span>
             ) : (
               <Link
-                to={invitePath(`/edit/${slug}`, { key: editKey, from: isAdmin ? 'admin' : 'customer' })}
+                to={invitePath(`/edit/${slug}`, { key: hasCustomerSession ? '' : editKey, from: isAdmin ? 'admin' : 'customer' })}
                 className="border border-ink/20 px-3 py-2 hover:border-gold-deep transition-colors"
               >
                 Edit data

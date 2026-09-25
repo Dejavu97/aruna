@@ -109,7 +109,7 @@ test('all Stage15H upload callers select the matching authority context', () => 
   assert.match(wedding, /uploadContext = \{\}/)
   assert.match(wedding, /uploadContext=\{uploadContext\}/)
   assert.match(media, /sendUpload\(file, uploadContext\)/)
-  assert.match(edit, /fromAdmin \? \{ adminKey: getAdminKey\(\) \} : key \? \{ slug, editKey: key \} : \{\}/)
+  assert.match(edit, /fromAdmin \? \{ adminKey: getAdminKey\(\) \} : hasCustomerSession \? \{\} : key \? \{ slug, editKey: key \} : \{\}/)
   assert.match(manage, /isAdmin \? \{ adminKey: getAdminKey\(\) \} : \{ slug, editKey \}/)
   assert.match(printCard, /uploadFile\(file, uploadContext\)/)
   assert.match(uploads, /action: 'upload-capability'/)

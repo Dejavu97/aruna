@@ -47,3 +47,10 @@ test('linked owner domain management can use account credentials without editKey
   assert.match(manageDomain, /addCustomDomain\(cleanDomain, slug, editKey\)/)
   assert.match(manageDomain, /removeCustomDomain\(prevDomain, slug, editKey\)/)
 })
+
+test('owner session wins over stale remembered edit keys and omits secrets from navigation', () => {
+  assert.match(manage, /fetchOwnedInvitation\(slug\)\.catch/)
+  assert.match(edit, /fetchOwnedInvitation\(slug\)\.catch/)
+  assert.match(manage, /hasCustomerSession \? '' : editKey/)
+  assert.match(edit, /hasCustomerSession\) navigate\(\`\/kelola\//)
+})
