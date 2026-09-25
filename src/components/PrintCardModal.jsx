@@ -571,13 +571,30 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       {/* ---------------------------------------------------- */}
       <style>{`
         /*
-         * One authoritative geometry for both preview and print.
-         * Screen mode only scales the full A4 page; it never resizes card internals.
+         * One physical A4 model for preview + print.
+         * Preview scales the entire page. Printed content uses the exact same geometry.
          */
+        .print-page,
+        .print-sheet {
+          box-sizing: border-box !important;
+        }
+        .print-page {
+          background: #fff;
+          overflow: hidden;
+        }
+        .print-page-portrait {
+          width: 210mm !important;
+          height: 297mm !important;
+          padding: 6mm !important;
+        }
+        .print-page-landscape {
+          width: 297mm !important;
+          height: 210mm !important;
+          padding: 6mm !important;
+        }
         .print-sheet {
           margin: 0 !important;
           padding: 0 !important;
-          box-sizing: border-box !important;
           overflow: hidden !important;
           display: flex !important;
           flex-direction: column !important;
@@ -591,6 +608,43 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           height: 198mm !important;
         }
 
+        /*
+         * Souvenir physical sizing. These rules apply to BOTH preview and print,
+         * so the screen preview is a true scaled copy of the printed card.
+         */
+        .print-card-souvenir {
+          padding: 4mm !important;
+        }
+        .print-card-souvenir .print-card-kicker,
+        .print-card-souvenir .print-card-date {
+          font-size: 2.1mm !important;
+          line-height: 1.15 !important;
+        }
+        .print-card-souvenir .print-card-names {
+          font-size: 5mm !important;
+          line-height: 1.05 !important;
+        }
+        .print-card-souvenir .print-card-subtitle {
+          font-size: 2.7mm !important;
+          line-height: 1.2 !important;
+        }
+        .print-card-souvenir .print-card-photo {
+          width: 20mm !important;
+          height: 20mm !important;
+        }
+        .print-card-souvenir .print-card-qr {
+          width: 22mm !important;
+          height: 22mm !important;
+        }
+        .print-card-souvenir .print-card-qr-label {
+          font-size: 1.7mm !important;
+          line-height: 1.1 !important;
+        }
+        .print-card-souvenir .print-card-footer {
+          padding-top: 1mm !important;
+          font-size: 1.8mm !important;
+        }
+
         @media screen {
           .print-preview-shell {
             position: relative;
@@ -598,29 +652,17 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             overflow: hidden;
           }
           .print-page {
-            box-sizing: border-box;
-            background: #fff;
             transform: scale(var(--print-preview-scale));
             transform-origin: top left;
             border: 1px solid rgba(0, 0, 0, 0.15);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
-          }
-          .print-page-portrait {
-            width: 210mm;
-            height: 297mm;
-            padding: 6mm;
-          }
-          .print-page-landscape {
-            width: 297mm;
-            height: 210mm;
-            padding: 6mm;
           }
         }
 
         @media print {
           @page {
             size: ${cardType === 'bifold' ? 'A4 landscape' : 'A4 portrait'};
-            margin: 6mm;
+            margin: 0;
           }
           html, body {
             margin: 0 !important;
@@ -629,12 +671,16 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
-          body * {
-            visibility: hidden;
+
+          /*
+           * Remove every unrelated app/admin node from print layout, not merely
+           * make it invisible. Invisible nodes still consume pages and caused
+           * the blank pages seen in Chrome print preview.
+           */
+          body *:not(:has(.print-area-wrapper)):not(.print-area-wrapper):not(.print-area-wrapper *) {
+            display: none !important;
           }
-          .print-area-wrapper, .print-area-wrapper * {
-            visibility: visible;
-          }
+
           .fixed:has(.print-area-wrapper),
           .fixed:has(.print-area-wrapper) > div,
           .fixed:has(.print-area-wrapper) > div > .grid {
@@ -649,11 +695,11 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           }
           .print-area-wrapper {
             position: static !important;
+            display: block !important;
             height: auto !important;
             max-height: none !important;
             overflow: visible !important;
-            top: auto !important;
-            width: 100% !important;
+            width: auto !important;
             max-width: none !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -661,42 +707,46 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           }
           .print-page-group {
             display: block !important;
-            width: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
             page-break-after: always;
             break-after: page;
+            overflow: hidden !important;
+          }
+          .print-page-group-portrait {
+            width: 210mm !important;
+            height: 297mm !important;
+          }
+          .print-page-group-landscape {
+            width: 297mm !important;
+            height: 210mm !important;
           }
           .print-page-group:last-child {
             page-break-after: auto;
             break-after: auto;
           }
           .print-preview-shell {
-            width: auto !important;
-            height: auto !important;
-            overflow: visible !important;
+            display: block !important;
             margin: 0 !important;
             padding: 0 !important;
+            overflow: hidden !important;
+          }
+          .print-preview-shell-portrait {
+            width: 210mm !important;
+            height: 297mm !important;
+          }
+          .print-preview-shell-landscape {
+            width: 297mm !important;
+            height: 210mm !important;
           }
           .print-page {
-            width: auto !important;
-            height: auto !important;
-            padding: 0 !important;
             margin: 0 !important;
             transform: none !important;
             border: 0 !important;
             box-shadow: none !important;
-            background: transparent !important;
           }
-          .print-sheet-portrait {
-            width: 198mm !important;
-            height: 285mm !important;
-          }
-          .print-sheet-landscape {
-            width: 285mm !important;
-            height: 198mm !important;
-          }
-          .no-print {
+          .no-print,
+          .print\\:hidden {
             display: none !important;
           }
         }
@@ -804,8 +854,8 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
             {/* SOUVENIR GRID (8 KARTU PER LEMBAR A4 PORTRAIT) */}
             {cardType === 'souvenir' && (
-              <div className="print-page-group w-full flex flex-col items-center">
-                <div className="print-preview-shell" style={previewShellStyle('portrait')}>
+              <div className="print-page-group print-page-group-portrait w-full flex flex-col items-center">
+                <div className="print-preview-shell print-preview-shell-portrait" style={previewShellStyle('portrait')}>
                   <div className="print-page print-page-portrait">
                     <div className="print-sheet print-sheet-portrait bg-white">
                       <div className="grid grid-cols-2 grid-rows-4 gap-2.5 w-full h-full min-h-0">
@@ -822,8 +872,8 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
             {/* MINI ENCLOSURE (2 OR 4 PER LEMBAR A4 PORTRAIT) */}
             {cardType === 'enclosure' && (
-              <div className="print-page-group w-full flex flex-col items-center">
-                <div className="print-preview-shell" style={previewShellStyle('portrait')}>
+              <div className="print-page-group print-page-group-portrait w-full flex flex-col items-center">
+                <div className="print-preview-shell print-preview-shell-portrait" style={previewShellStyle('portrait')}>
                   <div className="print-page print-page-portrait">
                     <div className="print-sheet print-sheet-portrait bg-white">
                       {enclosureLayout === '4-per-page' ? (
@@ -850,11 +900,11 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
                 {Array.from({ length: Math.ceil(tableList.length / itemsPerSheet) }).map((_, sheetIdx) => {
                   const itemsOnThisSheet = tableList.slice(sheetIdx * itemsPerSheet, sheetIdx * itemsPerSheet + itemsPerSheet)
                   return (
-                    <div key={sheetIdx} className="print-page-group w-full flex flex-col items-center">
+                    <div key={sheetIdx} className="print-page-group print-page-group-portrait w-full flex flex-col items-center">
                       <div className="no-print mb-1 text-center text-[8.5px] text-stone font-mono uppercase tracking-wider">
                         Lembar A4 Halaman #{sheetIdx + 1}
                       </div>
-                      <div className="print-preview-shell" style={previewShellStyle('portrait')}>
+                      <div className="print-preview-shell print-preview-shell-portrait" style={previewShellStyle('portrait')}>
                         <div className="print-page print-page-portrait">
                           <div className="print-sheet print-sheet-portrait bg-white">
                             {tableLayout === '4-per-page' ? (
@@ -884,7 +934,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
             {/* BIFOLD FOLDABLE INVITATION (A4 LANDSCAPE) */}
             {cardType === 'bifold' && (
-              <div className="print-page-group w-full flex flex-col items-center">
+              <div className="print-page-group print-page-group-landscape w-full flex flex-col items-center">
                 <div className="print-preview-shell" style={previewShellStyle('landscape')}>
                   <div className="print-page print-page-landscape">
                     <div className="print-sheet print-sheet-landscape bg-white">
