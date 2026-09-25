@@ -140,6 +140,34 @@ test('customer SPA routes serve the shell without reflecting edit credentials', 
   }
 })
 
+test('remaining first-party SPA routes serve the shell with route-appropriate metadata', async () => {
+  const publicRoute = await request({ host: 'byaruna.my.id', path: '/inspirasi', db: makeDb() })
+  assert.equal(publicRoute.statusCode, 200)
+  assert.match(publicRoute.body, /<script type="module" src="\/assets\/app\.js"><\/script>/)
+  assert.match(publicRoute.body, /<meta name="robots" content="index, follow"/)
+  assert.match(publicRoute.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/inspirasi"/)
+
+  const secret = 'SECRET_ROUTE_QUERY_SHOULD_NOT_LEAK'
+  for (const path of ['/pesan', '/pesan/test-theme', '/masuk', '/dashboard', '/admin']) {
+    const res = await request({
+      host: 'byaruna.my.id',
+      path,
+      query: { key: secret, token: secret, from: 'customer' },
+      db: makeDb(),
+    })
+    assert.equal(res.statusCode, 200, path)
+    assert.match(res.body, /<script type="module" src="\/assets\/app\.js"><\/script>/, path)
+    assert.match(res.body, /<meta name="robots" content="noindex, nofollow"/, path)
+    assert.doesNotMatch(res.body, /SECRET_ROUTE_QUERY_SHOULD_NOT_LEAK/, path)
+  }
+})
+
+test('unrelated first-party routes remain a 404 after the SPA allowlist expansion', async () => {
+  const res = await request({ host: 'byaruna.my.id', path: '/not-a-real-route', db: makeDb() })
+  assert.equal(res.statusCode, 404)
+  assert.match(res.body, /noindex, nofollow/)
+})
+
 test('homepage keeps homepage metadata and unknown invitation is a non-indexable 404', async () => {
   const home = await request({ host: 'byaruna.my.id', path: '/', db: makeDb() })
   assert.equal(home.statusCode, 200)
