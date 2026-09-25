@@ -228,7 +228,7 @@ export default function Dashboard() {
                     {/* Card Actions Footer */}
                     <div className="p-4 bg-ivory/60 border-t border-ink/10 grid grid-cols-2 gap-2 text-xs">
                       <Link
-                        to={`/kelola/${item.slug}`}
+                        to={`/kelola/${item.slug}?from=customer`}
                         className="bg-ink text-ivory py-2 text-center uppercase tracking-wider font-semibold rounded-xs hover:bg-gold-deep transition-colors"
                       >
                         Buku Tamu &amp; QR
@@ -243,7 +243,7 @@ export default function Dashboard() {
                         </span>
                       ) : (
                         <Link
-                          to={`/edit/${item.slug}`}
+                          to={`/edit/${item.slug}?from=customer`}
                           className="border border-ink/25 text-ink bg-white py-2 text-center uppercase tracking-wider font-semibold rounded-xs hover:bg-ink hover:text-ivory transition-colors"
                         >
                           Edit Data

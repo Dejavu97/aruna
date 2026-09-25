@@ -266,7 +266,7 @@ export async function fetchInvitation(slug, editKey) {
   if (!docSnap.exists()) throw new Error('Undangan tidak ditemukan.')
 
   let privateData = {}
-  if (editKey && editKey !== 'admin-bypass' && !getAdminKey()) {
+  if (editKey && editKey !== 'admin-bypass') {
     const res = await fetch('/api/verify-key', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -307,7 +307,9 @@ async function getAdminCredentials() {
 }
 
 export async function updateInvitation(slug, payload, editKey) {
-  const creds = await getAdminCredentials()
+  const creds = editKey && editKey !== 'admin-bypass'
+    ? {}
+    : await getAdminCredentials()
   const res = await fetch('/api/update-invitation', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

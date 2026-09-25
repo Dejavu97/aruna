@@ -34,10 +34,10 @@ export function useManageState() {
   const { slug } = useParams()
   const [params] = useSearchParams()
   const queryKey = params.get('key') || ''
-  const from = params.get('from') || (getAdminKey() && !queryKey ? 'admin' : '')
+  const from = params.get('from') || ''
   const adminLoggedIn = Boolean(getAdminKey())
-  const editKey = queryKey || getEditKey(slug) || (adminLoggedIn ? 'admin-bypass' : '')
   const isAdmin = from === 'admin' && adminLoggedIn
+  const editKey = queryKey || getEditKey(slug) || (isAdmin ? 'admin-bypass' : '')
 
   const [item, setItem] = useState(null)
   const [text, setText] = useState('')
@@ -71,8 +71,16 @@ export function useManageState() {
   const [showStoryModal, setShowStoryModal] = useState(false)
   const [showPrintCardModal, setShowPrintCardModal] = useState(false)
 
-  const backHref = backFromInvite(slug, { key: editKey && !isAdmin ? editKey : '', from: isAdmin ? 'admin' : '' })
-  const backLabel = isAdmin ? '← Kembali ke admin' : '← Kembali ke halaman bayar'
+  const backHref = isAdmin
+    ? '/admin'
+    : from === 'customer'
+      ? '/dashboard'
+      : backFromInvite(slug, { key: editKey, from: '' })
+  const backLabel = isAdmin
+    ? '← Kembali ke admin'
+    : from === 'customer'
+      ? '← Kembali ke dashboard'
+      : '← Kembali ke halaman bayar'
 
   useEffect(() => {
     if (queryKey) rememberEditKey(slug, queryKey)
