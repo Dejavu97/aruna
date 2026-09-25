@@ -829,9 +829,8 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         }
         .print-card-bifold-fold-line {
           left: 50% !important;
-          top: 9mm !important;
-          bottom: 9mm !important;
-          transform: translateX(-0.5px);
+          top: 4mm !important;
+          bottom: 4mm !important;
           z-index: 20;
         }
         .print-card-bifold-panel {

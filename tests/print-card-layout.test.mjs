@@ -109,14 +109,15 @@ test('bifold uses bride and groom portrait fields instead of gallery photo state
   assert.doesNotMatch(bifold, /renderPhotoBadge\(/)
 })
 
-test('bifold compacts content into a centered stack instead of justify-between gaps', () => {
+test('bifold compacts content into explicit aligned regions instead of justify-between gaps', () => {
   const start = source.indexOf('const renderBifoldCard')
   const end = source.indexOf('// Items per sheet calculation', start)
   const bifold = source.slice(start, end)
-  assert.match(bifold, /print-card-bifold-stack/)
-  assert.match(bifold, /justify-center/)
+  assert.match(bifold, /print-card-bifold-region-top/)
+  assert.match(bifold, /print-card-bifold-region-middle/)
+  assert.match(bifold, /print-card-bifold-region-bottom/)
   assert.doesNotMatch(bifold, /justify-between/)
-  assert.match(source, /\.print-card-bifold-stack[\s\S]*?gap: 7mm !important/)
+  assert.match(source, /\.print-card-bifold-panel[\s\S]*?row-gap: 6mm !important/)
   assert.match(source, /\.print-card-bifold \.print-card-bifold-portrait[\s\S]*?width: 34mm !important/)
   assert.match(source, /\.print-card-bifold \.print-card-bifold-title[\s\S]*?font-size: 10mm !important/)
 })
