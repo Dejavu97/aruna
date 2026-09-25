@@ -42,7 +42,7 @@ function adminIds() {
   return String(process.env.TELEGRAM_ADMIN_IDS || '').split(',').map((s) => s.trim()).filter(Boolean);
 }
 function baseUrl() {
-  return (process.env.SITE_BASE_URL || 'https://byaruna.my.id').replace(/\/$/, '');
+  return (process.env.SITE_BASE_URL || 'https://byaruna.com').replace(/\/$/, '');
 }
 
 async function tg(method, payload) {
