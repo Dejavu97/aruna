@@ -12,10 +12,16 @@ import {
   Upload
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { themes, getDemoByTheme } from '../../data/themes'
-import { formatRupiah, getOrderPackage } from '../../data/site'
+import { eventPackages, formatRupiah, getOrderPackage } from '../../data/site'
 import { copyText, formatLongDate, invitationUrl } from '../../lib/utils'
 import { invitePath } from '../../lib/nav'
+
+const eventLabels = {
+  wedding: 'Pernikahan', birthday: 'Ulang Tahun', graduation: 'Wisuda',
+  aqiqah: 'Aqiqah', corporate: 'Corporate', 'love-letter': 'Surat Cinta',
+}
 
 /** AdminMonetizationTab — diekstrak verbatim dari Admin.jsx (Fase 3, perilaku identik). */
 export default function AdminMonetizationTab({ adSettings,
@@ -52,6 +58,7 @@ export default function AdminMonetizationTab({ adSettings,
   handleUploadQris,
   load,
   customDomainItems }) {
+  const [pricingEventType, setPricingEventType] = useState('wedding')
   return (
     <>
 {/* TAB 3: HARGA, VOUCHER, REKENING & MONETISASI */}
@@ -125,11 +132,27 @@ export default function AdminMonetizationTab({ adSettings,
           </p>
         </div>
 
+        <div className="flex gap-2 overflow-x-auto border-b border-ink/10 pb-2" role="tablist" aria-label="Jenis undangan">
+          {Object.keys(eventPackages).map((eventType) => (
+            <button
+              key={eventType}
+              type="button"
+              role="tab"
+              aria-selected={pricingEventType === eventType}
+              onClick={() => setPricingEventType(eventType)}
+              className={`shrink-0 rounded-xs px-4 py-2 text-xs font-semibold transition-colors ${pricingEventType === eventType
+                ? 'bg-ink text-ivory'
+                : 'border border-ink/15 bg-paper text-stone hover:border-ink hover:text-ink'}`}
+            >
+              {eventLabels[eventType]} <span className="opacity-70">({eventPackages[eventType].length})</span>
+            </button>
+          ))}
+        </div>
+
         <div className="grid md:grid-cols-3 gap-4">
-          {adminPackages.map((pkg, idx) => (
+          {adminPackages.map((pkg, idx) => ({ pkg, idx })).filter(({ pkg }) => pkg.eventType === pricingEventType).map(({ pkg, idx }) => (
             <div key={`${pkg.eventType}-${pkg.id}`} className="bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-3 flex flex-col justify-between">
               <div className="space-y-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gold-deep">{{ wedding: 'Pernikahan', birthday: 'Ulang Tahun', graduation: 'Wisuda', aqiqah: 'Aqiqah', corporate: 'Corporate', 'love-letter': 'Surat Cinta' }[pkg.eventType] || pkg.eventType}</h3>
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs uppercase font-bold text-stone">ID: {pkg.id}</span>
                   {pkg.popular && (
