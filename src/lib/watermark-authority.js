@@ -1,5 +1,7 @@
+import { canUseFeature } from '../../shared/package-access.js'
+
 export function resolveWatermarkPresentation(data = {}) {
-  if (data?.status !== 'paid') {
+  if (data?.status !== 'paid' || !canUseFeature(data, 'whiteLabel')) {
     return { mode: 'default', text: '', url: '' }
   }
 

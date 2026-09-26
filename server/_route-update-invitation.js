@@ -4,6 +4,19 @@ import { hasPrivilegedAdminCredential } from './_admin-guard.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import { partitionInvitationUpdate } from './_invitation-lifecycle.js';
 import handleUpgrade from './_upgrade-handler.js';
+import { canUseFeature, requiredPackage } from '../shared/package-access.js';
+
+const RESTRICTED_UPDATES = {
+  guests: 'guestList',
+  waTemplate: 'guestList',
+  waReminderTemplate: 'guestList',
+  checkIns: 'checkIn',
+  wishes: 'reply',
+  protectPhotos: 'photoProtection',
+  watermarkMode: 'whiteLabel',
+  customWatermarkText: 'whiteLabel',
+  customWatermarkUrl: 'whiteLabel',
+};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -45,14 +58,19 @@ export default async function handler(req, res) {
     // membersihkan field private legacy saat dokumen lama pertama kali diedit.
     const docRef = adminDb.collection('invitations').doc(slug)
     const privateRef = adminDb.collection('invitation_private').doc(slug)
-    let allowPremiumWatermark = isAdmin
+    let existingInvitation = null
     if (!isAdmin) {
-      const existingInvitation = await docRef.get()
+      existingInvitation = await docRef.get()
       if (!existingInvitation.exists) {
         return res.status(404).json({ error: 'Undangan tidak ditemukan.' })
       }
-      allowPremiumWatermark = existingInvitation.data()?.status === 'paid'
+      for (const [field, feature] of Object.entries(RESTRICTED_UPDATES)) {
+        if (Object.hasOwn(payload, field) && !canUseFeature(existingInvitation.data(), feature)) {
+          return res.status(403).json({ error: `Fitur ini memerlukan paket ${requiredPackage(feature)} yang sudah aktif.` })
+        }
+      }
     }
+    const allowPremiumWatermark = isAdmin || canUseFeature(existingInvitation.data(), 'whiteLabel')
     const { publicPayload, privatePayload } = partitionInvitationUpdate(payload, isAdmin, allowPremiumWatermark)
 
     const publicUpdate = {

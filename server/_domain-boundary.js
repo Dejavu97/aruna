@@ -1,3 +1,5 @@
+import { canUseFeature } from '../shared/package-access.js'
+
 function boundaryError(message, status) {
   return Object.assign(new Error(message), { status })
 }
@@ -62,7 +64,10 @@ export async function addDomainBoundary(input, deps) {
   const domain = normalizeDomain(input?.domain)
   const slug = String(input?.slug || '').trim()
   const editKey = String(input?.editKey || '')
-  await authorizeOwner({ slug, editKey }, deps)
+  const invitation = await authorizeOwner({ slug, editKey }, deps)
+  if (!canUseFeature(invitation, 'domain')) {
+    throw boundaryError('Domain pribadi memerlukan paket VIP yang sudah aktif.', 403)
+  }
 
   const addition = await deps.addToVercel(domain)
   let idempotent = false

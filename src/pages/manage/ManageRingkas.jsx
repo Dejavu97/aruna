@@ -2,13 +2,15 @@ import { updateInvitation } from '../../lib/api'
 import {
   Camera,
   Check,
+  Lock,
   Shield,
   Tag,
 } from 'lucide-react'
 import { copyText, invitationUrl } from '../../lib/utils'
 
 /** ManageRingkas — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
-export default function ManageRingkas({ copied,
+export default function ManageRingkas({ allowed,
+  copied,
   customWatermarkText,
   customWatermarkUrl,
   editKey,
@@ -27,7 +29,7 @@ export default function ManageRingkas({ copied,
   tab,
   text,
   watermarkMode }) {
-  const watermarkPremiumEnabled = item?.status === 'paid'
+  const watermarkPremiumEnabled = allowed('whiteLabel')
 
   return (
 
@@ -92,21 +94,21 @@ export default function ManageRingkas({ copied,
                 Simpan gambar QR Code ini untuk dicetak di undangan fisik atau kartu suvenir.
               </p>
               <div className="mt-4 flex flex-col gap-2 w-full">
-                <button
+                {allowed('printCard') ? <button
                   type="button"
                   onClick={() => setShowStoryModal(true)}
                   className="bg-gold-deep text-ivory px-4 py-2.5 text-[11px] uppercase tracking-widest hover:bg-gold transition-colors font-medium flex items-center justify-center gap-2"
                 >
                   <Camera size={14} /> Buat Story IG &amp; Frame
-                </button>
-                <a 
+                </button> : <a href="#upgrade" className="border border-gold/40 px-4 py-2 text-[10px] text-gold-deep"><Lock size={12} className="inline" /> Story &amp; Frame · VIP</a>}
+                {allowed('highResQr') ? <a
                   href={`https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(invitationUrl(slug))}&margin=10`}
                   target="_blank"
                   rel="noreferrer"
                   className="border border-ink/20 px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-ink/5"
                 >
                   Download QR Resolusi Tinggi
-                </a>
+                </a> : <a href="#upgrade" className="border border-gold/40 px-4 py-2 text-[10px] text-gold-deep"><Lock size={12} className="inline" /> QR Resolusi Tinggi · Lengkap</a>}
               </div>
             </div>
 
@@ -121,7 +123,7 @@ export default function ManageRingkas({ copied,
                   Nonaktifkan klik kanan, drag-and-drop, dan fitur simpan gambar pada seluruh foto galeri dan profil pengantin agar foto momen bahagia Anda tidak dapat diunduh sembarangan oleh tamu.
                 </p>
               </div>
-              <button
+              {allowed('photoProtection') ? <button
                 type="button"
                 onClick={async () => {
                   const nextVal = !item.protectPhotos
@@ -139,7 +141,7 @@ export default function ManageRingkas({ copied,
                 }`}
               >
                 {item.protectPhotos ? '✓ Proteksi Foto Aktif' : 'Aktifkan Proteksi Foto'}
-              </button>
+              </button> : <a href="#upgrade" className="border border-gold/40 px-4 py-2 text-xs text-gold-deep"><Lock size={12} className="inline" /> Paket Lengkap</a>}
             </div>
 
             {/* White-Label & Custom Branding Card */}
@@ -155,7 +157,7 @@ export default function ManageRingkas({ copied,
                   </p>
                   {!watermarkPremiumEnabled && (
                     <p className="text-xs font-semibold text-amber-800">
-                      Fitur premium tersedia setelah pelunasan dikonfirmasi admin.
+                      White label tersedia di paket VIP Exclusive setelah pembayaran dikonfirmasi.
                     </p>
                   )}
                 </div>
@@ -163,7 +165,7 @@ export default function ManageRingkas({ copied,
                 <button
                   type="button"
                   onClick={handleSaveWatermark}
-                  disabled={savingWatermark || (!watermarkPremiumEnabled && watermarkMode !== 'default')}
+                  disabled={savingWatermark || !watermarkPremiumEnabled}
                   className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-widest font-semibold hover:bg-gold-deep transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
                 >
                   <Check size={13} /> {savingWatermark ? 'Menyimpan...' : 'Simpan Branding'}

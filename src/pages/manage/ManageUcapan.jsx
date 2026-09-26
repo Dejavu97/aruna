@@ -1,7 +1,8 @@
 import { copyText } from '../../lib/utils'
 
 /** ManageUcapan — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
-export default function ManageUcapan({ handleReply,
+export default function ManageUcapan({ allowed,
+  handleReply,
   item,
   replyText,
   replying,
@@ -26,7 +27,7 @@ export default function ManageUcapan({ handleReply,
                         <p className="font-medium text-xs uppercase tracking-widest mb-1 text-gold-deep">Balasan Anda</p>
                         <p>{w.reply}</p>
                       </div>
-                    ) : (
+                    ) : allowed('reply') ? (
                       <div className="mt-3">
                         {replyingTo === w.id ? (
                           <div className="flex flex-col gap-2">
@@ -73,7 +74,7 @@ export default function ManageUcapan({ handleReply,
                           </button>
                         )}
                       </div>
-                    )}
+                    ) : <a href="#upgrade" className="mt-3 inline-block text-xs font-semibold text-gold-deep underline">Balas ucapan · Paket Lengkap</a>}
                   </li>
                 ))}
               </ul>

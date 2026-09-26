@@ -19,6 +19,8 @@ import ManageUcapan from './manage/ManageUcapan'
 import ManageDomain from './manage/ManageDomain'
 import ManageTamu from './manage/ManageTamu'
 import ManageUpgrade from './manage/ManageUpgrade'
+import ManageFeatureLock from './manage/ManageFeatureLock'
+import { canUseFeature } from '../../shared/package-access.js'
 
 /**
  * Manage — thin orchestrator (Fase 3c). State/logic verbatim di
@@ -106,6 +108,9 @@ export default function Manage() {
   waReminderTemplate,
   waTemplate,
   watermarkMode } = useManageState()
+
+  const allowed = (feature) => canUseFeature(item, feature, isAdmin)
+  const lockedTabs = { love_qr: 'printCard', checkin: 'checkIn', tamu: 'guestList', domain: 'domain' }
 
   if (loading && !item && !error) {
     return (
@@ -253,13 +258,13 @@ export default function Manage() {
                 Edit data
               </Link>
             )}
-            <button
+            {allowed('printCard') ? <button
               type="button"
               onClick={() => setShowPrintCardModal(true)}
               className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep px-3 py-2 font-semibold inline-flex items-center gap-1 hover:bg-gold-deep hover:text-white transition-colors"
             >
               <QrCode size={13} /> Kartu Souvenir &amp; QR
-            </button>
+            </button> : <a href="#upgrade" className="border border-gold/40 px-3 py-2 text-gold-deep inline-flex items-center gap-1"><Lock size={12} /> Kartu Souvenir · VIP</a>}
             <button type="button" onClick={reload} className="border border-ink/20 px-3 py-2 hover:bg-ink/5 transition-colors">
               Segarkan
             </button>
@@ -312,13 +317,14 @@ export default function Manage() {
                 tab === id ? 'border-gold text-ink font-bold bg-gold/5' : 'border-transparent text-stone hover:text-ink'
               }`}
             >
-              {label}
+              {label} {lockedTabs[id] && !allowed(lockedTabs[id]) && <Lock size={11} className="inline-block align-baseline" aria-label="Terkunci" />}
             </button>
           ))}
         </div>
 
         <div className="mt-6">
-          {tab === 'love_qr' && (
+          {tab === 'love_qr' && !allowed('printCard') && <ManageFeatureLock feature="printCard" title="Kartu QR Cinta & Kado" />}
+          {tab === 'love_qr' && allowed('printCard') && (
             <ManageLoveQr
             item={item}
             slug={slug}
@@ -345,6 +351,7 @@ export default function Manage() {
             tab={tab}
             text={text}
             watermarkMode={watermarkMode}
+            allowed={allowed}
             />
           )}
           {tab === 'rsvp' && (
@@ -355,7 +362,8 @@ export default function Manage() {
             text={text}
             />
           )}
-          {tab === 'checkin' && (
+          {tab === 'checkin' && !allowed('checkIn') && <ManageFeatureLock feature="checkIn" title="QR check-in lokasi" />}
+          {tab === 'checkin' && allowed('checkIn') && (
             <ManageCheckIn
             checkInFilter={checkInFilter}
             checkInSearch={checkInSearch}
@@ -378,6 +386,7 @@ export default function Manage() {
             <ManageUcapan
             handleReply={handleReply}
             item={item}
+            allowed={allowed}
             replyText={replyText}
             replying={replying}
             replyingTo={replyingTo}
@@ -386,7 +395,8 @@ export default function Manage() {
             text={text}
             />
           )}
-          {tab === 'domain' && (
+          {tab === 'domain' && !allowed('domain') && <ManageFeatureLock feature="domain" title="Domain pribadi" />}
+          {tab === 'domain' && allowed('domain') && (
             <ManageDomain
             customDomain={customDomain}
             editKey={editKey}
@@ -399,8 +409,10 @@ export default function Manage() {
             text={text}
             />
           )}
-          {tab === 'tamu' && (
+          {tab === 'tamu' && !allowed('guestList') && <ManageFeatureLock feature="guestList" title="Daftar tamu & WhatsApp" />}
+          {tab === 'tamu' && allowed('guestList') && (
             <ManageTamu
+            allowed={allowed}
             composeMessage={composeMessage}
             copied={copied}
             copiedMsg={copiedMsg}

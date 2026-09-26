@@ -13,7 +13,8 @@ import { copyText, invitationUrl } from '../../lib/utils'
 import Stat from './Stat'
 
 /** ManageTamu — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
-export default function ManageTamu({ composeMessage,
+export default function ManageTamu({ allowed,
+  composeMessage,
   copied,
   copiedMsg,
   copyAllMessages,
@@ -57,7 +58,7 @@ export default function ManageTamu({ composeMessage,
                   <h2 className="mt-1 font-display text-2xl">Daftar Tamu, RSVP &amp; Pengingat</h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className="inline-flex cursor-pointer items-center gap-2 border border-ink bg-ink px-4 py-2.5 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep transition-colors">
+                  {allowed('csv') ? <label className="inline-flex cursor-pointer items-center gap-2 border border-ink bg-ink px-4 py-2.5 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep transition-colors">
                     <Upload size={14} /> Import File (CSV / TXT)
                     <input
                       type="file"
@@ -65,16 +66,16 @@ export default function ManageTamu({ composeMessage,
                       className="hidden"
                       onChange={handleFileUpload}
                     />
-                  </label>
+                  </label> : <a href="#upgrade" className="border border-gold/40 px-4 py-2.5 text-xs text-gold-deep">Import CSV · Lengkap</a>}
                   {parsedGuests.length > 0 && (
                     <>
-                      <button
+                      {allowed('csv') ? <button
                         type="button"
                         onClick={exportGuestsCSV}
                         className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
                       >
                         <Download size={14} /> Download Excel (CSV)
-                      </button>
+                      </button> : <a href="#upgrade" className="border border-gold/40 px-4 py-2.5 text-xs text-gold-deep">Ekspor CSV · Lengkap</a>}
                       <button
                         type="button"
                         onClick={copyAllMessages}
