@@ -1,16 +1,16 @@
 import { randomUUID } from 'node:crypto'
-import { adminAuth, adminDb } from '../server/_firebase.js'
-import { getClientIp, verifyPrivilegedAdmin } from '../server/_auth.js'
-import { buildCloudinaryUploadAuthorization, createUploadCapability } from '../server/_cloudinary-upload.js'
-import { createNotificationProof } from '../server/_notification-proof.js'
-import { resolveOrderPackage } from '../server/_package-pricing.js'
+import { adminAuth, adminDb } from './_firebase.js'
+import { getClientIp, verifyPrivilegedAdmin } from './_auth.js'
+import { buildCloudinaryUploadAuthorization, createUploadCapability } from './_cloudinary-upload.js'
+import { createNotificationProof } from './_notification-proof.js'
+import { resolveOrderPackage } from './_package-pricing.js'
 import {
   buildCreationRecords,
   createInvitationRecords,
   generateEditKey,
   getMergedInvitation,
   sanitizeInvitationSlug,
-} from '../server/_invitation-lifecycle.js'
+} from './_invitation-lifecycle.js'
 
 const MAX_PAYLOAD_BYTES = 800_000
 const CAPABILITY_WINDOW_MS = 10 * 60 * 1000

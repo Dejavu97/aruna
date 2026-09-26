@@ -1,5 +1,5 @@
-import { adminDb } from '../server/_firebase.js';
-import { assertNotLocked, recordFailure, clearFailures, hashPassword, verifyPassword, verifyPrivilegedAdmin } from '../server/_auth.js';
+import { adminDb } from './_firebase.js';
+import { assertNotLocked, recordFailure, clearFailures, hashPassword, verifyPassword, verifyPrivilegedAdmin } from './_auth.js';
 
 async function readStoredPassword() {
   const snap = await adminDb.collection('settings').doc('admin_auth').get();

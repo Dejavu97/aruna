@@ -1,6 +1,6 @@
-import { adminDb } from '../server/_firebase.js';
-import { verifyPrivilegedAdmin } from '../server/_auth.js';
-import { deleteInvitationRecords } from '../server/_invitation-lifecycle.js';
+import { adminDb } from './_firebase.js';
+import { verifyPrivilegedAdmin } from './_auth.js';
+import { deleteInvitationRecords } from './_invitation-lifecycle.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

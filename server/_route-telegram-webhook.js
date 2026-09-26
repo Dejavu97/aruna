@@ -1,5 +1,5 @@
-import { adminDb } from '../server/_firebase.js';
-import { getMergedInvitation, listMergedInvitations } from '../server/_invitation-lifecycle.js';
+import { adminDb } from './_firebase.js';
+import { getMergedInvitation, listMergedInvitations } from './_invitation-lifecycle.js';
 
 // ============ BOT ADMIN TELEGRAM VIA WEBHOOK (Vercel serverless) ============
 // Telegram → POST https://<domain>/api/telegram-webhook → baca/tulis Firestore
