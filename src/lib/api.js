@@ -95,6 +95,20 @@ export async function fetchDynamicPackages() {
   return null
 }
 
+export async function fetchDynamicPackagesWithTimeout(timeoutMs = 10000) {
+  let timer
+  try {
+    return await Promise.race([
+      fetchDynamicPackages(),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Harga paket terlalu lama dimuat. Periksa koneksi lalu coba lagi.')), timeoutMs)
+      }),
+    ])
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 export async function saveDynamicPackages(packagesList) {
   if (!getAdminKey()) throw new Error('Unauthorized')
   await adminApiCall({ action: 'setSetting', doc: 'packages', data: { packages: packagesList } })

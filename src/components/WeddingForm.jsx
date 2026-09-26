@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatRupiah, getPackagesByEventType } from '../data/site'
-import { fetchDynamicPackages, verifyAdminAccess } from '../lib/api'
+import { fetchDynamicPackagesWithTimeout, verifyAdminAccess } from '../lib/api'
 import { getTheme, themes, getThemeFeatures, getFormMode } from '../data/themes'
 import { getDummyWeddingData } from '../data/dummyData'
 import MediaUpload from './MediaUpload'
@@ -123,6 +123,7 @@ export default function InvitationForm({
   const [dynamicPackages, setDynamicPackages] = useState(null)
   const [packagesReady, setPackagesReady] = useState(mode !== 'create')
   const [pricingError, setPricingError] = useState('')
+  const [pricingAttempt, setPricingAttempt] = useState(0)
   const draftKey = `aruna.draft.${themeId}`
   const availablePackages = getPackagesByEventType(formConfig.eventType, dynamicPackages)
 
@@ -159,18 +160,17 @@ export default function InvitationForm({
     ...(mode === 'create' ? [{ id: 'review', label: 'Review' }] : []),
   ]
 
-  const reviewingOrder = steps[step]?.id === 'review'
   useEffect(() => {
     if (mode !== 'create') return
     let active = true
     setPackagesReady(false)
     setPricingError('')
-    fetchDynamicPackages()
+    fetchDynamicPackagesWithTimeout()
       .then((list) => { if (active) setDynamicPackages(list) })
-      .catch(() => { if (active) setPricingError('Harga paket gagal dimuat. Muat ulang halaman sebelum memesan.') })
+      .catch((err) => { if (active) setPricingError(err.message || 'Harga paket gagal dimuat. Coba lagi.') })
       .finally(() => { if (active) setPackagesReady(true) })
     return () => { active = false }
-  }, [mode, themeId, reviewingOrder])
+  }, [mode, themeId, pricingAttempt])
 
   useEffect(() => {
     if (mode !== 'create') return
@@ -764,7 +764,10 @@ export default function InvitationForm({
             {mode === 'create' && (
               <div className="grid gap-3">
                 {(!packagesReady || pricingError) && (
-                  <p className="text-sm text-stone">{pricingError || 'Memuat harga paket terbaru...'}</p>
+                  <div role={pricingError ? 'alert' : 'status'} className="border border-ink/15 bg-paper/80 p-4 text-sm text-stone">
+                    <p>{pricingError || 'Memuat harga paket terbaru...'}</p>
+                    {pricingError && <button type="button" onClick={() => setPricingAttempt((n) => n + 1)} className="mt-2 underline font-semibold text-ink">Coba muat harga lagi</button>}
+                  </div>
                 )}
                 {packagesReady && !pricingError && availablePackages.map((p) => (
                   <label

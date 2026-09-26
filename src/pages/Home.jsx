@@ -5,7 +5,7 @@ import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import { faqs, features, formatRupiah, getPackagesByEventType, site, steps, waLink } from '../data/site'
 import { themes } from '../data/themes'
-import { fetchDynamicPackages, getAnnouncement } from '../lib/api'
+import { fetchDynamicPackagesWithTimeout, getAnnouncement } from '../lib/api'
 import AdSlot from '../components/AdSlot'
 import InteractiveVideoTeaser from '../components/InteractiveVideoTeaser'
 import ClientTestimonials from '../components/ClientTestimonials'
@@ -38,11 +38,11 @@ export default function Home() {
         <SiteNav />
         <Hero />
         <How />
+        <Pricing />
         <InteractiveVideoTeaser />
         <VibeAndStudioSection />
         <FeatureGrid />
         <ClientTestimonials />
-        <Pricing />
         <AdSlot slot="home" className="max-w-4xl" />
         <Faq />
         <Close />
@@ -164,6 +164,9 @@ function Hero() {
             >
               Buka Studio Desain
             </Link>
+            <a href="#harga" className="inline-flex items-center border border-ink/20 bg-paper/80 px-6 py-3 text-sm uppercase tracking-[0.16em] text-ink transition-colors hover:border-gold-deep font-semibold">
+              Lihat harga paket
+            </a>
           </div>
         </div>
 
@@ -362,6 +365,17 @@ function VibeAndStudioSection() {
 
 function FeatureGrid() {
   const [selectedCategory, setSelectedCategory] = useState('Semua')
+  const [showAll, setShowAll] = useState(false)
+  const featuredTitles = new Set([
+    'Nama Tamu di Sampul & Sapaan Personal',
+    'Pernikahan, Ulang Tahun, Wisuda & Aqiqah',
+    'Scanner Kamera QR Check-in Real-Time',
+    'Rekap RSVP Kehadiran & Ekspor CSV/Excel',
+    'Amplop Digital Multi-Bank & QRIS Dinamis',
+    'Theme Studio 2.0 (Visual Reordering)',
+    'Galeri Foto Layar Penuh & Cerita Cinta',
+    'Self-Service Custom Domain (.com / .id)',
+  ])
 
   const categories = [
     'Semua',
@@ -374,21 +388,23 @@ function FeatureGrid() {
   ]
 
   const filteredFeatures =
-    selectedCategory === 'Semua'
+    !showAll
+      ? features.filter((f) => featuredTitles.has(f.title))
+      : selectedCategory === 'Semua'
       ? features
       : features.filter((f) => f.category === selectedCategory || (selectedCategory === 'Tamu & Sapaan' && f.category === 'Multi-Acara') || (selectedCategory === 'Audio & Media' && f.category === 'Media Sosial') || (selectedCategory === 'Akses & Akun' && (f.category === 'Keamanan' || f.category === 'Bisnis & Agensi' || f.category === 'Domain & Teknis')))
 
   return (
     <section id="fitur" className="mx-auto max-w-6xl px-5 py-20 relative">
       <div className="text-center max-w-2xl mx-auto space-y-3">
-        <p className="text-xs uppercase tracking-[0.28em] text-gold-deep font-semibold">Fitur Lengkap Platform</p>
-        <h2 className="font-display text-4xl md:text-5xl text-ink">Semua Fitur Cerdas untuk Hari Bahagia.</h2>
+        <p className="text-xs uppercase tracking-[0.28em] text-gold-deep font-semibold">Fitur unggulan</p>
+        <h2 className="font-display text-4xl md:text-5xl text-ink">Yang bikin undangan terasa lebih personal.</h2>
         <p className="text-sm text-stone">
           Mulai dari kartu kado fisik, buku tamu digital dengan kamera scanner, hingga studio kustomisasi bebas.
         </p>
 
         {/* Category Filter Pills */}
-        <div className="pt-4 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+        {showAll && <div className="pt-4 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -403,7 +419,7 @@ function FeatureGrid() {
               {cat === 'Semua' ? `Semua (${features.length})` : cat}
             </button>
           ))}
-        </div>
+        </div>}
       </div>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -425,6 +441,11 @@ function FeatureGrid() {
           </article>
         ))}
       </div>
+      <div className="mt-8 text-center">
+        <button type="button" onClick={() => { setShowAll((value) => !value); setSelectedCategory('Semua') }} className="border border-ink/25 bg-paper/80 px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em] hover:border-gold-deep">
+          {showAll ? 'Tampilkan fitur unggulan' : `Lihat semua ${features.length} fitur`}
+        </button>
+      </div>
     </section>
   )
 }
@@ -432,23 +453,25 @@ function FeatureGrid() {
 function Pricing() {
   const [currentPackages, setCurrentPackages] = useState(null)
   const [pricingError, setPricingError] = useState(false)
+  const [pricingAttempt, setPricingAttempt] = useState(0)
 
   useEffect(() => {
     let active = true
-    fetchDynamicPackages()
+    setPricingError(false)
+    fetchDynamicPackagesWithTimeout()
       .then((saved) => { if (active) setCurrentPackages(getPackagesByEventType('wedding', saved)) })
       .catch(() => { if (active) setPricingError(true) })
     return () => { active = false }
-  }, [])
+  }, [pricingAttempt])
 
   return (
     <section id="harga" className="bg-transparent py-20 text-ink">
       <div className="mx-auto max-w-6xl px-5">
         <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Harga jasa</p>
         <h2 className="mt-2 font-display text-4xl md:text-5xl">Jelas dari awal. Tidak ada biaya mengejutkan.</h2>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {pricingError && <p className="text-sm text-stone">Harga paket belum dapat dimuat. Coba muat ulang halaman.</p>}
-          {!currentPackages && !pricingError && <p className="text-sm text-stone">Memuat harga paket...</p>}
+        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {pricingError && <div role="alert" className="md:col-span-2 xl:col-span-4 border border-ink/15 bg-paper p-5 text-sm text-stone">Harga paket gagal dimuat. Periksa koneksi, lalu <button type="button" onClick={() => setPricingAttempt((n) => n + 1)} className="font-semibold text-ink underline">coba lagi</button>.</div>}
+          {!currentPackages && !pricingError && <p role="status" className="md:col-span-2 xl:col-span-4 text-sm text-stone">Memuat harga paket...</p>}
           {(currentPackages || []).map((p) => (
             <article
               key={p.id}
