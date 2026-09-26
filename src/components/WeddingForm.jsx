@@ -8,6 +8,7 @@ import MediaUpload from './MediaUpload'
 import Invitation from '../invitation/Invitation'
 import { slugify } from '../lib/utils'
 import { useAuth } from '../context/AuthContext'
+import { googleAuthErrorMessage } from '../lib/google-auth-error'
 import { Sparkles, RotateCcw, Wand2, Globe, CheckCircle2 } from 'lucide-react'
 
 const emptyEvent = () => ({
@@ -91,6 +92,20 @@ export default function InvitationForm({
   uploadContext = {},
 }) {
   const { user, loginWithGoogle } = useAuth()
+  const [googleError, setGoogleError] = useState('')
+  const [connectingGoogle, setConnectingGoogle] = useState(false)
+
+  async function handleGoogleConnect() {
+    setGoogleError('')
+    setConnectingGoogle(true)
+    try {
+      await loginWithGoogle()
+    } catch (err) {
+      setGoogleError(googleAuthErrorMessage(err))
+    } finally {
+      setConnectingGoogle(false)
+    }
+  }
   const theme = getTheme(themeId, customThemes)
   const formConfig = getFormMode(theme, customThemes)
   const features = getThemeFeatures(theme)
@@ -774,7 +789,7 @@ export default function InvitationForm({
                   <div>
                     <strong className="font-display text-lg">Domain Pribadi (Kustom)</strong>
                     <span className="mt-1 block text-sm normal-case tracking-normal text-stone leading-relaxed">
-                      Kabar baik! Anda dapat memasang domain pribadi secara <strong>mandiri &amp; gratis</strong> melalui Dashboard Pelanggan setelah pesanan ini selesai. Hubungi Admin jika Anda memerlukan bantuan konfigurasi.
+                      Paket VIP dapat memasang domain pribadi secara mandiri melalui Dashboard Pelanggan setelah pembayaran dikonfirmasi. Domainnya dibeli terpisah di penyedia domain. Hubungi Admin jika Anda memerlukan bantuan konfigurasi.
                     </span>
                   </div>
                 </div>
@@ -808,11 +823,13 @@ export default function InvitationForm({
                 </div>
                 <button
                   type="button"
-                  onClick={loginWithGoogle}
-                  className="bg-white border border-ink/20 hover:border-ink px-3 py-1.5 font-bold text-ink text-[11px] uppercase tracking-wider rounded-xs transition-colors shrink-0 shadow-2xs"
+                  onClick={handleGoogleConnect}
+                  disabled={connectingGoogle}
+                  className="bg-white border border-ink/20 hover:border-ink px-3 py-1.5 font-bold text-ink text-[11px] uppercase tracking-wider rounded-xs transition-colors shrink-0 shadow-2xs disabled:opacity-50"
                 >
-                  Hubungkan Google
+                  {connectingGoogle ? 'Menghubungkan...' : 'Hubungkan Google'}
                 </button>
+                {googleError && <p role="alert" className="w-full text-xs text-red-700">{googleError}</p>}
               </div>
             )}
 
