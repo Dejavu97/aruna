@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { googleAuthErrorMessage } from '../lib/google-auth-error'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import { ShieldCheck, Sparkles, Smartphone, Laptop, CheckCircle2, ArrowRight } from 'lucide-react'
@@ -28,11 +29,7 @@ export default function Login() {
       navigate(redirectUrl, { replace: true })
     } catch (err) {
       console.error(err)
-      if (err.code === 'auth/popup-closed-by-user') {
-        setError('Proses login dibatalkan.')
-      } else {
-        setError('Gagal masuk dengan Google. Silakan coba lagi.')
-      }
+      setError(googleAuthErrorMessage(err))
     } finally {
       setLoggingIn(false)
     }
