@@ -17,6 +17,7 @@ import Stat from './Stat'
 
 /** ManageTamu — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageTamu({ allowed,
+  editKey,
   locked = false,
   composeMessage,
   copied,
@@ -366,7 +367,7 @@ export default function ManageTamu({ allowed,
                 </div>
               </div>
             )}
-            {qrGuest && <GuestCheckInQr slug={slug} guest={qrGuest} onClose={() => setQrGuest(null)} />}
+            {qrGuest && <GuestCheckInQr slug={slug} guest={qrGuest} editKey={editKey} onClose={() => setQrGuest(null)} />}
           </div>
   )
 }

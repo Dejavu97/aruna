@@ -415,6 +415,7 @@ export default function Manage() {
           {tab === 'tamu' && !allowed('guestList') && <ManageFeatureLock feature="guestList" title="Daftar tamu & WhatsApp" preview />}
           {tab === 'tamu' && (
             <ManageTamu
+            editKey={editKey}
             locked={!allowed('guestList')}
             allowed={allowed}
             composeMessage={composeMessage}

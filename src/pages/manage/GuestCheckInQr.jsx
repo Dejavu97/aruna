@@ -1,12 +1,22 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Download, Copy, X } from 'lucide-react'
 import qrcode from '../../vendor/qrcode.mjs'
 import { copyText, invitationUrl } from '../../lib/utils'
+import { getGuestCheckInQr } from '../../lib/api'
 
-export default function GuestCheckInQr({ slug, guest, onClose }) {
+export default function GuestCheckInQr({ slug, guest, editKey, onClose }) {
   const [copied, setCopied] = useState(false)
-  const url = invitationUrl(slug, guest.name)
+  const [token, setToken] = useState('')
+  const [error, setError] = useState('')
+  useEffect(() => {
+    let live = true
+    getGuestCheckInQr(slug, guest.name, editKey).then((result) => { if (live) setToken(result.token) })
+      .catch((err) => { if (live) setError(err.message) })
+    return () => { live = false }
+  }, [slug, guest.name, editKey])
+  const url = token ? `${invitationUrl(slug, guest.name)}&ci=${encodeURIComponent(token)}` : ''
   const svg = useMemo(() => {
+    if (!url) return ''
     const qr = qrcode(0, 'H')
     qr.addData(url)
     qr.make()
@@ -14,6 +24,7 @@ export default function GuestCheckInQr({ slug, guest, onClose }) {
   }, [url])
 
   function download() {
+    if (!svg) return
     const image = new Image()
     const href = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }))
     image.onload = () => {
@@ -44,12 +55,12 @@ export default function GuestCheckInQr({ slug, guest, onClose }) {
           </div>
           <button type="button" onClick={onClose} aria-label="Tutup QR" className="p-2 text-stone hover:text-ink"><X size={18} /></button>
         </div>
-        <img src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`} alt={`QR undangan personal ${guest.name}`} className="mx-auto my-5 w-64 max-w-full bg-white p-2" />
-        <p className="break-all text-xs text-stone">{url}</p>
+        {svg ? <img src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`} alt={`QR undangan personal ${guest.name}`} className="mx-auto my-5 w-64 max-w-full bg-white p-2" /> : <p className="my-8 text-center text-sm text-stone">{error || 'Menyiapkan QR tamu...'}</p>}
+        {url && <p className="break-all text-xs text-stone">{url}</p>}
         <p className="mt-2 text-xs text-stone">Bagikan QR ini ke tamu. Petugas memindainya dari menu Buku Tamu saat acara.</p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <button type="button" onClick={download} className="inline-flex items-center gap-2 bg-ink px-4 py-2 text-xs font-semibold text-white"><Download size={14} /> Unduh QR</button>
-          <button type="button" onClick={async () => { if (await copyText(url)) setCopied(true) }} className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2 text-xs"><Copy size={14} /> {copied ? 'Tautan tersalin' : 'Salin tautan'}</button>
+          <button type="button" disabled={!svg} onClick={download} className="inline-flex items-center gap-2 bg-ink px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"><Download size={14} /> Unduh QR</button>
+          <button type="button" disabled={!url} onClick={async () => { if (await copyText(url)) setCopied(true) }} className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2 text-xs disabled:opacity-50"><Copy size={14} /> {copied ? 'Tautan tersalin' : 'Salin tautan'}</button>
         </div>
       </div>
     </div>

@@ -321,6 +321,20 @@ export async function updateInvitation(slug, payload, editKey) {
   return { success: true }
 }
 
+async function checkInAction(slug, editKey, action, fields = {}) {
+  const creds = editKey && editKey !== 'admin-bypass' ? {} : await getAdminCredentials()
+  const res = await fetch('/api/update-invitation', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, editKey, action, ...fields, ...creds }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) throw new Error(data.error || 'QR check-in gagal diproses.')
+  return data
+}
+
+export const getGuestCheckInQr = (slug, guestName, editKey) => checkInAction(slug, editKey, 'guest-qr', { guestName })
+export const scanGuestCheckIn = (slug, guestName, token, editKey) => checkInAction(slug, editKey, 'checkin-scan', { guestName, token })
+
 export async function setInvitationStatus(slug, status) {
   if (!getAdminKey()) throw new Error('Unauthorized')
   // Lewat updateInvitation agar kredensial benar (password-kustom tidak punya

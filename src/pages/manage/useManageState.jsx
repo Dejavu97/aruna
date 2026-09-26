@@ -5,6 +5,7 @@ import SiteNav from '../../components/SiteNav'
 import SiteFooter from '../../components/SiteFooter'
 import QrCameraScanner from '../../components/QrCameraScanner'
 import { resolveScannedGuest } from '../../lib/check-in.js'
+import { scanGuestCheckIn } from '../../lib/api'
 import WeddingFrameModal from '../../components/WeddingFrameModal'
 import PrintCardModal from '../../components/PrintCardModal'
 import LoveQRCardGenerator from '../../components/LoveQRCardGenerator'
@@ -289,7 +290,7 @@ export function useManageState() {
     document.body.removeChild(link)
   }
 
-  const handleQrScanned = (decodedText) => {
+  const handleQrScanned = async (decodedText) => {
     setShowScanner(false)
     const result = resolveScannedGuest(decodedText, slug, window.location.origin, guestsWithRsvp, item?.checkIns || [])
     if (result.error) {
@@ -297,7 +298,15 @@ export function useManageState() {
       setTimeout(() => setRecentCheckIn(null), 4000)
       return
     }
-    toggleCheckIn(result.name, result.pax)
+    try {
+      const scanned = await scanGuestCheckIn(slug, result.name, result.token, editKey)
+      setItem((prev) => ({ ...prev, checkIns: scanned.checkIns }))
+      setRecentCheckIn({ type: 'added', name: scanned.name, pax: scanned.pax })
+      setTimeout(() => setRecentCheckIn(null), 4000)
+    } catch (err) {
+      setRecentCheckIn({ type: 'duplicate', name: err.message })
+      setTimeout(() => setRecentCheckIn(null), 4000)
+    }
   }
 
   const composeMessage = (guestName, guestPhone = '', mode = messageMode) => {
