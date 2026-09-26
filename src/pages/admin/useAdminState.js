@@ -412,16 +412,16 @@ export function useAdminState() {
   // Handle Save Voucher
   async function handleAddVoucher(e) {
     e.preventDefault()
-    if (!newVoucherCode.trim() || !newVoucherDiscount) {
+    if (!newVoucherCode.trim() || (newVoucherType !== 'marketplace' && !newVoucherDiscount)) {
       alert('Mohon isi kode voucher dan nilai diskon.')
       return
     }
     setSavingVoucher(true)
     try {
       await saveVoucher(newVoucherCode, {
-        discount: Number(newVoucherDiscount),
+        discount: newVoucherType === 'marketplace' ? 0 : Number(newVoucherDiscount),
         type: newVoucherType,
-        quota: Number(newVoucherQuota) || 100,
+        quota: newVoucherType === 'marketplace' ? 0 : Number(newVoucherQuota) || 100,
         usedCount: 0,
         active: true,
       })

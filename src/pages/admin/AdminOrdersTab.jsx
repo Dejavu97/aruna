@@ -190,7 +190,7 @@ export default function AdminOrdersTab({ adminPackages,
                         )}
                         {item.voucher && (
                           <span className="px-2 py-0.5 text-[10px] border border-ink/20 text-ink uppercase tracking-wider font-medium">
-                            Voucher: {item.voucher}
+                            {item.paymentSource === 'marketplace' ? 'Marketplace' : 'Voucher'}: {item.voucher}
                           </span>
                         )}
                       </div>

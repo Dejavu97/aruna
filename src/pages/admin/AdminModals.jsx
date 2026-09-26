@@ -229,7 +229,7 @@ export default function AdminModals({ adminPackages,
                 </tr>
                 {invoiceModalItem.voucher && (
                   <tr>
-                    <td className="py-2 text-green-700">Voucher Diskon ({invoiceModalItem.voucher})</td>
+                    <td className="py-2 text-green-700">{invoiceModalItem.paymentSource === 'marketplace' ? 'Aktivasi marketplace' : 'Voucher Diskon'} ({invoiceModalItem.voucher})</td>
                     <td className="py-2 text-center text-green-700">-</td>
                     <td className="py-2 text-right text-green-700 font-mono">-</td>
                   </tr>

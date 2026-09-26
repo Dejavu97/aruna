@@ -798,7 +798,7 @@ export default function InvitationForm({
                     label="Kode Voucher / Promo"
                     value={form.voucher}
                     onChange={(v) => update('voucher', v)}
-                    hint="Punya kode diskon? Masukkan di sini."
+                    hint="Punya kode promo atau kode pembelian marketplace? Masukkan di sini."
                   />
                 </div>
               </div>

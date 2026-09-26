@@ -35,6 +35,7 @@ class FakeDb {
         if (this.failSetAt === setCount) throw new Error(`set ${setCount} failed`)
         staged.set(ref.path, structuredClone(value))
       },
+      update: (ref, value) => staged.set(ref.path, { ...this.records.get(ref.path), ...structuredClone(value) }),
     }
     const result = await work(tx)
     for (const [path, value] of staged) this.records.set(path, value)
@@ -51,6 +52,29 @@ class FakeDb {
     }
   }
 }
+
+test('reusable marketplace voucher activates selected package and records use atomically', async () => {
+  const db = new FakeDb({ 'vouchers/ETSY': { type: 'marketplace', active: true, quota: 0, usedCount: 3 } })
+  const records = buildCreationRecords(payload, {
+    slug: 'marketplace-test', editKey: 'key', orderCode: 'ORDER', now: 1,
+  })
+  records.privateData.packagePrice = 100000
+  await createInvitationRecords(db, 'marketplace-test', records, { voucherCode: 'ETSY' })
+  assert.equal(db.records.get('invitations/marketplace-test').packageId, 'lengkap')
+  assert.equal(db.records.get('invitations/marketplace-test').status, 'paid')
+  assert.equal(db.records.get('invitation_private/marketplace-test').packagePrice, 0)
+  assert.equal(db.records.get('invitation_private/marketplace-test').originalPackagePrice, 100000)
+  assert.equal(db.records.get('vouchers/ETSY').usedCount, 4)
+})
+
+test('invalid marketplace voucher does not create an invitation', async () => {
+  const db = new FakeDb()
+  const records = buildCreationRecords(payload, {
+    slug: 'invalid-marketplace', editKey: 'key', orderCode: 'ORDER', now: 1,
+  })
+  await assert.rejects(createInvitationRecords(db, 'invalid-marketplace', records, { voucherCode: 'UNKNOWN' }), { status: 400 })
+  assert.equal(db.records.has('invitations/invalid-marketplace'), false)
+})
 
 const payload = {
   slug: 'sarah-budi',

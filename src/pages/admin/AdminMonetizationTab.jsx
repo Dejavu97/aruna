@@ -245,8 +245,8 @@ export default function AdminMonetizationTab({ adSettings,
         <div className="grid md:grid-cols-12 gap-6">
           {/* Form Tambah Voucher (5 Cols) */}
           <div className="md:col-span-5 bg-paper border border-ink/15 p-5 rounded-sm shadow-xs space-y-4">
-            <h3 className="font-display text-lg font-bold">Buat Voucher Promo Baru</h3>
-            <p className="text-xs text-stone">Kode voucher ini dapat dimasukkan pelanggan saat pemesanan.</p>
+            <h3 className="font-display text-lg font-bold">Buat Voucher / Kode Marketplace</h3>
+            <p className="text-xs text-stone">Kode marketplace dapat dipakai berulang untuk mengaktifkan paket tanpa tagihan di ByAruna. Periksa pesanan di admin dan hapus kode bila perlu.</p>
 
             <form onSubmit={handleAddVoucher} className="space-y-3 pt-2">
               <div>
@@ -262,7 +262,7 @@ export default function AdminMonetizationTab({ adSettings,
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-medium">Tipe Diskon</label>
+                  <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-medium">Jenis Kode</label>
                   <select
                     value={newVoucherType}
                     onChange={(e) => setNewVoucherType(e.target.value)}
@@ -270,10 +270,11 @@ export default function AdminMonetizationTab({ adSettings,
                   >
                     <option value="nominal">Nominal (Rp)</option>
                     <option value="percent">Persentase (%)</option>
+                    <option value="marketplace">Marketplace · aktif tanpa tagihan</option>
                   </select>
                 </div>
 
-                <div>
+                {newVoucherType !== 'marketplace' && <div>
                   <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-medium">
                     {newVoucherType === 'nominal' ? 'Potongan (Rp)' : 'Potongan (%)'}
                   </label>
@@ -284,10 +285,10 @@ export default function AdminMonetizationTab({ adSettings,
                     onChange={(e) => setNewVoucherDiscount(e.target.value)}
                     className="w-full border border-ink/20 p-2 text-xs focus:border-ink focus:outline-none"
                   />
-                </div>
+                </div>}
               </div>
 
-              <div>
+              {newVoucherType !== 'marketplace' && <div>
                 <label className="block text-xs uppercase tracking-wider text-stone mb-1 font-medium">Batas Kuota Pemakaian</label>
                 <input
                   type="number"
@@ -295,7 +296,7 @@ export default function AdminMonetizationTab({ adSettings,
                   onChange={(e) => setNewVoucherQuota(e.target.value)}
                   className="w-full border border-ink/20 p-2 text-xs focus:border-ink focus:outline-none"
                 />
-              </div>
+              </div>}
 
               <button
                 type="submit"
@@ -324,11 +325,11 @@ export default function AdminMonetizationTab({ adSettings,
                           {v.code}
                         </span>
                         <span className="text-xs font-semibold text-green-700">
-                          {v.type === 'nominal' ? `Potongan ${formatRupiah(v.discount)}` : `Diskon ${v.discount}%`}
+                          {v.type === 'marketplace' ? 'Aktivasi marketplace' : v.type === 'nominal' ? `Potongan ${formatRupiah(v.discount)}` : `Diskon ${v.discount}%`}
                         </span>
                       </div>
                       <p className="text-[10px] text-stone mt-1">
-                        Kuota: {v.usedCount || 0} / {v.quota || 100} terpakai
+                        Pemakaian: {v.usedCount || 0} {v.type === 'marketplace' ? '· tanpa batas' : `/ ${v.quota || 100}`}
                       </p>
                     </div>
 

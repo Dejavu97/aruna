@@ -8,6 +8,8 @@ export const PRIVATE_INVITATION_FIELDS = Object.freeze([
   'voucher',
   'packagePrice',
   'packageName',
+  'paymentSource',
+  'originalPackagePrice',
   'pendingUpgrade',
   'upgradeHistory',
   'guests',
@@ -26,6 +28,8 @@ const SERVER_CONTROLLED_FIELDS = Object.freeze([
   'orderCode',
   'packagePrice',
   'packageName',
+  'paymentSource',
+  'originalPackagePrice',
   'pendingUpgrade',
   'upgradeHistory',
   'views',
@@ -51,6 +55,8 @@ const IMMUTABLE_UPDATE_FIELDS = Object.freeze([
   'packageId',
   'packagePrice',
   'packageName',
+  'paymentSource',
+  'originalPackagePrice',
   'pendingUpgrade',
   'upgradeHistory',
   'customDomain',
@@ -187,10 +193,11 @@ export async function listMergedInvitations(db, { limit = 0 } = {}) {
   return rows
 }
 
-export async function createInvitationRecords(db, slug, records) {
+export async function createInvitationRecords(db, slug, records, { voucherCode = '' } = {}) {
   const invitationRef = db.collection('invitations').doc(slug)
   const privateRef = db.collection('invitation_private').doc(slug)
   const keyRef = db.collection('private_keys').doc(slug)
+  const voucherRef = voucherCode ? db.collection('vouchers').doc(voucherCode) : null
 
   return db.runTransaction(async (transaction) => {
     const [invitationSnap, privateSnap, keySnap] = await Promise.all([
@@ -198,9 +205,29 @@ export async function createInvitationRecords(db, slug, records) {
       transaction.get(privateRef),
       transaction.get(keyRef),
     ])
+    const voucherSnap = voucherRef ? await transaction.get(voucherRef) : null
 
     if (invitationSnap.exists || privateSnap.exists || keySnap.exists) {
       throw new Error('Tautan (slug) sudah dipakai orang lain. Silakan pilih tautan lain.')
+    }
+
+    if (voucherRef) {
+      const voucher = voucherSnap.exists ? voucherSnap.data() : null
+      if (!voucher || voucher.active !== true) {
+        throw Object.assign(new Error('Kode voucher tidak valid atau sudah tidak aktif.'), { status: 400 })
+      }
+      if (voucher.type === 'marketplace') {
+        const quota = Number(voucher.quota) || 0
+        const used = Number(voucher.usedCount) || 0
+        if (quota > 0 && used >= quota) {
+          throw Object.assign(new Error('Kuota kode marketplace sudah habis.'), { status: 400 })
+        }
+        records.publicData.status = 'paid'
+        records.privateData.originalPackagePrice = records.privateData.packagePrice
+        records.privateData.packagePrice = 0
+        records.privateData.paymentSource = 'marketplace'
+        transaction.update(voucherRef, { usedCount: used + 1 })
+      }
     }
 
     transaction.set(invitationRef, records.publicData)

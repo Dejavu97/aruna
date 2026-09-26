@@ -161,7 +161,12 @@ export default async function handler(req, res) {
     }
     // Restore adalah jalur admin-terautentikasi; normal create/clone tetap unpaid.
     if (isRestore && payload.status === 'paid') records.publicData.status = 'paid'
-    await createInvitationRecords(adminDb, slug, records)
+    const voucherCode = !isRestore && payload.voucher ? String(payload.voucher).trim().toUpperCase() : ''
+    if (voucherCode && !/^[A-Z0-9_-]{2,40}$/.test(voucherCode)) {
+      throw Object.assign(new Error('Format kode voucher tidak valid.'), { status: 400 })
+    }
+    if (voucherCode) records.privateData.voucher = voucherCode
+    await createInvitationRecords(adminDb, slug, records, { voucherCode })
 
     return res.status(201).json({
       success: true,
