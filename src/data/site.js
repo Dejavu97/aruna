@@ -59,7 +59,7 @@ export const eventPackages = {
       id: 'premium',
       name: 'VIP Exclusive',
       price: 100000,
-      blurb: 'Fitur terlengkap dengan bantuan pengerjaan dan masa aktif panjang.',
+      blurb: 'Semua alat kelola ditambah domain pribadi dan branding sendiri.',
       features: [
         'Semua di paket Lengkap',
         'White label & domain pribadi',
@@ -265,7 +265,12 @@ export function getPackagesByEventType(eventType = 'wedding', savedPackages = nu
       ...saved,
       id: base.id,
       price: Number.isFinite(price) && price >= 0 ? price : base.price,
-      features: Array.isArray(saved.features) ? saved.features : base.features,
+      // Wedding access is defined in shared/package-access.js. Old saved copy
+      // must not advertise features that the customer's tier cannot use.
+      blurb: eventType === 'wedding' ? base.blurb : saved.blurb || base.blurb,
+      features: eventType === 'wedding'
+        ? base.features
+        : Array.isArray(saved.features) ? saved.features : base.features,
     }
   })
 }

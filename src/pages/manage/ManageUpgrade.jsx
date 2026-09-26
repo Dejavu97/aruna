@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
 import { fetchDynamicPackages, fetchSettings, upgradePackage } from '../../lib/api'
 import { formatRupiah, getOrderPackage, getPackagesByEventType, waLink } from '../../data/site'
+import { weddingUpgradeUnlocks } from '../../../shared/package-access.js'
+
+function unlockedFeatures(item, current, target) {
+  if ((item.eventType || 'wedding') === 'wedding') {
+    return weddingUpgradeUnlocks(current.id, target.id)
+  }
+  return (target.features || []).filter((feature) =>
+    !/^Semua di paket/i.test(feature) && !(current.features || []).includes(feature))
+}
 
 export default function ManageUpgrade({ item, slug, editKey, reload }) {
   const [prices, setPrices] = useState(null)
@@ -24,6 +33,7 @@ export default function ManageUpgrade({ item, slug, editKey, reload }) {
   const current = getOrderPackage(item, prices)
   const options = list.slice(currentIndex + 1).filter((p) => p.price > current.price)
   const pending = item.pendingUpgrade
+  const selectedPackage = options.find((p) => p.id === selected)
   if (currentIndex < 0 || (!pending && options.length === 0 && prices)) return null
 
   async function requestUpgrade() {
@@ -73,9 +83,19 @@ export default function ManageUpgrade({ item, slug, editKey, reload }) {
               <label key={p.id} className={`w-full cursor-pointer rounded-xs border p-3 text-sm sm:w-64 ${selected === p.id ? 'border-gold-deep bg-gold/10' : 'border-ink/15'}`}>
                 <input type="radio" name="upgrade-package" className="mr-2 accent-gold-deep" checked={selected === p.id} onChange={() => setSelected(p.id)} />
                 <strong>{p.name}</strong> · Tambah {formatRupiah(p.price - current.price)}
+                <span className="mt-1 block text-xs text-stone">{unlockedFeatures(item, list[currentIndex], p).slice(0, 2).join(' · ')}</span>
               </label>
             ))}
           </div>
+          {selectedPackage && (
+            <div className="rounded-xs border border-gold/30 bg-ivory/60 p-4 text-xs">
+              <p className="font-semibold">Yang terbuka setelah upgrade ke {selectedPackage.name}:</p>
+              <ul className="mt-2 grid gap-1 sm:grid-cols-2">
+                {unlockedFeatures(item, list[currentIndex], selectedPackage).map((feature) => <li key={feature}>✓ {feature}</li>)}
+              </ul>
+              <p className="mt-2 text-stone">Akses aktif setelah pembayaran dikonfirmasi admin.</p>
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <button type="button" disabled={!selected || busy} onClick={requestUpgrade} className="bg-ink px-4 py-2 text-xs font-semibold uppercase text-white disabled:opacity-50">
               {busy ? 'Mengajukan...' : 'Ajukan upgrade'}
