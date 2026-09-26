@@ -88,13 +88,22 @@ export default async function handler(req, res) {
       : await resolvePrice(inv.packageId, inv.eventType);
     const bride = inv.bride?.nick || inv.bride?.full || '-';
     const groom = inv.groom?.nick || inv.groom?.full || '-';
-    const couple = groom && groom !== '-' ? `${bride} &amp; ${groom}` : escapeHtml(bride);
+    const couple = groom && groom !== '-' ? `${escapeHtml(bride)} &amp; ${escapeHtml(groom)}` : escapeHtml(bride);
+    const marketplaceOrder = inv.paymentSource === 'marketplace';
+    const paymentDetails = marketplaceOrder
+      ? `Pembayaran: Marketplace (di luar ByAruna)\n` +
+        `Kode marketplace: <code>${escapeHtml(inv.voucher || '-')}</code>\n` +
+        `Harga paket sebelum kode: ${formatRupiah(inv.originalPackagePrice)}\n`
+      : inv.voucher
+        ? `Kode voucher: <code>${escapeHtml(inv.voucher)}</code>\n`
+        : '';
 
     const text =
       `<b>🧾 ORDER BARU — ${escapeHtml(inv.orderCode || 'NO-CODE')}</b>\n` +
       `Mempelai: ${couple}\n` +
       `Pemesan: ${escapeHtml(inv.customerName || '-')} (${escapeHtml(inv.customerWhatsapp || '-')})\n` +
       `Paket: ${escapeHtml(name)} — ${formatRupiah(price)}\n` +
+      paymentDetails +
       `Tema: ${escapeHtml(inv.themeId || '-')} · Tgl acara: ${escapeHtml(inv.date || '-')}\n` +
       `Status: ${escapeHtml(inv.status || 'unpaid')}\n\n` +
       `🔗 <a href="${base}/u/${cleanSlug}">Buka undangan</a>\n` +
