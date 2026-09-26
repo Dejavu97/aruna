@@ -69,7 +69,17 @@ export default function Edit() {
     setBusy(true)
     setError('')
     try {
-      await updateInvitation(slug, payload, key)
+      // The form starts from the whole invitation document, which also contains
+      // dashboard-only fields (guest list, wishes, check-ins, branding). Sending
+      // those back would make an ordinary edit fail the package feature checks.
+      const formFields = blankInvitation(item.themeId, customThemes)
+      const editableFields = Object.fromEntries(
+        Object.keys(formFields)
+          .filter((field) => !['slug', 'packageId', 'voucher', 'customDomain'].includes(field))
+          .filter((field) => Object.hasOwn(payload, field))
+          .map((field) => [field, payload[field]]),
+      )
+      await updateInvitation(slug, editableFields, key)
       if (fromAdmin) navigate('/admin')
       else navigate(`/kelola/${slug}?key=${encodeURIComponent(key)}&from=customer`)
     } catch (err) {
