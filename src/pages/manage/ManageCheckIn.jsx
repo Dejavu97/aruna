@@ -83,7 +83,7 @@ export default function ManageCheckIn({ checkInFilter,
                   recentCheckIn.type === 'added' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-stone-100 border-stone-300 text-stone-700'
                 }`}>
                   <span>
-                    {recentCheckIn.type === 'added' ? `✓ Tamu "${recentCheckIn.name}" berhasil Check-In (${recentCheckIn.pax} orang)!` : `✕ Check-In tamu "${recentCheckIn.name}" dibatalkan.`}
+                  {recentCheckIn.type === 'added' ? `✓ Tamu "${recentCheckIn.name}" berhasil Check-In (${recentCheckIn.pax} orang)!` : recentCheckIn.type === 'duplicate' ? recentCheckIn.name : `✕ Check-In tamu "${recentCheckIn.name}" dibatalkan.`}
                   </span>
                 </div>
               )}
@@ -186,7 +186,7 @@ export default function ManageCheckIn({ checkInFilter,
                         {g.isCheckedIn ? (
                           <button
                             type="button"
-                            onClick={() => toggleCheckIn(g.name)}
+                            onClick={() => toggleCheckIn(g.name, 1, true)}
                             disabled={locked}
                             className="inline-flex items-center gap-1.5 border border-red-300 text-red-700 bg-red-50/50 px-3 py-2 text-xs uppercase tracking-widest hover:bg-red-100"
                           >

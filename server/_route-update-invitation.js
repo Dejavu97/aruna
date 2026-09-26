@@ -5,6 +5,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { partitionInvitationUpdate } from './_invitation-lifecycle.js';
 import handleUpgrade from './_upgrade-handler.js';
 import { canUseFeature, requiredPackage } from '../shared/package-access.js';
+import { validateCheckIns } from './_check-in-validation.js';
 
 const RESTRICTED_UPDATES = {
   guests: 'guestList',
@@ -67,6 +68,13 @@ export default async function handler(req, res) {
       for (const [field, feature] of Object.entries(RESTRICTED_UPDATES)) {
         if (Object.hasOwn(payload, field) && !canUseFeature(existingInvitation.data(), feature)) {
           return res.status(403).json({ error: `Fitur ini memerlukan paket ${requiredPackage(feature)} yang sudah aktif.` })
+        }
+      }
+      if (Object.hasOwn(payload, 'checkIns')) {
+        const privateSnap = await privateRef.get()
+        const guestLines = privateSnap.exists ? privateSnap.data()?.guests : []
+        if (!validateCheckIns(payload.checkIns, guestLines)) {
+          return res.status(400).json({ error: 'Check-in hanya untuk tamu terdaftar dan tidak boleh duplikat.' })
         }
       }
     }

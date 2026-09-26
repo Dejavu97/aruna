@@ -4,6 +4,7 @@ import { Bell, Camera, Check, Clock, Copy, Download, FileSpreadsheet, Plus, QrCo
 import SiteNav from '../../components/SiteNav'
 import SiteFooter from '../../components/SiteFooter'
 import QrCameraScanner from '../../components/QrCameraScanner'
+import { resolveScannedGuest } from '../../lib/check-in.js'
 import WeddingFrameModal from '../../components/WeddingFrameModal'
 import PrintCardModal from '../../components/PrintCardModal'
 import LoveQRCardGenerator from '../../components/LoveQRCardGenerator'
@@ -230,15 +231,20 @@ export function useManageState() {
     })
   }, [guestsWithCheckIn, checkInFilter, checkInSearch])
 
-  async function toggleCheckIn(guestName, pax = 1) {
+  async function toggleCheckIn(guestName, pax = 1, cancel = false) {
     const list = item?.checkIns || []
     const existingIdx = list.findIndex(
-      (c) => c.guestName.toLowerCase().trim() === guestName.toLowerCase().trim(),
+      (c) => c.guestName?.toLowerCase().trim() === guestName.toLowerCase().trim(),
     )
+    if (existingIdx >= 0 && !cancel) {
+      setRecentCheckIn({ type: 'duplicate', name: guestName })
+      setTimeout(() => setRecentCheckIn(null), 4000)
+      return
+    }
+    if (existingIdx < 0 && cancel) return
     let newCheckIns
     if (existingIdx >= 0) {
       newCheckIns = list.filter((_, idx) => idx !== existingIdx)
-      setRecentCheckIn({ type: 'removed', name: guestName })
     } else {
       const rec = {
         id: uid(),
@@ -247,12 +253,12 @@ export function useManageState() {
         pax: Number(pax) || 1,
       }
       newCheckIns = [rec, ...list]
-      setRecentCheckIn({ type: 'added', name: guestName, time: Date.now(), pax: Number(pax) || 1 })
     }
-    setTimeout(() => setRecentCheckIn(null), 4000)
     try {
       await updateInvitation(slug, { checkIns: newCheckIns }, editKey)
       setItem((prev) => ({ ...prev, checkIns: newCheckIns }))
+      setRecentCheckIn({ type: cancel ? 'removed' : 'added', name: guestName, pax: Number(pax) || 1 })
+      setTimeout(() => setRecentCheckIn(null), 4000)
     } catch (err) {
       setError(err.message)
     }
@@ -284,30 +290,14 @@ export function useManageState() {
   }
 
   const handleQrScanned = (decodedText) => {
-    let name = ''
-    try {
-      if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
-        const parsed = new URL(decodedText)
-        const to = parsed.searchParams.get('to')
-        if (to) name = decodeURIComponent(to).replace(/\+/g, ' ').trim()
-      } else if (decodedText.includes('to=')) {
-        const parts = decodedText.split('to=')
-        if (parts[1]) {
-          name = decodeURIComponent(parts[1].split('&')[0]).replace(/\+/g, ' ').trim()
-        }
-      }
-    } catch {}
-
-    if (!name) name = decodedText.trim()
-
     setShowScanner(false)
-    if (name) {
-      const matched = guestsWithRsvp.find(
-        (g) => g.name.toLowerCase().trim() === name.toLowerCase().trim(),
-      )
-      const defaultPax = matched?.rsvp?.guests || 1
-      toggleCheckIn(name, defaultPax)
+    const result = resolveScannedGuest(decodedText, slug, window.location.origin, guestsWithRsvp, item?.checkIns || [])
+    if (result.error) {
+      setRecentCheckIn({ type: 'duplicate', name: result.error })
+      setTimeout(() => setRecentCheckIn(null), 4000)
+      return
     }
+    toggleCheckIn(result.name, result.pax)
   }
 
   const composeMessage = (guestName, guestPhone = '', mode = messageMode) => {
