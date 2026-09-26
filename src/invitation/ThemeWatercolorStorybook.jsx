@@ -111,8 +111,8 @@ function OpeningBook({ data, guest, couple, opening, onOpen, reduce }) {
         </div>
         <motion.article
           className="wsb-book-cover"
-          animate={opening && !reduce ? { rotateY: -112, x: -24 } : { rotateY: 0, x: 0 }}
-          transition={{ duration: 1.05, ease: [0.65, 0, 0.35, 1] }}
+          animate={opening && !reduce ? { rotateY: -155, rotateX: 5, x: -12 } : { rotateY: 0, rotateX: 0, x: 0 }}
+          transition={{ duration: 1.25, ease: [0.65, 0, 0.35, 1] }}
         >
           <div className="wsb-cover-frame">
             <span className="wsb-cover-kicker">A watercolor story</span>
@@ -218,7 +218,7 @@ export default function ThemeWatercolorStorybook({ data, guest = '', preview = f
     if (opening) return
     setOpening(true)
     playMusic()
-    const wait = reduce ? 160 : 1050
+    const wait = reduce ? 160 : 1300
     window.setTimeout(() => {
       setOpen(true)
       window.scrollTo({ top: 0, behavior: 'auto' })

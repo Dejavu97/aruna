@@ -45,10 +45,20 @@
   padding: 34px 18px 26px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse at 12% 19%, rgba(216, 148, 145, .36), transparent 42%),
-    radial-gradient(ellipse at 91% 76%, rgba(116, 153, 125, .3), transparent 42%),
-    radial-gradient(ellipse at 62% 8%, rgba(194, 210, 220, .32), transparent 38%),
-    #f9f0e8;
+    radial-gradient(ellipse at 12% 19%, rgba(180, 107, 111, .38), transparent 42%),
+    radial-gradient(ellipse at 91% 76%, rgba(86, 126, 100, .36), transparent 42%),
+    #eee1d6;
+}
+
+.wsb-opening::before {
+  content: "";
+  position: absolute;
+  inset: -5%;
+  background: url('/themes/watercolor-storybook/garden-depth.webp') center / cover no-repeat;
+  opacity: .3;
+  filter: blur(16px) saturate(.8);
+  transform: scale(1.08);
+  pointer-events: none;
 }
 
 .wsb-opening::after,
@@ -76,6 +86,8 @@
   pointer-events: none;
 }
 
+.wsb-opening-wash { opacity: .3; }
+
 .wsb-floral {
   position: absolute;
   width: min(43vw, 560px);
@@ -87,13 +99,22 @@
 .wsb-floral-top { top: -100px; left: -95px; transform: rotate(-10deg); opacity: .95; }
 .wsb-floral-bottom { right: -95px; bottom: -110px; transform: rotate(170deg); opacity: .92; }
 
+.wsb-opening .wsb-floral { z-index: 5; filter: saturate(1.5) drop-shadow(0 18px 22px rgba(54,63,48,.22)); }
+
 .wsb-book-stage {
   position: relative;
-  width: min(72vw, 420px, 47dvh);
-  aspect-ratio: 0.73;
+  width: min(72vw, 390px, 43dvh);
+  aspect-ratio: .62;
   perspective: 1500px;
   transform-style: preserve-3d;
   z-index: 4;
+  transform: rotate(-2deg) rotateY(-5deg);
+  filter: drop-shadow(18px 28px 24px rgba(58,45,35,.25));
+  animation: wsb-book-float 6s ease-in-out infinite;
+}
+
+@keyframes wsb-book-float {
+  50% { transform: translateY(-9px) rotate(-1deg) rotateY(2deg); }
 }
 
 .wsb-book-shadow {
@@ -113,7 +134,7 @@
   border-radius: 7px 14px 14px 7px;
   background: #fdf8f0;
   border: 1px solid rgba(92, 74, 67, 0.15);
-  box-shadow: 8px 10px 24px rgba(85, 66, 54, 0.18);
+  box-shadow: 10px 14px 30px rgba(85, 66, 54, .25), inset -7px 0 5px rgba(107,83,67,.09);
   overflow: hidden;
 }
 
@@ -136,9 +157,8 @@
   border-radius: 8px 15px 15px 8px;
   border: 1px solid rgba(92, 74, 67, 0.18);
   background:
-    linear-gradient(135deg, rgba(255,255,255,.5), transparent 47%),
-    radial-gradient(circle at 72% 18%, rgba(215,139,135,.5), transparent 34%),
-    radial-gradient(circle at 28% 80%, rgba(137,166,143,.46), transparent 35%),
+    linear-gradient(90deg, rgba(66,47,42,.13), transparent 8%, transparent 92%, rgba(70,52,43,.12)),
+    url('/themes/watercolor-storybook/garden-depth.webp') center / cover no-repeat,
     #efe0d2;
   box-shadow: 0 34px 78px rgba(88, 68, 56, .29), inset 8px 0 16px rgba(92, 74, 67, .1);
   overflow: hidden;
@@ -149,11 +169,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    url('/themes/watercolor-storybook/floral-corner.svg') top right / 94% auto no-repeat,
-    url('/themes/watercolor-storybook/floral-corner.svg') bottom left / 72% auto no-repeat;
-  opacity: .88;
-  filter: saturate(1.5);
+  background: linear-gradient(105deg, rgba(255,255,255,.28), transparent 32%, rgba(255,255,255,.13) 50%, transparent 68%);
 }
 
 .wsb-book-cover::after {
@@ -169,16 +185,16 @@
 
 .wsb-cover-frame {
   position: absolute;
-  inset: 38px 32px;
+  inset: 23% 19% 25%;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  border: 1px solid rgba(92, 74, 67, .4);
+  border: 0;
   padding: 26px 18px;
-  background: rgba(255, 250, 242, .32);
+  background: transparent;
 }
 
 .wsb-cover-frame::before,
@@ -189,7 +205,7 @@
   transform: translateX(-50%);
   padding: 0 8px;
   color: var(--wsb-sage-deep);
-  background: #eee4d8;
+  background: transparent;
   font-size: 12px;
 }
 .wsb-cover-frame::before { top: -8px; }
@@ -209,7 +225,7 @@
 .wsb-cover-frame h1 {
   margin: 16px 0 5px;
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(48px, 8vw, 76px);
+  font-size: clamp(42px, 7vw, 68px);
   font-weight: 500;
   line-height: 0.9;
 }
@@ -488,8 +504,8 @@
 
 @media (max-width: 520px) {
   .wsb-opening { padding-top: 22px; }
-  .wsb-book-stage { width: min(82vw, 340px, 48dvh); }
-  .wsb-cover-frame { inset: 28px 23px; }
+  .wsb-book-stage { width: min(82vw, 340px, 47dvh); }
+  .wsb-cover-frame { inset: 22% 17% 24%; padding: 10px; }
   .wsb-floral-top, .wsb-floral-bottom { width: 88vw; }
   .wsb-page { padding: 44px 24px; }
   .wsb-page-left { min-height: 500px; }
