@@ -8,7 +8,6 @@ import { themes } from '../data/themes'
 import { fetchDynamicPackagesWithTimeout, getAnnouncement } from '../lib/api'
 import AdSlot from '../components/AdSlot'
 import InteractiveVideoTeaser from '../components/InteractiveVideoTeaser'
-import ClientTestimonials from '../components/ClientTestimonials'
 
 export default function Home() {
   const [globalAnnouncement, setGlobalAnnouncement] = useState('')
@@ -42,7 +41,6 @@ export default function Home() {
         <InteractiveVideoTeaser />
         <VibeAndStudioSection />
         <FeatureGrid />
-        <ClientTestimonials />
         <AdSlot slot="home" className="max-w-4xl" />
         <Faq />
         <Close />
@@ -499,24 +497,6 @@ function Pricing() {
             </article>
           ))}
         </div>
-      </div>
-    </section>
-  )
-}
-
-function Words() {
-  return (
-    <section className="mx-auto max-w-6xl px-5 py-20">
-      <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Kata mereka</p>
-      <div className="mt-8 grid gap-6 md:grid-cols-3">
-        {testimonials.map((t) => (
-          <blockquote key={t.name} className="border border-ink/10 bg-transparent p-6">
-            <p className="font-display text-2xl leading-snug">“{t.quote}”</p>
-            <footer className="mt-5 text-sm text-stone">
-              {t.name} · {t.city}
-            </footer>
-          </blockquote>
-        ))}
       </div>
     </section>
   )

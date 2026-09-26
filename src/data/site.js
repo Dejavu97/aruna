@@ -447,27 +447,6 @@ export const features = [
   },
 ]
 
-export const testimonials = [
-  {
-    name: 'Nadya & Farhan',
-    city: 'Jakarta',
-    quote:
-      'Tamu yang paling gaptek pun bisa buka. RSVP-nya bantu banget hitung jamuan.',
-  },
-  {
-    name: 'Laras & Raka',
-    city: 'Yogyakarta',
-    quote:
-      'Tema Batiknya terasa adat, bukan template luar negeri yang dipaksakan.',
-  },
-  {
-    name: 'Alya & Rafi',
-    city: 'Bandung',
-    quote:
-      'Dari pilih tema sampai link jadi, belum sempat masak nasi goreng. Rapinya di luar ekspektasi.',
-  },
-]
-
 export const faqs = [
   {
     q: 'Berapa lama undangan jadi?',
