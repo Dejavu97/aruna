@@ -194,18 +194,20 @@ export default function AdminMonetizationTab({ adSettings,
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Keterangan Singkat</label>
+                  <label className="block text-[10px] uppercase text-stone mb-1 font-semibold">Keterangan Singkat{pkg.eventType === 'wedding' ? ' (Otomatis)' : ''}</label>
                   <textarea
                     rows={2}
                     value={pkg.blurb || ''}
+                    disabled={pkg.eventType === 'wedding'}
                     onChange={(e) => {
                       const val = e.target.value
                       setAdminPackages((prev) => {
                         return prev.map((p, i) => i === idx ? { ...p, blurb: val } : p)
                       })
                     }}
-                    className="w-full border border-ink/20 p-2 text-xs bg-white"
+                    className="w-full border border-ink/20 p-2 text-xs bg-white disabled:bg-ink/5 disabled:text-stone"
                   />
+                  {pkg.eventType === 'wedding' && <p className="text-[10px] text-stone">Deskripsi dan daftar fitur pernikahan mengikuti akses paket di dashboard.</p>}
                 </div>
               </div>
 

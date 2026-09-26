@@ -1,5 +1,18 @@
 const WEDDING_TIERS = ['gratis', 'hemat', 'lengkap', 'premium']
 
+const WEDDING_UNLOCKS = Object.freeze({
+  hemat: ['Daftar tamu & tautan personal', 'Template pesan & pengingat WhatsApp', 'Impor & ekspor CSV', 'QR resolusi tinggi'],
+  lengkap: ['Balas ucapan', 'Proteksi foto', 'Kartu QR Cinta & Kado & frame', 'QR check-in lokasi'],
+  premium: ['Domain pribadi', 'White label'],
+})
+
+export function weddingUpgradeUnlocks(currentId, targetId) {
+  const current = WEDDING_TIERS.indexOf(currentId)
+  const target = WEDDING_TIERS.indexOf(targetId)
+  if (current < 0 || target <= current) return []
+  return WEDDING_TIERS.slice(current + 1, target + 1).flatMap((tier) => WEDDING_UNLOCKS[tier] || [])
+}
+
 export const FEATURE_TIERS = Object.freeze({
   guestList: 'hemat',
   csv: 'hemat',

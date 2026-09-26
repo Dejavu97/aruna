@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { canUseFeature } from '../shared/package-access.js'
+import { canUseFeature, weddingUpgradeUnlocks } from '../shared/package-access.js'
+import { getPackagesByEventType } from '../src/data/site.js'
 import { addDomainBoundary } from '../server/_domain-boundary.js'
 import { resolveWatermarkPresentation } from '../src/lib/watermark-authority.js'
 
@@ -40,4 +41,21 @@ test('existing white label only displays for active VIP wedding orders', () => {
     assert.equal(resolveWatermarkPresentation({ eventType: 'wedding', status: 'paid', packageId, watermarkMode: 'hidden' }).mode, 'default')
   }
   assert.equal(resolveWatermarkPresentation({ eventType: 'wedding', status: 'paid', packageId: 'premium', watermarkMode: 'hidden' }).mode, 'hidden')
+})
+
+test('old admin copy cannot overwrite wedding feature list or blurb', () => {
+  const saved = [{ id: 'premium', price: 125000, name: 'Paket Spesial', blurb: 'Bantuan admin lama', features: ['Fitur usang'] }]
+  const premium = getPackagesByEventType('wedding', saved).find((p) => p.id === 'premium')
+  assert.equal(premium.price, 125000)
+  assert.equal(premium.name, 'Paket Spesial')
+  assert.equal(premium.features.includes('Fitur usang'), false)
+  assert.equal(premium.blurb.includes('Bantuan admin lama'), false)
+})
+
+test('upgrade preview includes all newly unlocked intermediate tiers', () => {
+  const unlocks = weddingUpgradeUnlocks('gratis', 'premium')
+  assert.ok(unlocks.includes('Impor & ekspor CSV'))
+  assert.ok(unlocks.includes('QR check-in lokasi'))
+  assert.ok(unlocks.includes('White label'))
+  assert.deepEqual(weddingUpgradeUnlocks('lengkap', 'premium'), ['Domain pribadi', 'White label'])
 })
