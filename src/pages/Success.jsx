@@ -170,6 +170,9 @@ Mohon dicek pembayarannya.`
               Demi keamanan, sistem kami <strong>tidak akan pernah</strong> menampilkan kunci akses ini lagi di masa depan. 
               Segera salin dan simpan <strong>Kode Edit</strong> atau <strong>Link Dashboard</strong> di bawah ini ke catatan Anda (atau *bookmark* halaman ini).
             </p>
+            <p role="alert" className="mt-3 rounded border border-red-300 bg-white p-3 font-semibold text-red-900 leading-relaxed">
+              Jangan bagikan kode edit atau URL yang mengandung <code>?key=</code> kepada tamu atau di media sosial. Siapa pun yang memegangnya dapat mengelola undangan Anda. Untuk tamu, bagikan hanya tautan undangan <strong>{url}</strong> di bagian atas halaman ini.
+            </p>
             <p className="mt-4 break-all font-mono bg-white p-2 border border-red-200">{editKey}</p>
             <div className="mt-3 flex flex-wrap gap-3 text-red-800">
               <button type="button" className="underline font-bold" onClick={() => copy(editKey, 'key')}>

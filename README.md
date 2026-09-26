@@ -154,6 +154,8 @@ aruna-undangan/
 
 ## 🛡️ Keamanan & Privasi
 - **Kunci Rahasia (*Edit Key*):** Setiap pesanan memiliki kode edit unik yang disimpan terisolasi di database.
+- **Privasi undangan:** Halaman undangan pelanggan (`/u/:slug` dan domain pribadi) serta rute akun/kelola/edit/sukses mengirim `noindex, nofollow`; halaman pemasaran tetap dapat diindeks. Jangan memasukkan undangan pelanggan ke sitemap publik.
+- **Tautan pengelola:** URL dengan `?key=` memberi akses mengelola undangan dan hanya boleh dibagikan kepada pemilik. Tamu menerima tautan `/u/:slug` tanpa kunci.
 - **Proteksi Media:** Proteksi klik kanan dan anti-drag pada galeri foto pengantin.
 - **Admin Super Access:** Autentikasi Firebase Auth terenkripsi untuk pengelola sistem.
 
