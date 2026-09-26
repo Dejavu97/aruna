@@ -4,6 +4,7 @@ import BoardingInvitation from './BoardingInvitation'
 import ThemeAdatJawa from './ThemeAdatJawa'
 import ThemeArtJawaBiru from './ThemeArtJawaBiru'
 import ThemeRoyalBunny from './ThemeRoyalBunny'
+import ThemeWatercolorStorybook from './ThemeWatercolorStorybook'
 import ThemeWeddingGazette from './ThemeWeddingGazette'
 import ThemeCinematicMinimal from './ThemeCinematicMinimal'
 import ThemeCinematicLoveLetter from './ThemeCinematicLoveLetter'
@@ -18,6 +19,7 @@ registerThemeComponent('modern-editorial-letter', ThemeModernEditorialLetter)
 registerThemeComponent('cinematic-love-letter', ThemeCinematicLoveLetter)
 registerThemeComponent('cinematic-minimal', ThemeCinematicMinimal)
 registerThemeComponent('royal-bunny', ThemeRoyalBunny)
+registerThemeComponent('watercolor-storybook', ThemeWatercolorStorybook)
 registerThemeComponent('adat-jawa', ThemeAdatJawa)
 registerThemeComponent('art-jawa-biru', ThemeArtJawaBiru)
 registerThemeComponent('attari', AttariInvitation)
