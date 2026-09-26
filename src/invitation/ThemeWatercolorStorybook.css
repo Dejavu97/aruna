@@ -332,7 +332,7 @@
   position: relative;
   width: min(100%, 430px);
   aspect-ratio: .78;
-  margin: 10px auto 38px;
+  margin: 10px auto 100px;
   isolation: isolate;
   overflow: visible;
 }
@@ -539,7 +539,7 @@
   .wsb-cover-frame { inset: 22% 17% 24%; padding: 10px; }
   .wsb-floral-top, .wsb-floral-bottom { width: 88vw; }
   .wsb-page { padding: 44px 24px; }
-  .wsb-hero-art { width: min(82%, 330px); margin-bottom: 65px; }
+  .wsb-hero-art { width: min(82%, 330px); margin-bottom: 90px; }
   .wsb-hero-art .wsb-foreground-bouquet { left: -26%; bottom: -11%; }
   .wsb-page-left { min-height: 500px; }
   .wsb-hero-names { margin-top: 96px; font-size: clamp(54px,17vw,76px); }
