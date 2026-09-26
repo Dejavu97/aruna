@@ -52,6 +52,20 @@ export default async function handler(req, res) {
         throw Object.assign(new Error('Lunasi paket saat ini sebelum upgrade.'), { status: 409 })
       }
       const delta = calculateUpgrade(inv.packageId, oldPrice, targetPackageId, target.price, inv.eventType)
+      if (delta === 0) {
+        const upgradedAt = Date.now()
+        tx.update(publicRef, { packageId: targetPackageId, status: 'paid', updatedAt: upgradedAt })
+        tx.set(privateRef, {
+          packageName: target.name,
+          packagePrice: target.price,
+          upgradeHistory: [...(meta.upgradeHistory || []), {
+            fromPackageId: inv.packageId, fromPrice: Number(oldPrice),
+            toPackageId: targetPackageId, toName: target.name, toPrice: target.price,
+            amount: 0, requestedAt: upgradedAt, confirmedAt: upgradedAt,
+          }],
+        }, { merge: true })
+        return 0
+      }
       tx.set(privateRef, { pendingUpgrade: {
         fromPackageId: inv.packageId, fromPrice: Number(oldPrice),
         toPackageId: targetPackageId, toName: target.name, toPrice: target.price,

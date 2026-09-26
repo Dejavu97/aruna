@@ -12,6 +12,6 @@ export function calculateUpgrade(currentId, currentPrice, targetId, targetPrice,
     throw Object.assign(new Error('Harga paket tidak valid.'), { status: 400 })
   }
   const amount = targetPrice - oldPrice
-  if (amount <= 0) throw Object.assign(new Error('Harga paket tujuan harus lebih tinggi.'), { status: 400 })
+  if (amount < 0) throw Object.assign(new Error('Harga paket tujuan tidak boleh lebih rendah dari harga paket saat ini.'), { status: 400 })
   return amount
 }

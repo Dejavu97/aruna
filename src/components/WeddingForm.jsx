@@ -780,7 +780,7 @@ export default function InvitationForm({
                       <span className="mt-1 block text-sm normal-case tracking-normal text-stone">{p.blurb}</span>
                     </span>
                     <span className="shrink-0 font-display text-xl font-semibold">
-                      {p.price === 0 ? 'Rp 0 (Gratis)' : formatRupiah(p.price)}
+                      {formatRupiah(p.price)}
                     </span>
                   </label>
                 ))}
@@ -889,7 +889,7 @@ export default function InvitationForm({
                     <p className="text-[11px] uppercase tracking-wider text-stone font-semibold">Paket</p>
                     <p className="font-display text-xl text-ink">{!packagesReady || pricingError
                       ? (pricingError || 'Memuat harga paket terbaru...')
-                      : `${pkg?.name || form.packageId} — ${pkg?.price === 0 ? 'Rp 0 (Gratis)' : formatRupiah(pkg?.price || 0)}`}</p>
+                      : `${pkg?.name || form.packageId} — ${formatRupiah(pkg?.price || 0)}`}</p>
                     {form.voucher && <p className="text-xs text-stone mt-0.5">Voucher: {form.voucher}</p>}
                   </div>
                   <button type="button" onClick={() => setStep(steps.findIndex((s) => s.id === 'pemesan'))} className="text-xs underline shrink-0">Ubah</button>

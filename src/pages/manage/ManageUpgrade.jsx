@@ -31,7 +31,7 @@ export default function ManageUpgrade({ item, slug, editKey, reload }) {
   const list = getPackagesByEventType(item.eventType, prices)
   const currentIndex = list.findIndex((p) => p.id === item.packageId)
   const current = getOrderPackage(item, prices)
-  const options = list.slice(currentIndex + 1).filter((p) => p.price > current.price)
+  const options = list.slice(currentIndex + 1).filter((p) => p.price >= current.price)
   const pending = item.pendingUpgrade
   const selectedPackage = options.find((p) => p.id === selected)
   if (currentIndex < 0 || (!pending && options.length === 0 && prices)) return null
@@ -93,7 +93,7 @@ export default function ManageUpgrade({ item, slug, editKey, reload }) {
               <ul className="mt-2 grid gap-1 sm:grid-cols-2">
                 {unlockedFeatures(item, list[currentIndex], selectedPackage).map((feature) => <li key={feature}>✓ {feature}</li>)}
               </ul>
-              <p className="mt-2 text-stone">Akses aktif setelah pembayaran dikonfirmasi admin.</p>
+              <p className="mt-2 text-stone">{selectedPackage.price === current.price ? 'Akses langsung aktif tanpa pembayaran.' : 'Akses aktif setelah pembayaran dikonfirmasi admin.'}</p>
             </div>
           )}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">

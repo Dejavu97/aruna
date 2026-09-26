@@ -32,10 +32,23 @@ export default async function handler(req, res) {
     }
 
     await clearFailures(req);
-    const privateSnap = await adminDb.collection('invitation_private').doc(slug).get()
+    const privateRef = adminDb.collection('invitation_private').doc(slug)
+    const publicRef = adminDb.collection('invitations').doc(slug)
+    const { privateData, status } = await adminDb.runTransaction(async (tx) => {
+      const [privateSnap, publicSnap] = await Promise.all([tx.get(privateRef), tx.get(publicRef)])
+      const privateData = privateSnap.exists ? privateSnap.data() : {}
+      if (!publicSnap.exists) return { privateData }
+      const invitation = publicSnap.data()
+      if (invitation.packageId !== 'gratis' && privateData.packagePrice === 0 && invitation.status !== 'paid') {
+        tx.update(publicRef, { status: 'paid', updatedAt: Date.now() })
+        return { privateData, status: 'paid' }
+      }
+      return { privateData, status: invitation.status }
+    })
     return res.status(200).json({
       success: true,
-      privateData: privateSnap.exists ? privateSnap.data() : {},
+      privateData,
+      status,
     })
   } catch (err) {
     if (err.status === 429) {

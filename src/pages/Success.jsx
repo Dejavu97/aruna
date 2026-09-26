@@ -60,7 +60,7 @@ export default function Success() {
   const payText = `Halo ByAruna, saya sudah pesan undangan digital.
 Kode Order: ${data?.orderCode || '-'}
 Acara (${eventLabel}): ${heroNames}
-Paket: ${pack.name} (${pack.price === 0 ? 'Gratis' : formatRupiah(pack.price)})
+Paket: ${pack.name} (${formatRupiah(pack.price)})
 Link: ${url}
 Mohon dicek pembayarannya.`
 
@@ -149,10 +149,10 @@ Mohon dicek pembayarannya.`
         ) : (
           <div className="mt-5 border border-gold-deep/30 bg-paper/80 p-5 rounded">
             <div className="flex items-center gap-2 text-gold-deep font-semibold text-xs uppercase tracking-wider">
-              <CheckCircle2 size={15} /> Paket Gratis Aktif
+              <CheckCircle2 size={15} /> Paket {pack.name} Aktif
             </div>
             <p className="mt-2 text-sm text-stone leading-relaxed">
-              Undangan digital Anda sudah aktif dan siap disebar ke para tamu. Bebas biaya dan didukung oleh sponsor iklan platform.
+              Undangan digital Anda sudah aktif dan siap disebar ke para tamu. Tidak ada pembayaran untuk pesanan ini.
             </p>
           </div>
         )}

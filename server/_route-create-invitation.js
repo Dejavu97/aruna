@@ -155,6 +155,9 @@ export default async function handler(req, res) {
       const currentPackage = await resolveOrderPackage(adminDb, payload.packageId, payload.eventType)
       records.privateData.packagePrice = currentPackage.price
       records.privateData.packageName = currentPackage.name
+      if (currentPackage.price === 0 && payload.packageId !== 'gratis') {
+        records.publicData.status = 'paid'
+      }
     }
     // Restore adalah jalur admin-terautentikasi; normal create/clone tetap unpaid.
     if (isRestore && payload.status === 'paid') records.publicData.status = 'paid'

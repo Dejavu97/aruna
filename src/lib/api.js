@@ -274,6 +274,7 @@ export async function fetchInvitation(slug, editKey) {
     if (res.status === 403) throw new Error('Kunci rahasia salah.')
     if (!res.ok) throw new Error(data.error || `Verifikasi gagal (${res.status}).`)
     privateData = data.privateData || {}
+    if (data.status) privateData.status = data.status
   }
 
   return { ...docSnap.data(), ...privateData }
