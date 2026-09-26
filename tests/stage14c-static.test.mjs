@@ -43,7 +43,7 @@ test('sitemap is valid-looking XML and excludes the login route', async () => {
   const source = await read('public/sitemap.xml')
   assert.match(source, /^<\?xml version="1\.0" encoding="UTF-8"\?>/)
   assert.match(source.trim(), /<urlset[\s\S]*<\/urlset>$/)
-  assert.equal(source.includes('https://byaruna.my.id/masuk'), false)
+  assert.equal(source.includes('https://byaruna.com/masuk'), false)
   assert.equal((source.match(/<url>/g) || []).length, (source.match(/<\/url>/g) || []).length)
 })
 

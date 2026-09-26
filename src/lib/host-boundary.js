@@ -1,4 +1,6 @@
 export const FIRST_PARTY_HOSTS = Object.freeze([
+  'byaruna.com',
+  'www.byaruna.com',
   'byaruna.my.id',
   'www.byaruna.my.id',
   'aruna-sand.vercel.app',

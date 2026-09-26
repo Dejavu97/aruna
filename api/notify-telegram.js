@@ -82,7 +82,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, deduped: true });
     }
 
-    const base = (process.env.SITE_BASE_URL || 'https://byaruna.my.id').replace(/\/$/, '');
+    const base = (process.env.SITE_BASE_URL || 'https://byaruna.com').replace(/\/$/, '');
     const { name, price } = Number.isSafeInteger(Number(inv.packagePrice)) && inv.packagePrice !== undefined
       ? { name: inv.packageName || inv.packageId, price: Number(inv.packagePrice) }
       : await resolvePrice(inv.packageId, inv.eventType);

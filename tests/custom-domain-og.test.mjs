@@ -8,7 +8,7 @@ const BASE_HTML = `<!doctype html><html><head>
 <title>ByAruna — Undangan Digital Eksklusif & Elegan</title>
 <meta name="description" content="Generic ByAruna" />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://byaruna.my.id/" />
+<link rel="canonical" href="https://byaruna.com/" />
 <!-- Open Graph / Facebook / WhatsApp Preview -->
 <meta property="og:title" content="Generic ByAruna" />
 <!-- Google Structured Data / JSON-LD Rich Snippets -->
@@ -77,6 +77,8 @@ async function request({ host, path = '/', query = {}, db }) {
 test('host authority recognizes only ByAruna Vercel hosts', () => {
   assert.equal(normalizeRequestHost('BYARUNA.MY.ID.'), 'byaruna.my.id')
   assert.equal(normalizeRequestHost('aruna-hzcgvb516-whydidyoucomehere.vercel.app'), 'aruna-hzcgvb516-whydidyoucomehere.vercel.app')
+  assert.equal(isFirstPartyHostname('byaruna.com'), true)
+  assert.equal(isFirstPartyHostname('www.byaruna.com'), true)
   assert.equal(isFirstPartyHostname('byaruna.my.id'), true)
   assert.equal(isFirstPartyHostname('www.byaruna.my.id'), true)
   assert.equal(isFirstPartyHostname('aruna-hzcgvb516-whydidyoucomehere.vercel.app'), true)
@@ -88,7 +90,7 @@ test('host authority recognizes only ByAruna Vercel hosts', () => {
 })
 
 test('first-party root and known Vercel hosts retain the normal ByAruna shell', async () => {
-  for (const host of ['byaruna.my.id', 'aruna-hzcgvb516-whydidyoucomehere.vercel.app']) {
+  for (const host of ['byaruna.com', 'byaruna.my.id', 'aruna-hzcgvb516-whydidyoucomehere.vercel.app']) {
     const res = await request({ host, db: makeDb() })
     assert.equal(res.statusCode, 200)
     assert.match(res.body, /<title>ByAruna — Undangan Digital Eksklusif &amp; Elegan<\/title>/)
@@ -107,14 +109,14 @@ test('first-party public routes receive route-aware canonical and OG metadata', 
   assert.equal(catalog.statusCode, 200)
   assert.match(catalog.body, /<title>Katalog Tema Undangan Digital — ByAruna<\/title>/)
   assert.match(catalog.body, /<meta name="robots" content="index, follow"/)
-  assert.match(catalog.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/tema"/)
-  assert.match(catalog.body, /<meta property="og:url" content="https:\/\/byaruna\.my\.id\/tema"/)
+  assert.match(catalog.body, /<link rel="canonical" href="https:\/\/byaruna\.com\/tema"/)
+  assert.match(catalog.body, /<meta property="og:url" content="https:\/\/byaruna\.com\/tema"/)
 
   const studio = await request({ host: 'byaruna.my.id', path: '/studio', db: makeDb() })
   assert.equal(studio.statusCode, 200)
   assert.match(studio.body, /<title>Theme Studio — Racik Undangan Digital ByAruna<\/title>/)
-  assert.match(studio.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/studio"/)
-  assert.match(studio.body, /<meta property="og:url" content="https:\/\/byaruna\.my\.id\/studio"/)
+  assert.match(studio.body, /<link rel="canonical" href="https:\/\/byaruna\.com\/studio"/)
+  assert.match(studio.body, /<meta property="og:url" content="https:\/\/byaruna\.com\/studio"/)
 })
 
 test('customer SPA routes serve the shell without reflecting edit credentials', async () => {
@@ -145,7 +147,7 @@ test('remaining first-party SPA routes serve the shell with route-appropriate me
   assert.equal(publicRoute.statusCode, 200)
   assert.match(publicRoute.body, /<script type="module" src="\/assets\/app\.js"><\/script>/)
   assert.match(publicRoute.body, /<meta name="robots" content="index, follow"/)
-  assert.match(publicRoute.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/inspirasi"/)
+  assert.match(publicRoute.body, /<link rel="canonical" href="https:\/\/byaruna\.com\/inspirasi"/)
 
   const secret = 'SECRET_ROUTE_QUERY_SHOULD_NOT_LEAK'
   for (const path of ['/pesan', '/pesan/test-theme', '/masuk', '/dashboard', '/admin']) {
@@ -171,7 +173,7 @@ test('unrelated first-party routes remain a 404 after the SPA allowlist expansio
 test('homepage keeps homepage metadata and unknown invitation is a non-indexable 404', async () => {
   const home = await request({ host: 'byaruna.my.id', path: '/', db: makeDb() })
   assert.equal(home.statusCode, 200)
-  assert.match(home.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/"/)
+  assert.match(home.body, /<link rel="canonical" href="https:\/\/byaruna\.com\/"/)
 
   const unknown = await request({
     host: 'byaruna.my.id',
@@ -198,8 +200,8 @@ test('existing first-party /u/:slug returns escaped invitation metadata and keep
   assert.match(res.body, /The Wedding of Ayu &lt;script&gt;alert\(&quot;x&quot;\)&lt;\/script&gt; &amp; 'Kawan' &amp; Bima/)
   assert.doesNotMatch(res.body, /<script>alert\("x"\)<\/script>/)
   assert.match(res.body, /<meta name="robots" content="noindex, nofollow"/)
-  assert.match(res.body, /<meta property="og:url" content="https:\/\/byaruna\.my\.id\/u\/ayu-bima"/)
-  assert.match(res.body, /<link rel="canonical" href="https:\/\/byaruna\.my\.id\/u\/ayu-bima"/)
+  assert.match(res.body, /<meta property="og:url" content="https:\/\/byaruna\.com\/u\/ayu-bima"/)
+  assert.match(res.body, /<link rel="canonical" href="https:\/\/byaruna\.com\/u\/ayu-bima"/)
   assert.match(res.body, /<script type="module" src="\/assets\/app\.js"><\/script>/)
 })
 
