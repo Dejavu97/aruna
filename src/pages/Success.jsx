@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
-import { fetchDynamicPackages, fetchInvitation, fetchSettings, getEditKey, rememberEditKey } from '../lib/api'
+import { fetchDynamicPackages, fetchInvitation, fetchSettings, rememberEditKey } from '../lib/api'
 import { copyText, invitationUrl } from '../lib/utils'
 import { formatRupiah, getOrderPackage, waLink } from '../data/site'
 import AdSlot from '../components/AdSlot'
@@ -20,25 +20,45 @@ export default function Success() {
   const [pricingError, setPricingError] = useState(false)
   const [orderError, setOrderError] = useState('')
   const [copied, setCopied] = useState('')
-  const editKey = params.get('key') || getEditKey(slug)
+  // A saved browser key must never turn a slug-only success URL into a key reveal.
+  const editKey = params.get('key') || ''
   const url = invitationUrl(slug)
 
   useEffect(() => {
-    if (params.get('key')) rememberEditKey(slug, params.get('key'))
-  }, [slug, params])
-
-  useEffect(() => {
+    if (!editKey) return
+    let active = true
+    setData(null)
+    setOrderError('')
     fetchInvitation(slug, editKey)
-      .then(setData)
-      .catch(() => setOrderError('Data pesanan gagal dimuat. Coba muat ulang halaman.'))
+      .then((item) => {
+        if (!active) return
+        setData(item)
+        rememberEditKey(slug, editKey)
+      })
+      .catch(() => { if (active) setOrderError('Kunci tidak valid atau data pesanan gagal dimuat.') })
     fetchSettings()
-      .then((s) => setBank(s.bank))
+      .then((s) => { if (active) setBank(s.bank) })
       .catch(() => {})
     fetchDynamicPackages()
-      .then(setDynamicPackages)
-      .catch(() => setPricingError(true))
-      .finally(() => setPricingReady(true))
+      .then((list) => { if (active) setDynamicPackages(list) })
+      .catch(() => { if (active) setPricingError(true) })
+      .finally(() => { if (active) setPricingReady(true) })
+    return () => { active = false }
   }, [slug, editKey])
+
+  if (!editKey || orderError) {
+    return (
+      <div className="min-h-screen bg-ivory">
+        <SiteNav />
+        <section className="mx-auto max-w-xl px-5 py-20">
+          <h1 className="font-display text-3xl">Akses pesanan diperlukan</h1>
+          <p className="mt-3 text-sm text-stone">{orderError || 'Buka tautan lengkap dari halaman checkout atau pesan konfirmasi yang memuat kode akses pribadi.'}</p>
+          <p className="mt-4 text-sm text-stone">Tautan undangan untuk tamu: <Link to={`/u/${slug}`} className="underline">{url}</Link></p>
+        </section>
+        <SiteFooter />
+      </div>
+    )
+  }
 
   const pack = getOrderPackage(data, dynamicPackages)
   const hasRecordedPrice = data?.packagePrice != null
@@ -161,7 +181,7 @@ Mohon dicek pembayarannya.`
 
         <AdSlot slot="success" data={data} />
 
-        {editKey && (
+        {data && editKey && (
           <div className="mt-5 border-l-4 border-red-600 bg-red-50 p-5 text-sm">
             <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-red-800 font-bold">
               <AlertTriangle size={14} /> PERHATIAN PENTING: SIMPAN AKSES INI
