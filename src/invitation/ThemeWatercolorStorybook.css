@@ -45,9 +45,10 @@
   padding: 34px 18px 26px;
   overflow: hidden;
   background:
-    radial-gradient(circle at 20% 12%, rgba(217, 168, 162, 0.2), transparent 30%),
-    radial-gradient(circle at 82% 78%, rgba(169, 185, 162, 0.23), transparent 34%),
-    #f7f1e8;
+    radial-gradient(ellipse at 12% 19%, rgba(216, 148, 145, .36), transparent 42%),
+    radial-gradient(ellipse at 91% 76%, rgba(116, 153, 125, .3), transparent 42%),
+    radial-gradient(ellipse at 62% 8%, rgba(194, 210, 220, .32), transparent 38%),
+    #f9f0e8;
 }
 
 .wsb-opening::after,
@@ -71,23 +72,24 @@
   width: 116%;
   height: 116%;
   object-fit: cover;
-  opacity: 0.72;
+  opacity: 0.58;
   pointer-events: none;
 }
 
 .wsb-floral {
   position: absolute;
-  width: min(46vw, 430px);
+  width: min(43vw, 560px);
   pointer-events: none;
   user-select: none;
+  filter: saturate(1.55) contrast(1.12);
 }
 
-.wsb-floral-top { top: -70px; left: -72px; transform: rotate(-10deg); opacity: 0.72; }
-.wsb-floral-bottom { right: -80px; bottom: -70px; transform: rotate(170deg); opacity: 0.74; }
+.wsb-floral-top { top: -100px; left: -95px; transform: rotate(-10deg); opacity: .95; }
+.wsb-floral-bottom { right: -95px; bottom: -110px; transform: rotate(170deg); opacity: .92; }
 
 .wsb-book-stage {
   position: relative;
-  width: min(78vw, 335px);
+  width: min(72vw, 420px, 47dvh);
   aspect-ratio: 0.73;
   perspective: 1500px;
   transform-style: preserve-3d;
@@ -134,11 +136,11 @@
   border-radius: 8px 15px 15px 8px;
   border: 1px solid rgba(92, 74, 67, 0.18);
   background:
-    linear-gradient(135deg, rgba(255,255,255,.42), transparent 44%),
-    radial-gradient(circle at 72% 18%, rgba(217,168,162,.48), transparent 26%),
-    radial-gradient(circle at 28% 80%, rgba(169,185,162,.54), transparent 30%),
-    #eee3d6;
-  box-shadow: 0 28px 70px rgba(88, 68, 56, 0.22), inset 8px 0 16px rgba(92, 74, 67, 0.07);
+    linear-gradient(135deg, rgba(255,255,255,.5), transparent 47%),
+    radial-gradient(circle at 72% 18%, rgba(215,139,135,.5), transparent 34%),
+    radial-gradient(circle at 28% 80%, rgba(137,166,143,.46), transparent 35%),
+    #efe0d2;
+  box-shadow: 0 34px 78px rgba(88, 68, 56, .29), inset 8px 0 16px rgba(92, 74, 67, .1);
   overflow: hidden;
   backface-visibility: hidden;
 }
@@ -147,8 +149,11 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: url('/themes/watercolor-storybook/floral-corner.svg') top right / 76% auto no-repeat;
-  opacity: 0.76;
+  background:
+    url('/themes/watercolor-storybook/floral-corner.svg') top right / 94% auto no-repeat,
+    url('/themes/watercolor-storybook/floral-corner.svg') bottom left / 72% auto no-repeat;
+  opacity: .88;
+  filter: saturate(1.5);
 }
 
 .wsb-book-cover::after {
@@ -164,15 +169,16 @@
 
 .wsb-cover-frame {
   position: absolute;
-  inset: 34px 28px;
+  inset: 38px 32px;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  border: 1px solid rgba(92, 74, 67, 0.24);
+  border: 1px solid rgba(92, 74, 67, .4);
   padding: 26px 18px;
+  background: rgba(255, 250, 242, .32);
 }
 
 .wsb-cover-frame::before,
@@ -203,7 +209,7 @@
 .wsb-cover-frame h1 {
   margin: 16px 0 5px;
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(38px, 10vw, 58px);
+  font-size: clamp(48px, 8vw, 76px);
   font-weight: 500;
   line-height: 0.9;
 }
@@ -254,12 +260,12 @@
   position: relative;
   min-height: 100dvh;
   background:
-    radial-gradient(circle at 10% 18%, rgba(217,168,162,.14), transparent 23%),
-    radial-gradient(circle at 90% 42%, rgba(191,209,217,.18), transparent 28%),
+    radial-gradient(circle at 10% 18%, rgba(217,168,162,.23), transparent 30%),
+    radial-gradient(circle at 90% 42%, rgba(191,209,217,.25), transparent 34%),
     var(--wsb-paper);
 }
 
-.wsb-story-wash { position: fixed; opacity: .28; z-index: 0; }
+.wsb-story-wash { position: fixed; opacity: .44; z-index: 0; }
 .wsb-story > *:not(.wsb-story-wash) { position: relative; z-index: 3; }
 
 .wsb-page-spread {
@@ -482,9 +488,9 @@
 
 @media (max-width: 520px) {
   .wsb-opening { padding-top: 22px; }
-  .wsb-book-stage { width: min(76vw, 292px); }
+  .wsb-book-stage { width: min(82vw, 340px, 48dvh); }
   .wsb-cover-frame { inset: 28px 23px; }
-  .wsb-floral-top, .wsb-floral-bottom { width: 78vw; }
+  .wsb-floral-top, .wsb-floral-bottom { width: 88vw; }
   .wsb-page { padding: 44px 24px; }
   .wsb-page-left { min-height: 500px; }
   .wsb-hero-names { margin-top: 96px; font-size: clamp(54px,17vw,76px); }
