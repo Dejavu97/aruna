@@ -8,6 +8,7 @@ import { canUseFeature, requiredPackage } from '../shared/package-access.js';
 import { validateCheckIns } from './_check-in-validation.js';
 import { guestCheckInToken, verifyGuestCheckInToken } from './_check-in-token.js';
 import { randomUUID } from 'node:crypto';
+import { assertInvitationNameLengths } from '../shared/invitation-names.js';
 
 const RESTRICTED_UPDATES = {
   guests: 'guestList',
@@ -98,6 +99,7 @@ export default async function handler(req, res) {
       })
       return res.status(200).json({ success: true, ...result })
     }
+    assertInvitationNameLengths(payload)
     let existingInvitation = null
     if (!isAdmin) {
       existingInvitation = await docRef.get()

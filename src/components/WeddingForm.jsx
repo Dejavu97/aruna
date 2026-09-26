@@ -9,6 +9,7 @@ import Invitation from '../invitation/Invitation'
 import { slugify } from '../lib/utils'
 import { useAuth } from '../context/AuthContext'
 import { googleAuthErrorMessage } from '../lib/google-auth-error'
+import { MAX_INVITATION_NAME_LENGTH } from '../../shared/invitation-names.js'
 import { Sparkles, RotateCcw, Wand2, Globe, CheckCircle2 } from 'lucide-react'
 
 const emptyEvent = () => ({
@@ -416,12 +417,13 @@ export default function InvitationForm({
               <Field
                 label={formConfig.person1NickLabel}
                 value={form.bride.nick}
+                maxLength={MAX_INVITATION_NAME_LENGTH}
                 onChange={(v) => update('bride.nick', v)}
                 hint={formConfig.person1NickHint}
               />
               <div className="grid gap-4 sm:grid-cols-4">
                 <div className="sm:col-span-3">
-                  <Field label={formConfig.person1FullLabel} value={form.bride.full} onChange={(v) => update('bride.full', v)} />
+                  <Field label={formConfig.person1FullLabel} value={form.bride.full} maxLength={MAX_INVITATION_NAME_LENGTH} onChange={(v) => update('bride.full', v)} />
                 </div>
                 {formConfig.mode !== 'love-letter' && (
                   <div className="sm:col-span-1">
@@ -434,7 +436,7 @@ export default function InvitationForm({
                   <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">{formConfig.parentsLabel || 'Orang tua'}</p>
                   <div className="grid gap-4 sm:grid-cols-4">
                     <div className="sm:col-span-3">
-                      <Field label="Nama Bapak / Penyelenggara 1" value={form.bride.fatherName} onChange={(v) => update('bride.fatherName', v)} />
+                      <Field label="Nama Bapak / Penyelenggara 1" value={form.bride.fatherName} maxLength={MAX_INVITATION_NAME_LENGTH} onChange={(v) => update('bride.fatherName', v)} />
                     </div>
                     <div className="sm:col-span-1">
                       <Field label="Gelar" value={form.bride.fatherDegree} onChange={(v) => update('bride.fatherDegree', v)} />
@@ -442,7 +444,7 @@ export default function InvitationForm({
                   </div>
                   <div className="mt-3 grid gap-4 sm:grid-cols-4">
                     <div className="sm:col-span-3">
-                      <Field label="Nama Ibu / Penyelenggara 2" value={form.bride.motherName} onChange={(v) => update('bride.motherName', v)} />
+                      <Field label="Nama Ibu / Penyelenggara 2" value={form.bride.motherName} maxLength={MAX_INVITATION_NAME_LENGTH} onChange={(v) => update('bride.motherName', v)} />
                     </div>
                     <div className="sm:col-span-1">
                       <Field label="Gelar" value={form.bride.motherDegree} onChange={(v) => update('bride.motherDegree', v)} />
@@ -471,10 +473,10 @@ export default function InvitationForm({
 
             {formConfig.showPerson2 && (
               <Pair title={formConfig.person2Title}>
-                <Field label="Nama panggilan" value={form.groom.nick} onChange={(v) => update('groom.nick', v)} />
+                <Field label="Nama panggilan" value={form.groom.nick} maxLength={MAX_INVITATION_NAME_LENGTH} onChange={(v) => update('groom.nick', v)} />
                 <div className="grid gap-4 sm:grid-cols-4">
                   <div className="sm:col-span-3">
-                    <Field label="Nama lengkap" value={form.groom.full} onChange={(v) => update('groom.full', v)} />
+                    <Field label="Nama lengkap" value={form.groom.full} maxLength={MAX_INVITATION_NAME_LENGTH} onChange={(v) => update('groom.full', v)} />
                   </div>
                   <div className="sm:col-span-1">
                     <Field label="Gelar" value={form.groom.degree} onChange={(v) => update('groom.degree', v)} hint="S.T., M.Sc." />
@@ -485,7 +487,7 @@ export default function InvitationForm({
                     <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-stone">Orang tua</p>
                     <div className="grid gap-4 sm:grid-cols-4">
                       <div className="sm:col-span-3">
-                        <Field label="Nama Bapak" value={form.groom.fatherName} onChange={(v) => update('groom.fatherName', v)} />
+                        <Field label="Nama Bapak" value={form.groom.fatherName} maxLength={MAX_INVITATION_NAME_LENGTH} onChange={(v) => update('groom.fatherName', v)} />
                       </div>
                       <div className="sm:col-span-1">
                         <Field label="Gelar Bapak" value={form.groom.fatherDegree} onChange={(v) => update('groom.fatherDegree', v)} />
@@ -493,7 +495,7 @@ export default function InvitationForm({
                     </div>
                     <div className="mt-3 grid gap-4 sm:grid-cols-4">
                       <div className="sm:col-span-3">
-                        <Field label="Nama Ibu" value={form.groom.motherName} onChange={(v) => update('groom.motherName', v)} />
+                        <Field label="Nama Ibu" value={form.groom.motherName} maxLength={MAX_INVITATION_NAME_LENGTH} onChange={(v) => update('groom.motherName', v)} />
                       </div>
                       <div className="sm:col-span-1">
                         <Field label="Gelar Ibu" value={form.groom.motherDegree} onChange={(v) => update('groom.motherDegree', v)} />
@@ -853,6 +855,7 @@ export default function InvitationForm({
               <Field
                 label="Nama pemesan"
                 value={form.customerName}
+                maxLength={MAX_INVITATION_NAME_LENGTH}
                 onChange={(v) => update('customerName', v)}
               />
               <Field
@@ -975,12 +978,13 @@ function Pair({ title, children }) {
   )
 }
 
-function Field({ label, value, onChange, type = 'text', hint }) {
+function Field({ label, value, onChange, type = 'text', hint, maxLength }) {
   return (
     <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-stone">
       {label}
       <input
         type={type}
+        maxLength={maxLength}
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         className="w-full min-w-0 border border-ink/15 bg-ivory px-3 py-2.5 text-base normal-case tracking-normal text-ink"

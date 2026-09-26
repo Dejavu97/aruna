@@ -4,6 +4,7 @@ import { getClientIp, verifyPrivilegedAdmin } from './_auth.js'
 import { buildCloudinaryUploadAuthorization, createUploadCapability } from './_cloudinary-upload.js'
 import { createNotificationProof } from './_notification-proof.js'
 import { resolveOrderPackage } from './_package-pricing.js'
+import { assertInvitationNameLengths } from '../shared/invitation-names.js'
 import {
   buildCreationRecords,
   createInvitationRecords,
@@ -48,6 +49,7 @@ function validatePayload(payload, { requireCustomer = true } = {}) {
   if (Buffer.byteLength(JSON.stringify(payload), 'utf8') > MAX_PAYLOAD_BYTES) {
     throw Object.assign(new Error('Payload undangan terlalu besar.'), { status: 413 })
   }
+  assertInvitationNameLengths(payload)
   if (!payload.themeId || !payload.bride?.nick || !payload.date) {
     throw Object.assign(new Error('Tema, nama utama, dan tanggal wajib diisi.'), { status: 400 })
   }

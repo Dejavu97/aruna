@@ -115,7 +115,7 @@ export default function Edit() {
           <p className="text-xs uppercase tracking-[0.28em] text-gold-deep">Revisi</p>
           <h1 className="mt-2 font-display text-4xl">Masukkan kode edit</h1>
           <p className="mt-3 text-sm text-stone">
-            Kode ada di halaman sukses setelah undangan dibuat. Admin bisa pakai kata sandi admin.
+            Masukkan kode edit yang Anda simpan saat membuat undangan. Admin masuk melalui halaman admin.
           </p>
           {loading && <p className="mt-6 text-sm">Membuka…</p>}
           <form
