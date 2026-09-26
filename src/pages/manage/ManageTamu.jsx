@@ -1,9 +1,12 @@
 import { shareWaLink } from '../../data/site'
+import { useState } from 'react'
+import GuestCheckInQr from './GuestCheckInQr'
 import {
   Bell,
   Copy,
   Download,
   Search,
+  QrCode,
   Send,
   Share2,
   Trash2,
@@ -24,6 +27,7 @@ export default function ManageTamu({ allowed,
   filteredGuests,
   guestSearch,
   guests,
+  savedGuests = [],
   guestsWithRsvp,
   hadirCount,
   handleFileUpload,
@@ -48,6 +52,7 @@ export default function ManageTamu({ allowed,
   unconfirmedCount,
   waReminderTemplate,
   waTemplate  }) {
+  const [qrGuest, setQrGuest] = useState(null)
   return (
 
           <div className="grid gap-8">
@@ -293,6 +298,13 @@ export default function ManageTamu({ allowed,
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.14em]">
+                          {allowed('checkIn') && savedGuests.includes(g.raw) ? (
+                            <button type="button" onClick={() => setQrGuest(g)} className="inline-flex items-center gap-1.5 border border-gold/40 px-3 py-2 text-gold-deep hover:bg-gold/10">
+                              <QrCode size={13} /> Lihat QR tamu
+                            </button>
+                          ) : !locked && !allowed('checkIn') ? (
+                            <a href="#upgrade" className="inline-flex items-center gap-1.5 border border-gold/40 px-3 py-2 text-gold-deep"><QrCode size={13} /> QR tamu · Lengkap</a>
+                          ) : null}
                           <a
                             href={shareWaLink(msg, g.phone)}
                             onClick={(event) => { if (locked) event.preventDefault() }}
@@ -354,6 +366,7 @@ export default function ManageTamu({ allowed,
                 </div>
               </div>
             )}
+            {qrGuest && <GuestCheckInQr slug={slug} guest={qrGuest} onClose={() => setQrGuest(null)} />}
           </div>
   )
 }

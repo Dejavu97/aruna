@@ -426,6 +426,7 @@ export default function Manage() {
             filteredGuests={filteredGuests}
             guestSearch={guestSearch}
             guests={guests}
+            savedGuests={item?.guests || []}
             guestsWithRsvp={guestsWithRsvp}
             hadirCount={hadirCount}
             handleFileUpload={handleFileUpload}
