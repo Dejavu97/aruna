@@ -29,6 +29,8 @@ export default async function handler(req, res) {
     }
 
     switch (action) {
+      case 'verify':
+        return res.status(200).json({ success: true });
       // ---- VOUCHERS ----
       case 'setVoucher': {
         if (!code || typeof code !== 'string') {

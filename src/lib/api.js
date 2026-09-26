@@ -219,6 +219,17 @@ async function adminApiCall(body) {
   return data
 }
 
+export async function verifyAdminAccess() {
+  const creds = await getAdminCredentials()
+  if (!Object.keys(creds).length) return false
+  const res = await fetch('/api/admin-settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'verify', ...creds }),
+  })
+  return res.ok
+}
+
 export { uploadFile } from './api-uploads'
 
 export async function createInvitation(payload) {

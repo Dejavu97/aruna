@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatRupiah, getPackagesByEventType } from '../data/site'
-import { fetchDynamicPackages } from '../lib/api'
+import { fetchDynamicPackages, verifyAdminAccess } from '../lib/api'
 import { getTheme, themes, getThemeFeatures, getFormMode } from '../data/themes'
 import { getDummyWeddingData } from '../data/dummyData'
 import MediaUpload from './MediaUpload'
@@ -94,6 +94,14 @@ export default function InvitationForm({
   const { user, loginWithGoogle } = useAuth()
   const [googleError, setGoogleError] = useState('')
   const [connectingGoogle, setConnectingGoogle] = useState(false)
+  const [adminVerified, setAdminVerified] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    setAdminVerified(false)
+    verifyAdminAccess().then((allowed) => { if (active) setAdminVerified(allowed) }).catch(() => {})
+    return () => { active = false }
+  }, [user])
 
   async function handleGoogleConnect() {
     setGoogleError('')
@@ -340,16 +348,16 @@ export default function InvitationForm({
 
       <form onSubmit={submit} className="border border-ink/10 bg-paper p-5 md:p-8">
         {/* Quick Auto-Fill Helper Bar */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-sm bg-gold/10 border border-gold-deep/30 p-3">
-          <div className="flex items-center gap-2.5">
+        <div className={`mb-6 flex flex-wrap items-center justify-between gap-3 rounded-sm border p-3 ${adminVerified ? 'bg-gold/10 border-gold-deep/30' : 'bg-ivory/50 border-ink/10'}`}>
+          {adminVerified && <div className="flex items-center gap-2.5">
             <Wand2 size={16} className="text-gold-deep shrink-0" />
             <div>
               <p className="text-xs font-bold text-ink">Mode Pengujian Cepat (Admin / Review)</p>
               <p className="text-[10px] text-stone">Isi seluruh data contoh yang lengkap &amp; estetik sesuai tema dalam 1-klik.</p>
             </div>
-          </div>
+          </div>}
           <div className="flex items-center gap-2">
-            <button
+            {adminVerified && <button
               type="button"
               onClick={() => {
                 const dummy = {
@@ -362,7 +370,7 @@ export default function InvitationForm({
               className="bg-gold-deep text-ivory px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-xs hover:bg-gold transition-colors inline-flex items-center gap-1.5 shadow-xs"
             >
               <Sparkles size={13} /> Auto-Fill Data Dummy
-            </button>
+            </button>}
             <button
               type="button"
               onClick={() => {
