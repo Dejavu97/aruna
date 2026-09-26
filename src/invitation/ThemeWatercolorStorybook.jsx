@@ -24,6 +24,7 @@ import './ThemeWatercolorStorybook.css'
 const ART = {
   wash: '/themes/watercolor-storybook/wash.svg',
   floral: '/themes/watercolor-storybook/floral-corner.svg',
+  bouquet: '/themes/watercolor-storybook/foreground-bouquet.webp',
 }
 
 const DEFAULT_STORY = [
@@ -317,6 +318,7 @@ export default function ThemeWatercolorStorybook({ data, guest = '', preview = f
                 <div className="wsb-hero-art">
                   {gallery[0] ? <img src={gallery[0]} alt={`Momen ${couple}`} /> : <div className="wsb-photo-placeholder"><Heart size={46} /></div>}
                   <span className="wsb-watercolor-blob" aria-hidden="true" />
+                  <img className="wsb-foreground-bouquet" src={ART.bouquet} alt="" aria-hidden="true" />
                 </div>
                 <blockquote>{data.quote || 'Setiap kisah indah memiliki awal. Dan inilah halaman baru yang ingin kami tulis bersama.'}</blockquote>
                 {data.quoteSource && <cite>{data.quoteSource}</cite>}
@@ -364,6 +366,7 @@ export default function ThemeWatercolorStorybook({ data, guest = '', preview = f
                   <Reveal key={`${chapter.year}-${index}`} className={`wsb-chapter ${index % 2 ? 'is-reverse' : ''}`} delay={index * 0.04}>
                     <div className="wsb-chapter-art">
                       {chapter.image ? <img src={chapter.image} alt="" /> : <div className="wsb-chapter-paint"><Sparkles size={28} /></div>}
+                      <img className="wsb-chapter-foreground" src={ART.bouquet} alt="" aria-hidden="true" loading="lazy" />
                     </div>
                     <div className="wsb-chapter-copy">
                       <span className="wsb-chapter-index">Chapter {String(index + 1).padStart(2, '0')}</span>
