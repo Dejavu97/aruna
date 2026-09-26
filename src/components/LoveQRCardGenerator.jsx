@@ -29,7 +29,7 @@ const CARD_TEMPLATES = [
   },
 ]
 
-export default function LoveQRCardGenerator({ invitationUrl, names = 'Sarah & Budi', date = '' }) {
+export default function LoveQRCardGenerator({ invitationUrl, names = 'Sarah & Budi', date = '', locked = false }) {
   const [selectedTemplate, setSelectedTemplate] = useState('love_heart')
   const [cardFormat, setCardFormat] = useState('square')
   const [qrStyle, setQrStyle] = useState('dots')
@@ -170,9 +170,9 @@ export default function LoveQRCardGenerator({ invitationUrl, names = 'Sarah & Bu
           <ShieldCheck size={14} className="text-gold-deep" />
           <span>Gambar beresolusi tinggi siap dikirim atau dicetak.</span>
         </div>
-        <button type="button" onClick={handleDownloadCard} disabled={downloading}
+        <button type="button" onClick={handleDownloadCard} disabled={downloading || locked}
           className="inline-flex items-center gap-2 bg-gold-deep text-ivory px-6 py-3 text-xs uppercase tracking-widest font-bold hover:bg-gold transition-colors shadow-xs">
-          <Download size={15} /> {downloading ? 'Memproses Kartu...' : 'Download Kartu QR (PNG)'}
+          <Download size={15} /> {locked ? 'Download tersedia di paket Lengkap' : downloading ? 'Memproses Kartu...' : 'Download Kartu QR (PNG)'}
         </button>
       </div>
     </div>

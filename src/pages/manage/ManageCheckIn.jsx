@@ -10,6 +10,7 @@ import { copyText } from '../../lib/utils'
 
 /** ManageCheckIn — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageCheckIn({ checkInFilter,
+  locked = false,
   checkInSearch,
   checkedInCount,
   exportCheckInCSV,
@@ -38,6 +39,7 @@ export default function ManageCheckIn({ checkInFilter,
                   <button
                     type="button"
                     onClick={() => setShowScanner(true)}
+                    disabled={locked}
                     className="inline-flex items-center gap-2 bg-gold-deep text-ivory px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-gold transition-colors font-medium shadow-sm"
                   >
                     <Camera size={15} /> Scan QR Kamera
@@ -46,6 +48,7 @@ export default function ManageCheckIn({ checkInFilter,
                     <button
                       type="button"
                       onClick={exportCheckInCSV}
+                      disabled={locked}
                       className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
                     >
                       <Download size={14} /> Download Rekap (CSV)
@@ -134,7 +137,9 @@ export default function ManageCheckIn({ checkInFilter,
             <div className="grid gap-3">
               {filteredCheckInGuests.length === 0 ? (
                 <div className="border border-ink/10 bg-paper p-8 text-center text-sm text-stone">
-                  Tidak ada tamu yang sesuai pencarian atau filter.
+                  {locked && guestsWithCheckIn.length === 0
+                    ? 'Contoh alur: tamu menunjukkan QR saat tiba, petugas memindai, lalu status hadir dan jumlah orang otomatis tercatat di buku tamu.'
+                    : 'Tidak ada tamu yang sesuai pencarian atau filter.'}
                 </div>
               ) : (
                 filteredCheckInGuests.map((g) => {
@@ -182,6 +187,7 @@ export default function ManageCheckIn({ checkInFilter,
                           <button
                             type="button"
                             onClick={() => toggleCheckIn(g.name)}
+                            disabled={locked}
                             className="inline-flex items-center gap-1.5 border border-red-300 text-red-700 bg-red-50/50 px-3 py-2 text-xs uppercase tracking-widest hover:bg-red-100"
                           >
                             <UserX size={12} /> Batalkan
@@ -190,6 +196,7 @@ export default function ManageCheckIn({ checkInFilter,
                           <button
                             type="button"
                             onClick={() => toggleCheckIn(g.name, g.rsvp?.guests || 1)}
+                            disabled={locked}
                             className="inline-flex items-center gap-1.5 bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-widest hover:bg-gold-deep transition-colors"
                           >
                             <UserCheck size={14} /> Check-In

@@ -2,6 +2,7 @@ import { copyText } from '../../lib/utils'
 
 /** ManageDomain — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageDomain({ customDomain,
+  locked = false,
   editKey,
   error,
   item,
@@ -31,6 +32,7 @@ export default function ManageDomain({ customDomain,
                 />
                 <button
                   type="button"
+                  disabled={locked}
                   onClick={async () => {
                     if (!customDomain.trim()) return
                     setError('')
@@ -65,6 +67,7 @@ export default function ManageDomain({ customDomain,
                 {item?.customDomain && (
                   <button
                     type="button"
+                    disabled={locked}
                     onClick={async () => {
                       if (!confirm('Yakin ingin menghapus domain khusus ini?')) return
                       setError('')

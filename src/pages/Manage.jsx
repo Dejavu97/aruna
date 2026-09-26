@@ -258,13 +258,13 @@ export default function Manage() {
                 Edit data
               </Link>
             )}
-            {allowed('printCard') ? <button
+            <button
               type="button"
               onClick={() => setShowPrintCardModal(true)}
               className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep px-3 py-2 font-semibold inline-flex items-center gap-1 hover:bg-gold-deep hover:text-white transition-colors"
             >
               <QrCode size={13} /> Kartu Souvenir &amp; QR
-            </button> : <a href="#upgrade" className="border border-gold/40 px-3 py-2 text-gold-deep inline-flex items-center gap-1"><Lock size={12} /> Kartu Souvenir · Lengkap</a>}
+            </button>
             <button type="button" onClick={reload} className="border border-ink/20 px-3 py-2 hover:bg-ink/5 transition-colors">
               Segarkan
             </button>
@@ -323,11 +323,12 @@ export default function Manage() {
         </div>
 
         <div className="mt-6">
-          {tab === 'love_qr' && !allowed('printCard') && <ManageFeatureLock feature="printCard" title="Kartu QR Cinta & Kado" />}
-          {tab === 'love_qr' && allowed('printCard') && (
+          {tab === 'love_qr' && !allowed('printCard') && <ManageFeatureLock feature="printCard" title="Kartu QR Cinta & Kado" preview />}
+          {tab === 'love_qr' && (
             <ManageLoveQr
             item={item}
             slug={slug}
+            locked={!allowed('printCard')}
             />
           )}
           {tab === 'ringkas' && (
@@ -362,9 +363,10 @@ export default function Manage() {
             text={text}
             />
           )}
-          {tab === 'checkin' && !allowed('checkIn') && <ManageFeatureLock feature="checkIn" title="QR check-in lokasi" />}
-          {tab === 'checkin' && allowed('checkIn') && (
+          {tab === 'checkin' && !allowed('checkIn') && <ManageFeatureLock feature="checkIn" title="QR check-in lokasi" preview />}
+          {tab === 'checkin' && (
             <ManageCheckIn
+            locked={!allowed('checkIn')}
             checkInFilter={checkInFilter}
             checkInSearch={checkInSearch}
             checkedInCount={checkedInCount}
@@ -395,9 +397,10 @@ export default function Manage() {
             text={text}
             />
           )}
-          {tab === 'domain' && !allowed('domain') && <ManageFeatureLock feature="domain" title="Domain pribadi" />}
-          {tab === 'domain' && allowed('domain') && (
+          {tab === 'domain' && !allowed('domain') && <ManageFeatureLock feature="domain" title="Domain pribadi" preview />}
+          {tab === 'domain' && (
             <ManageDomain
+            locked={!allowed('domain')}
             customDomain={customDomain}
             editKey={editKey}
             error={error}
@@ -409,9 +412,10 @@ export default function Manage() {
             text={text}
             />
           )}
-          {tab === 'tamu' && !allowed('guestList') && <ManageFeatureLock feature="guestList" title="Daftar tamu & WhatsApp" />}
-          {tab === 'tamu' && allowed('guestList') && (
+          {tab === 'tamu' && !allowed('guestList') && <ManageFeatureLock feature="guestList" title="Daftar tamu & WhatsApp" preview />}
+          {tab === 'tamu' && (
             <ManageTamu
+            locked={!allowed('guestList')}
             allowed={allowed}
             composeMessage={composeMessage}
             copied={copied}
@@ -469,6 +473,7 @@ export default function Manage() {
       {showPrintCardModal && item && (
         <PrintCardModal
           item={item}
+          locked={!allowed('printCard')}
           uploadContext={isAdmin ? { adminKey: getAdminKey() } : { slug, editKey }}
           onClose={() => setShowPrintCardModal(false)}
         />

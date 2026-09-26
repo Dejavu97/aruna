@@ -157,7 +157,7 @@ export default function ManageRingkas({ allowed,
                   </p>
                   {!watermarkPremiumEnabled && (
                     <p className="text-xs font-semibold text-amber-800">
-                      White label tersedia di paket VIP Exclusive setelah pembayaran dikonfirmasi.
+                      Coba pilih mode branding di bawah. Simpan branding tersedia setelah paket VIP Exclusive aktif.
                     </p>
                   )}
                 </div>
@@ -179,13 +179,11 @@ export default function ManageRingkas({ allowed,
                   ['custom', 'White-Label Kustom', 'Menampilkan nama brand / WO / Fotografer Anda'],
                   ['hidden', 'Sembunyikan Total', '100% Bersih tanpa teks watermark sama sekali'],
                 ].map(([modeVal, modeTitle, modeDesc]) => {
-                  const premiumMode = modeVal !== 'default'
                   return (
                     <button
                       key={modeVal}
                       type="button"
                       onClick={() => setWatermarkMode(modeVal)}
-                      disabled={premiumMode && !watermarkPremiumEnabled}
                       className={`p-3 border text-left rounded-xs transition-colors space-y-1 disabled:cursor-not-allowed disabled:opacity-50 ${
                         watermarkMode === modeVal
                           ? 'border-gold-deep bg-gold/10 font-semibold text-ink shadow-xs'
@@ -199,7 +197,7 @@ export default function ManageRingkas({ allowed,
                 })}
               </div>
 
-              {watermarkPremiumEnabled && watermarkMode === 'custom' && (
+              {watermarkMode === 'custom' && (
                 <div className="grid sm:grid-cols-2 gap-3 pt-2 text-xs bg-ivory/50 p-3.5 border border-ink/10 rounded-xs animate-in fade-in">
                   <div>
                     <label className="block uppercase tracking-wider text-stone font-semibold mb-1">

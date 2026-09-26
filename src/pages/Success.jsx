@@ -8,6 +8,7 @@ import { formatRupiah, getOrderPackage, waLink } from '../data/site'
 import AdSlot from '../components/AdSlot'
 import LoveQRCardGenerator from '../components/LoveQRCardGenerator'
 import { CheckCircle2, AlertTriangle } from 'lucide-react'
+import { canUseFeature } from '../../shared/package-access.js'
 
 export default function Success() {
   const { slug } = useParams()
@@ -109,6 +110,7 @@ Mohon dicek pembayarannya.`
         {/* Aesthetic Love QR Card & Physical Gift Card Generator */}
         <div className="mt-8">
           <LoveQRCardGenerator
+            locked={!canUseFeature(data, 'printCard')}
             invitationUrl={url}
             names={heroNames}
             eventType={data?.eventType || 'birthday'}

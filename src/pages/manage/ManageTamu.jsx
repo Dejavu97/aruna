@@ -14,6 +14,7 @@ import Stat from './Stat'
 
 /** ManageTamu — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
 export default function ManageTamu({ allowed,
+  locked = false,
   composeMessage,
   copied,
   copiedMsg,
@@ -58,7 +59,7 @@ export default function ManageTamu({ allowed,
                   <h2 className="mt-1 font-display text-2xl">Daftar Tamu, RSVP &amp; Pengingat</h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  {allowed('csv') ? <label className="inline-flex cursor-pointer items-center gap-2 border border-ink bg-ink px-4 py-2.5 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep transition-colors">
+                  {allowed('csv') && !locked ? <label className="inline-flex cursor-pointer items-center gap-2 border border-ink bg-ink px-4 py-2.5 text-xs uppercase tracking-widest text-ivory hover:bg-gold-deep transition-colors">
                     <Upload size={14} /> Import File (CSV / TXT)
                     <input
                       type="file"
@@ -69,7 +70,7 @@ export default function ManageTamu({ allowed,
                   </label> : <a href="#upgrade" className="border border-gold/40 px-4 py-2.5 text-xs text-gold-deep">Import CSV · Hemat</a>}
                   {parsedGuests.length > 0 && (
                     <>
-                      {allowed('csv') ? <button
+                      {allowed('csv') && !locked ? <button
                         type="button"
                         onClick={exportGuestsCSV}
                         className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
@@ -79,6 +80,7 @@ export default function ManageTamu({ allowed,
                       <button
                         type="button"
                         onClick={copyAllMessages}
+                        disabled={locked}
                         className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
                       >
                         <Copy size={14} /> {copied === 'all' ? 'Semua Tersalin!' : messageMode === 'reminder' ? 'Salin Semua Reminder' : 'Salin Semua Pesan'}
@@ -172,6 +174,7 @@ export default function ManageTamu({ allowed,
                   <button
                     type="button"
                     onClick={save}
+                    disabled={locked}
                     className="bg-ink px-6 py-3 text-xs uppercase tracking-[0.16em] text-ivory hover:bg-gold-deep transition-colors"
                   >
                     Simpan Perubahan
@@ -188,6 +191,13 @@ export default function ManageTamu({ allowed,
             </div>
 
             {/* Guest Search & Filter Tabs */}
+            {locked && parsedGuests.length === 0 && (
+              <div className="border border-gold/30 bg-paper p-5 text-sm">
+                <p className="text-xs uppercase tracking-widest text-gold-deep">Contoh tampilan daftar tamu</p>
+                <p className="mt-2 font-display text-xl">Bapak Budi &amp; Istri</p>
+                <p className="mt-1 text-stone">Tautan undangan personal, status RSVP, pesan WhatsApp, dan pengingat akan muncul di sini setelah daftar disimpan.</p>
+              </div>
+            )}
             {parsedGuests.length > 0 && (
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
@@ -285,6 +295,7 @@ export default function ManageTamu({ allowed,
                         <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.14em]">
                           <a
                             href={shareWaLink(msg, g.phone)}
+                            onClick={(event) => { if (locked) event.preventDefault() }}
                             target="_blank"
                             rel="noreferrer"
                             className={`inline-flex items-center gap-1.5 px-3 py-2 text-ivory transition-colors ${
@@ -303,6 +314,7 @@ export default function ManageTamu({ allowed,
                           </a>
                           <button
                             type="button"
+                            disabled={locked}
                             onClick={async () => {
                               if (await copyText(url)) {
                                 setCopied(g.name)
@@ -315,6 +327,7 @@ export default function ManageTamu({ allowed,
                           </button>
                           <button
                             type="button"
+                            disabled={locked}
                             onClick={async () => {
                               if (await copyText(msg)) {
                                 setCopiedMsg(g.name)
@@ -327,6 +340,7 @@ export default function ManageTamu({ allowed,
                           </button>
                           <button
                             type="button"
+                            disabled={locked}
                             onClick={() => removeGuest(g.raw)}
                             className="inline-flex items-center p-2 text-stone hover:text-red-700 border border-transparent hover:border-red-200"
                             title="Hapus tamu"

@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 /** PrintCardControls — sidebar kontrol kartu (diekstrak verbatim, Fase 3d). */
 export default function PrintCardControls({ activeTab,
+  locked = false,
   bgOverlayOpacity,
   bgTexturePresets,
   bgTextureUrl,
@@ -498,6 +499,7 @@ export default function PrintCardControls({ activeTab,
             <button
               type="button"
               onClick={downloadQrCode}
+              disabled={locked}
               className="text-xs text-gold-deep hover:underline font-semibold inline-flex items-center gap-1"
             >
               <Download size={13} /> Download QR PNG HD
@@ -520,4 +522,3 @@ export default function PrintCardControls({ activeTab,
     </>
   )
 }
-

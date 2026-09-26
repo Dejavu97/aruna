@@ -20,7 +20,7 @@ const PREVIEW_PAGE = {
   landscape: { widthMm: 297, heightMm: 210, maxWidthPx: 620 },
 }
 
-export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
+export default function PrintCardModal({ item, onClose, uploadContext = {}, locked = false }) {
   const [cardType, setCardType] = useState('souvenir') // 'souvenir' | 'enclosure' | 'table' | 'bifold'
   const [themeStyle, setThemeStyle] = useState('gold-ivory') // 'gold-ivory' | 'monochrome' | 'sage-green' | 'royal-navy'
   const [activeTab, setActiveTab] = useState('text') // 'text' | 'image' | 'table'
@@ -269,7 +269,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
       }
       reader.readAsDataURL(file)
 
-      uploadFile(file, uploadContext).then((res) => {
+      if (!locked) uploadFile(file, uploadContext).then((res) => {
         if (type === 'photo') setPhotoUrl(res.url)
         else if (type === 'bifold-bride') setBifoldBridePhotoUrl(res.url)
         else if (type === 'bifold-groom') setBifoldGroomPhotoUrl(res.url)
@@ -613,7 +613,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
   const itemsPerSheet = getItemsPerSheet()
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto print:p-0 print:bg-white print:fixed print:inset-0">
+    <div className={`fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto print:p-0 print:bg-white print:fixed print:inset-0 ${locked ? 'print-card-locked' : ''}`}>
       
       {/* ---------------------------------------------------- */}
       {/* 100% AUTO-FIT A4 PRINT CSS RULES                     */}
@@ -946,6 +946,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
         }
 
         @media print {
+          .print-card-locked .print-page-group { display: none !important; }
           @page {
             size: ${cardType === 'bifold' ? 'A4 landscape' : 'A4 portrait'};
             margin: 0;
@@ -1067,10 +1068,11 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
 
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={() => { if (!locked) window.print() }}
+              disabled={locked}
               className="bg-ink text-ivory px-4 py-2 text-xs uppercase tracking-wider font-bold hover:bg-gold-deep transition-colors inline-flex items-center gap-1.5 shadow-xs"
             >
-              <Printer size={14} /> Cetak Lembar A4 (PDF)
+              <Printer size={14} /> {locked ? 'Cetak tersedia di paket Lengkap' : 'Cetak Lembar A4 (PDF)'}
             </button>
 
             <button
@@ -1088,6 +1090,7 @@ export default function PrintCardModal({ item, onClose, uploadContext = {} }) {
           
         {/* Controls Sidebar (extracted to PrintCardControls — Fase 3d) */}
         <PrintCardControls
+          locked={locked}
           activeTab={activeTab}
           bgOverlayOpacity={bgOverlayOpacity}
           bgTexturePresets={bgTexturePresets}

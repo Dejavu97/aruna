@@ -2,11 +2,12 @@ import LoveQRCardGenerator from '../../components/LoveQRCardGenerator'
 import { copyText, invitationUrl } from '../../lib/utils'
 
 /** ManageLoveQr — diekstrak verbatim dari Manage.jsx (Fase 3c, perilaku identik). */
-export default function ManageLoveQr({ item, slug }) {
+export default function ManageLoveQr({ item, slug, locked = false }) {
   return (
 
           <div className="space-y-6">
             <LoveQRCardGenerator
+              locked={locked}
               invitationUrl={invitationUrl(slug)}
               names={
                 item?.groom?.nick && item?.groom?.nick !== item?.bride?.nick
