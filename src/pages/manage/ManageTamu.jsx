@@ -66,7 +66,7 @@ export default function ManageTamu({ allowed,
                       className="hidden"
                       onChange={handleFileUpload}
                     />
-                  </label> : <a href="#upgrade" className="border border-gold/40 px-4 py-2.5 text-xs text-gold-deep">Import CSV · Lengkap</a>}
+                  </label> : <a href="#upgrade" className="border border-gold/40 px-4 py-2.5 text-xs text-gold-deep">Import CSV · Hemat</a>}
                   {parsedGuests.length > 0 && (
                     <>
                       {allowed('csv') ? <button
@@ -75,7 +75,7 @@ export default function ManageTamu({ allowed,
                         className="inline-flex items-center gap-2 border border-ink/20 px-4 py-2.5 text-xs uppercase tracking-widest hover:bg-ink/5"
                       >
                         <Download size={14} /> Download Excel (CSV)
-                      </button> : <a href="#upgrade" className="border border-gold/40 px-4 py-2.5 text-xs text-gold-deep">Ekspor CSV · Lengkap</a>}
+                      </button> : <a href="#upgrade" className="border border-gold/40 px-4 py-2.5 text-xs text-gold-deep">Ekspor CSV · Hemat</a>}
                       <button
                         type="button"
                         onClick={copyAllMessages}

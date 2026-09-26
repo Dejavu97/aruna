@@ -100,7 +100,7 @@ export default function ManageRingkas({ allowed,
                   className="bg-gold-deep text-ivory px-4 py-2.5 text-[11px] uppercase tracking-widest hover:bg-gold transition-colors font-medium flex items-center justify-center gap-2"
                 >
                   <Camera size={14} /> Buat Story IG &amp; Frame
-                </button> : <a href="#upgrade" className="border border-gold/40 px-4 py-2 text-[10px] text-gold-deep"><Lock size={12} className="inline" /> Story &amp; Frame · VIP</a>}
+                </button> : <a href="#upgrade" className="border border-gold/40 px-4 py-2 text-[10px] text-gold-deep"><Lock size={12} className="inline" /> Story &amp; Frame · Lengkap</a>}
                 {allowed('highResQr') ? <a
                   href={`https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(invitationUrl(slug))}&margin=10`}
                   target="_blank"
@@ -108,7 +108,7 @@ export default function ManageRingkas({ allowed,
                   className="border border-ink/20 px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-ink/5"
                 >
                   Download QR Resolusi Tinggi
-                </a> : <a href="#upgrade" className="border border-gold/40 px-4 py-2 text-[10px] text-gold-deep"><Lock size={12} className="inline" /> QR Resolusi Tinggi · Lengkap</a>}
+                </a> : <a href="#upgrade" className="border border-gold/40 px-4 py-2 text-[10px] text-gold-deep"><Lock size={12} className="inline" /> QR Resolusi Tinggi · Hemat</a>}
               </div>
             </div>
 

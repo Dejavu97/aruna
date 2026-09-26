@@ -2,14 +2,14 @@ const WEDDING_TIERS = ['gratis', 'hemat', 'lengkap', 'premium']
 
 export const FEATURE_TIERS = Object.freeze({
   guestList: 'hemat',
-  csv: 'lengkap',
+  csv: 'hemat',
   reply: 'lengkap',
   photoProtection: 'lengkap',
-  highResQr: 'lengkap',
-  checkIn: 'premium',
+  highResQr: 'hemat',
+  checkIn: 'lengkap',
   domain: 'premium',
   whiteLabel: 'premium',
-  printCard: 'premium',
+  printCard: 'lengkap',
 })
 
 export function canUseFeature(invitation, feature, isAdmin = false) {

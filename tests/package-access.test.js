@@ -9,12 +9,15 @@ test('wedding dashboard features unlock cumulatively after payment', () => {
     ['gratis', 'unpaid', [false, false, false, false]],
     ['hemat', 'unpaid', [false, false, false, false]],
     ['hemat', 'paid', [true, false, false, false]],
-    ['lengkap', 'paid', [true, true, false, false]],
+    ['lengkap', 'paid', [true, true, true, false]],
     ['premium', 'paid', [true, true, true, true]],
   ]
   for (const [packageId, status, expected] of cases) {
     const order = { packageId, status, eventType: 'wedding' }
     assert.deepEqual(['guestList', 'reply', 'checkIn', 'whiteLabel'].map((feature) => canUseFeature(order, feature)), expected)
+    assert.equal(canUseFeature(order, 'csv'), status === 'paid' && packageId !== 'gratis')
+    assert.equal(canUseFeature(order, 'highResQr'), status === 'paid' && packageId !== 'gratis')
+    assert.equal(canUseFeature(order, 'printCard'), status === 'paid' && ['lengkap', 'premium'].includes(packageId))
   }
   assert.equal(canUseFeature({ packageId: 'gratis', status: 'unpaid', eventType: 'birthday' }, 'domain'), true)
   assert.equal(canUseFeature({ packageId: 'gratis', status: 'unpaid' }, 'whiteLabel'), false)

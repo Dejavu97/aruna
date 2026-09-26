@@ -264,7 +264,7 @@ export default function Manage() {
               className="border border-gold-deep/30 bg-gold-deep/10 text-gold-deep px-3 py-2 font-semibold inline-flex items-center gap-1 hover:bg-gold-deep hover:text-white transition-colors"
             >
               <QrCode size={13} /> Kartu Souvenir &amp; QR
-            </button> : <a href="#upgrade" className="border border-gold/40 px-3 py-2 text-gold-deep inline-flex items-center gap-1"><Lock size={12} /> Kartu Souvenir · VIP</a>}
+            </button> : <a href="#upgrade" className="border border-gold/40 px-3 py-2 text-gold-deep inline-flex items-center gap-1"><Lock size={12} /> Kartu Souvenir · Lengkap</a>}
             <button type="button" onClick={reload} className="border border-ink/20 px-3 py-2 hover:bg-ink/5 transition-colors">
               Segarkan
             </button>
