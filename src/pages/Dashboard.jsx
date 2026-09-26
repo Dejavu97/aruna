@@ -7,6 +7,7 @@ import { fetchUserInvitations, getEditKey } from '../lib/api'
 import { formatLongDate, invitationUrl, isEventEditLocked } from '../lib/utils'
 import { formatRupiah, packages, getPackagesByEventType } from '../data/site'
 import { invitePath } from '../lib/nav'
+import { isInvitationActive } from '../../shared/package-access.js'
 import {
   Plus,
   ExternalLink,
@@ -189,12 +190,12 @@ export default function Dashboard() {
                           ) : (
                             <span
                               className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-xs shadow-xs ${
-                                item.status === 'paid'
+                                isInvitationActive(item)
                                   ? 'bg-green-700 text-white'
                                   : 'bg-gold-deep text-ivory'
                               }`}
                             >
-                              {item.status === 'paid' ? 'Aktif' : 'Draft / Unpaid'}
+                              {isInvitationActive(item) ? 'Aktif' : 'Draft / Unpaid'}
                             </span>
                           )}
                         </div>

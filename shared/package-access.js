@@ -25,6 +25,10 @@ export const FEATURE_TIERS = Object.freeze({
   printCard: 'lengkap',
 })
 
+export function isInvitationActive(invitation) {
+  return invitation?.status === 'paid' || invitation?.packageId === 'gratis'
+}
+
 export function canUseFeature(invitation, feature, isAdmin = false) {
   if (isAdmin || (invitation?.eventType || 'wedding') !== 'wedding') return true
   const needed = WEDDING_TIERS.indexOf(FEATURE_TIERS[feature])

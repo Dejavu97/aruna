@@ -74,7 +74,7 @@ export function blankInvitation(themeId, customThemes = []) {
     customerNote: '',
     voucher: '',
     customDomain: false,
-    packageId: 'lengkap',
+    packageId: 'gratis',
   }
 }
 
@@ -183,6 +183,9 @@ export default function InvitationForm({
         setForm({
           ...fresh,
           ...draft,
+          // Older drafts inherited Lengkap as the default. Preserve paid
+          // choices only when the customer explicitly selected the package.
+          packageId: draft._packageChoiceExplicit ? draft.packageId : 'gratis',
           themeId,
           eventType: fresh.eventType,
           formMode: fresh.formMode,
@@ -227,6 +230,7 @@ export default function InvitationForm({
       let cur = next
       for (let i = 0; i < keys.length - 1; i += 1) cur = cur[keys[i]]
       cur[keys.at(-1)] = value
+      if (path === 'packageId') next._packageChoiceExplicit = true
       return next
     })
   }
@@ -262,8 +266,9 @@ export default function InvitationForm({
       setStep(reviewIdx >= 0 ? reviewIdx : steps.length - 1)
       return
     }
+    const { _packageChoiceExplicit, ...formData } = form
     const payload = {
-      ...form,
+      ...formData,
       ownerUid: user?.uid || form.ownerUid || '',
       customerEmail: user?.email || form.customerEmail || '',
       customerName: form.customerName || user?.displayName || '',
@@ -271,7 +276,7 @@ export default function InvitationForm({
       slug,
       eventType: formConfig.eventType,
       formMode: formConfig.mode,
-      packageId: form.packageId || 'lengkap',
+      packageId: form.packageId || 'gratis',
       story: (form.story || []).filter((s) => s.title || s.body || s.image),
       banks: showBanks ? (form.banks || []).filter((b) => b.bank && b.number) : [],
       events: formConfig.showEvents ? (form.events || []).filter((ev) => ev.title || ev.venue || ev.address) : [],

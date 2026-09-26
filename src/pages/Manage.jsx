@@ -236,7 +236,7 @@ export default function Manage() {
             <p className="mt-2 text-sm text-stone">
               {item?.date ? formatLongDate(item.date) : ''}
               {theme ? ` · ${theme.name}` : ''}
-              {item?.status === 'paid' ? ' · Lunas' : ' · Menunggu pelunasan'}
+              {item?.packageId === 'gratis' ? ' · Paket Gratis aktif' : item?.status === 'paid' ? ' · Lunas' : ' · Menunggu pelunasan'}
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.14em]">

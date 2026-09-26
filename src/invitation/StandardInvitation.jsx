@@ -27,6 +27,7 @@ import WeddingFrameModal from '../components/WeddingFrameModal'
 import AtmosphereParticles from '../components/AtmosphereParticles'
 import AdSlot from '../components/AdSlot'
 import { resolveInvitationMusic } from './musicSource'
+import { isInvitationActive } from '../../shared/package-access.js'
 
 export function StandardInvitation({ data, guest = '', preview = false, theme }) {
   const formConfig = useMemo(() => getFormMode(theme), [theme])
@@ -48,7 +49,7 @@ export function StandardInvitation({ data, guest = '', preview = false, theme })
   // Soft gate pembayaran (lihat DATA_MODEL.md / sistem 'unpaid'):
   // undangan belum lunas tetap terbuka utk tamu, tapi fitur premium
   // (QR check-in, Frame foto) disembunyikan + banner status tampil.
-  const isUnpaid = !preview && data.status === 'unpaid'
+  const isUnpaid = !preview && data.status === 'unpaid' && !isInvitationActive(data)
   const scenes = useMemo(() => sceneMap(data, theme), [data, theme])
   const showEvents = formConfig.showEvents && features.events?.enabled !== false && (data.events || []).length > 0
   const showGift = formConfig.showBanks && ((data.banks || []).length > 0 || data.qris || data.giftAddress)

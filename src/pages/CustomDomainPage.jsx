@@ -4,6 +4,7 @@ import { getTheme } from '../data/themes'
 import { fetchInvitationByDomain } from '../lib/api'
 import { guestFromSearch } from '../lib/utils'
 import Invitation from '../invitation/Invitation'
+import { isInvitationActive } from '../../shared/package-access.js'
 
 export default function CustomDomainPage({ domain }) {
   const { search } = useLocation()
@@ -64,7 +65,7 @@ export default function CustomDomainPage({ domain }) {
   const theme = getTheme(data.themeId)
   return (
     <div>
-      {data.status === 'unpaid' && (
+      {data.status === 'unpaid' && !isInvitationActive(data) && (
         <div className="relative z-50 bg-gold px-4 py-2 text-center text-[11px] uppercase tracking-[0.16em] text-ink">
           Menunggu pelunasan — undangan sudah bisa dibuka untuk dicek
         </div>

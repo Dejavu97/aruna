@@ -1,6 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { canUseFeature, weddingUpgradeUnlocks } from '../shared/package-access.js'
+import { canUseFeature, isInvitationActive, weddingUpgradeUnlocks } from '../shared/package-access.js'
+
+test('free invitations are active even when an older record says unpaid', () => {
+  assert.equal(isInvitationActive({ packageId: 'gratis', status: 'unpaid' }), true)
+  assert.equal(isInvitationActive({ packageId: 'lengkap', packagePrice: 0, status: 'unpaid' }), false)
+  assert.equal(isInvitationActive({ packageId: 'lengkap', packagePrice: 0, status: 'paid' }), true)
+})
 import { getPackagesByEventType } from '../src/data/site.js'
 import { addDomainBoundary } from '../server/_domain-boundary.js'
 import { resolveWatermarkPresentation } from '../src/lib/watermark-authority.js'

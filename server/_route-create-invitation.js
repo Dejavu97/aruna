@@ -155,7 +155,7 @@ export default async function handler(req, res) {
       const currentPackage = await resolveOrderPackage(adminDb, payload.packageId, payload.eventType)
       records.privateData.packagePrice = currentPackage.price
       records.privateData.packageName = currentPackage.name
-      if (currentPackage.price === 0 && payload.packageId !== 'gratis') {
+      if (payload.packageId === 'gratis' || currentPackage.price === 0) {
         records.publicData.status = 'paid'
       }
     }
